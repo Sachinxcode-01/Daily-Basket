@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Google Stitch Daily Basket Design System
@@ -20,6 +20,7 @@ class AppColors {
   static const inversePrimary     = Color(0xFF70DD7A);
   static const primaryFixed       = Color(0xFF8CFA93);
   static const primaryFixedDim    = Color(0xFF70DD7A);
+  static const onPrimaryFixed     = Color(0xFF002106);
 
   // ─── Secondary ──────────────────────────────────────────────────────────
   static const secondary              = Color(0xFF58605A);
@@ -303,7 +304,7 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.black.withValues(alpha: 0.04),
         elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: radiusLg),
+        shape: const RoundedRectangleBorder(borderRadius: radiusLg),
         margin: EdgeInsets.zero,
       ),
       // ─── Chips / Tags ──────────────────────────────────────────────────
@@ -311,7 +312,7 @@ class AppTheme {
         backgroundColor: AppColors.secondaryContainer,
         selectedColor: AppColors.primaryFixed,
         labelStyle: AppTextStyles.labelMd,
-        shape: RoundedRectangleBorder(borderRadius: radiusFull),
+        shape: const RoundedRectangleBorder(borderRadius: radiusFull),
         side: BorderSide.none,
       ),
       // ─── Switch / Toggles ──────────────────────────────────────────────
@@ -335,7 +336,7 @@ class AppTheme {
         contentTextStyle: AppTextStyles.bodyLg.copyWith(
           color: AppColors.inverseOnSurface,
         ),
-        shape: RoundedRectangleBorder(borderRadius: radiusMd),
+        shape: const RoundedRectangleBorder(borderRadius: radiusMd),
         behavior: SnackBarBehavior.floating,
       ),
     );

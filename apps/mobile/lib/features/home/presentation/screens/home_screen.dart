@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/theme/app_theme.dart';
 
+/// Customer Homepage — Google Stitch Design System
+/// Ref: stitch_daily_basket_quick_commerce_suite/home_screen/ & website/app/page.tsx
+///
+/// Palette: Primary Grocery Green (#006B23), Surface (#F9F9FC), Container (#EEEEF0)
+/// Typography: Outfit (headlines/titles), Inter (body/labels)
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
 
@@ -27,94 +34,112 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: Stack(
           children: [
             CustomScrollView(
               slivers: [
-                // Top Header with Delivery Badge & Address
+                // ─── Top Header with Delivery Badge & Location ─────────────
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.all(AppTheme.marginMobile),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
+                            // 10 MINS Pill Badge (Stitch Signature)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(color: const Color(0xFF10B981).withValues(alpha: 0.4)),
+                                color: AppColors.primaryContainer,
+                                borderRadius: BorderRadius.circular(9999),
+                                boxShadow: AppTheme.level1,
                               ),
-                              child: const Row(
+                              child: Row(
                                 children: [
-                                  Icon(Icons.bolt, color: Color(0xFF10B981), size: 16),
-                                  SizedBox(width: 4),
+                                  const Icon(Icons.bolt_rounded, color: AppColors.onPrimary, size: 16),
+                                  const SizedBox(width: 4),
                                   Text(
                                     '10 MINS',
-                                    style: TextStyle(
-                                      color: Color(0xFF10B981),
-                                      fontWeight: FontWeight.w800,
+                                    style: GoogleFonts.inter(
+                                      color: AppColors.onPrimary,
+                                      fontWeight: FontWeight.w700,
                                       fontSize: 12,
+                                      letterSpacing: 0.5,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const CircleAvatar(
-                              radius: 18,
-                              backgroundColor: Color(0xFF1E293B),
-                              child: Icon(Icons.person, color: Colors.white, size: 20),
+                            // User Profile Avatar
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: AppColors.secondaryContainer,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.3)),
+                              ),
+                              child: const Icon(Icons.person_outline_rounded, color: AppColors.primary, size: 20),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        const Row(
+                        const SizedBox(height: AppTheme.spacingSm),
+                        // Delivery location line
+                        Row(
                           children: [
                             Text(
                               'Delivery to ',
-                              style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                              style: GoogleFonts.inter(color: AppColors.onSurfaceVariant, fontSize: 13),
                             ),
-                            Icon(Icons.location_on, color: Color(0xFF10B981), size: 14),
-                            SizedBox(width: 2),
+                            const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 16),
+                            const SizedBox(width: 2),
                             Text(
                               'Koramangala 4th Block',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
+                              style: GoogleFonts.outfit(
+                                color: AppColors.onSurface,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
                               ),
                             ),
+                            const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.onSurfaceVariant, size: 18),
                           ],
                         ),
-                        const SizedBox(height: 16),
-                        // Search Bar
+                        const SizedBox(height: AppTheme.spacingMd),
+                        // Stitch Search Bar with voice icon
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E293B),
+                            color: AppColors.surfaceContainerLowest,
                             borderRadius: BorderRadius.circular(16),
-                            border: Border.all(color: const Color(0xFF334155)),
+                            border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.4)),
+                            boxShadow: AppTheme.level1,
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(Icons.search, color: Color(0xFF64748B), size: 20),
-                              SizedBox(width: 10),
+                              const Icon(Icons.search_rounded, color: AppColors.onSurfaceVariant, size: 22),
+                              const SizedBox(width: 10),
                               Expanded(
                                 child: TextField(
-                                  style: TextStyle(color: Colors.white, fontSize: 14),
+                                  style: GoogleFonts.inter(color: AppColors.onSurface, fontSize: 14),
                                   decoration: InputDecoration(
                                     hintText: 'Search "tomatoes", "milk", "bread"...',
-                                    hintStyle: TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                                    hintStyle: GoogleFonts.inter(
+                                      color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+                                      fontSize: 14,
+                                    ),
                                     border: InputBorder.none,
+                                    enabledBorder: InputBorder.none,
+                                    focusedBorder: InputBorder.none,
+                                    filled: false,
+                                    contentPadding: EdgeInsets.zero,
                                   ),
                                 ),
                               ),
-                              Icon(Icons.mic, color: Color(0xFF10B981), size: 20),
+                              const Icon(Icons.mic_none_rounded, color: AppColors.primary, size: 22),
                             ],
                           ),
                         ),
@@ -123,117 +148,127 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   ),
                 ),
 
-                // Hero Banner
+                // ─── Stitch Hero Promo Banner ──────────────────────────────
                 SliverToBoxAdapter(
                   child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 16),
-                    padding: const EdgeInsets.all(20),
+                    margin: const EdgeInsets.symmetric(horizontal: AppTheme.marginMobile),
+                    padding: const EdgeInsets.all(AppTheme.spacingLg),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFF047857), Color(0xFF065F46)],
+                        colors: [Color(0xFF078730), Color(0xFF00531A)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF047857).withValues(alpha: 0.3),
-                          blurRadius: 16,
-                          offset: const Offset(0, 6),
-                        ),
-                      ],
+                      borderRadius: BorderRadius.circular(24),
+                      boxShadow: AppTheme.level2,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFA3E635),
-                            borderRadius: BorderRadius.circular(12),
+                            color: AppColors.primaryFixed,
+                            borderRadius: BorderRadius.circular(9999),
                           ),
-                          child: const Text(
+                          child: Text(
                             'FLASH SALE 40% OFF',
-                            style: TextStyle(
-                              color: Color(0xFF0F172A),
-                              fontWeight: FontWeight.w900,
+                            style: GoogleFonts.inter(
+                              color: AppColors.onPrimaryFixed,
+                              fontWeight: FontWeight.w800,
                               fontSize: 10,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        const Text(
+                        const SizedBox(height: AppTheme.spacingSm),
+                        Text(
                           'Farm Fresh Vegetables',
-                          style: TextStyle(
+                          style: GoogleFonts.outfit(
                             color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
+                        Text(
                           'Delivered to your kitchen in 10 minutes.',
-                          style: TextStyle(color: Color(0xFFD1FAE5), fontSize: 12),
+                          style: GoogleFonts.inter(
+                            color: Colors.white.withValues(alpha: 0.85),
+                            fontSize: 13,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
 
-                // Flash Deals Header
-                const SliverToBoxAdapter(
+                // ─── Flash Deals Section Title ─────────────────────────────
+                SliverToBoxAdapter(
                   child: Padding(
-                    padding: EdgeInsets.fromLTRB(16, 24, 16, 12),
-                    child: Text(
-                      '⚡ 10-Min Flash Deals',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
+                    padding: const EdgeInsets.fromLTRB(AppTheme.marginMobile, AppTheme.spacingLg, AppTheme.marginMobile, AppTheme.spacingSm),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '⚡ 10-Min Flash Deals',
+                          style: GoogleFonts.outfit(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.onSurface,
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {},
+                          child: Text(
+                            'See All',
+                            style: GoogleFonts.inter(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
 
-                // Flash Deals Grid
+                // ─── Flash Deals Product Grid ──────────────────────────────
                 SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: AppTheme.marginMobile),
                   sliver: SliverGrid(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.72,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
+                      childAspectRatio: 0.70,
+                      crossAxisSpacing: 14,
+                      mainAxisSpacing: 14,
                     ),
                     delegate: SliverChildListDelegate([
-                      _buildProductCard('p1', 'Organic Farm Tomatoes', '500g', '₹24', '₹40'),
-                      _buildProductCard('p2', 'Amul Fresh Toned Milk', '1 Litre', '₹54', '₹56'),
-                      _buildProductCard('p3', 'Brown Sandwich Bread', '400g', '₹45', '₹50'),
-                      _buildProductCard('p4', 'Alphonso Mangoes', '1 kg', '₹299', '₹450'),
+                      _buildProductCard('p1', 'Organic Farm Tomatoes', '500g', '₹24', '₹40', Icons.local_grocery_store_rounded),
+                      _buildProductCard('p2', 'Amul Fresh Toned Milk', '1 Litre', '₹54', '₹56', Icons.local_drink_rounded),
+                      _buildProductCard('p3', 'Brown Sandwich Bread', '400g', '₹45', '₹50', Icons.bakery_dining_rounded),
+                      _buildProductCard('p4', 'Alphonso Mangoes', '1 kg', '₹299', '₹450', Icons.eco_rounded),
                     ]),
                   ),
                 ),
 
-                const SliverToBoxAdapter(child: SizedBox(height: 100)),
+                const SliverToBoxAdapter(child: SizedBox(height: 120)),
               ],
             ),
 
-            // Floating Cart Summary Bar
+            // ─── Floating Cart Summary Bar ─────────────────────────────────
             if (_totalCartCount > 0)
               Positioned(
-                bottom: 16,
-                left: 16,
-                right: 16,
+                bottom: 20,
+                left: AppTheme.marginMobile,
+                right: AppTheme.marginMobile,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF059669),
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF059669).withValues(alpha: 0.4),
-                        blurRadius: 20,
-                        offset: const Offset(0, 6),
-                      ),
-                    ],
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: AppTheme.level3,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -242,31 +277,31 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                         children: [
                           CircleAvatar(
                             radius: 14,
-                            backgroundColor: const Color(0xFF10B981),
+                            backgroundColor: AppColors.primaryFixed,
                             child: Text(
                               '$_totalCartCount',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
+                              style: GoogleFonts.inter(
+                                color: AppColors.onPrimaryFixed,
+                                fontWeight: FontWeight.w800,
                                 fontSize: 12,
                               ),
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Column(
+                          Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
                                 'Items Added',
-                                style: TextStyle(color: Color(0xFFD1FAE5), fontSize: 11),
+                                style: GoogleFonts.inter(color: Colors.white.withValues(alpha: 0.8), fontSize: 11),
                               ),
                               Text(
                                 'Instant 10-Min Delivery',
-                                style: TextStyle(
+                                style: GoogleFonts.outfit(
                                   color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
                                 ),
                               ),
                             ],
@@ -277,12 +312,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF0F172A),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          foregroundColor: AppColors.primary,
+                          shape: const StadiumBorder(),
+                          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                          elevation: 0,
                         ),
-                        child: const Text('View Cart', style: TextStyle(fontWeight: FontWeight.bold)),
+                        child: Text(
+                          'View Cart',
+                          style: GoogleFonts.inter(fontWeight: FontWeight.w700, fontSize: 13),
+                        ),
                       ),
                     ],
                   ),
@@ -294,14 +332,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     );
   }
 
-  Widget _buildProductCard(String id, String title, String unit, String price, String mrp) {
+  Widget _buildProductCard(String id, String title, String unit, String price, String mrp, IconData icon) {
     final qty = _cartItems[id] ?? 0;
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
+        color: AppColors.surfaceContainerLowest,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF334155)),
+        border: Border.all(color: AppColors.outlineVariant.withValues(alpha: 0.3)),
+        boxShadow: AppTheme.level1,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -309,64 +348,87 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF0F172A),
+                color: AppColors.surfaceContainerLow,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Center(
-                child: Icon(Icons.shopping_bag, size: 44, color: Color(0xFF10B981)),
+              child: Center(
+                child: Icon(icon, size: 48, color: AppColors.primary),
               ),
             ),
           ),
           const SizedBox(height: 8),
-          Text(unit, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+          Text(unit, style: GoogleFonts.inter(color: AppColors.onSurfaceVariant, fontSize: 11)),
           const SizedBox(height: 2),
           Text(
             title,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+            style: GoogleFonts.outfit(color: AppColors.onSurface, fontWeight: FontWeight.w600, fontSize: 14),
           ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                price,
-                style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w800, fontSize: 14),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(
+                    price,
+                    style: GoogleFonts.outfit(color: AppColors.primary, fontWeight: FontWeight.w700, fontSize: 16),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    mrp,
+                    style: GoogleFonts.inter(
+                      color: AppColors.onSurfaceVariant.withValues(alpha: 0.5),
+                      fontSize: 11,
+                      decoration: TextDecoration.lineThrough,
+                    ),
+                  ),
+                ],
               ),
               if (qty == 0)
                 InkWell(
                   onTap: () => _updateQuantity(id, 1),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.15),
-                      border: Border.all(color: const Color(0xFF10B981)),
-                      borderRadius: BorderRadius.circular(8),
+                      color: AppColors.primaryContainer.withValues(alpha: 0.15),
+                      border: Border.all(color: AppColors.primary),
+                      borderRadius: BorderRadius.circular(9999),
                     ),
-                    child: const Text(
-                      '+ ADD',
-                      style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold, fontSize: 11),
+                    child: Text(
+                      'ADD',
+                      style: GoogleFonts.inter(color: AppColors.primary, fontWeight: FontWeight.w700, fontSize: 11),
                     ),
                   ),
                 )
               else
-                Row(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.remove, size: 16, color: Colors.white),
-                      onPressed: () => _updateQuantity(id, -1),
-                      constraints: const BoxConstraints(),
-                      padding: EdgeInsets.zero,
-                    ),
-                    Text('$qty', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                    IconButton(
-                      icon: const Icon(Icons.add, size: 16, color: Colors.white),
-                      onPressed: () => _updateQuantity(id, 1),
-                      constraints: const BoxConstraints(),
-                      padding: EdgeInsets.zero,
-                    ),
-                  ],
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(9999),
+                  ),
+                  child: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () => _updateQuantity(id, -1),
+                        child: const Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Icon(Icons.remove, size: 14, color: Colors.white),
+                        ),
+                      ),
+                      Text('$qty', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
+                      GestureDetector(
+                        onTap: () => _updateQuantity(id, 1),
+                        child: const Padding(
+                          padding: EdgeInsets.all(4.0),
+                          child: Icon(Icons.add, size: 14, color: Colors.white),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
             ],
           ),
