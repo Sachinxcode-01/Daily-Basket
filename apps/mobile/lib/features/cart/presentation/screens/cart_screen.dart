@@ -64,25 +64,25 @@ class _CartScreenState extends State<CartScreen> {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: const Color(0xFF334155)),
                 ),
-                child: Column(
+                child: const Column(
                   children: [
-                    const Row(
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Subtotal', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
                         Text('₹102', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                       ],
                     ),
-                    const SizedBox(height: 6),
-                    const Row(
+                    SizedBox(height: 6),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('Delivery Fee', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
                         Text('FREE', style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.bold)),
                       ],
                     ),
-                    const Divider(color: Color(0xFF334155), height: 20),
-                    const Row(
+                    Divider(color: Color(0xFF334155), height: 20),
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text('To Pay', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),

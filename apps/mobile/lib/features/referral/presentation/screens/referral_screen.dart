@@ -55,11 +55,11 @@ class _ReferralScreenState extends State<ReferralScreen> {
                 ),
                 borderRadius: BorderRadius.circular(24.0),
               ),
-              child: Column(
+              child: const Column(
                 children: [
-                  const Icon(Icons.card_giftcard, size: 48, color: Colors.white),
-                  const SizedBox(height: 12),
-                  const Text(
+                  Icon(Icons.card_giftcard, size: 48, color: Colors.white),
+                  SizedBox(height: 12),
+                  Text(
                     'Invite Friends to Daily Basket',
                     style: TextStyle(
                       color: Colors.white,
@@ -67,8 +67,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
+                  SizedBox(height: 8),
+                  Text(
                     'Give ₹100 on their 1st 10-min delivery, get ₹100 cashback when they order!',
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.white70, fontSize: 13),
