@@ -93,7 +93,7 @@ class WelcomeScreen extends StatelessWidget {
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Image.asset(
-                                    'assets/illustrations/grocery_basket_3d.png',
+                                    'assets/images/daily_basket_logo.png',
                                     fit: BoxFit.contain,
                                   ),
                                 ),

@@ -167,11 +167,11 @@ class _SplashScreenState extends State<SplashScreen>
                                   Container(
                                     color: Colors.white.withValues(alpha: 0.05),
                                   ),
-                                  // 3D Grocery Basket Illustration Asset
+                                  // Official Daily Basket Logo Asset
                                   Image.asset(
-                                    'assets/illustrations/grocery_basket_3d.png',
-                                    width: 96,
-                                    height: 96,
+                                    'assets/images/daily_basket_logo.png',
+                                    width: 104,
+                                    height: 104,
                                     fit: BoxFit.contain,
                                   ),
                                 ],
