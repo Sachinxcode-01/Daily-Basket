@@ -1,0 +1,24 @@
+name: Continuous Deployment - API Service
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'services/api/**'
+      - 'packages/**'
+      - 'infrastructure/docker/Dockerfile.api'
+      - '.github/workflows/cd-api.yml'
+
+jobs:
+  deploy-api:
+    name: Build & Push API Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build API Docker Image
+        run: |
+          docker build -t daily-basket-api:latest -f infrastructure/docker/Dockerfile.api .

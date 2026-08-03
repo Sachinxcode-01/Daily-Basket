@@ -1,0 +1,24 @@
+FROM node:18-alpine AS builder
+
+WORKDIR /app
+RUN npm install -g pnpm
+
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY services/api/package.json services/api/
+COPY packages/ packages/
+
+RUN pnpm install --frozen-lockfile
+
+COPY services/api/ services/api/
+RUN pnpm --filter api build
+
+FROM node:18-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV production
+
+COPY --from=builder /app/services/api/dist ./dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY services/api/package.json ./
+
+EXPOSE 4000
+CMD ["node", "dist/main.js"]

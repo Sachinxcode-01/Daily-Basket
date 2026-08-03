@@ -1,0 +1,32 @@
+name: Continuous Deployment - Customer Website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/website/**'
+      - 'packages/**'
+      - '.github/workflows/cd-website.yml'
+
+jobs:
+  deploy-website:
+    name: Build & Validate Customer Website
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Next.js App
+        run: pnpm --filter website build

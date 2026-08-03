@@ -1,0 +1,28 @@
+{
+  "name": "daily-basket",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Daily Basket Enterprise Quick-Commerce Platform Monorepo",
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" --filter \"./services/*\" dev",
+    "dev:api": "pnpm --filter api dev",
+    "dev:website": "pnpm --filter website dev",
+    "dev:admin": "pnpm --filter admin dev",
+    "build": "pnpm --recursive run build",
+    "test": "pnpm --recursive run test",
+    "lint": "pnpm --recursive run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "docker:up": "docker-compose -f infrastructure/docker-compose.yml up -d",
+    "docker:down": "docker-compose -f infrastructure/docker-compose.yml down",
+    "prisma:generate": "pnpm --filter api prisma generate",
+    "prisma:migrate": "pnpm --filter api prisma migrate dev"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}

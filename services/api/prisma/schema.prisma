@@ -1,0 +1,269 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+  STORE_MANAGER
+  DELIVERY_PARTNER
+}
+
+enum OrderStatus {
+  CREATED
+  CONFIRMED
+  PACKING
+  READY_FOR_PICKUP
+  OUT_FOR_DELIVERY
+  DELIVERED
+  CANCELLED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  UPI
+  CARD
+  NET_BANKING
+  WALLET
+  CASH_ON_DELIVERY
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+model Store {
+  id           String      @id @default(uuid())
+  name         String
+  code         String      @unique
+  address      String
+  city         String
+  pincode      String
+  latitude     Float
+  longitude    Float
+  isOpen       Boolean     @default(true)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  products     Product[]
+  orders       Order[]
+  inventories  Inventory[]
+
+  @@map("stores")
+}
+
+model User {
+  id           String      @id @default(uuid())
+  phoneNumber  String      @unique
+  email        String?     @unique
+  fullName     String
+  role         Role        @default(CUSTOMER)
+  avatarUrl    String?
+  isVerified   Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  addresses    Address[]
+  orders       Order[]     @relation("CustomerOrders")
+  deliveries   Order[]     @relation("DeliveryPartnerOrders")
+  wallet       Wallet?
+  reviews      Review[]
+
+  @@map("users")
+}
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label       String   // HOME, WORK, OTHER
+  houseNo     String
+  street      String
+  landmark    String?
+  city        String
+  pincode     String
+  latitude    Float
+  longitude   Float
+  isDefault   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  orders      Order[]
+
+  @@map("addresses")
+}
+
+model Category {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  imageUrl    String?
+  iconName    String?
+  parentId    String?
+  parent      Category?  @relation("SubCategories", fields: [parentId], references: [id])
+  children    Category[] @relation("SubCategories")
+  sortOrder   Int        @default(0)
+  isActive    Boolean    @default(true)
+  products    Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String           @id @default(uuid())
+  storeId     String
+  store       Store            @relation(fields: [storeId], references: [id])
+  categoryId  String
+  category    Category         @relation(fields: [categoryId], references: [id])
+  name        String
+  slug        String           @unique
+  description String
+  images      String[]
+  isOrganic   Boolean          @default(false)
+  tags        String[]
+  variants    ProductVariant[]
+  reviews     Review[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@map("products")
+}
+
+model ProductVariant {
+  id            String      @id @default(uuid())
+  productId     String
+  product       Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  unitName      String      // e.g. 500g, 1 kg
+  price         Float
+  mrp           Float
+  sku           String      @unique
+  isAvailable   Boolean     @default(true)
+  inventories   Inventory[]
+  orderItems    OrderItem[]
+
+  @@map("product_variants")
+}
+
+model Inventory {
+  id               String         @id @default(uuid())
+  storeId          String
+  store            Store          @relation(fields: [storeId], references: [id])
+  variantId        String
+  variant          ProductVariant @relation(fields: [variantId], references: [id])
+  stockQuantity    Int            @default(0)
+  reservedQuantity Int            @default(0)
+  updatedAt        DateTime       @updatedAt
+
+  @@unique([storeId, variantId])
+  @@map("inventories")
+}
+
+model Order {
+  id                   String        @id @default(uuid())
+  orderNumber          String        @unique
+  storeId              String
+  store                Store         @relation(fields: [storeId], references: [id])
+  userId               String
+  user                 User          @relation("CustomerOrders", fields: [userId], references: [id])
+  addressId            String
+  address              Address       @relation(fields: [addressId], references: [id])
+  deliveryPartnerId    String?
+  deliveryPartner      User?         @relation("DeliveryPartnerOrders", fields: [deliveryPartnerId], references: [id])
+  items                OrderItem[]
+  subtotal             Float
+  deliveryFee          Float
+  discount             Float
+  totalAmount          Float
+  status               OrderStatus   @default(CREATED)
+  paymentMethod        PaymentMethod
+  paymentStatus        PaymentStatus @default(PENDING)
+  estimatedArrivalMins Int           @default(10)
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+  payments             Payment[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id          String         @id @default(uuid())
+  orderId     String
+  order       Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  variantId   String
+  variant     ProductVariant @relation(fields: [variantId], references: [id])
+  productName String
+  unitName    String
+  price       Float
+  quantity    Int
+  totalPrice  Float
+
+  @@map("order_items")
+}
+
+model Payment {
+  id              String        @id @default(uuid())
+  orderId         String
+  order           Order         @relation(fields: [orderId], references: [id])
+  razorpayOrderId String?
+  transactionRef  String?
+  amount          Float
+  method          PaymentMethod
+  status          PaymentStatus @default(PENDING)
+  createdAt       DateTime      @default(now())
+
+  @@map("payments")
+}
+
+model Coupon {
+  id             String    @id @default(uuid())
+  code           String    @unique
+  discountType   String    // PERCENTAGE, FLAT
+  discountValue  Float
+  minOrderAmount Float     @default(0)
+  maxDiscount    Float?
+  expiresAt      DateTime
+  isActive       Boolean   @default(true)
+
+  @@map("coupons")
+}
+
+model Wallet {
+  id           String              @id @default(uuid())
+  userId       String              @unique
+  user         User                @relation(fields: [userId], references: [id])
+  balance      Float               @default(0)
+  transactions WalletTransaction[]
+  updatedAt    DateTime            @updatedAt
+
+  @@map("wallets")
+}
+
+model WalletTransaction {
+  id          String   @id @default(uuid())
+  walletId    String
+  wallet      Wallet   @relation(fields: [walletId], references: [id])
+  amount      Float
+  type        String   // CREDIT, DEBIT
+  description String
+  createdAt   DateTime @default(now())
+
+  @@map("wallet_transactions")
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+
+  @@map("reviews")
+}
