@@ -1,27 +1,22 @@
-# API & OpenAPI Guidelines - Daily Basket
+# API Reference & Endpoint Directory — Daily Basket
 
-## 1. RESTful Standards
-- Base API Endpoint: `/api/v1`
-- JSON Payload formatting with `snake_case` or `camelCase` consistency.
-- Standardized HTTP Response Envelope:
-```json
-{
-  "success": true,
-  "statusCode": 200,
-  "data": {},
-  "meta": {
-    "timestamp": "2026-08-03T21:45:00.000Z"
-  }
-}
-```
+**Base URL**: `http://localhost:3000/api/v1`  
+**Swagger UI**: `http://localhost:3000/api/docs`
 
-## 2. Error Response Format
-```json
-{
-  "success": false,
-  "statusCode": 400,
-  "errorCode": "ERR_OUT_OF_STOCK",
-  "message": "Requested variant is currently out of stock.",
-  "timestamp": "2026-08-03T21:45:00.000Z"
-}
-```
+---
+
+## Endpoint Summary
+
+| Module | Method | Route | Description |
+|---|---|---|---|
+| **Auth** | `POST` | `/auth/login-otp` | Request 6-digit phone verification OTP |
+| **Auth** | `POST` | `/auth/verify-otp` | Verify OTP PIN & receive JWT bearer token |
+| **Products** | `GET` | `/products/home-feed` | Fetch home page flash deals & categories |
+| **Search** | `GET` | `/search?query=...` | Case-insensitive catalog product search |
+| **Coupons** | `POST` | `/coupons/apply` | Validate coupon code & subtotal |
+| **Orders** | `POST` | `/orders` | Place new 10-minute delivery order |
+| **Payments** | `POST` | `/payments/initiate` | Create Razorpay Order Intent (`rzp_order_*`) |
+| **Payments** | `POST` | `/payments/verify` | Verify Razorpay HMAC SHA-256 signature |
+| **Delivery** | `GET` | `/delivery/track/:orderId` | Live GPS telemetry & ETA countdown |
+| **Admin** | `GET` | `/analytics/:storeId` | Dark Store sales KPIs & fulfillment metrics |
+| **Rider** | `GET` | `/delivery-partner/dashboard/:driverId` | Rider duty status & wallet earnings |

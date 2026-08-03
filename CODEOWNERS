@@ -1,0 +1,19 @@
+# Daily Basket Code Owners
+
+# Global Maintainers
+*       @Sachinxcode-01
+
+# Mobile App (Flutter)
+/apps/mobile/   @Sachinxcode-01
+
+# Web Applications (Next.js)
+/apps/website/  @Sachinxcode-01
+/apps/admin/    @Sachinxcode-01
+/apps/delivery/ @Sachinxcode-01
+
+# Backend Services (NestJS)
+/services/api/  @Sachinxcode-01
+
+# Infrastructure & CI/CD
+/infrastructure/ @Sachinxcode-01
+/.github/        @Sachinxcode-01

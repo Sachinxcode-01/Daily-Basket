@@ -1,36 +1,41 @@
-# System Architecture Specification - Daily Basket
+# Monorepo & System Architecture — Daily Basket
 
-## 1. High-Level Architecture
-The system employs a **Monorepo Modular Monolith Architecture** for the API service, coupled with client applications for Web, Admin, and Mobile.
+```mermaid
+graph TD
+    subgraph Frontend Applications
+        Mobile[Flutter Customer App]
+        Web[Next.js Customer Web]
+        Admin[Next.js Dark Store Admin]
+        Delivery[Next.js Delivery Partner PWA]
+    end
 
-```text
-                               ┌─────────────────────────┐
-                               │   Client Applications   │
-                               │ Next.js Web / Admin    │
-                               │ Flutter Mobile / Driver │
-                               └───────────┬─────────────┘
-                                           │ HTTPS / WSS
-                                           ▼
-                               ┌─────────────────────────┐
-                               │   NGINX Reverse Proxy   │
-                               └───────────┬─────────────┘
-                                           │
-                                           ▼
-                               ┌─────────────────────────┐
-                               │   NestJS API Service    │
-                               │   (Modular Monolith)    │
-                               └───────┬─────────┬───────┘
-                                       │         │
-                        Prisma / SQL   │         │ Cache / PubSub
-                                       ▼         ▼
-                                 ┌───────────┐ ┌───────────┐
-                                 │PostgreSQL │ │   Redis   │
-                                 └───────────┘ └───────────┘
+    subgraph API Gateway & Microservices
+        NGINX[NGINX Reverse Proxy]
+        Nest[NestJS API Gateway]
+    end
+
+    subgraph Data & Infra
+        PG[(PostgreSQL 16)]
+        Redis[(Redis 7 Cache)]
+        Razorpay[Razorpay Gateway]
+    end
+
+    Mobile --> NGINX
+    Web --> NGINX
+    Admin --> NGINX
+    Delivery --> NGINX
+
+    NGINX --> Nest
+    Nest --> PG
+    Nest --> Redis
+    Nest --> Razorpay
 ```
 
-## 2. Low-Level Module Architecture
-Each NestJS module strictly implements Clean Architecture layers:
-- **Controller Layer**: Handles HTTP requests, DTO validation, and route definitions.
-- **Service Layer**: Implements business domain rules and transactions.
-- **Repository Layer**: Encapsulates DB access via Prisma ORM.
-- **Entity / DTO Layer**: Defines domain types and request/response contracts.
+---
+
+## Clean Architecture Layers (NestJS Backend)
+
+1. **Domain Layer**: Core business models & entities (`prisma/schema.prisma`).
+2. **Application Layer**: Business logic services (`orders.service.ts`, `payments.service.ts`, `delivery.service.ts`).
+3. **Infrastructure Layer**: Database connectors (`prisma.service.ts`), Redis cache (`redis.service.ts`), third-party SDKs (Razorpay, S3 uploads).
+4. **Presentation Layer**: REST API controllers with OpenAPI annotations (`orders.controller.ts`, `payments.controller.ts`).
