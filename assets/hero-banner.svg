@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="100%" height="auto">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A" />
+      <stop offset="50%" stop-color="#064E3B" />
+      <stop offset="100%" stop-color="#0F172A" />
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10B981" />
+      <stop offset="50%" stop-color="#34D399" />
+      <stop offset="100%" stop-color="#A3E635" />
+    </linearGradient>
+    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#10B981" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="400" rx="24" fill="url(#bgGrad)" stroke="#1E293B" stroke-width="2" />
+  
+  <!-- Subtle Grid Pattern -->
+  <g opacity="0.08" stroke="#FFFFFF" stroke-width="1">
+    <path d="M0 50H1200 M0 100H1200 M0 150H1200 M0 200H1200 M0 250H1200 M0 300H1200 M0 350H1200" />
+    <path d="M100 0V400 M200 0V400 M300 0V400 M400 0V400 M500 0V400 M600 0V400 M700 0V400 M800 0V400 M900 0V400 M1000 0V400 M1100 0V400" />
+  </g>
+
+  <!-- Hero Content -->
+  <g transform="translate(80, 100)">
+    <!-- Pill Tag -->
+    <rect x="0" y="0" width="280" height="36" rx="18" fill="url(#badgeGrad)" opacity="0.2" stroke="#10B981" stroke-width="1.5" />
+    <text x="140" y="23" fill="#34D399" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" text-anchor="middle" letter-spacing="1.5">⚡ 10-MINUTE QUICK COMMERCE</text>
+
+    <!-- Main Title -->
+    <text x="0" y="90" fill="url(#textGrad)" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="900" letter-spacing="-1">DAILY BASKET</text>
+    <text x="0" y="130" fill="#E2E8F0" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" opacity="0.9">Enterprise Production-Ready Full-Stack Platform</text>
+
+    <!-- Tech Stack Pill Chips -->
+    <g transform="translate(0, 170)">
+      <rect x="0" y="0" width="110" height="32" rx="10" fill="#1E293B" stroke="#334155" />
+      <text x="55" y="20" fill="#38BDF8" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">Flutter 3</text>
+
+      <rect x="120" y="0" width="110" height="32" rx="10" fill="#1E293B" stroke="#334155" />
+      <text x="175" y="20" fill="#F87171" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">NestJS 10</text>
+
+      <rect x="240" y="0" width="110" height="32" rx="10" fill="#1E293B" stroke="#334155" />
+      <text x="295" y="20" fill="#FACC15" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">Next.js 14</text>
+
+      <rect x="360" y="0" width="130" height="32" rx="10" fill="#1E293B" stroke="#334155" />
+      <text x="425" y="20" fill="#A78BFA" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">PostgreSQL 16</text>
+
+      <rect x="500" y="0" width="110" height="32" rx="10" fill="#1E293B" stroke="#334155" />
+      <text x="555" y="20" fill="#34D399" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">Redis 7</text>
+    </g>
+  </g>
+
+  <!-- Decorative Shopping Basket Icon Graphic -->
+  <g transform="translate(900, 110)">
+    <circle cx="100" cy="100" r="90" fill="#059669" opacity="0.15" />
+    <circle cx="100" cy="100" r="70" fill="#10B981" opacity="0.25" />
+    <path d="M60 90 L140 90 L130 150 L70 150 Z" fill="none" stroke="#34D399" stroke-width="6" stroke-linejoin="round" />
+    <path d="M80 90 L100 50 L120 90" fill="none" stroke="#34D399" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+</svg>
