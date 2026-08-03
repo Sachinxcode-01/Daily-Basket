@@ -193,16 +193,39 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
                                     boxShadow: AppTheme.level2,
                                   ),
                                 ),
-                                 // 3D Location Pin Illustration Asset
-                                 Center(
-                                   child: Padding(
-                                     padding: const EdgeInsets.all(24.0),
-                                     child: Image.asset(
-                                       'assets/illustrations/location_pin_3d.png',
-                                       fit: BoxFit.contain,
-                                     ),
-                                   ),
-                                 ),
+                                  // Center White Container with Daily Basket Logo
+                                  Center(
+                                    child: Container(
+                                      width: 110,
+                                      height: 110,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.white,
+                                        boxShadow: AppTheme.level1,
+                                        border: Border.all(
+                                          color: AppColors.outlineVariant.withValues(alpha: 0.20),
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Image.asset(
+                                        'assets/images/daily_basket_logo.png',
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
+                                  // 3D Location Pin Illustration Asset (Positioned floating above logo)
+                                  Positioned(
+                                    top: 4,
+                                    left: 0,
+                                    right: 0,
+                                    child: SizedBox(
+                                      height: 96,
+                                      child: Image.asset(
+                                        'assets/illustrations/location_pin_3d.png',
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                  ),
                                 // Decorative eco icon (float slow)
                                 AnimatedBuilder(
                                   animation: _floatSlowAnim,
