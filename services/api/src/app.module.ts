@@ -29,6 +29,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { DeliveryPartnerModule } from './modules/delivery-partner/delivery-partner.module';
 import { LoyaltyModule } from './modules/loyalty/loyalty.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
+import { AiModule } from './modules/ai/ai.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { ReviewsModule } from './modules/reviews/reviews.module';
     DeliveryPartnerModule,
     LoyaltyModule,
     ReviewsModule,
+    AiModule,
   ],
   providers: [
     PrismaService,
