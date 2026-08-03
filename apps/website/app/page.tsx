@@ -209,9 +209,9 @@ export default function HomePage() {
             </button>
           </div>
 
-          {/* Avatar */}
-          <div className="w-9 h-9 rounded-full bg-secondary-container flex items-center justify-center">
-            <span className="font-label-md text-label-md text-on-secondary-container font-bold">DB</span>
+          {/* Brand Logo Avatar */}
+          <div className="w-9 h-9 rounded-full bg-surface-container-lowest border border-outline-variant/30 flex items-center justify-center overflow-hidden p-1 shadow-level-1">
+            <img src="/images/daily_basket_logo.png" alt="Daily Basket Logo" className="w-full h-full object-contain" />
           </div>
         </div>
 
@@ -258,11 +258,11 @@ export default function HomePage() {
             Shop Now
           </button>
         </div>
-        <div className="absolute right-0 bottom-0 w-40 h-36 rounded-tl-3xl overflow-hidden">
+        <div className="absolute right-0 bottom-0 w-48 h-40 rounded-tl-3xl overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80"
-            alt="Fresh vegetables"
-            className="w-full h-full object-cover"
+            src="/illustrations/web_hero_banner_3d.png"
+            alt="3D Fresh vegetables hero illustration"
+            className="w-full h-full object-contain drop-shadow-lg"
           />
         </div>
       </section>
