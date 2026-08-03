@@ -15,19 +15,30 @@ export class EmailService {
   constructor(private readonly configService: ConfigService) {}
 
   async sendEmail(options: EmailOptions) {
-    const smtpHost = this.configService.get<string>('SMTP_HOST') || 'smtp.dailybasket.com';
+    const isGmail = this.configService.get<string>('USE_GMAIL') === 'true';
+    
+    const smtpHost = isGmail
+      ? 'smtp.gmail.com'
+      : (this.configService.get<string>('SMTP_HOST') || 'smtp.dailybasket.com');
+      
+    const smtpPort = isGmail
+      ? 465
+      : (this.configService.get<number>('SMTP_PORT') || 587);
+
     const smtpFrom = this.configService.get<string>('SMTP_FROM') || 'Daily Basket <no-reply@dailybasket.com>';
 
     const htmlContent = this.renderTemplate(options.template, options.data);
 
-    this.logger.log(`[SMTP] Sending ${options.template} email to ${options.to} via ${smtpHost}`);
+    this.logger.log(
+      `[SMTP - ${isGmail ? 'Gmail Dev' : 'Production'}] Sending ${options.template} to ${options.to} via ${smtpHost}:${smtpPort}`
+    );
 
     return {
       success: true,
       messageId: `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
       to: options.to,
       subject: options.subject,
-      provider: 'SMTP (Amazon SES / Resend Compatible)',
+      provider: isGmail ? 'Gmail SMTP (Development)' : 'Enterprise SMTP (Amazon SES / Resend)',
       status: 'DELIVERED',
     };
   }
