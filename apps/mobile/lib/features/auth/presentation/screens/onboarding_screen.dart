@@ -72,21 +72,21 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       bgColor2: AppColors.secondaryContainer,
     ),
     _OnboardingPage(
-      title: 'Earn While You Shop',
+      title: 'Easy Payments & Secure Checkout',
       subtitle:
-          'Collect Daily Points on every order and redeem exclusive rewards, discounts, and free deliveries.',
-      icon: Icons.card_giftcard_rounded,
-      assetPath: 'assets/illustrations/gift_box_rewards_3d.png',
+          'Pay securely using UPI, cards, wallets, or cash on delivery with enterprise-grade security.',
+      icon: Icons.security_rounded,
+      assetPath: 'assets/illustrations/secure_payments_3d.png',
       iconColor: AppColors.primary,
       bgColor1: AppColors.secondaryContainer,
       bgColor2: AppColors.primaryFixed,
     ),
     _OnboardingPage(
-      title: 'Safe & Secure Payments',
+      title: 'Earn While You Shop',
       subtitle:
-          'Shop with confidence with our encrypted payment gateway supporting UPI, cards, and wallets.',
-      icon: Icons.security_rounded,
-      assetPath: 'assets/illustrations/secure_payments_3d.png',
+          'Collect Daily Points on every order and redeem exclusive rewards, discounts, and free deliveries.',
+      icon: Icons.card_giftcard_rounded,
+      assetPath: 'assets/illustrations/gift_box_rewards_3d.png',
       iconColor: AppColors.primary,
       bgColor1: AppColors.primaryFixed,
       bgColor2: AppColors.secondaryContainer,
@@ -276,16 +276,17 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   ],
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Progress dots (page 0 → dot active = wide)
+                  // Progress dots (centered)
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(_pages.length, (i) {
                       final isActive = i == _currentPage;
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.only(right: 6),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
                         width: isActive ? 28 : 8,
                         height: 8,
                         decoration: BoxDecoration(
@@ -297,33 +298,40 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       );
                     }),
                   ),
+                  const SizedBox(height: AppTheme.spacingLg),
 
-                  // Next / Get Started button
-                  ElevatedButton.icon(
-                    onPressed: _goToNext,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.onPrimary,
-                      minimumSize: const Size(120, 48),
-                      shape: const StadiumBorder(),
-                      elevation: 0,
-                      shadowColor: Colors.transparent,
-                    ).copyWith(
-                      overlayColor: WidgetStateProperty.all(
-                        AppColors.surfaceTint.withValues(alpha: 0.15),
+                  // Full-width Next / Get Started button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 52,
+                    child: ElevatedButton(
+                      onPressed: _goToNext,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: AppColors.onPrimary,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
-                    ),
-                    icon: Icon(
-                      isLast
-                          ? Icons.shopping_basket_outlined
-                          : Icons.arrow_forward_rounded,
-                      size: 18,
-                    ),
-                    label: Text(
-                      isLast ? 'Get Started' : 'Next',
-                      style: GoogleFonts.outfit(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            isLast ? 'Get Started' : 'Next',
+                            style: GoogleFonts.outfit(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            isLast
+                                ? Icons.shopping_basket_outlined
+                                : Icons.arrow_forward_rounded,
+                            size: 20,
+                          ),
+                        ],
                       ),
                     ),
                   ),

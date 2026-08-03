@@ -1,5 +1,6 @@
 'use client';
 
+// Clean Webpack Dev Refresh
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { formatCurrency } from '@daily-basket/shared-utils';
