@@ -1,64 +1,137 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 400" width="100%" height="auto">
-  <defs>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0F172A" />
-      <stop offset="50%" stop-color="#064E3B" />
-      <stop offset="100%" stop-color="#0F172A" />
-    </linearGradient>
-    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#10B981" />
-      <stop offset="50%" stop-color="#34D399" />
-      <stop offset="100%" stop-color="#A3E635" />
-    </linearGradient>
-    <linearGradient id="badgeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#059669" />
-      <stop offset="100%" stop-color="#10B981" />
-    </linearGradient>
-  </defs>
-
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 450" width="100%" height="100%">
   <!-- Background -->
-  <rect width="1200" height="400" rx="24" fill="url(#bgGrad)" stroke="#1E293B" stroke-width="2" />
-  
-  <!-- Subtle Grid Pattern -->
-  <g opacity="0.08" stroke="#FFFFFF" stroke-width="1">
-    <path d="M0 50H1200 M0 100H1200 M0 150H1200 M0 200H1200 M0 250H1200 M0 300H1200 M0 350H1200" />
-    <path d="M100 0V400 M200 0V400 M300 0V400 M400 0V400 M500 0V400 M600 0V400 M700 0V400 M800 0V400 M900 0V400 M1000 0V400 M1100 0V400" />
+  <rect width="1200" height="450" fill="#FFC909" rx="20"/>
+
+  <!-- Brand Section Left -->
+  <!-- Logo Icon -->
+  <g transform="translate(80, 50)">
+    <path d="M40 10 C30 10 20 20 20 35 L20 40 L60 40 L60 35 C60 20 50 10 40 10 Z" fill="none" stroke="#111" stroke-width="6"/>
+    <path d="M15 40 L65 40 L60 85 L20 85 Z" fill="none" stroke="#111" stroke-width="6" stroke-linejoin="round"/>
+    <text x="30" y="70" font-family="'Segoe UI', Arial, sans-serif" font-weight="900" font-size="32" fill="#0B5D2A">d</text>
+    <!-- Speed Lines -->
+    <line x1="2" y1="50" x2="10" y2="50" stroke="#0B5D2A" stroke-width="4" stroke-linecap="round"/>
+    <line x1="-5" y1="62" x2="8" y2="62" stroke="#0B5D2A" stroke-width="4" stroke-linecap="round"/>
+    <line x1="0" y1="74" x2="12" y2="74" stroke="#0B5D2A" stroke-width="4" stroke-linecap="round"/>
   </g>
 
-  <!-- Hero Content -->
-  <g transform="translate(80, 100)">
-    <!-- Pill Tag -->
-    <rect x="0" y="0" width="280" height="36" rx="18" fill="url(#badgeGrad)" opacity="0.2" stroke="#10B981" stroke-width="1.5" />
-    <text x="140" y="23" fill="#34D399" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" text-anchor="middle" letter-spacing="1.5">⚡ 10-MINUTE QUICK COMMERCE</text>
+  <!-- Title Typography -->
+  <text x="160" y="90" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="64" fill="#111111" letter-spacing="-1">daily</text>
+  <text x="160" y="155" font-family="'Montserrat', 'Arial Black', sans-serif" font-weight="900" font-size="76" fill="#0B5D2A" letter-spacing="-2">basket</text>
 
-    <!-- Main Title -->
-    <text x="0" y="90" fill="url(#textGrad)" font-family="system-ui, -apple-system, sans-serif" font-size="56" font-weight="900" letter-spacing="-1">DAILY BASKET</text>
-    <text x="0" y="130" fill="#E2E8F0" font-family="system-ui, -apple-system, sans-serif" font-size="22" font-weight="600" opacity="0.9">Enterprise Production-Ready Full-Stack Platform</text>
+  <!-- Tagline Dividers -->
+  <line x1="160" y1="185" x2="220" y2="185" stroke="#0B5D2A" stroke-width="3" stroke-linecap="round"/>
+  <text x="235" y="190" font-family="'Segoe UI', sans-serif" font-weight="800" font-size="16" fill="#111" letter-spacing="4">FRESH  •  FAST  •  RELIABLE</text>
+  <line x1="510" y1="185" x2="570" y2="185" stroke="#0B5D2A" stroke-width="3" stroke-linecap="round"/>
 
-    <!-- Tech Stack Pill Chips -->
-    <g transform="translate(0, 170)">
-      <rect x="0" y="0" width="110" height="32" rx="10" fill="#1E293B" stroke="#334155" />
-      <text x="55" y="20" fill="#38BDF8" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">Flutter 3</text>
+  <!-- 10 Minutes Delivery Badge -->
+  <g transform="translate(160, 215)">
+    <rect width="360" height="54" rx="27" fill="#0B5D2A"/>
+    <!-- Timer Icon -->
+    <circle cx="35" cy="27" r="16" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+    <polyline points="35,17 35,27 41,27" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round"/>
+    <line x1="12" y1="20" x2="18" y2="20" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="10" y1="27" x2="16" y2="27" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="68" y="35" font-family="'Segoe UI', sans-serif" font-weight="900" font-size="20" fill="#FFFFFF" letter-spacing="1">10 MINUTES DELIVERY</text>
+  </g>
 
-      <rect x="120" y="0" width="110" height="32" rx="10" fill="#1E293B" stroke="#334155" />
-      <text x="175" y="20" fill="#F87171" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">NestJS 10</text>
+  <!-- Right Graphic: Grocery Basket & Delivery Scooter Rider -->
+  <g transform="translate(680, 60)">
+    <!-- Delivery Scooter Rider Silhouette -->
+    <g transform="translate(240, 100)">
+      <!-- Delivery Box -->
+      <rect x="0" y="30" width="70" height="60" rx="8" fill="#FFC909" stroke="#111" stroke-width="5"/>
+      <text x="12" y="60" font-family="sans-serif" font-weight="900" font-size="11" fill="#111">daily</text>
+      <text x="8" y="74" font-family="sans-serif" font-weight="900" font-size="12" fill="#0B5D2A">basket</text>
 
-      <rect x="240" y="0" width="110" height="32" rx="10" fill="#1E293B" stroke="#334155" />
-      <text x="295" y="20" fill="#FACC15" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">Next.js 14</text>
+      <!-- Scooter Rider -->
+      <path d="M 65 50 Q 80 20 95 30 L 105 60 L 120 70 L 100 110 L 60 110 Z" fill="#111"/>
+      <circle cx="95" cy="25" r="14" fill="#111"/> <!-- Helmet -->
+      <!-- Scooter Body -->
+      <path d="M 40 110 L 150 110 C 160 110 165 95 155 85 L 140 70 L 125 70 Z" fill="#FFC909" stroke="#111" stroke-width="5"/>
+      <circle cx="50" cy="115" r="20" fill="#111" stroke="#FFC909" stroke-width="4"/> <!-- Back Wheel -->
+      <circle cx="150" cy="115" r="20" fill="#111" stroke="#FFC909" stroke-width="4"/> <!-- Front Wheel -->
+      <circle cx="165" cy="70" r="6" fill="#FFF"/> <!-- Headlight -->
+      <!-- Speed Lines -->
+      <line x1="-30" y1="90" x2="-5" y2="90" stroke="#111" stroke-width="4" stroke-linecap="round"/>
+      <line x1="-40" y1="105" x2="-10" y2="105" stroke="#111" stroke-width="4" stroke-linecap="round"/>
+    </g>
 
-      <rect x="360" y="0" width="130" height="32" rx="10" fill="#1E293B" stroke="#334155" />
-      <text x="425" y="20" fill="#A78BFA" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">PostgreSQL 16</text>
+    <!-- Grocery Basket 3D Element -->
+    <g transform="translate(0, 110)">
+      <!-- Basket Container -->
+      <rect x="20" y="60" width="180" height="90" rx="16" fill="#FFB703" stroke="#111" stroke-width="5"/>
+      <!-- Grid Basket Slots -->
+      <line x1="50" y1="75" x2="50" y2="135" stroke="#111" stroke-width="4"/>
+      <line x1="80" y1="75" x2="80" y2="135" stroke="#111" stroke-width="4"/>
+      <line x1="110" y1="75" x2="110" y2="135" stroke="#111" stroke-width="4"/>
+      <line x1="140" y1="75" x2="140" y2="135" stroke="#111" stroke-width="4"/>
+      <line x1="170" y1="75" x2="170" y2="135" stroke="#111" stroke-width="4"/>
 
-      <rect x="500" y="0" width="110" height="32" rx="10" fill="#1E293B" stroke="#334155" />
-      <text x="555" y="20" fill="#34D399" font-family="sans-serif" font-size="12" font-weight="700" text-anchor="middle">Redis 7</text>
+      <!-- Groceries inside Basket -->
+      <!-- Rice Bag -->
+      <rect x="30" y="10" width="45" height="60" rx="6" fill="#F4E4BA" stroke="#111" stroke-width="3"/>
+      <text x="37" y="45" font-family="sans-serif" font-weight="900" font-size="12" fill="#111">RICE</text>
+      <!-- Milk Bottle -->
+      <rect x="85" y="0" width="30" height="70" rx="8" fill="#FFFFFF" stroke="#111" stroke-width="3"/>
+      <rect x="90" y="-8" width="20" height="10" rx="3" fill="#0B5D2A"/>
+      <text x="88" y="45" font-family="sans-serif" font-weight="900" font-size="10" fill="#0B5D2A">MILK</text>
+      <!-- Oil Bottle -->
+      <rect x="125" y="15" width="28" height="55" rx="6" fill="#F7B000" stroke="#111" stroke-width="3"/>
+      <!-- Fresh Greens -->
+      <circle cx="165" cy="30" r="18" fill="#2EC4B6"/>
+      <circle cx="180" cy="20" r="16" fill="#10B981"/>
+      <circle cx="155" cy="15" r="15" fill="#059669"/>
+      <!-- Tomato & Bell Pepper -->
+      <circle cx="65" cy="55" r="14" fill="#E63946"/>
+      <circle cx="105" cy="55" r="14" fill="#FFB703"/>
     </g>
   </g>
 
-  <!-- Decorative Shopping Basket Icon Graphic -->
-  <g transform="translate(900, 110)">
-    <circle cx="100" cy="100" r="90" fill="#059669" opacity="0.15" />
-    <circle cx="100" cy="100" r="70" fill="#10B981" opacity="0.25" />
-    <path d="M60 90 L140 90 L130 150 L70 150 Z" fill="none" stroke="#34D399" stroke-width="6" stroke-linejoin="round" />
-    <path d="M80 90 L100 50 L120 90" fill="none" stroke="#34D399" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+  <!-- Feature Icons Row Bottom -->
+  <g transform="translate(100, 310)">
+    <!-- Divider Line Top -->
+    <line x1="0" y1="0" x2="1000" y2="0" stroke="#0B5D2A" stroke-width="2" opacity="0.4"/>
+
+    <!-- Feature 1: Fresh Products -->
+    <g transform="translate(60, 20)">
+      <circle cx="30" cy="30" r="26" fill="none" stroke="#0B5D2A" stroke-width="3.5"/>
+      <path d="M 22 38 C 22 25 38 22 38 22 C 38 22 38 38 22 38 Z" fill="#0B5D2A"/>
+      <text x="-15" y="76" font-family="'Segoe UI', sans-serif" font-weight="800" font-size="13" fill="#111" text-anchor="middle">FRESH PRODUCTS</text>
+    </g>
+
+    <line x1="200" y1="30" x2="200" y2="80" stroke="#0B5D2A" stroke-width="1.5" opacity="0.4"/>
+
+    <!-- Feature 2: Fast Delivery -->
+    <g transform="translate(310, 20)">
+      <circle cx="30" cy="30" r="26" fill="none" stroke="#0B5D2A" stroke-width="3.5"/>
+      <polygon points="32,16 20,32 30,32 28,44 40,28 30,28" fill="#0B5D2A"/>
+      <text x="-10" y="76" font-family="'Segoe UI', sans-serif" font-weight="800" font-size="13" fill="#111" text-anchor="middle">FAST DELIVERY</text>
+    </g>
+
+    <line x1="450" y1="30" x2="450" y2="80" stroke="#0B5D2A" stroke-width="1.5" opacity="0.4"/>
+
+    <!-- Feature 3: Reliable Service -->
+    <g transform="translate(560, 20)">
+      <circle cx="30" cy="30" r="26" fill="none" stroke="#0B5D2A" stroke-width="3.5"/>
+      <path d="M 30 18 L 40 22 L 40 33 C 40 40 30 44 30 44 C 30 44 20 40 20 33 L 20 22 Z" fill="#0B5D2A"/>
+      <polyline points="26,30 29,33 34,27" fill="none" stroke="#FFC909" stroke-width="2.5"/>
+      <text x="-10" y="76" font-family="'Segoe UI', sans-serif" font-weight="800" font-size="13" fill="#111" text-anchor="middle">RELIABLE SERVICE</text>
+    </g>
+
+    <line x1="700" y1="30" x2="700" y2="80" stroke="#0B5D2A" stroke-width="1.5" opacity="0.4"/>
+
+    <!-- Feature 4: Best Quality -->
+    <g transform="translate(810, 20)">
+      <circle cx="30" cy="30" r="26" fill="none" stroke="#0B5D2A" stroke-width="3.5"/>
+      <path d="M 22 36 L 22 28 C 22 28 26 28 28 24 C 29 22 32 16 32 16 C 34 16 35 18 35 20 C 35 24 31 28 31 28 L 40 28 C 42 28 43 30 43 32 C 43 34 41 35 41 35 C 43 35 44 37 43 39 C 42 41 40 42 40 42 C 41 42 42 44 40 46 C 39 47 37 47 37 47 Z" fill="#0B5D2A"/>
+      <text x="-10" y="76" font-family="'Segoe UI', sans-serif" font-weight="800" font-size="13" fill="#111" text-anchor="middle">BEST QUALITY</text>
+    </g>
+  </g>
+
+  <!-- Footer Tagline -->
+  <g transform="translate(600, 430)">
+    <line x1="-500" y1="-12" x2="500" y2="-12" stroke="#0B5D2A" stroke-width="1.5" opacity="0.4"/>
+    <circle cx="-90" cy="-2" r="5" fill="#0B5D2A"/>
+    <text x="0" y="3" font-family="'Segoe UI', sans-serif" font-weight="900" font-size="15" fill="#0B5D2A" text-anchor="middle" letter-spacing="3">GADAG &amp; BEYOND</text>
   </g>
 </svg>
