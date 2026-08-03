@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'welcome_screen.dart';
@@ -167,11 +167,12 @@ class _SplashScreenState extends State<SplashScreen>
                                   Container(
                                     color: Colors.white.withValues(alpha: 0.05),
                                   ),
-                                  // Brand icon
-                                  const Icon(
-                                    Icons.shopping_basket_rounded,
-                                    size: 64,
-                                    color: Colors.white,
+                                  // 3D Grocery Basket Illustration Asset
+                                  Image.asset(
+                                    'assets/illustrations/grocery_basket_3d.png',
+                                    width: 96,
+                                    height: 96,
+                                    fit: BoxFit.contain,
                                   ),
                                 ],
                               ),

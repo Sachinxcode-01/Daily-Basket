@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'ready_to_shop_screen.dart';
@@ -163,10 +163,12 @@ class _NotificationPermissionScreenState
                                       shape: BoxShape.circle,
                                       boxShadow: AppTheme.level2,
                                     ),
-                                    child: const Icon(
-                                      Icons.notifications_rounded,
-                                      size: 90,
-                                      color: AppColors.primary,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(16.0),
+                                      child: Image.asset(
+                                        'assets/illustrations/notification_bell_3d.png',
+                                        fit: BoxFit.contain,
+                                      ),
                                     ),
                                   ),
                                 ),

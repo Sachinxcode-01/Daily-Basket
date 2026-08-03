@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'login_screen.dart';
@@ -90,10 +90,12 @@ class WelcomeScreen extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   boxShadow: AppTheme.level1,
                                 ),
-                                child: const Icon(
-                                  Icons.shopping_basket_rounded,
-                                  size: 64,
-                                  color: AppColors.primary,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16.0),
+                                  child: Image.asset(
+                                    'assets/illustrations/grocery_basket_3d.png',
+                                    fit: BoxFit.contain,
+                                  ),
                                 ),
                               ),
 

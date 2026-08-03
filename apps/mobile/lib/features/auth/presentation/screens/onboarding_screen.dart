@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'notification_permission_screen.dart';
@@ -56,6 +56,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       subtitle:
           'Shop farm-fresh fruits, vegetables, dairy, groceries, and daily essentials from your trusted local store.',
       icon: Icons.shopping_basket_rounded,
+      assetPath: 'assets/illustrations/grocery_basket_3d.png',
       iconColor: AppColors.primary,
       bgColor1: AppColors.secondaryContainer,
       bgColor2: AppColors.primaryFixed,
@@ -65,6 +66,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       subtitle:
           'Get your essentials delivered quickly with real-time order tracking from checkout to your doorstep.',
       icon: Icons.delivery_dining_rounded,
+      assetPath: 'assets/illustrations/delivery_rider_3d.png',
       iconColor: AppColors.primary,
       bgColor1: AppColors.primaryFixed,
       bgColor2: AppColors.secondaryContainer,
@@ -74,6 +76,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       subtitle:
           'Collect Daily Points on every order and redeem exclusive rewards, discounts, and free deliveries.',
       icon: Icons.card_giftcard_rounded,
+      assetPath: 'assets/illustrations/gift_box_rewards_3d.png',
       iconColor: AppColors.primary,
       bgColor1: AppColors.secondaryContainer,
       bgColor2: AppColors.primaryFixed,
@@ -83,6 +86,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       subtitle:
           'Shop with confidence with our encrypted payment gateway supporting UPI, cards, and wallets.',
       icon: Icons.security_rounded,
+      assetPath: 'assets/illustrations/secure_payments_3d.png',
       iconColor: AppColors.primary,
       bgColor1: AppColors.primaryFixed,
       bgColor2: AppColors.secondaryContainer,
@@ -360,19 +364,21 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                           color: page.bgColor1.withValues(alpha: 0.20),
                         ),
                       ),
-                      // Illustration icon (placeholder for 3D illustration)
+                      // 3D PNG Illustration Asset
                       Container(
-                        width: 220,
-                        height: 220,
+                        width: 240,
+                        height: 240,
                         decoration: BoxDecoration(
-                          color: page.bgColor1.withValues(alpha: 0.35),
+                          color: page.bgColor1.withValues(alpha: 0.25),
                           shape: BoxShape.circle,
                           boxShadow: AppTheme.level2,
                         ),
-                        child: Icon(
-                          page.icon,
-                          size: 110,
-                          color: page.iconColor,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Image.asset(
+                            page.assetPath,
+                            fit: BoxFit.contain,
+                          ),
                         ),
                       ),
                     ],
@@ -448,6 +454,7 @@ class _OnboardingPage {
   final String title;
   final String subtitle;
   final IconData icon;
+  final String assetPath;
   final Color iconColor;
   final Color bgColor1;
   final Color bgColor2;
@@ -456,6 +463,7 @@ class _OnboardingPage {
     required this.title,
     required this.subtitle,
     required this.icon,
+    required this.assetPath,
     required this.iconColor,
     required this.bgColor1,
     required this.bgColor2,

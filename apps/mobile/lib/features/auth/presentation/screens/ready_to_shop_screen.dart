@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../home/presentation/screens/home_screen.dart' show CustomerHomeScreen;
@@ -193,14 +193,16 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
                                     boxShadow: AppTheme.level2,
                                   ),
                                 ),
-                                // Brand icon
-                                const Center(
-                                  child: Icon(
-                                    Icons.shopping_basket_rounded,
-                                    size: 96,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
+                                 // 3D Location Pin Illustration Asset
+                                 Center(
+                                   child: Padding(
+                                     padding: const EdgeInsets.all(24.0),
+                                     child: Image.asset(
+                                       'assets/illustrations/location_pin_3d.png',
+                                       fit: BoxFit.contain,
+                                     ),
+                                   ),
+                                 ),
                                 // Decorative eco icon (float slow)
                                 AnimatedBuilder(
                                   animation: _floatSlowAnim,
