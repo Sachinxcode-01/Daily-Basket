@@ -1,43 +1,39 @@
-import { Controller, Post, Body, Headers } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody } from '@nestjs/swagger';
+import { Controller, Get, Post, Param, Body } from '@nestjs/common';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 
-@ApiTags('Authentication')
+@ApiTags('Authentication & Security')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login-otp')
-  @ApiOperation({ summary: 'Request 6-digit SMS OTP for authentication' })
-  @ApiBody({ schema: { type: 'object', properties: { phoneNumber: { type: 'string', example: '9876543210' } } } })
-  async requestOtp(@Body('phoneNumber') phoneNumber: string) {
-    return this.authService.requestOtp(phoneNumber);
+  @ApiOperation({ summary: 'Request phone OTP PIN' })
+  async requestOtp(@Body() body: { phone: string }) {
+    return this.authService.requestOtp(body.phone);
   }
 
   @Post('verify-otp')
-  @ApiOperation({ summary: 'Verify OTP code and obtain JWT Access & Refresh tokens' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        phoneNumber: { type: 'string', example: '9876543210' },
-        code: { type: 'string', example: '123456' },
-      },
-    },
-  })
-  async verifyOtp(
-    @Body('phoneNumber') phoneNumber: string,
-    @Body('code') code: string,
-    @Headers('user-agent') userAgent?: string,
-  ) {
-    return this.authService.verifyOtp(phoneNumber, code, userAgent);
+  @ApiOperation({ summary: 'Verify OTP PIN & generate JWT bearer tokens' })
+  async verifyOtp(@Body() body: { phone: string; otp: string }) {
+    return this.authService.verifyOtp(body.phone, body.otp);
   }
 
-  @Post('register')
-  @ApiOperation({ summary: 'Complete new user profile registration' })
-  async register(
-    @Body() body: { phoneNumber: string; fullName: string; email?: string },
-  ) {
-    return this.authService.registerUser(body);
+  @Get('sessions/:userId')
+  @ApiOperation({ summary: 'Get active logged-in device sessions' })
+  async getSessions(@Param('userId') userId: string) {
+    return this.authService.getActiveSessions(userId);
+  }
+
+  @Post('sessions/revoke')
+  @ApiOperation({ summary: 'Revoke specific device session' })
+  async revokeSession(@Body() body: { userId: string; sessionId: string }) {
+    return this.authService.revokeSession(body.userId, body.sessionId);
+  }
+
+  @Post('sessions/revoke-all')
+  @ApiOperation({ summary: 'Log out across all active devices' })
+  async revokeAllSessions(@Body() body: { userId: string }) {
+    return this.authService.revokeAllSessions(body.userId);
   }
 }

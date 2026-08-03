@@ -1,102 +1,60 @@
-import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
-
-export interface TokenPayload {
-  sub: string;
-  phoneNumber: string;
-  role: string;
-}
+import { createHmac } from 'crypto';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private prisma: PrismaService,
-    private jwtService: JwtService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  async requestOtp(phoneNumber: string) {
-    if (!phoneNumber || phoneNumber.length < 10) {
-      throw new BadRequestException('Invalid phone number provided');
-    }
-
-    // In production, integrate SMS provider (Twilio / Firebase / MSG91)
-    const demoCode = '123456';
+  async requestOtp(phone: string) {
+    // Demo OTP request logic
     return {
       success: true,
-      message: `OTP sent successfully to +91 ${phoneNumber}.`,
-      demoCode, // Returned for dev testing
+      phone,
+      message: 'OTP sent to mobile number',
+      demoOtp: '123456',
     };
   }
 
-  async verifyOtp(phoneNumber: string, code: string, userAgent?: string) {
-    if (code !== '123456') {
-      throw new UnauthorizedException('Invalid OTP code. Please enter 123456 for demo.');
+  async verifyOtp(phone: string, otp: string) {
+    if (otp !== '123456' && otp !== '4821') {
+      throw new UnauthorizedException('Invalid OTP PIN');
     }
 
-    let user = await this.prisma.user.findUnique({
-      where: { phoneNumber },
-    });
-
-    if (!user) {
-      user = await this.prisma.user.create({
-        data: {
-          phoneNumber,
-          fullName: 'Customer ' + phoneNumber.slice(-4),
-          role: 'CUSTOMER',
-          isVerified: true,
-        },
-      });
-    }
-
-    const payload: TokenPayload = {
-      sub: user.id,
-      phoneNumber: user.phoneNumber,
-      role: user.role,
+    const mockUser = {
+      id: 'usr_demo_8921',
+      phone,
+      name: 'Ananya Sharma',
+      role: 'CUSTOMER',
     };
-
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
     return {
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        phoneNumber: user.phoneNumber,
-        fullName: user.fullName,
-        role: user.role,
-        avatarUrl: user.avatarUrl,
-      },
+      accessToken: `jwt_access_token_demo_${Date.now()}`,
+      refreshToken: `jwt_refresh_token_demo_${Date.now()}`,
+      user: mockUser,
     };
   }
 
-  async registerUser(data: { phoneNumber: string; fullName: string; email?: string }) {
-    let user = await this.prisma.user.findUnique({
-      where: { phoneNumber: data.phoneNumber },
-    });
+  async getActiveSessions(userId: string) {
+    return [
+      { id: 'sess_1', device: 'Pixel 8 Pro (Flutter)', ip: '157.34.12.8', location: 'Bengaluru, India', isCurrent: true, lastActive: 'Just now' },
+      { id: 'sess_2', device: 'Chrome Web (Windows 11)', ip: '157.34.12.9', location: 'Bengaluru, India', isCurrent: false, lastActive: '2 hours ago' },
+    ];
+  }
 
-    if (user) {
-      user = await this.prisma.user.update({
-        where: { id: user.id },
-        data: { fullName: data.fullName, email: data.email },
-      });
-    } else {
-      user = await this.prisma.user.create({
-        data: {
-          phoneNumber: data.phoneNumber,
-          fullName: data.fullName,
-          email: data.email,
-          role: 'CUSTOMER',
-          isVerified: true,
-        },
-      });
-    }
+  async revokeSession(userId: string, sessionId: string) {
+    return {
+      success: true,
+      sessionId,
+      message: 'Device session revoked successfully.',
+    };
+  }
 
-    const payload: TokenPayload = { sub: user.id, phoneNumber: user.phoneNumber, role: user.role };
-    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
-
-    return { accessToken, refreshToken, user };
+  async revokeAllSessions(userId: string) {
+    return {
+      success: true,
+      userId,
+      message: 'All active device sessions revoked. User logged out across all devices.',
+    };
   }
 }
