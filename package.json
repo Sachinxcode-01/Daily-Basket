@@ -21,6 +21,14 @@
     "prettier": "^3.2.5",
     "typescript": "^5.4.5"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma"
+    ]
+  },
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
