@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { formatCurrency } from '@daily-basket/shared-utils';
 
 // ─── Google Stitch Design System Tokens ─────────────────────────────────────
@@ -209,10 +210,19 @@ export default function HomePage() {
             </button>
           </div>
 
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-md">
+            <Link href="/" className="font-label-md text-label-md text-primary font-bold border-b-2 border-primary pb-0.5">Home</Link>
+            <Link href="/features" className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Features</Link>
+            <Link href="/how-it-works" className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">How It Works</Link>
+            <Link href="/freshness" className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">Freshness</Link>
+            <Link href="/about" className="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors">About</Link>
+          </nav>
+
           {/* Brand Logo Avatar */}
-          <div className="w-9 h-9 rounded-full bg-surface-container-lowest border border-outline-variant/30 flex items-center justify-center overflow-hidden p-1 shadow-level-1">
+          <Link href="/about" className="w-9 h-9 rounded-full bg-surface-container-lowest border border-outline-variant/30 flex items-center justify-center overflow-hidden p-1 shadow-level-1 hover:scale-105 transition-transform">
             <img src="/images/daily_basket_logo.png" alt="Daily Basket Logo" className="w-full h-full object-contain" />
-          </div>
+          </Link>
         </div>
 
         {/* Search bar */}
