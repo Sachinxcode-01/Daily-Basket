@@ -19,6 +19,42 @@ export class AuthController {
     return this.authService.verifyOtp(body.phone, body.otp);
   }
 
+  @Post('google-login')
+  @ApiOperation({ summary: 'Google OAuth 2.0 single sign-on authentication' })
+  async googleOAuthLogin(@Body() body: { idToken: string }) {
+    return this.authService.googleOAuthLogin(body.idToken);
+  }
+
+  @Post('register-email')
+  @ApiOperation({ summary: 'Create new customer account via Email & Password' })
+  async registerEmail(@Body() body: { email: string; pass: string; name: string }) {
+    return this.authService.registerEmail(body);
+  }
+
+  @Post('login-email')
+  @ApiOperation({ summary: 'Log in using Email & Password' })
+  async loginEmail(@Body() body: { email: string; pass: string }) {
+    return this.authService.loginEmail(body);
+  }
+
+  @Post('forgot-password')
+  @ApiOperation({ summary: 'Request password reset verification link' })
+  async forgotPassword(@Body() body: { email: string }) {
+    return this.authService.forgotPassword(body.email);
+  }
+
+  @Post('reset-password')
+  @ApiOperation({ summary: 'Reset account password using reset token' })
+  async resetPassword(@Body() body: { token: string; newPass: string }) {
+    return this.authService.resetPassword(body.token, body.newPass);
+  }
+
+  @Post('verify-email')
+  @ApiOperation({ summary: 'Verify customer email address token' })
+  async verifyEmailToken(@Body() body: { token: string }) {
+    return this.authService.verifyEmailToken(body.token);
+  }
+
   @Get('sessions/:userId')
   @ApiOperation({ summary: 'Get active logged-in device sessions' })
   async getSessions(@Param('userId') userId: string) {
