@@ -1,72 +1,175 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  MapPin,
-  Search,
-  Mic,
-  Zap,
-  ShoppingBag,
-  Plus,
-  Minus,
-  Sparkles,
-  Flame,
-  ChevronRight,
-  Home,
-  Grid,
-  Tag,
-  User,
-} from 'lucide-react';
 import { formatCurrency } from '@daily-basket/shared-utils';
 
+// ─── Google Stitch Design System Tokens ─────────────────────────────────────
+// Primary: #006b23 | Surface: #f9f9fc | on-Surface: #1a1c1e
+// Outfit (headlines) + Inter (body) | Rounded-lg cards | Glassmorphism header
+
+interface Product {
+  id: string;
+  name: string;
+  unitName: string;
+  price: number;
+  mrp: number;
+  tag?: string;
+  image: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  emoji: string;
+  count: string;
+  color: string;
+}
+
+const categories: Category[] = [
+  { id: 'c1', name: 'Fresh Produce', emoji: '🥬', count: '45 items', color: 'bg-secondary-container' },
+  { id: 'c2', name: 'Dairy & Eggs',  emoji: '🥛', count: '28 items', color: 'bg-secondary-container' },
+  { id: 'c3', name: 'Beverages',     emoji: '🧃', count: '32 items', color: 'bg-secondary-container' },
+  { id: 'c4', name: 'Snacks',        emoji: '🥨', count: '50 items', color: 'bg-secondary-container' },
+  { id: 'c5', name: 'Bakery',        emoji: '🍞', count: '20 items', color: 'bg-secondary-container' },
+  { id: 'c6', name: 'Staples',       emoji: '🌾', count: '60 items', color: 'bg-secondary-container' },
+];
+
+const flashDeals: Product[] = [
+  {
+    id: 'p1',
+    name: 'Organic Farm Tomatoes',
+    unitName: '500g',
+    price: 24,
+    mrp: 40,
+    tag: '40% OFF',
+    image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&q=80',
+  },
+  {
+    id: 'p2',
+    name: 'Amul Taaza Toned Milk',
+    unitName: '1 Litre',
+    price: 54,
+    mrp: 56,
+    image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&q=80',
+  },
+  {
+    id: 'p3',
+    name: 'Brown Sandwich Bread',
+    unitName: '400g',
+    price: 45,
+    mrp: 50,
+    tag: '10% OFF',
+    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80',
+  },
+  {
+    id: 'p4',
+    name: 'Alphonso Mangoes',
+    unitName: '1 kg',
+    price: 299,
+    mrp: 450,
+    tag: '33% OFF',
+    image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80',
+  },
+];
+
+// ─── Product Card Component ──────────────────────────────────────────────────
+function ProductCard({
+  product,
+  qty,
+  onAdd,
+  onRemove,
+}: {
+  product: Product;
+  qty: number;
+  onAdd: () => void;
+  onRemove: () => void;
+}) {
+  const discount = Math.round(((product.mrp - product.price) / product.mrp) * 100);
+
+  return (
+    <div className="product-card flex-shrink-0 w-44 flex flex-col relative">
+      {/* Tag pill */}
+      {product.tag && (
+        <span className="absolute top-2 left-2 z-10 bg-primary text-on-primary font-label-md text-label-md px-2 py-0.5 rounded-full text-[10px]">
+          {product.tag}
+        </span>
+      )}
+
+      {/* Product image */}
+      <div className="relative w-full aspect-square bg-surface-container-low rounded-t-lg overflow-hidden">
+        <img
+          src={product.image}
+          alt={product.name}
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Info */}
+      <div className="p-sm flex-1 flex flex-col gap-xs">
+        <p className="font-body-sm text-body-sm text-on-surface-variant">{product.unitName}</p>
+        <h3 className="font-body-lg text-body-lg font-medium text-on-surface leading-snug line-clamp-2" style={{ fontFamily: 'Outfit' }}>
+          {product.name}
+        </h3>
+
+        <div className="flex items-baseline gap-xs mt-auto">
+          <span className="font-title-md text-title-md text-on-surface font-semibold" style={{ fontFamily: 'Outfit' }}>
+            {formatCurrency(product.price)}
+          </span>
+          {product.mrp > product.price && (
+            <span className="font-body-sm text-body-sm text-on-surface-variant line-through text-xs">
+              {formatCurrency(product.mrp)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Add / Qty toggle */}
+      <div className="px-sm pb-sm">
+        {qty === 0 ? (
+          <button
+            onClick={onAdd}
+            aria-label={`Add ${product.name} to cart`}
+            className="w-full h-9 bg-primary text-on-primary rounded-full font-label-md text-label-md
+                       hover:bg-surface-tint active:scale-95 transition-all duration-200 shadow-level-1
+                       flex items-center justify-center gap-1"
+          >
+            <span className="text-lg leading-none">+</span> Add
+          </button>
+        ) : (
+          <div className="qty-toggle justify-between w-full">
+            <button
+              onClick={onRemove}
+              aria-label="Remove one"
+              className="w-7 h-7 rounded-full bg-surface-container-lowest text-primary font-bold
+                         flex items-center justify-center hover:bg-outline-variant/30 transition-colors"
+            >
+              −
+            </button>
+            <span className="font-label-md text-label-md text-on-surface min-w-[20px] text-center">
+              {qty}
+            </span>
+            <button
+              onClick={onAdd}
+              aria-label="Add one"
+              className="w-7 h-7 rounded-full bg-primary text-on-primary font-bold
+                         flex items-center justify-center hover:bg-surface-tint transition-colors"
+            >
+              +
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Home Page ───────────────────────────────────────────────────────────────
 export default function HomePage() {
   const [cartItems, setCartItems] = useState<Record<string, number>>({});
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('home');
 
-  const categories = [
-    { id: 'c1', name: 'Fresh Produce', icon: '🥬', count: '45 Items' },
-    { id: 'c2', name: 'Dairy & Eggs', icon: '🥛', count: '28 Items' },
-    { id: 'c3', name: 'Beverages', icon: '🧃', count: '32 Items' },
-    { id: 'c4', name: 'Snacks & Chips', icon: '🥨', count: '50 Items' },
-    { id: 'c5', name: 'Bakery & Bread', icon: '🍞', count: '20 Items' },
-  ];
-
-  const flashDeals = [
-    {
-      id: 'p1',
-      name: 'Organic Farm Tomatoes',
-      unitName: '500g',
-      price: 24,
-      mrp: 40,
-      image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&q=80',
-    },
-    {
-      id: 'p2',
-      name: 'Amul Taaza Toned Milk',
-      unitName: '1 Litre',
-      price: 54,
-      mrp: 56,
-      image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&q=80',
-    },
-    {
-      id: 'p3',
-      name: 'Brown Sandwich Bread',
-      unitName: '400g',
-      price: 45,
-      mrp: 50,
-      image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80',
-    },
-    {
-      id: 'p4',
-      name: 'Alphonso Mangoes',
-      unitName: '1 kg',
-      price: 299,
-      mrp: 450,
-      image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80',
-    },
-  ];
-
-  const updateQuantity = (id: string, delta: number) => {
+  const updateQty = (id: string, delta: number) => {
     setCartItems((prev) => {
       const current = prev[id] || 0;
       const updated = Math.max(0, current + delta);
@@ -81,197 +184,204 @@ export default function HomePage() {
   const totalCartCount = Object.values(cartItems).reduce((a, b) => a + b, 0);
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 pb-24">
-      {/* Sticky Header */}
-      <header className="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 py-3">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-xs">
-              <Zap className="w-3.5 h-3.5 fill-emerald-400" />
-              <span>10 MINS</span>
+    <div className="min-h-screen bg-background text-on-background pb-24 max-w-mobile mx-auto relative">
+
+      {/* ─── Sticky Glass Header ─────────────────────────────────────────── */}
+      <header className="sticky top-0 z-40 glass-header shadow-level-1 px-margin-mobile py-sm border-b border-outline-variant/20">
+
+        {/* Top bar: location + avatar */}
+        <div className="flex items-center justify-between mb-sm">
+          <div className="flex items-center gap-sm">
+            {/* 10 min badge */}
+            <div className="flex items-center gap-1 px-sm py-xs rounded-full bg-primary/10 border border-primary/20">
+              <svg className="w-3.5 h-3.5 text-primary" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11 1v2H9C5.13 3 2 6.13 2 10s3.13 7 7 7h1v2H9C3.48 19 0 14.97 0 10S3.48 1 9 1h2zm2 0h2c5.52 0 9 4.03 9 9s-3.48 9-9 9h-2v-2h2c3.87 0 7-3.13 7-7s-3.13-7-7-7h-2V1zm-1 4v6l4 2-1 2-5-2.5V5h2z"/>
+              </svg>
+              <span className="font-label-md text-label-md text-primary font-bold">10 MINS</span>
             </div>
-            <div className="cursor-pointer">
-              <div className="flex items-center gap-1 text-slate-400 text-xs font-medium">
-                <span>Delivery to</span>
-                <MapPin className="w-3 h-3 text-emerald-400" />
-              </div>
-              <p className="text-white text-xs font-bold truncate max-w-[180px] sm:max-w-xs">
+
+            {/* Location */}
+            <button className="flex flex-col cursor-pointer text-left">
+              <span className="font-label-md text-label-md text-on-surface-variant">Delivery to 📍</span>
+              <span className="font-body-sm text-body-sm font-semibold text-on-surface truncate max-w-[160px]" style={{ fontFamily: 'Outfit' }}>
                 Koramangala 4th Block, Bengaluru
-              </p>
-            </div>
+              </span>
+            </button>
           </div>
 
-          <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 font-bold text-xs">
-            DB
+          {/* Avatar */}
+          <div className="w-9 h-9 rounded-full bg-secondary-container flex items-center justify-center">
+            <span className="font-label-md text-label-md text-on-secondary-container font-bold">DB</span>
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="max-w-4xl mx-auto mt-3 relative">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+        {/* Search bar */}
+        <div className="relative">
+          <svg className="w-4 h-4 text-on-surface-variant absolute left-md top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder='Search "milk", "tomatoes", "bread"...'
-            className="w-full bg-slate-800/90 border border-slate-700/60 focus:border-emerald-500 rounded-xl py-2.5 pl-10 pr-10 text-sm text-white placeholder-slate-400 outline-none transition"
+            className="input-field pl-10 pr-10"
           />
-          <Mic className="w-4 h-4 text-emerald-400 absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer hover:opacity-80" />
+          <button className="absolute right-md top-1/2 -translate-y-1/2 text-primary">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zm6.25 8.85a.75.75 0 0 0-1.5 0 4.75 4.75 0 0 1-9.5 0 .75.75 0 0 0-1.5 0 6.25 6.25 0 0 0 5.5 6.21V18h-2a.75.75 0 0 0 0 1.5h5.5a.75.75 0 0 0 0-1.5h-2v-1.94A6.25 6.25 0 0 0 18.25 9.85z"/>
+            </svg>
+          </button>
+        </div>
+
+        {/* Flash deal banner strip */}
+        <div className="mt-sm -mx-margin-mobile px-margin-mobile bg-primary/5 py-xs flex items-center gap-sm overflow-x-auto scrollbar-none">
+          <span className="font-label-md text-label-md text-primary whitespace-nowrap">⚡ Flash Deal</span>
+          <span className="font-body-sm text-body-sm text-on-surface-variant whitespace-nowrap">40% OFF on Farm Tomatoes</span>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="max-w-4xl mx-auto px-4 mt-4 space-y-6">
-        {/* Banner Carousel */}
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-r from-emerald-700 to-teal-900 p-6 border border-emerald-500/30 shadow-xl">
-          <div className="relative z-10 max-w-xs">
-            <span className="bg-lime-400 text-slate-950 font-black text-[10px] uppercase px-2 py-0.5 rounded-full inline-block mb-2">
-              Flash Deal 40% OFF
-            </span>
-            <h2 className="text-xl sm:text-2xl font-black text-white leading-tight mb-2">
-              Farm Fresh Vegetables Delivered in 10 Mins
-            </h2>
-            <p className="text-emerald-100 text-xs mb-4">Directly from local farms to your doorstep.</p>
-            <button className="px-4 py-2 bg-white text-emerald-950 font-bold rounded-xl text-xs shadow-md hover:bg-slate-100 transition">
-              Shop Now
-            </button>
-          </div>
+      {/* ─── Hero Banner ─────────────────────────────────────────────────── */}
+      <section className="mx-margin-mobile mt-md rounded-xl overflow-hidden relative bg-primary shadow-level-2">
+        <div className="absolute top-0 left-0 w-full h-full opacity-10 blob-primary" />
+        <div className="relative z-10 p-md">
+          <p className="font-label-md text-label-md text-on-primary/70 uppercase tracking-wider mb-xs">
+            Farm Fresh Vegetables
+          </p>
+          <h1 className="font-headline-lg-mobile text-headline-lg-mobile text-on-primary mb-sm" style={{ fontFamily: 'Outfit' }}>
+            Delivered in 10 Mins
+          </h1>
+          <p className="font-body-sm text-body-sm text-on-primary/80 mb-md">
+            Directly from local farms to your doorstep.
+          </p>
+          <button className="bg-surface-container-lowest text-primary font-label-md text-label-md px-lg py-sm rounded-full hover:bg-surface-container-low transition-colors shadow-level-1 active:scale-95">
+            Shop Now
+          </button>
+        </div>
+        <div className="absolute right-0 bottom-0 w-40 h-36 rounded-tl-3xl overflow-hidden">
           <img
-            src="https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=600&q=80"
-            alt="Fresh Produce"
-            className="absolute right-0 top-0 bottom-0 w-1/2 object-cover opacity-60 mix-blend-overlay"
+            src="https://images.unsplash.com/photo-1540420773420-3366772f4999?w=400&q=80"
+            alt="Fresh vegetables"
+            className="w-full h-full object-cover"
           />
         </div>
+      </section>
 
-        {/* Categories Grid */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span>Explore Categories</span>
-            </h3>
-            <span className="text-xs text-emerald-400 font-semibold cursor-pointer flex items-center">
-              View All <ChevronRight className="w-3 h-3" />
-            </span>
+      {/* ─── Categories ──────────────────────────────────────────────────── */}
+      <section className="mt-lg">
+        <div className="flex items-center justify-between px-margin-mobile mb-sm">
+          <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface" style={{ fontFamily: 'Outfit' }}>
+            Explore Categories
+          </h2>
+          <button className="font-label-md text-label-md text-primary flex items-center gap-xs hover:opacity-80">
+            See All
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
+
+        <div className="flex gap-sm px-margin-mobile overflow-x-auto scrollbar-none pb-sm">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              className="flex-shrink-0 flex flex-col items-center gap-xs bg-surface-container-lowest
+                         rounded-lg p-sm shadow-level-1 w-20 hover:shadow-level-2 active:scale-95
+                         transition-all duration-200 border border-outline-variant/10"
+            >
+              <span className="text-3xl">{cat.emoji}</span>
+              <span className="font-label-md text-label-md text-on-surface text-center leading-tight">
+                {cat.name}
+              </span>
+              <span className="font-label-md text-[10px] text-on-surface-variant">{cat.count}</span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Flash Deals ─────────────────────────────────────────────────── */}
+      <section className="mt-lg">
+        <div className="flex items-center justify-between px-margin-mobile mb-sm">
+          <div className="flex items-center gap-xs">
+            <span className="text-lg">⚡</span>
+            <h2 className="font-headline-lg-mobile text-headline-lg-mobile text-on-surface" style={{ fontFamily: 'Outfit' }}>
+              Flash Deals
+            </h2>
           </div>
+          <button className="font-label-md text-label-md text-primary flex items-center gap-xs hover:opacity-80">
+            See All
+            <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+              <path d="m9 18 6-6-6-6"/>
+            </svg>
+          </button>
+        </div>
 
-          <div className="grid grid-cols-5 gap-2.5">
-            {categories.map((cat) => (
-              <div
-                key={cat.id}
-                className="bg-slate-800/60 border border-slate-700/40 hover:border-emerald-500/50 rounded-xl p-3 flex flex-col items-center text-center cursor-pointer transition"
-              >
-                <span className="text-2xl mb-1">{cat.icon}</span>
-                <span className="text-xs font-bold text-slate-200 truncate w-full">{cat.name}</span>
-                <span className="text-[10px] text-slate-400">{cat.count}</span>
-              </div>
-            ))}
-          </div>
-        </section>
+        <div className="flex gap-md px-margin-mobile overflow-x-auto scrollbar-none pb-sm">
+          {flashDeals.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              qty={cartItems[product.id] || 0}
+              onAdd={() => updateQty(product.id, 1)}
+              onRemove={() => updateQty(product.id, -1)}
+            />
+          ))}
+        </div>
+      </section>
 
-        {/* ⚡ Flash Deals Horizontal Carousel */}
-        <section>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-base font-bold text-white flex items-center gap-2">
-              <Flame className="w-4 h-4 text-amber-400" />
-              <span>⚡ 10-Min Flash Deals</span>
-            </h3>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {flashDeals.map((prod) => {
-              const qty = cartItems[prod.id] || 0;
-              return (
-                <div
-                  key={prod.id}
-                  className="bg-slate-800/80 border border-slate-700/50 rounded-2xl p-3 flex flex-col justify-between hover:border-emerald-500/40 transition shadow-md"
-                >
-                  <div>
-                    <div className="relative w-full h-28 rounded-xl overflow-hidden bg-slate-900 mb-2">
-                      <img src={prod.image} alt={prod.name} className="w-full h-full object-cover" />
-                      <span className="absolute top-1.5 left-1.5 bg-emerald-500 text-white font-extrabold text-[10px] px-1.5 py-0.5 rounded-md">
-                        {Math.round(((prod.mrp - prod.price) / prod.mrp) * 100)}% OFF
-                      </span>
-                    </div>
-
-                    <span className="text-[11px] text-slate-400 font-medium">{prod.unitName}</span>
-                    <h4 className="text-xs font-bold text-slate-100 line-clamp-2 mt-0.5 mb-2">{prod.name}</h4>
-                  </div>
-
-                  <div className="flex items-center justify-between mt-1">
-                    <div>
-                      <span className="text-sm font-extrabold text-emerald-400">{formatCurrency(prod.price)}</span>
-                      <span className="text-[10px] text-slate-500 line-through ml-1">{formatCurrency(prod.mrp)}</span>
-                    </div>
-
-                    {qty === 0 ? (
-                      <button
-                        onClick={() => updateQuantity(prod.id, 1)}
-                        className="px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600 border border-emerald-500/50 text-emerald-400 hover:text-white font-bold text-xs rounded-lg transition"
-                      >
-                        + ADD
-                      </button>
-                    ) : (
-                      <div className="flex items-center gap-2 bg-emerald-600 text-white rounded-lg px-2 py-1">
-                        <button onClick={() => updateQuantity(prod.id, -1)} className="hover:opacity-80">
-                          <Minus className="w-3 h-3" />
-                        </button>
-                        <span className="text-xs font-bold">{qty}</span>
-                        <button onClick={() => updateQuantity(prod.id, 1)} className="hover:opacity-80">
-                          <Plus className="w-3 h-3" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      </main>
-
-      {/* Floating Cart Bar (Appears when items are in cart) */}
-      {totalCartCount > 0 && (
-        <div className="fixed bottom-16 left-4 right-4 max-w-md mx-auto z-40">
-          <div className="bg-emerald-600 text-white p-3.5 rounded-2xl shadow-xl shadow-emerald-900/50 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center font-black text-xs">
-                {totalCartCount}
-              </div>
-              <div>
-                <p className="text-xs font-semibold text-emerald-100">{totalCartCount} Items Added</p>
-                <p className="text-sm font-extrabold">Instant Delivery in 10 Mins</p>
-              </div>
+      {/* ─── Feature Highlights Strip ────────────────────────────────────── */}
+      <section className="mt-lg mx-margin-mobile rounded-xl bg-secondary-container/30 p-md">
+        <div className="grid grid-cols-3 gap-md text-center">
+          {[
+            { icon: '🌿', label: 'Farm Fresh' },
+            { icon: '⚡', label: '10 Min Delivery' },
+            { icon: '🔒', label: 'Secure Pay' },
+          ].map((feat) => (
+            <div key={feat.label} className="flex flex-col items-center gap-xs">
+              <span className="text-2xl">{feat.icon}</span>
+              <span className="font-label-md text-label-md text-on-surface-variant">{feat.label}</span>
             </div>
+          ))}
+        </div>
+      </section>
 
-            <button className="flex items-center gap-1.5 bg-white text-emerald-950 font-bold px-4 py-2 rounded-xl text-xs shadow">
-              <span>View Cart</span>
-              <ChevronRight className="w-4 h-4" />
+      {/* ─── Bottom Navigation Bar (Glassmorphism) ──────────────────────── */}
+      <nav className="bottom-nav" aria-label="Main navigation">
+        {[
+          { id: 'home',   label: 'Home',       icon: '🏠' },
+          { id: 'search', label: 'Search',      icon: '🔍' },
+          { id: 'orders', label: 'Orders',      icon: '📦' },
+          { id: 'profile',label: 'Profile',     icon: '👤' },
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`bottom-nav-item ${activeTab === tab.id ? 'active' : ''}`}
+            aria-label={tab.label}
+            aria-current={activeTab === tab.id ? 'page' : undefined}
+          >
+            {activeTab === tab.id ? (
+              <span className="bottom-nav-pill flex items-center justify-center">
+                <span className="text-lg">{tab.icon}</span>
+              </span>
+            ) : (
+              <span className="text-lg">{tab.icon}</span>
+            )}
+            <span className="font-label-md text-label-md text-[10px]">{tab.label}</span>
+          </button>
+        ))}
+
+        {/* Cart FAB */}
+        {totalCartCount > 0 && (
+          <div className="fixed bottom-20 right-4 z-50">
+            <button className="bg-primary text-on-primary w-14 h-14 rounded-full shadow-level-3
+                               flex items-center justify-center flex-col hover:bg-surface-tint
+                               active:scale-95 transition-all duration-200">
+              <span className="text-xl">🛒</span>
+              <span className="font-label-md text-label-md text-[10px] font-bold">{totalCartCount}</span>
             </button>
           </div>
-        </div>
-      )}
-
-      {/* Sticky Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-lg border-t border-slate-800 py-2">
-        <div className="max-w-md mx-auto flex items-center justify-around">
-          <button className="flex flex-col items-center text-emerald-400">
-            <Home className="w-5 h-5" />
-            <span className="text-[10px] font-bold mt-1">Home</span>
-          </button>
-          <button className="flex flex-col items-center text-slate-400 hover:text-slate-200">
-            <Grid className="w-5 h-5" />
-            <span className="text-[10px] font-bold mt-1">Categories</span>
-          </button>
-          <button className="flex flex-col items-center text-slate-400 hover:text-slate-200">
-            <Tag className="w-5 h-5" />
-            <span className="text-[10px] font-bold mt-1">Offers</span>
-          </button>
-          <button className="flex flex-col items-center text-slate-400 hover:text-slate-200">
-            <User className="w-5 h-5" />
-            <span className="text-[10px] font-bold mt-1">Profile</span>
-          </button>
-        </div>
+        )}
       </nav>
     </div>
   );
