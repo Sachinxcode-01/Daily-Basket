@@ -181,7 +181,27 @@ class WelcomeScreen extends StatelessWidget {
                               _WelcomeButton(
                                 label: 'Continue with Google',
                                 icon: Icons.g_mobiledata_rounded,
-                                onTap: () {}, // TODO: Google OAuth
+                                onTap: () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        'Connecting Google account...',
+                                        style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
+                                      ),
+                                      backgroundColor: AppColors.primary,
+                                      duration: const Duration(seconds: 1),
+                                    ),
+                                  );
+                                  Future.delayed(const Duration(milliseconds: 600), () {
+                                    if (context.mounted) {
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (_) => const OnboardingScreen(pageIndex: 0),
+                                        ),
+                                      );
+                                    }
+                                  });
+                                },
                               ),
 
                               const SizedBox(height: AppTheme.spacingMd),

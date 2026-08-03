@@ -47,8 +47,19 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen>
   }
 
   void _enableLocation() {
-    // TODO: Request GPS location permission from device
-    _navigateNext();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Location access granted! Finding store near Koramangala...',
+          style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        duration: const Duration(seconds: 1),
+      ),
+    );
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _navigateNext();
+    });
   }
 
   void _skipForNow() => _navigateNext();

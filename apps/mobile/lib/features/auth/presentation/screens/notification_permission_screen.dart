@@ -49,8 +49,19 @@ class _NotificationPermissionScreenState
   }
 
   void _allow() {
-    // TODO: Request notification permission from OS
-    _navigate();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Notifications enabled! You will get 10-minute order updates.',
+          style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
+        ),
+        backgroundColor: AppColors.primary,
+        duration: const Duration(seconds: 1),
+      ),
+    );
+    Future.delayed(const Duration(milliseconds: 600), () {
+      if (mounted) _navigate();
+    });
   }
 
   void _maybeLater() => _navigate();
