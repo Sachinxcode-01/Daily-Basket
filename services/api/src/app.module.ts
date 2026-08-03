@@ -27,6 +27,8 @@ import { PaymentsModule } from './modules/payments/payments.module';
 import { DeliveryModule } from './modules/delivery/delivery.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { DeliveryPartnerModule } from './modules/delivery-partner/delivery-partner.module';
+import { LoyaltyModule } from './modules/loyalty/loyalty.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
 
 @Module({
   imports: [
@@ -51,6 +53,8 @@ import { DeliveryPartnerModule } from './modules/delivery-partner/delivery-partn
     DeliveryModule,
     AnalyticsModule,
     DeliveryPartnerModule,
+    LoyaltyModule,
+    ReviewsModule,
   ],
   providers: [
     PrismaService,
