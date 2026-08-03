@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
-import 'notification_permission_screen.dart';
+import 'location_permission_screen.dart';
 
 /// Unified Onboarding Screen — Google Stitch Design System
 /// Implements ALL 4 onboarding pages from Stitch:
@@ -128,16 +128,16 @@ class _OnboardingScreenState extends State<OnboardingScreen>
         curve: Curves.easeInOut,
       );
     } else {
-      _goToLogin();
+      _completeOnboarding();
     }
   }
 
-  void _skip() => _goToLogin();
+  void _skip() => _completeOnboarding();
 
-  void _goToLogin() {
+  void _completeOnboarding() {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const NotificationPermissionScreen(),
+        pageBuilder: (_, __, ___) => const LocationPermissionScreen(),
         transitionsBuilder: (_, anim, __, child) =>
             FadeTransition(opacity: anim, child: child),
         transitionDuration: const Duration(milliseconds: 300),
