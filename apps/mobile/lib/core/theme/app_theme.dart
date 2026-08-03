@@ -27,6 +27,7 @@ class AppColors {
   static const onSecondary            = Color(0xFFFFFFFF);
   static const secondaryContainer     = Color(0xFFDCE5DD);
   static const onSecondaryContainer   = Color(0xFF5E6660);
+  static const secondaryFixed         = Color(0xFFDCE5DD);
 
   // ─── Tertiary ───────────────────────────────────────────────────────────
   static const tertiary           = Color(0xFF5A5C5C);
