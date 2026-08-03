@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'notification_permission_screen.dart';
@@ -158,7 +158,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.secondaryContainer.withOpacity(0.20),
+                color: AppColors.secondaryContainer.withValues(alpha: 0.20),
               ),
             ),
           ),
@@ -170,7 +170,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               height: 280,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primaryFixed.withOpacity(0.10),
+                color: AppColors.primaryFixed.withValues(alpha: 0.10),
               ),
             ),
           ),
@@ -266,8 +266,8 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    AppColors.background.withOpacity(0),
-                    AppColors.background.withOpacity(0.95),
+                    AppColors.background.withValues(alpha: 0),
+                    AppColors.background.withValues(alpha: 0.95),
                     AppColors.background,
                   ],
                 ),
@@ -306,7 +306,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                       shadowColor: Colors.transparent,
                     ).copyWith(
                       overlayColor: WidgetStateProperty.all(
-                        AppColors.surfaceTint.withOpacity(0.15),
+                        AppColors.surfaceTint.withValues(alpha: 0.15),
                       ),
                     ),
                     icon: Icon(
@@ -357,7 +357,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         height: 280,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: page.bgColor1.withOpacity(0.20),
+                          color: page.bgColor1.withValues(alpha: 0.20),
                         ),
                       ),
                       // Illustration icon (placeholder for 3D illustration)
@@ -365,7 +365,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                         width: 220,
                         height: 220,
                         decoration: BoxDecoration(
-                          color: page.bgColor1.withOpacity(0.35),
+                          color: page.bgColor1.withValues(alpha: 0.35),
                           shape: BoxShape.circle,
                           boxShadow: AppTheme.level2,
                         ),
@@ -393,14 +393,14 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   width: double.infinity,
                   padding: const EdgeInsets.all(AppTheme.spacingXl),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.40),
+                    color: Colors.white.withValues(alpha: 0.40),
                     borderRadius: BorderRadius.circular(32),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.50),
+                      color: Colors.white.withValues(alpha: 0.50),
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.03),
+                        color: Colors.black.withValues(alpha: 0.03),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),

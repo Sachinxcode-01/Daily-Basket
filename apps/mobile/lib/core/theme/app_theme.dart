@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Google Stitch Daily Basket Design System
@@ -207,10 +207,10 @@ class AppTheme {
       ),
       // ─── AppBar ────────────────────────────────────────────────────────
       appBarTheme: AppBarTheme(
-        backgroundColor: AppColors.surface.withOpacity(0.80),
+        backgroundColor: AppColors.surface.withValues(alpha: 0.80),
         elevation: 0,
         scrolledUnderElevation: 1,
-        shadowColor: AppColors.outline.withOpacity(0.15),
+        shadowColor: AppColors.outline.withValues(alpha: 0.15),
         centerTitle: false,
         titleTextStyle: AppTextStyles.headlineLgMobile.copyWith(
           color: AppColors.onSurface,
@@ -228,7 +228,7 @@ class AppTheme {
         showUnselectedLabels: true,
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: AppColors.surface.withOpacity(0.90),
+        backgroundColor: AppColors.surface.withValues(alpha: 0.90),
         indicatorColor: AppColors.secondaryContainer,
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -290,7 +290,7 @@ class AppTheme {
           borderSide: BorderSide(color: AppColors.error, width: 1),
         ),
         hintStyle: AppTextStyles.bodyLg.copyWith(
-          color: AppColors.onSurfaceVariant.withOpacity(0.6),
+          color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
         ),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: spacingMd,
@@ -303,7 +303,7 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         shadowColor: Colors.black.withValues(alpha: 0.04),
         elevation: 2,
-     const    shape: RoundedRectangleBorder(borderRadius: radiusLg),
+        shape: RoundedRectangleBorder(borderRadius: radiusLg),
         margin: EdgeInsets.zero,
       ),
       // ─── Chips / Tags ──────────────────────────────────────────────────
@@ -311,7 +311,7 @@ class AppTheme {
         backgroundColor: AppColors.secondaryContainer,
         selectedColor: AppColors.primaryFixed,
         labelStyle: AppTextStyles.labelMd,
-     const    shape: RoundedRectangleBorder(borderRadius: radiusFull),
+        shape: RoundedRectangleBorder(borderRadius: radiusFull),
         side: BorderSide.none,
       ),
       // ─── Switch / Toggles ──────────────────────────────────────────────
@@ -335,15 +335,15 @@ class AppTheme {
         contentTextStyle: AppTextStyles.bodyLg.copyWith(
           color: AppColors.inverseOnSurface,
         ),
-     const    shape: RoundedRectangleBorder(borderRadius: radiusMd),
+        shape: RoundedRectangleBorder(borderRadius: radiusMd),
         behavior: SnackBarBehavior.floating,
       ),
     );
   }
 
   // ─── Dark Theme ────────────────────────────────────────────────────────────
-  static ThemeData get darkThconst
-    final coloe = const ColorScheme.dark(
+  static ThemeData get darkTheme {
+    const colorScheme = ColorScheme.dark(
       primary:              AppColors.inversePrimary,  // #70DD7A on dark
       onPrimary:            Color(0xFF002106),
       primaryContainer:     Color(0xFF00531A),
@@ -355,10 +355,10 @@ class AppTheme {
     );
 
     return ThemeData(
-      useMaterial3 = true,
-      brightness = Brightness.dark,
-      colorScheme = colorScheme,
-      scaffoldBackgroundColor = AppColors.inverseSurface,
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: AppColors.inverseSurface,
     );
   }
 

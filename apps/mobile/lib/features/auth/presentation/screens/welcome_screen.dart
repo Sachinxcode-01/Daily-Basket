@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'login_screen.dart';
@@ -35,7 +35,7 @@ class WelcomeScreen extends StatelessWidget {
               height: 320,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.secondaryContainer.withOpacity(0.30),
+                color: AppColors.secondaryContainer.withValues(alpha: 0.30),
               ),
               // Blur effect via opacity — full BackdropFilter requires separate widget
             ),
@@ -48,7 +48,7 @@ class WelcomeScreen extends StatelessWidget {
               height: 280,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primaryContainer.withOpacity(0.10),
+                color: AppColors.primaryContainer.withValues(alpha: 0.10),
               ),
             ),
           ),
@@ -70,10 +70,10 @@ class WelcomeScreen extends StatelessWidget {
                         child: Container(
                           padding: const EdgeInsets.all(AppTheme.spacingXl),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.70),
+                            color: Colors.white.withValues(alpha: 0.70),
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.50),
+                              color: Colors.white.withValues(alpha: 0.50),
                             ),
                             boxShadow: AppTheme.level2,
                           ),
@@ -149,7 +149,7 @@ class WelcomeScreen extends StatelessWidget {
                                     Expanded(
                                       child: Divider(
                                         color: AppColors.outlineVariant
-                                            .withOpacity(0.50),
+                                            .withValues(alpha: 0.50),
                                       ),
                                     ),
                                     Padding(
@@ -168,7 +168,7 @@ class WelcomeScreen extends StatelessWidget {
                                     Expanded(
                                       child: Divider(
                                         color: AppColors.outlineVariant
-                                            .withOpacity(0.50),
+                                            .withValues(alpha: 0.50),
                                       ),
                                     ),
                                   ],
@@ -225,7 +225,7 @@ class WelcomeScreen extends StatelessWidget {
                                     style: GoogleFonts.inter(
                                       fontSize: 12,
                                       color: AppColors.onSurfaceVariant
-                                          .withOpacity(0.70),
+                                          .withValues(alpha: 0.70),
                                     ),
                                     children: [
                                       TextSpan(
@@ -304,7 +304,7 @@ class _WelcomeButton extends StatelessWidget {
             border: isPrimary
                 ? null
                 : Border.all(
-                    color: AppColors.outlineVariant.withOpacity(0.30),
+                    color: AppColors.outlineVariant.withValues(alpha: 0.30),
                   ),
             boxShadow: isPrimary ? AppTheme.level2 : AppTheme.level1,
           ),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'ready_to_shop_screen.dart';
@@ -85,7 +85,7 @@ class _NotificationPermissionScreenState
                   end: Alignment.bottomCenter,
                   colors: [
                     Colors.transparent,
-                    AppColors.secondaryContainer.withOpacity(0.20),
+                    AppColors.secondaryContainer.withValues(alpha: 0.20),
                   ],
                 ),
               ),
@@ -111,7 +111,7 @@ class _NotificationPermissionScreenState
                         color: AppColors.onSurfaceVariant,
                         style: IconButton.styleFrom(
                           backgroundColor:
-                              AppColors.secondaryContainer.withOpacity(0.50),
+                              AppColors.secondaryContainer.withValues(alpha: 0.50),
                           shape: const CircleBorder(),
                         ),
                       ),
@@ -142,7 +142,7 @@ class _NotificationPermissionScreenState
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: AppColors.primaryContainer
-                                        .withOpacity(0.20),
+                                        .withValues(alpha: 0.20),
                                   ),
                                 ),
                                 // Floating illustration
@@ -159,7 +159,7 @@ class _NotificationPermissionScreenState
                                     height: 180,
                                     decoration: BoxDecoration(
                                       color:
-                                          AppColors.secondaryContainer.withOpacity(0.40),
+                                          AppColors.secondaryContainer.withValues(alpha: 0.40),
                                       shape: BoxShape.circle,
                                       boxShadow: AppTheme.level2,
                                     ),

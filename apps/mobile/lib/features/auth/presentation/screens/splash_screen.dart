@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'welcome_screen.dart';
@@ -144,15 +144,15 @@ class _SplashScreenState extends State<SplashScreen>
                             height: 128,
                             margin: const EdgeInsets.only(bottom: AppTheme.spacingLg),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.10),
+                              color: Colors.white.withValues(alpha: 0.10),
                               borderRadius: BorderRadius.circular(24), // rounded-3xl
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.20),
+                                color: Colors.white.withValues(alpha: 0.20),
                                 width: 1,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.15),
+                                  color: Colors.black.withValues(alpha: 0.15),
                                   blurRadius: 20,
                                   offset: const Offset(0, 4),
                                 ),
@@ -165,7 +165,7 @@ class _SplashScreenState extends State<SplashScreen>
                                 children: [
                                   // Frosted glass blur layer
                                   Container(
-                                    color: Colors.white.withOpacity(0.05),
+                                    color: Colors.white.withValues(alpha: 0.05),
                                   ),
                                   // Brand icon
                                   const Icon(
@@ -212,7 +212,7 @@ class _SplashScreenState extends State<SplashScreen>
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                               height: 28 / 20,
-                              color: AppColors.onPrimary.withOpacity(0.80),
+                              color: AppColors.onPrimary.withValues(alpha: 0.80),
                             ),
                             textAlign: TextAlign.center,
                           ),

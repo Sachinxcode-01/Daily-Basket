@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../home/presentation/screens/home_screen.dart' show CustomerHomeScreen;
@@ -139,7 +139,7 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.primaryFixed.withOpacity(0.20),
+                color: AppColors.primaryFixed.withValues(alpha: 0.20),
               ),
             ),
           ),
@@ -155,7 +155,7 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
               height: 240,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: AppColors.secondaryContainer.withOpacity(0.30),
+                color: AppColors.secondaryContainer.withValues(alpha: 0.30),
               ),
             ),
           ),
@@ -185,10 +185,10 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
                                 Container(
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: AppColors.surface.withOpacity(0.40),
+                                    color: AppColors.surface.withValues(alpha: 0.40),
                                     border: Border.all(
                                       color: AppColors.surfaceContainerHighest
-                                          .withOpacity(0.50),
+                                          .withValues(alpha: 0.50),
                                     ),
                                     boxShadow: AppTheme.level2,
                                   ),
