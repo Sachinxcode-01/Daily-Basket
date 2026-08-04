@@ -270,21 +270,21 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text('Fresh Arrivals', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white)),
-                const SizedBox(height: 6),
+                Text('Fresh Arrivals', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white)),
+                const SizedBox(height: 4),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 190),
-                  child: Text('Up to 20% off organic vegetables this weekend.', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.95), height: 1.4)),
+                  child: Text('Up to 20% off organic vegetables this weekend.', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.95), height: 1.3), maxLines: 2, overflow: TextOverflow.ellipsis),
                 ),
-                const SizedBox(height: 14),
+                const SizedBox(height: 10),
                 GestureDetector(
                   onTap: () => Navigator.pushNamed(context, '/categories'),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
                     decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(9999)),
-                    child: Text('Shop Now', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF006B23))),
+                    child: Text('Shop Now', style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF006B23))),
                   ),
                 ),
               ]),
