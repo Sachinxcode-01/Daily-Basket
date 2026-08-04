@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../providers/coupon_provider.dart';
 
 /// Coupon Details Modal Bottom Sheet — Google Stitch Design System Exact Replica
 class CouponDetailsSheet extends StatefulWidget {
@@ -332,28 +334,67 @@ class _CouponDetailsSheetState extends State<CouponDetailsSheet> {
 
               const SizedBox(height: 16),
 
-              // ─── 5. Shop Now Primary CTA Button ─────────────────────────────
-              SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF006B23),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
+              // ─── 5. Apply Coupon Now & Shop Now Buttons ─────────────────────
+              Row(
+                children: [
+                  Expanded(
+                    child: SizedBox(
+                      height: 52,
+                      child: OutlinedButton(
+                        onPressed: () {
+                          final couponProvider = context.read<CouponProvider>();
+                          final res = couponProvider.applyCouponByCode(widget.code, 100.0);
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(res.message),
+                              backgroundColor: res.success ? const Color(0xFF006B23) : const Color(0xFFD32F2F),
+                              behavior: SnackBarBehavior.floating,
+                            ),
+                          );
+                        },
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF006B23),
+                          side: const BorderSide(color: Color(0xFF006B23), width: 1.5),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text(
+                          'Apply Coupon',
+                          style: GoogleFonts.outfit(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                  child: Text(
-                    'Shop Now',
-                    style: GoogleFonts.outfit(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SizedBox(
+                      height: 52,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF006B23),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        child: Text(
+                          'Shop Now',
+                          style: GoogleFonts.outfit(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
 
               const SizedBox(height: 20),
@@ -366,11 +407,20 @@ class _CouponDetailsSheetState extends State<CouponDetailsSheet> {
 }
 
 /// Helper function to display the Coupon Details Bottom Sheet Modal
-void showCouponDetailsBottomSheet(BuildContext context) {
+void showCouponDetailsBottomSheet(
+  BuildContext context, {
+  String code = 'ORGANIC15',
+  String title = 'Organic Staples Promo',
+  String discountTag = '15% OFF',
+}) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => const CouponDetailsSheet(),
+    builder: (context) => CouponDetailsSheet(
+      code: code,
+      title: title,
+      discountTag: discountTag,
+    ),
   );
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../referral/providers/coupon_provider.dart';
+import '../../../referral/providers/coupon_provider.dart';
 
 /// Your Basket / Cart Screen — Google Stitch Design System Exact Replica
 class CartScreen extends StatefulWidget {

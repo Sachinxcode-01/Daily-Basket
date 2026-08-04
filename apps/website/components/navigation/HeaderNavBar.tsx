@@ -41,8 +41,8 @@ export default function HeaderNavBar({ cartCount = 0, onSearch, onCartClick }: H
         <Link href="/loyalty" className="underline font-bold hover:opacity-90 ml-1">Join DB Plus →</Link>
       </div>
 
-      {/* ─── Main Desktop Navigation Bar ──────────────────────────────────── */}
-      <div className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop h-20 flex items-center justify-between gap-6">
+      {/* ─── Main Desktop Navigation Bar (Full Width Stretched) ─────────────── */}
+      <div className="w-full px-4 sm:px-8 md:px-10 lg:px-12 h-20 flex items-center justify-between gap-6">
 
         {/* Left: Logo & Location Selector */}
         <div className="flex items-center gap-5">

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../../referral/providers/coupon_provider.dart';
+import '../../../referral/providers/coupon_provider.dart';
 import 'payment_screen.dart';
 
 /// Checkout Summary / Confirm Order Screen — Google Stitch Design System Exact Replica
@@ -621,17 +621,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildBillRow(String label, String value) {
+  Widget _buildBillRow(String label, String value, {bool isDiscount = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF6E7A6C)),
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: isDiscount ? FontWeight.w600 : FontWeight.w400,
+            color: isDiscount ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
+          ),
         ),
         Text(
           value,
-          style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF1A1C1E)),
+          style: GoogleFonts.inter(
+            fontSize: 14,
+            fontWeight: isDiscount ? FontWeight.w700 : FontWeight.w400,
+            color: isDiscount ? const Color(0xFF006B23) : const Color(0xFF1A1C1E),
+          ),
         ),
       ],
     );
