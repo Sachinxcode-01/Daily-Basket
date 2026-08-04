@@ -245,7 +245,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
                   // ─── 4. Fresh Arrivals Card ───────────────────────────
                   Container(
-                    height: 180,
                     width: double.infinity,
                     decoration: BoxDecoration(
                       color: const Color(0xFF006B23),

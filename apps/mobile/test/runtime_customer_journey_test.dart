@@ -79,7 +79,7 @@ void main() {
       await tester.pumpAndSettle();
 
       // Verify Cart Screen
-      expect(find.text('Basket'), findsWidgets);
+      expect(find.text('Cart'), findsWidgets);
 
       // Navigate to Checkout
       Navigator.pushNamed(navContext, '/checkout');
