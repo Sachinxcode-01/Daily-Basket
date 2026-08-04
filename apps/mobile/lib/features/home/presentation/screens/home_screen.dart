@@ -162,7 +162,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               ]),
             ),
             SizedBox(
-              height: 290,
+              height: 310,
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
@@ -188,7 +188,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, childAspectRatio: 0.62,
+                  crossAxisCount: 2, childAspectRatio: 0.54,
                   crossAxisSpacing: 14, mainAxisSpacing: 14,
                 ),
                 itemCount: _filtered.length,
@@ -353,7 +353,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         ClipRRect(
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           child: AspectRatio(
-            aspectRatio: 1.05,
+            aspectRatio: 1.3,
             child: Image.network(
               p.imageUrl, fit: BoxFit.cover,
               loadingBuilder: (_, child, prog) => prog == null ? child : Container(color: const Color(0xFFF3F3F6), child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF006B23)))),
