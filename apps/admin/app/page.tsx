@@ -1,300 +1,164 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import {
-  Store,
-  Package,
   TrendingUp,
-  AlertTriangle,
+  Package,
+  ShoppingCart,
   Clock,
   CheckCircle2,
-  Users,
-  Search,
-  Plus,
+  AlertTriangle,
   ArrowUpRight,
-  Filter,
-  BarChart3,
-  RefreshCw,
+  Bike,
+  DollarSign,
+  Users,
 } from 'lucide-react';
-import { formatCurrency } from '@daily-basket/shared-utils';
 
-export default function AdminDashboardPage() {
-  const [activeTab, setActiveTab] = useState<'OVERVIEW' | 'INVENTORY' | 'ORDERS' | 'ANALYTICS'>('OVERVIEW');
-
-  const [inventoryList, setInventoryList] = useState([
-    { id: 'inv_1', name: 'Fresh Organic Farm Tomatoes', category: 'Produce', sku: 'VEG-TOM-500G', stock: 45, reserved: 3, lowStock: false, price: 24 },
-    { id: 'inv_2', name: 'Amul Taaza Toned Milk', category: 'Dairy', sku: 'DAI-MLK-1L', stock: 12, reserved: 5, lowStock: true, price: 54 },
-    { id: 'inv_3', name: 'Brown Sandwich Bread', category: 'Bakery', sku: 'BAK-BRD-400G', stock: 8, reserved: 2, lowStock: true, price: 45 },
-    { id: 'inv_4', name: 'Alphonso Mangoes Box', category: 'Produce', sku: 'FRU-MNG-1KG', stock: 28, reserved: 4, lowStock: false, price: 299 },
-  ]);
-
-  const [ordersQueue, setOrdersQueue] = useState([
-    { id: 'DB-892104', customer: 'Ananya Sharma', items: '2x Tomatoes, 1x Milk', total: 102, status: 'CONFIRMED', time: '2 Mins ago' },
-    { id: 'DB-892105', customer: 'Vikram Mehta', items: '1x Mangoes Box', total: 299, status: 'PACKING', time: '4 Mins ago' },
-    { id: 'DB-892106', customer: 'Priya Nair', items: '1x Brown Bread, 2x Milk', total: 153, status: 'READY_FOR_PICKUP', time: '7 Mins ago' },
-  ]);
-
-  const updateStock = (id: string, delta: number) => {
-    setInventoryList((prev) =>
-      prev.map((item) => {
-        if (item.id === id) {
-          const newStock = Math.max(0, item.stock + delta);
-          return { ...item, stock: newStock, lowStock: newStock < 15 };
-        }
-        return item;
-      }),
-    );
-  };
-
-  const advanceOrderStatus = (id: string) => {
-    setOrdersQueue((prev) =>
-      prev.map((order) => {
-        if (order.id === id) {
-          let nextStatus = 'PACKING';
-          if (order.status === 'CONFIRMED') nextStatus = 'PACKING';
-          else if (order.status === 'PACKING') nextStatus = 'READY_FOR_PICKUP';
-          else if (order.status === 'READY_FOR_PICKUP') nextStatus = 'OUT_FOR_DELIVERY';
-          return { ...order, status: nextStatus };
-        }
-        return order;
-      }),
-    );
-  };
-
+export default function AdminOverviewPage() {
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 p-6">
-      {/* Top Admin Header */}
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-4 border-b border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-600 flex items-center justify-center text-white shadow-lg shadow-emerald-900/40">
-            <Store className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-xl font-extrabold text-white">Daily Basket Store Manager</h1>
-            <p className="text-xs text-slate-400">Kirana Hub #01 • Koramangala, Bengaluru</p>
-          </div>
+    <div className="space-y-8">
+      {/* Page Title Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl md:text-3xl font-extrabold text-[#1a1c1e] tracking-tight">Admin Overview</h1>
+          <p className="text-sm text-[#3f4a3d]">Real-time dark store operations, dispatch metrics, and revenue analytics.</p>
         </div>
-
-        <div className="flex items-center gap-3">
-          <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            Store Open & Active
+        <div className="flex items-center gap-2">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#dce5dd] text-[#006b23] text-xs font-bold">
+            <span className="w-2 h-2 rounded-full bg-[#006b23] animate-pulse" /> Live Store Feeds
           </span>
         </div>
-      </header>
+      </div>
 
-      {/* KPI Overview Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-            <span>Today's Sales Revenue</span>
-            <TrendingUp className="w-4 h-4 text-emerald-400" />
+      {/* KPI Stats Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#e2e2e5] space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider">Today&apos;s Revenue</span>
+            <div className="w-9 h-9 rounded-xl bg-[#dce5dd] text-[#006b23] flex items-center justify-center font-bold">
+              <DollarSign className="w-5 h-5" />
+            </div>
           </div>
-          <h3 className="text-2xl font-black text-emerald-400">₹38,450</h3>
-          <p className="text-[10px] text-emerald-300/80 mt-1">↑ 18% vs yesterday</p>
+          <div className="text-3xl font-black text-[#1a1c1e]">₹1,84,920</div>
+          <div className="flex items-center gap-1 text-xs text-emerald-700 font-bold">
+            <ArrowUpRight className="w-3.5 h-3.5" /> +14.2% from yesterday
+          </div>
         </div>
 
-        <div className="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-            <span>Orders Processed</span>
-            <Package className="w-4 h-4 text-sky-400" />
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#e2e2e5] space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider">Active Orders</span>
+            <div className="w-9 h-9 rounded-xl bg-[#dce5dd] text-[#006b23] flex items-center justify-center font-bold">
+              <ShoppingCart className="w-5 h-5" />
+            </div>
           </div>
-          <h3 className="text-2xl font-black text-white">142 Orders</h3>
-          <p className="text-[10px] text-slate-400 mt-1">Avg 14 orders/hr</p>
+          <div className="text-3xl font-black text-[#1a1c1e]">142</div>
+          <div className="flex items-center gap-1 text-xs text-[#3f4a3d]">
+            38 packing • 104 out for delivery
+          </div>
         </div>
 
-        <div className="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-            <span>Low Stock Alerts</span>
-            <AlertTriangle className="w-4 h-4 text-amber-400" />
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#e2e2e5] space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider">Avg Delivery Time</span>
+            <div className="w-9 h-9 rounded-xl bg-[#dce5dd] text-[#006b23] flex items-center justify-center font-bold">
+              <Clock className="w-5 h-5" />
+            </div>
           </div>
-          <h3 className="text-2xl font-black text-amber-400">2 SKUs Warning</h3>
-          <p className="text-[10px] text-amber-300/80 mt-1">Restock required today</p>
+          <div className="text-3xl font-black text-[#1a1c1e]">9.4 mins</div>
+          <div className="flex items-center gap-1 text-xs text-emerald-700 font-bold">
+            <CheckCircle2 className="w-3.5 h-3.5" /> SLA Target: &lt; 10 mins
+          </div>
         </div>
 
-        <div className="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-1">
-            <span>Avg Dispatch Time</span>
-            <Clock className="w-4 h-4 text-purple-400" />
+        <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#e2e2e5] space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider">Active Fleet</span>
+            <div className="w-9 h-9 rounded-xl bg-[#dce5dd] text-[#006b23] flex items-center justify-center font-bold">
+              <Bike className="w-5 h-5" />
+            </div>
           </div>
-          <h3 className="text-2xl font-black text-white">2.4 Mins</h3>
-          <p className="text-[10px] text-purple-300/80 mt-1">Target: &lt; 3.0 Mins</p>
+          <div className="text-3xl font-black text-[#1a1c1e]">48 / 52</div>
+          <div className="flex items-center gap-1 text-xs text-[#3f4a3d]">
+            92.3% rider utilization
+          </div>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex gap-2 border-b border-slate-800 mb-6">
-        {(['OVERVIEW', 'INVENTORY', 'ORDERS', 'ANALYTICS'] as const).map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-5 py-2.5 text-xs font-bold rounded-t-xl transition ${
-              activeTab === tab
-                ? 'bg-slate-800 text-emerald-400 border-t-2 border-emerald-500'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab 1: OVERVIEW */}
-      {activeTab === 'OVERVIEW' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl">
-            <h3 className="text-sm font-bold text-white mb-4">Active Orders Queue</h3>
-            <div className="space-y-3">
-              {ordersQueue.map((ord) => (
-                <div key={ord.id} className="p-3.5 bg-slate-900/60 rounded-xl flex items-center justify-between border border-slate-700/40">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-white">{ord.id}</span>
-                      <span className="text-[10px] text-slate-400">• {ord.time}</span>
-                    </div>
-                    <p className="text-xs text-slate-300 font-medium mt-0.5">{ord.customer}</p>
-                    <p className="text-[11px] text-slate-400">{ord.items}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-xs font-bold text-emerald-400 block">{formatCurrency(ord.total)}</span>
-                    <button
-                      onClick={() => advanceOrderStatus(ord.id)}
-                      className="mt-1.5 px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] rounded-lg shadow"
-                    >
-                      {ord.status === 'CONFIRMED' ? 'Start Packing' : ord.status === 'PACKING' ? 'Ready Pickup' : 'Dispatch'}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl">
-            <h3 className="text-sm font-bold text-white mb-4">Low Stock Restock Warnings</h3>
-            <div className="space-y-3">
-              {inventoryList
-                .filter((item) => item.lowStock)
-                .map((item) => (
-                  <div key={item.id} className="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-center justify-between">
-                    <div>
-                      <h4 className="text-xs font-bold text-white">{item.name}</h4>
-                      <p className="text-[10px] text-amber-300">SKU: {item.sku}</p>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-extrabold text-amber-400">{item.stock} left</span>
-                      <button onClick={() => updateStock(item.id, 20)} className="px-3 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-extrabold text-[10px] rounded-lg">
-                        + Restock 20
-                      </button>
-                    </div>
-                  </div>
-                ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Tab 2: INVENTORY */}
-      {activeTab === 'INVENTORY' && (
-        <div className="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-bold text-white">Store Inventory Catalog ({inventoryList.length} SKUs)</h3>
-            <button className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow">
-              <Plus className="w-4 h-4" />
-              <span>Add New Product</span>
-            </button>
+      {/* Main Content Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Live Order Queue Feed (Span 8) */}
+        <div className="lg:col-span-8 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-[#e2e2e5] space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-[#1a1c1e]">Live Dispatch Queue</h2>
+            <span className="text-xs text-[#3f4a3d]">Auto-refreshing (2s)</span>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs text-slate-300">
-              <thead className="bg-slate-900/60 text-slate-400 font-semibold border-b border-slate-700">
-                <tr>
-                  <th className="p-3">Product Name</th>
-                  <th className="p-3">SKU</th>
-                  <th className="p-3">Price</th>
-                  <th className="p-3">Available Stock</th>
-                  <th className="p-3">Reserved</th>
-                  <th className="p-3">Actions</th>
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="border-b border-[#e2e2e5] text-[#3f4a3d] uppercase font-bold tracking-wider">
+                  <th className="pb-3">Order ID</th>
+                  <th className="pb-3">Customer</th>
+                  <th className="pb-3">Items</th>
+                  <th className="pb-3">Amount</th>
+                  <th className="pb-3">Status</th>
+                  <th className="pb-3">SLA Timer</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-700/60">
-                {inventoryList.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-800/50">
-                    <td className="p-3 font-bold text-white">{item.name}</td>
-                    <td className="p-3 text-slate-400 font-mono">{item.sku}</td>
-                    <td className="p-3 text-emerald-400 font-bold">{formatCurrency(item.price)}</td>
-                    <td className="p-3 font-extrabold">
-                      <span className={item.lowStock ? 'text-amber-400' : 'text-white'}>{item.stock}</span>
+              <tbody className="divide-y divide-[#e2e2e5]">
+                {[
+                  { id: 'ORD-9824', name: 'Aarav Sharma', items: '3 items (Avocados, Milk)', amount: '₹240', status: 'PACKING', timer: '2m 14s' },
+                  { id: 'ORD-9825', name: 'Neha Gupta', items: '5 items (Vegetables)', amount: '₹410', status: 'DISPATCHED', timer: '5m 02s' },
+                  { id: 'ORD-9826', name: 'Rahul Verma', items: '1 item (Fruit Box)', amount: '₹299', status: 'CONFIRMED', timer: '0m 45s' },
+                  { id: 'ORD-9827', name: 'Siddharth R.', items: '4 items (Snacks)', amount: '₹180', status: 'DELIVERED', timer: '8m 40s' },
+                ].map((row) => (
+                  <tr key={row.id} className="hover:bg-[#f3f3f6] transition">
+                    <td className="py-3 font-bold text-[#006b23]">{row.id}</td>
+                    <td className="py-3 font-semibold text-[#1a1c1e]">{row.name}</td>
+                    <td className="py-3 text-[#3f4a3d]">{row.items}</td>
+                    <td className="py-3 font-bold text-[#1a1c1e]">{row.amount}</td>
+                    <td className="py-3">
+                      <span className={`px-2.5 py-1 rounded-full font-bold text-[10px] ${
+                        row.status === 'DELIVERED' ? 'bg-[#dce5dd] text-[#006b23]' : 'bg-[#ffdad6] text-[#ba1a1a]'
+                      }`}>
+                        {row.status}
+                      </span>
                     </td>
-                    <td className="p-3 text-slate-400">{item.reserved}</td>
-                    <td className="p-3">
-                      <div className="flex items-center gap-1.5">
-                        <button onClick={() => updateStock(item.id, -1)} className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-white">
-                          -
-                        </button>
-                        <button onClick={() => updateStock(item.id, 1)} className="px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded text-xs font-bold text-white">
-                          +
-                        </button>
-                      </div>
-                    </td>
+                    <td className="py-3 font-mono font-bold text-[#1a1c1e]">{row.timer}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         </div>
-      )}
 
-      {/* Tab 3: ORDERS QUEUE */}
-      {activeTab === 'ORDERS' && (
-        <div className="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-5 space-y-4">
-          <h3 className="text-sm font-bold text-white">Real-Time Store Fulfillment Queue</h3>
-          <div className="space-y-3">
-            {ordersQueue.map((ord) => (
-              <div key={ord.id} className="p-4 bg-slate-900/70 rounded-xl border border-slate-700 flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-extrabold text-white">{ord.id}</span>
-                    <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2.5 py-0.5 rounded-full font-bold">{ord.status}</span>
-                  </div>
-                  <p className="text-xs text-slate-300 font-semibold mt-1">Customer: {ord.customer}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{ord.items}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-extrabold text-emerald-400">{formatCurrency(ord.total)}</span>
-                  <button onClick={() => advanceOrderStatus(ord.id)} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow">
-                    Advance Status
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        {/* Low Stock Alerts & Dark Store Health (Span 4) */}
+        <div className="lg:col-span-4 space-y-6">
+          <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#e2e2e5] space-y-4">
+            <div className="flex items-center gap-2 text-[#ba1a1a]">
+              <AlertTriangle className="w-5 h-5" />
+              <h3 className="text-base font-bold text-[#1a1c1e]">Low Stock SKU Alerts</h3>
+            </div>
 
-      {/* Tab 4: ANALYTICS */}
-      {activeTab === 'ANALYTICS' && (
-        <div className="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-5 space-y-4">
-          <h3 className="text-sm font-bold text-white">Top Selling Products Breakdown</h3>
-          <div className="space-y-3">
-            {[
-              { name: 'Fresh Organic Farm Tomatoes', sold: '420 Units', revenue: '₹10,080' },
-              { name: 'Amul Taaza Toned Milk', sold: '350 Units', revenue: '₹18,900' },
-              { name: 'Brown Sandwich Bread', sold: '210 Units', revenue: '₹9,450' },
-            ].map((p, idx) => (
-              <div key={p.name} className="p-3 bg-slate-900/60 rounded-xl flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-300">{idx + 1}</span>
+            <div className="space-y-3">
+              {[
+                { name: 'Amul Toned Milk 1L', stock: '4 units left', darkStore: 'Indiranagar Hub' },
+                { name: 'Brown Sandwich Bread 400g', stock: '2 units left', darkStore: 'Koramangala Hub' },
+                { name: 'Organic Hass Avocados 2x', stock: '6 units left', darkStore: 'HSR Layout Hub' },
+              ].map((alert, i) => (
+                <div key={i} className="p-3 bg-[#ffdad6]/40 rounded-2xl border border-[#ffdad6] flex items-center justify-between text-xs">
                   <div>
-                    <p className="text-xs font-bold text-white">{p.name}</p>
-                    <p className="text-[10px] text-slate-400">{p.sold}</p>
+                    <h4 className="font-bold text-[#1a1c1e]">{alert.name}</h4>
+                    <p className="text-[#3f4a3d]">{alert.darkStore}</p>
                   </div>
+                  <span className="font-bold text-[#ba1a1a]">{alert.stock}</span>
                 </div>
-                <span className="text-xs font-extrabold text-emerald-400">{p.revenue}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }
