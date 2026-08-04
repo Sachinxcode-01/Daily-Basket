@@ -63,12 +63,15 @@ import 'features/freshness/presentation/screens/fresh_produce_explorer_screen.da
 import 'features/support/presentation/screens/about_app_screen.dart';
 import 'features/settings/presentation/screens/delete_account_screen.dart';
 
+import 'features/profile/providers/address_provider.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CouponProvider()),
+        ChangeNotifierProvider(create: (_) => AddressProvider()),
       ],
       child: const DailyBasketApp(),
     ),

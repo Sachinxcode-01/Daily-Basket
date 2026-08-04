@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../providers/coupon_provider.dart';
+import '../../providers/coupon_provider.dart';
 
 /// Coupon Details Modal Bottom Sheet — Google Stitch Design System Exact Replica
 class CouponDetailsSheet extends StatefulWidget {

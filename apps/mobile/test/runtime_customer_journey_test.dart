@@ -22,6 +22,13 @@ void main() {
   HttpOverrides.global = _MockHttpOverrides();
   GoogleFonts.config.allowRuntimeFetching = false;
 
+  Widget wrapWithProviders(Widget child) {
+    return ChangeNotifierProvider(
+      create: (_) => CouponProvider(),
+      child: MaterialApp(home: child),
+    );
+  }
+
   group('Runtime Customer Journey Verification Suite', () {
     testWidgets('1. App Launch & Splash Screen Test', (WidgetTester tester) async {
       await tester.pumpWidget(const MaterialApp(home: SplashScreen()));
@@ -30,12 +37,7 @@ void main() {
     });
 
     testWidgets('2. Customer Home Screen Test', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ChangeNotifierProvider(
-          create: (_) => CouponProvider(),
-          child: const MaterialApp(home: CustomerHomeScreen()),
-        ),
-      );
+      await tester.pumpWidget(wrapWithProviders(const CustomerHomeScreen()));
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.text('Daily Basket'), findsWidgets);
@@ -56,22 +58,17 @@ void main() {
     });
 
     testWidgets('4. Cart, Checkout & Payment Screens Test', (WidgetTester tester) async {
-      await tester.pumpWidget(
-        ChangeNotifierProvider(
-          create: (_) => CouponProvider(),
-          child: const MaterialApp(home: CartScreen()),
-        ),
-      );
+      await tester.pumpWidget(wrapWithProviders(const CartScreen()));
       await tester.pump(const Duration(milliseconds: 200));
       expect(find.text('Cart'), findsWidgets);
 
-      await tester.pumpWidget(const MaterialApp(home: CheckoutScreen()));
+      await tester.pumpWidget(wrapWithProviders(const CheckoutScreen()));
       await tester.pump(const Duration(milliseconds: 200));
 
-      await tester.pumpWidget(const MaterialApp(home: PaymentScreen()));
+      await tester.pumpWidget(wrapWithProviders(const PaymentScreen()));
       await tester.pump(const Duration(milliseconds: 200));
 
-      await tester.pumpWidget(const MaterialApp(home: OrderSuccessScreen()));
+      await tester.pumpWidget(wrapWithProviders(const OrderSuccessScreen()));
       await tester.pump(const Duration(milliseconds: 200));
       expect(find.text('Order Placed!'), findsWidgets);
     });

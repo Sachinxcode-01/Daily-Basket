@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/user_provider.dart';
+import '../widgets/profile_photo_picker_sheet.dart';
 
 /// Personal Information Screen — Google Stitch Design System Exact Replica
 class PersonalInfoScreen extends StatefulWidget {
@@ -10,9 +13,18 @@ class PersonalInfoScreen extends StatefulWidget {
 }
 
 class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
-  final _nameController = TextEditingController(text: 'Alex Johnson');
-  final _emailController = TextEditingController(text: 'alex.j@example.com');
-  final _phoneController = TextEditingController(text: '+1 (555) 123-4567');
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late TextEditingController _phoneController;
+
+  @override
+  void initState() {
+    super.initState();
+    final userProvider = context.read<UserProvider>();
+    _nameController = TextEditingController(text: userProvider.name);
+    _emailController = TextEditingController(text: userProvider.email);
+    _phoneController = TextEditingController(text: userProvider.phone);
+  }
 
   @override
   void dispose() {
@@ -23,6 +35,12 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
   }
 
   void _saveChanges() {
+    context.read<UserProvider>().updatePersonalInfo(
+          name: _nameController.text.trim(),
+          phone: _phoneController.text.trim(),
+          email: _emailController.text.trim(),
+        );
+
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Personal information updated successfully!'),
@@ -35,6 +53,8 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       appBar: AppBar(
@@ -67,48 +87,51 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                 Center(
                   child: Column(
                     children: [
-                      Stack(
-                        children: [
-                          Container(
-                            width: 104,
-                            height: 104,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(color: const Color(0xFFC0E8C7), width: 3),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.06),
-                                  blurRadius: 8,
-                                ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(9999),
-                              child: Image.network(
-                                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80',
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
-                                  color: const Color(0xFFE8F5E9),
-                                  child: const Icon(Icons.person, size: 50, color: Color(0xFF006B23)),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 2,
-                            right: 2,
-                            child: Container(
-                              width: 32,
-                              height: 32,
+                      GestureDetector(
+                        onTap: () => ProfilePhotoPickerSheet.show(context),
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: 104,
+                              height: 104,
                               decoration: BoxDecoration(
-                                color: const Color(0xFF006B23),
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
+                                border: Border.all(color: const Color(0xFFC0E8C7), width: 3),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.06),
+                                    blurRadius: 8,
+                                  ),
+                                ],
                               ),
-                              child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 16),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(9999),
+                                child: Image.network(
+                                  userProvider.profileImageUrl,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    color: const Color(0xFFE8F5E9),
+                                    child: const Icon(Icons.person, size: 50, color: Color(0xFF006B23)),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
-                        ],
+                            Positioned(
+                              bottom: 2,
+                              right: 2,
+                              child: Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF006B23),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: Colors.white, width: 2),
+                                ),
+                                child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 16),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 10),
                       Text(
@@ -142,7 +165,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                 const SizedBox(height: 18),
 
                 // Field 3: PHONE NUMBER
-                _buildFieldHeader('PHONE NUMBER', isVerified: true),
+                _buildFieldHeader('PHONE NUMBER (+91 INDIA)', isVerified: true),
                 const SizedBox(height: 6),
                 _buildInputField(controller: _phoneController),
 
@@ -163,7 +186,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Your email and phone number are verified. Changing them will require a new verification code.',
+                          'Your email and phone number are verified. Changing them will require an OTP verification code.',
                           style: GoogleFonts.inter(
                             fontSize: 13,
                             height: 18 / 13,

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../providers/coupon_provider.dart';
 
 /// Referral History Screen — Google Stitch Design System Exact Replica
 class ReferralHistoryScreen extends StatefulWidget {
@@ -13,75 +15,175 @@ class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
   int _selectedTabIndex = 0; // 0: All, 1: Successful, 2: Pending
   int _bottomNavIndex = 3; // Rewards active
 
-  final List<Map<String, dynamic>> _referrals = [
-    {
-      'id': 'r1',
-      'name': 'Sarah Jenkins',
-      'date': 'Oct 24, 2023',
-      'status': 'COMPLETED',
-      'statusColor': const Color(0xFF006B23),
-      'statusBg': const Color(0xFFE8F5E9),
-      'amount': '+\$20',
-      'hint': null,
-      'avatarUrl': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80',
-    },
-    {
-      'id': 'r2',
-      'name': 'Marcus Chen',
-      'date': 'Nov 02, 2023',
-      'status': 'JOINED',
-      'statusColor': const Color(0xFF1E88E5),
-      'statusBg': const Color(0xFFE3F2FD),
-      'amount': '+\$20',
-      'hint': 'Waiting for first order',
-      'avatarUrl': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80',
-    },
-    {
-      'id': 'r3',
-      'name': 'Elena Rodriguez',
-      'date': 'Oct 18, 2023',
-      'status': 'COMPLETED',
-      'statusColor': const Color(0xFF006B23),
-      'statusBg': const Color(0xFFE8F5E9),
-      'amount': '+\$20',
-      'hint': null,
-      'avatarUrl': 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
-    },
-    {
-      'id': 'r4',
-      'name': 'David Wu',
-      'date': 'Nov 05, 2023',
-      'status': 'PENDING',
-      'statusColor': const Color(0xFFE65100),
-      'statusBg': const Color(0xFFFFF3E0),
-      'amount': '+\$20',
-      'hint': null,
-      'avatarUrl': 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80',
-    },
-    {
-      'id': 'r5',
-      'name': 'Aisha Khan',
-      'date': 'Oct 12, 2023',
-      'status': 'COMPLETED',
-      'statusColor': const Color(0xFF006B23),
-      'statusBg': const Color(0xFFE8F5E9),
-      'amount': '+\$20',
-      'hint': null,
-      'avatarUrl': 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&q=80',
-    },
-  ];
+  void _showReferralDetailSheet(BuildContext context, Map<String, dynamic> item) {
+    final isCompleted = item['status'] == 'COMPLETED';
 
-  List<Map<String, dynamic>> get _filteredReferrals {
-    if (_selectedTabIndex == 1) {
-      return _referrals.where((r) => r['status'] == 'COMPLETED').toList();
-    } else if (_selectedTabIndex == 2) {
-      return _referrals.where((r) => r['status'] == 'PENDING' || r['status'] == 'JOINED').toList();
-    }
-    return _referrals;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(9999),
+                  child: Image.network(
+                    item['avatarUrl'] as String,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const Icon(Icons.person, color: Color(0xFF006B23)),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item['name'] as String,
+                        style: GoogleFonts.outfit(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF1A1C1E),
+                        ),
+                      ),
+                      Text(
+                        'Invited on ${item['date']}',
+                        style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF6E7A6C)),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: item['statusBg'] as Color,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    item['status'] as String,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: item['statusColor'] as Color,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Referral Progress Timeline',
+              style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
+            ),
+            const SizedBox(height: 14),
+
+            // Timeline steps
+            _buildTimelineStep('Invitation Sent', 'App referral link shared', true),
+            _buildTimelineStep('Account Created', 'Friend registered on Daily Basket', item['status'] == 'JOINED' || isCompleted),
+            _buildTimelineStep('First Order Completed', '\$20 reward credited to wallet', isCompleted),
+
+            const SizedBox(height: 20),
+
+            if (!isCompleted)
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Reminder sent to ${item['name']} via SMS!'),
+                        backgroundColor: const Color(0xFF006B23),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF006B23),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  icon: const Icon(Icons.send_rounded, size: 18),
+                  label: Text('Send Reminder SMS', style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
+                ),
+              )
+            else
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8F5E9),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Color(0xFF006B23), size: 20),
+                    const SizedBox(width: 10),
+                    Text(
+                      '+\$20 reward successfully claimed!',
+                      style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF006B23)),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTimelineStep(String title, String desc, bool isDone) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          Icon(
+            isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+            color: isDone ? const Color(0xFF006B23) : const Color(0xFFBECAB9),
+            size: 20,
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.outfit(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isDone ? const Color(0xFF1A1C1E) : const Color(0xFF6E7A6C),
+                ),
+              ),
+              Text(
+                desc,
+                style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF6E7A6C)),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final couponProvider = context.watch<CouponProvider>();
+    final referrals = couponProvider.referrals;
+
+    final filteredReferrals = referrals.where((r) {
+      if (_selectedTabIndex == 1) return r['status'] == 'COMPLETED';
+      if (_selectedTabIndex == 2) return r['status'] != 'COMPLETED';
+      return true;
+    }).toList();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       appBar: AppBar(
@@ -140,7 +242,7 @@ class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'TOTAL EARNED',
+                          'TOTAL REWARD EARNINGS',
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,
@@ -150,7 +252,7 @@ class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '\$120',
+                          '\$${couponProvider.referralEarnings.toStringAsFixed(0)}',
                           style: GoogleFonts.outfit(
                             fontSize: 36,
                             fontWeight: FontWeight.w800,
@@ -174,7 +276,7 @@ class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
                                 ),
                                 const SizedBox(width: 8),
                                 Text(
-                                  '6 Successful Referrals',
+                                  '${couponProvider.successfulReferrals} Successful Referrals',
                                   style: GoogleFonts.inter(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -196,9 +298,9 @@ class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildTabItem(0, 'All'),
-                      _buildTabItem(1, 'Successful'),
-                      _buildTabItem(2, 'Pending'),
+                      _buildTabItem(0, 'All (${referrals.length})'),
+                      _buildTabItem(1, 'Successful (${couponProvider.successfulReferrals})'),
+                      _buildTabItem(2, 'Pending (${couponProvider.pendingReferrals})'),
                     ],
                   ),
                   const Divider(color: Color(0xFFEEEEF0), height: 1),
@@ -209,45 +311,47 @@ class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
                   ListView.separated(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    itemCount: _filteredReferrals.length,
+                    itemCount: filteredReferrals.length,
                     separatorBuilder: (_, __) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
-                      final item = _filteredReferrals[index];
-                      return Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: const Color(0xFFBECAB9).withValues(alpha: 0.3),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
-                              blurRadius: 6,
-                              offset: const Offset(0, 2),
+                      final item = filteredReferrals[index];
+                      return GestureDetector(
+                        onTap: () => _showReferralDetailSheet(context, item),
+                        child: Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: const Color(0xFFBECAB9).withValues(alpha: 0.3),
                             ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            // Friend Avatar Image
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(9999),
-                              child: Image.network(
-                                item['avatarUrl'] as String,
-                                width: 46,
-                                height: 46,
-                                fit: BoxFit.cover,
-                                errorBuilder: (_, __, ___) => Container(
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.03),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              // Friend Avatar Image
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(9999),
+                                child: Image.network(
+                                  item['avatarUrl'] as String,
                                   width: 46,
                                   height: 46,
-                                  color: const Color(0xFFE8F5E9),
-                                  child: const Icon(Icons.person, color: Color(0xFF006B23)),
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    width: 46,
+                                    height: 46,
+                                    color: const Color(0xFFE8F5E9),
+                                    child: const Icon(Icons.person, color: Color(0xFF006B23)),
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(width: 14),
+                              const SizedBox(width: 14),
 
                             // Referral Details Column
                             Expanded(
@@ -325,9 +429,10 @@ class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
                             ),
                           ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
+                    );
+                  },
+                ),
 
                   const SizedBox(height: 24),
                 ],

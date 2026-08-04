@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../providers/coupon_provider.dart';
 
 /// Refer & Earn Screen — Google Stitch Design System Exact Replica
 class ReferralScreen extends StatefulWidget {
@@ -35,6 +37,9 @@ class _ReferralScreenState extends State<ReferralScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final couponProvider = context.watch<CouponProvider>();
+    final referralCode = couponProvider.referralCode;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       body: SafeArea(
@@ -272,7 +277,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       child: Column(
                         children: [
                           Text(
-                            _referralCode,
+                            referralCode,
                             style: GoogleFonts.outfit(
                               fontSize: 26,
                               fontWeight: FontWeight.w800,
@@ -390,7 +395,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       child: Column(
                         children: [
                           Text(
-                            'FRIENDS JOINED',
+                            'SUCCESSFUL REFERRALS',
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w800,
@@ -400,7 +405,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '0',
+                            '${couponProvider.successfulReferrals} / ${couponProvider.totalInvited}',
                             style: GoogleFonts.outfit(
                               fontSize: 28,
                               fontWeight: FontWeight.w800,
@@ -410,7 +415,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                           const SizedBox(height: 14),
 
                           Text(
-                            'TOTAL EARNED',
+                            'TOTAL REWARDS EARNED',
                             style: GoogleFonts.inter(
                               fontSize: 10,
                               fontWeight: FontWeight.w800,
@@ -420,7 +425,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '\$0',
+                            '\$${couponProvider.referralEarnings.toStringAsFixed(0)}',
                             style: GoogleFonts.outfit(
                               fontSize: 32,
                               fontWeight: FontWeight.w800,
@@ -430,12 +435,12 @@ class _ReferralScreenState extends State<ReferralScreen> {
                           const SizedBox(height: 14),
 
                           GestureDetector(
-                            onTap: () => Navigator.of(context).pushNamed('/loyalty'),
+                            onTap: () => Navigator.of(context).pushNamed('/referral-history'),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  'View Referral Details',
+                                  'View Referral Details & History',
                                   style: GoogleFonts.outfit(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w700,

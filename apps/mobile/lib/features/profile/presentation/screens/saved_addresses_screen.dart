@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../providers/address_provider.dart';
+import '../widgets/location_permission_dialog.dart';
 import 'add_address_screen.dart';
 
 /// Saved Addresses Screen — Google Stitch Design System Exact Replica
@@ -11,41 +14,96 @@ class SavedAddressesScreen extends StatefulWidget {
 }
 
 class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
-  final List<Map<String, dynamic>> _addresses = [
-    {
-      'id': 'a1',
-      'label': 'Home',
-      'icon': Icons.home_outlined,
-      'isDefault': true,
-      'addressText': '123 Green Valley Lane, Apt 4B\nPortland, OR 97204',
-      'phone': '(555) 123-4567',
-      'instruction': null,
-    },
-    {
-      'id': 'a2',
-      'label': 'Work',
-      'icon': Icons.work_outline_rounded,
-      'isDefault': false,
-      'addressText': '880 Tech Park Blvd, Suite 200\nPortland, OR 97209',
-      'phone': null,
-      'instruction': 'Leave at front desk',
-    },
-    {
-      'id': 'a3',
-      'label': 'Parents',
-      'icon': Icons.favorite_border_rounded,
-      'isDefault': false,
-      'addressText': '45 Maple Street\nBeaverton, OR 97005',
-      'phone': null,
-      'instruction': null,
-    },
-  ];
+  Future<void> _handleLiveLocationFetch() async {
+    final addressProvider = Provider.of<AddressProvider>(context, listen: false);
 
-  void _deleteAddress(int index) {
-    final deleted = _addresses[index]['label'];
-    setState(() {
-      _addresses.removeAt(index);
-    });
+    // 1. Mobile App Permission Check & Prompt
+    if (!addressProvider.isPermissionGranted) {
+      final permissionResult = await LocationPermissionDialog.show(context);
+      if (permissionResult == LocationPermissionState.granted) {
+        addressProvider.setPermissionState(LocationPermissionState.granted);
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location permission denied. Please grant access or enter address manually.'),
+              backgroundColor: Color(0xFFBA1A1A),
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+        return;
+      }
+    }
+
+    // 2. Display Live Location Progress Modal
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => Consumer<AddressProvider>(
+        builder: (context, provider, child) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 28),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF006B23),
+                      strokeWidth: 3.5,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Detecting Live Location',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF1A1C1E),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    provider.fetchingProgressText,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 13,
+                      color: const Color(0xFF6E7A6C),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
+    // 3. Perform Live GPS Detection
+    final payload = await addressProvider.fetchLiveLocation();
+
+    if (mounted) {
+      Navigator.of(context, rootNavigator: true).pop(); // Close progress dialog
+
+      if (payload != null) {
+        // 4. Open Add Address screen with detected location pre-filled!
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => AddAddressScreen(initialLocationPayload: payload),
+          ),
+        );
+      }
+    }
+  }
+
+  void _deleteAddress(int index, AddressProvider provider) {
+    final deleted = provider.addresses[index]['label'];
+    provider.deleteAddress(index);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('$deleted address deleted'),
@@ -57,6 +115,9 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final addressProvider = Provider.of<AddressProvider>(context);
+    final addresses = addressProvider.addresses;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       appBar: AppBar(
@@ -95,179 +156,305 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                     color: const Color(0xFF1A1C1E),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
 
-                // Address Cards List
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _addresses.length,
-                  separatorBuilder: (_, __) => const SizedBox(height: 14),
-                  itemBuilder: (context, index) {
-                    final item = _addresses[index];
-                    final isDefault = item['isDefault'] as bool;
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20),
-                        border: isDefault
-                            ? const Border(
-                                left: BorderSide(color: Color(0xFF006B23), width: 4),
-                                top: BorderSide(color: Color(0xFFE0E0E0), width: 1),
-                                right: BorderSide(color: Color(0xFFE0E0E0), width: 1),
-                                bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1),
-                              )
-                            : Border.all(
-                                color: const Color(0xFFBECAB9).withValues(alpha: 0.3),
-                              ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                // ─── Live GPS Location Fetch Banner Card ────────────────────
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF006B23), Color(0xFF0B8732)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF006B23).withValues(alpha: 0.25),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                      padding: const EdgeInsets.all(18),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Icon Avatar
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: BoxDecoration(
-                              color: isDefault ? const Color(0xFFE8F5E9) : const Color(0xFFF3F3F6),
-                              shape: BoxShape.circle,
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: _handleLiveLocationFetch,
+                      child: Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: const BoxDecoration(
+                                color: Colors.white24,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.my_location_rounded,
+                                color: Colors.white,
+                                size: 26,
+                              ),
                             ),
-                            child: Icon(
-                              item['icon'] as IconData,
-                              color: isDefault ? const Color(0xFF006B23) : const Color(0xFF1A1C1E),
-                              size: 22,
-                            ),
-                          ),
-                          const SizedBox(width: 14),
-
-                          // Address Info
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      item['label'] as String,
-                                      style: GoogleFonts.outfit(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w700,
-                                        color: const Color(0xFF1A1C1E),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Fetch Live Location',
+                                        style: GoogleFonts.outfit(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
+                                        ),
                                       ),
-                                    ),
-                                    if (isDefault) ...[
-                                      const SizedBox(width: 8),
+                                      const SizedBox(width: 6),
                                       Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                         decoration: BoxDecoration(
-                                          color: const Color(0xFF006B23),
+                                          color: Colors.white24,
                                           borderRadius: BorderRadius.circular(6),
                                         ),
                                         child: Text(
-                                          'DEFAULT',
+                                          'GPS',
                                           style: GoogleFonts.inter(
-                                            fontSize: 9,
+                                            fontSize: 10,
                                             fontWeight: FontWeight.w800,
-                                            letterSpacing: 0.5,
                                             color: Colors.white,
                                           ),
                                         ),
                                       ),
                                     ],
-                                  ],
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  item['addressText'] as String,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 13,
-                                    height: 18 / 13,
-                                    color: const Color(0xFF6E7A6C),
                                   ),
-                                ),
-                                if (item['phone'] != null) ...[
-                                  const SizedBox(height: 6),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF6E7A6C)),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        item['phone'] as String,
-                                        style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF6E7A6C)),
-                                      ),
-                                    ],
+                                  const SizedBox(height: 3),
+                                  Text(
+                                    'Detect current GPS position & auto-fill address',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 12,
+                                      color: Colors.white.withValues(alpha: 0.90),
+                                    ),
                                   ),
                                 ],
-                                if (item['instruction'] != null) ...[
-                                  const SizedBox(height: 6),
-                                  Row(
-                                    children: [
-                                      const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFF6E7A6C)),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        item['instruction'] as String,
-                                        style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF6E7A6C)),
-                                      ),
-                                    ],
-                                  ),
-                                ],
+                              ),
+                            ),
+                            const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Address Cards List
+                addresses.isEmpty
+                    ? Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(vertical: 40),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.location_off_outlined, size: 48, color: Color(0xFF6E7A6C)),
+                            const SizedBox(height: 12),
+                            Text(
+                              'No Saved Addresses Yet',
+                              style: GoogleFonts.outfit(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF1A1C1E),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Tap "Fetch Live Location" above to add your location.',
+                              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF6E7A6C)),
+                            ),
+                          ],
+                        ),
+                      )
+                    : ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: addresses.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 14),
+                        itemBuilder: (context, index) {
+                          final item = addresses[index];
+                          final isDefault = item['isDefault'] as bool;
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              border: isDefault
+                                  ? const Border(
+                                      left: BorderSide(color: Color(0xFF006B23), width: 4),
+                                      top: BorderSide(color: Color(0xFFE0E0E0), width: 1),
+                                      right: BorderSide(color: Color(0xFFE0E0E0), width: 1),
+                                      bottom: BorderSide(color: Color(0xFFE0E0E0), width: 1),
+                                    )
+                                  : Border.all(
+                                      color: const Color(0xFFBECAB9).withValues(alpha: 0.3),
+                                    ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.03),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
                               ],
                             ),
-                          ),
-
-                          // Action Buttons Column
-                          Column(
-                            children: [
-                              Container(
-                                width: 36,
-                                height: 36,
-                                decoration: const BoxDecoration(
-                                  color: Color(0xFFF3F3F6),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (_) => const AddAddressScreen(),
-                                      ),
-                                    );
-                                  },
-                                  icon: const Icon(Icons.edit_outlined, size: 18, color: Color(0xFF1A1C1E)),
-                                  padding: EdgeInsets.zero,
-                                ),
-                              ),
-                              if (!isDefault) ...[
-                                const SizedBox(height: 10),
+                            padding: const EdgeInsets.all(18),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Icon Avatar
                                 Container(
-                                  width: 36,
-                                  height: 36,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFF3F3F6),
+                                  width: 44,
+                                  height: 44,
+                                  decoration: BoxDecoration(
+                                    color: isDefault ? const Color(0xFFE8F5E9) : const Color(0xFFF3F3F6),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: IconButton(
-                                    onPressed: () => _deleteAddress(index),
-                                    icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Color(0xFF6E7A6C)),
-                                    padding: EdgeInsets.zero,
+                                  child: Icon(
+                                    item['icon'] as IconData,
+                                    color: isDefault ? const Color(0xFF006B23) : const Color(0xFF1A1C1E),
+                                    size: 22,
                                   ),
                                 ),
+                                const SizedBox(width: 14),
+
+                                // Address Info
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Text(
+                                            item['label'] as String,
+                                            style: GoogleFonts.outfit(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w700,
+                                              color: const Color(0xFF1A1C1E),
+                                            ),
+                                          ),
+                                          if (isDefault) ...[
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFF006B23),
+                                                borderRadius: BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                'DEFAULT',
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.w800,
+                                                  letterSpacing: 0.5,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        item['addressText'] as String,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 13,
+                                          height: 18 / 13,
+                                          color: const Color(0xFF6E7A6C),
+                                        ),
+                                      ),
+                                      if (item['phone'] != null) ...[
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF6E7A6C)),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              item['phone'] as String,
+                                              style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF6E7A6C)),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                      if (item['instruction'] != null) ...[
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFF6E7A6C)),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              item['instruction'] as String,
+                                              style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF6E7A6C)),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ],
+                                  ),
+                                ),
+
+                                // Action Buttons Column
+                                Column(
+                                  children: [
+                                    Container(
+                                      width: 36,
+                                      height: 36,
+                                      decoration: const BoxDecoration(
+                                        color: Color(0xFFF3F3F6),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: IconButton(
+                                        onPressed: () {
+                                          Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                              builder: (_) => const AddAddressScreen(),
+                                            ),
+                                          );
+                                        },
+                                        icon: const Icon(Icons.edit_outlined, size: 18, color: Color(0xFF1A1C1E)),
+                                        padding: EdgeInsets.zero,
+                                      ),
+                                    ),
+                                    if (!isDefault) ...[
+                                      const SizedBox(height: 10),
+                                      Container(
+                                        width: 36,
+                                        height: 36,
+                                        decoration: const BoxDecoration(
+                                          color: Color(0xFFF3F3F6),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: IconButton(
+                                          onPressed: () => _deleteAddress(index, addressProvider),
+                                          icon: const Icon(Icons.delete_outline_rounded, size: 18, color: Color(0xFF6E7A6C)),
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
                               ],
-                            ],
-                          ),
-                        ],
+                            ),
+                          );
+                        },
                       ),
-                    );
-                  },
-                ),
 
                 const SizedBox(height: 100),
               ],

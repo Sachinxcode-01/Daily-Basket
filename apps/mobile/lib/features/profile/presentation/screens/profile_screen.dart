@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/providers/user_provider.dart';
+import '../../../../core/providers/app_theme_provider.dart';
+import '../../../../core/providers/language_provider.dart';
+import '../../../../core/providers/notification_provider.dart';
+import '../widgets/profile_photo_picker_sheet.dart';
 
 /// Customer Profile / Settings Screen — Google Stitch Design System Exact Replica
 class ProfileScreen extends StatefulWidget {
@@ -10,12 +17,93 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  bool _notificationsEnabled = true;
-  final String _selectedLanguage = 'English';
-  final String _selectedTheme = 'Light Mode';
+  void _showLanguagePickerModal(BuildContext context) {
+    final languageProvider = context.read<LanguageProvider>();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(20),
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE0E0E0),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Select Language',
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1A1C1E),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Flexible(
+              child: ListView.separated(
+                shrinkWrap: true,
+                itemCount: languageProvider.availableLanguages.length,
+                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final lang = languageProvider.availableLanguages[index];
+                  final isSelected = lang['name'] == languageProvider.selectedLanguage;
+
+                  return ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      '${lang['name']} (${lang['native']})',
+                      style: GoogleFonts.outfit(
+                        fontSize: 16,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                        color: isSelected ? const Color(0xFF006B23) : const Color(0xFF1A1C1E),
+                      ),
+                    ),
+                    trailing: isSelected
+                        ? const Icon(Icons.check_circle_rounded, color: Color(0xFF006B23))
+                        : null,
+                    onTap: () {
+                      context.read<LanguageProvider>().setLanguage(lang['name']!);
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('App language changed to ${lang['name']}'),
+                          backgroundColor: const Color(0xFF006B23),
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(seconds: 1),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
+    final userProvider = context.watch<UserProvider>();
+    final appThemeProvider = context.watch<AppThemeProvider>();
+    final languageProvider = context.watch<LanguageProvider>();
+    final notificationProvider = context.watch<NotificationProvider>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       body: SafeArea(
@@ -34,7 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          onPressed: () => Scaffold.of(context).openDrawer(),
+                          onPressed: () => AppNavigationDrawer.show(context),
                           icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
                         ),
                         Text(
@@ -58,52 +146,55 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     Center(
                       child: Column(
                         children: [
-                          Stack(
-                            children: [
-                              Container(
-                                width: 84,
-                                height: 84,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: const Color(0xFFC0E8C7), width: 3),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.06),
-                                      blurRadius: 8,
-                                    ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(9999),
-                                  child: Image.network(
-                                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&q=80',
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(
-                                      color: const Color(0xFFE8F5E9),
-                                      child: const Icon(Icons.person, size: 40, color: Color(0xFF006B23)),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  width: 28,
-                                  height: 28,
+                          GestureDetector(
+                            onTap: () => ProfilePhotoPickerSheet.show(context),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  width: 88,
+                                  height: 88,
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF006B23),
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: Colors.white, width: 2),
+                                    border: Border.all(color: const Color(0xFFC0E8C7), width: 3),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.06),
+                                        blurRadius: 8,
+                                      ),
+                                    ],
                                   ),
-                                  child: const Icon(Icons.edit_rounded, color: Colors.white, size: 14),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(9999),
+                                    child: Image.network(
+                                      userProvider.profileImageUrl,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) => Container(
+                                        color: const Color(0xFFE8F5E9),
+                                        child: const Icon(Icons.person, size: 44, color: Color(0xFF006B23)),
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    width: 28,
+                                    height: 28,
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF006B23),
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2),
+                                    ),
+                                    child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 14),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'Alex Johnson',
+                            userProvider.name,
                             style: GoogleFonts.outfit(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
@@ -112,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            '+1 (555) 123-4567',
+                            userProvider.phone,
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               color: const Color(0xFF6E7A6C),
@@ -147,24 +238,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             icon: Icons.person_outline_rounded,
                             title: 'Personal Information',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
+                            onTap: () => Navigator.of(context).pushNamed('/personal-info'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.shield_outlined,
                             title: 'Security',
-                            trailing: const Icon(Icons.shield_outlined, color: Color(0xFF1A1C1E), size: 20),
+                            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
+                            onTap: () => Navigator.of(context).pushNamed('/security'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.location_on_outlined,
                             title: 'Saved Addresses',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
+                            onTap: () => Navigator.of(context).pushNamed('/saved-addresses'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.credit_card_rounded,
                             title: 'Payment Methods',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
+                            onTap: () => Navigator.of(context).pushNamed('/payment-methods'),
                           ),
                         ],
                       ),
@@ -195,9 +290,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             icon: Icons.notifications_none_rounded,
                             title: 'Notification Settings',
                             trailing: Switch(
-                              value: _notificationsEnabled,
+                              value: notificationProvider.notificationsEnabled,
                               activeTrackColor: const Color(0xFF006B23),
-                              onChanged: (val) => setState(() => _notificationsEnabled = val),
+                              onChanged: (val) => notificationProvider.setNotificationsEnabled(val),
                             ),
                             onTap: () => Navigator.of(context).pushNamed('/notification-preferences'),
                           ),
@@ -209,13 +304,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  _selectedLanguage,
+                                  languageProvider.selectedLanguage,
                                   style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF6E7A6C)),
                                 ),
                                 const SizedBox(width: 4),
                                 const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
                               ],
                             ),
+                            onTap: () => _showLanguagePickerModal(context),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
@@ -225,7 +321,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  _selectedTheme,
+                                  appThemeProvider.selectedThemeLabel,
                                   style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF6E7A6C)),
                                 ),
                                 const SizedBox(width: 4),
@@ -360,9 +456,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildBottomNavItem(0, Icons.storefront_rounded, 'Shop'),
-                  _buildBottomNavItem(1, Icons.search_rounded, 'Search'),
-                  _buildBottomNavItem(2, Icons.person_rounded, 'Account', isSelected: true),
+                  _buildBottomNavItem(context, 0, Icons.storefront_rounded, 'Shop', route: '/customer/home'),
+                  _buildBottomNavItem(context, 1, Icons.search_rounded, 'Search', route: '/search'),
+                  _buildBottomNavItem(context, 2, Icons.person_rounded, 'Account', isSelected: true, route: '/profile'),
                 ],
               ),
             ),
@@ -427,32 +523,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildBottomNavItem(int index, IconData icon, String label, {bool isSelected = false}) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-      decoration: BoxDecoration(
-        color: isSelected ? const Color(0xFFE8F5E9) : Colors.transparent,
-        borderRadius: BorderRadius.circular(9999),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: isSelected ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
-            size: 20,
-          ),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: GoogleFonts.inter(
+  Widget _buildBottomNavItem(BuildContext context, int index, IconData icon, String label, {bool isSelected = false, String? route}) {
+    return InkWell(
+      onTap: () {
+        if (!isSelected && route != null) {
+          Navigator.of(context).pushReplacementNamed(route);
+        }
+      },
+      borderRadius: BorderRadius.circular(9999),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFE8F5E9) : Colors.transparent,
+          borderRadius: BorderRadius.circular(9999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
               color: isSelected ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
-              fontWeight: FontWeight.w700,
-              fontSize: 12,
+              size: 20,
             ),
-          ),
-        ],
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                color: isSelected ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
