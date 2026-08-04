@@ -1,15 +1,20 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:daily_basket_mobile/main.dart';
 
+class _MockHttpOverrides extends HttpOverrides {}
+
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = _MockHttpOverrides();
 
   group('Runtime Customer Journey Verification Suite', () {
     testWidgets('1. App Launch & Splash Screen Test', (WidgetTester tester) async {
       await tester.pumpWidget(const DailyBasketApp());
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.byType(DailyBasketApp), findsOneWidget);
+      await tester.pumpWidget(const SizedBox());
     });
 
     testWidgets('2. Customer Home Screen & Bottom Navigation Bar Tabs Test', (WidgetTester tester) async {
@@ -18,7 +23,7 @@ void main() {
 
       final navContext = tester.element(find.byType(Navigator));
       Navigator.pushReplacementNamed(navContext, '/customer/home');
-      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Verify Home Feed Header
       expect(find.text('Daily Basket'), findsWidgets);
@@ -47,6 +52,8 @@ void main() {
       final profileTab = find.text('Profile').last;
       await tester.tap(profileTab);
       await tester.pump(const Duration(milliseconds: 300));
+
+      await tester.pumpWidget(const SizedBox());
     });
 
     testWidgets('3. Product Details Navigation & Cart Binding Test', (WidgetTester tester) async {
@@ -55,15 +62,15 @@ void main() {
 
       final navContext = tester.element(find.byType(Navigator));
       Navigator.pushReplacementNamed(navContext, '/customer/home');
-      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 300));
 
-      // Tap Organic Hass Avocados Product Card
       final productCard = find.text('Organic Hass Avocados');
       expect(productCard, findsOneWidget);
       await tester.tap(productCard);
-      await tester.pump(const Duration(milliseconds: 500));
+      await tester.pump(const Duration(milliseconds: 300));
 
       expect(find.text('Organic Hass Avocados'), findsWidgets);
+      await tester.pumpWidget(const SizedBox());
     });
 
     testWidgets('4. Checkout & Payment Navigation Test', (WidgetTester tester) async {
@@ -85,6 +92,8 @@ void main() {
       Navigator.pushNamed(navContext, '/order-success');
       await tester.pump(const Duration(milliseconds: 300));
       expect(find.text('Order Confirmed!'), findsWidgets);
+
+      await tester.pumpWidget(const SizedBox());
     });
 
     testWidgets('5. Delivery Tracking & Order History Test', (WidgetTester tester) async {
@@ -104,6 +113,8 @@ void main() {
 
       Navigator.pushNamed(navContext, '/loyalty');
       await tester.pump(const Duration(milliseconds: 300));
+
+      await tester.pumpWidget(const SizedBox());
     });
   });
 }
