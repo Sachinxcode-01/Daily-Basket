@@ -73,7 +73,7 @@ export default function FeaturesPage() {
                 </div>
                 <h3 className="font-title-md text-title-md font-bold mb-3" style={{ fontFamily: 'Outfit' }}>Flash Deals & Rewards</h3>
                 <p className="font-body-sm text-body-sm text-on-surface-variant mb-6">
-                  Earn points on every purchase and unlock exclusive localized deals based on your neighborhood's harvest.
+                  Earn points on every purchase and unlock exclusive localized deals based on your neighborhood&apos;s harvest.
                 </p>
               </div>
               <div className="bg-primary text-on-primary p-5 rounded-xl">
@@ -90,7 +90,7 @@ export default function FeaturesPage() {
                 </div>
                 <h3 className="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-3" style={{ fontFamily: 'Outfit' }}>Seamless Checkout</h3>
                 <p className="font-body-lg text-body-lg text-on-surface-variant mb-4">
-                  Multiple secure payment options designed for speed. Apple Pay, Google Pay, UPI, saved cards, or cash on delivery. One tap and it's on the way.
+                  Multiple secure payment options designed for speed. Apple Pay, Google Pay, UPI, saved cards, or cash on delivery. One tap and it&apos;s on the way.
                 </p>
                 <div className="flex flex-wrap gap-2">
                   <span className="px-3 py-1 bg-surface-container-lowest border border-outline-variant/20 rounded-full font-label-md text-label-md text-on-surface-variant">Credit/Debit</span>

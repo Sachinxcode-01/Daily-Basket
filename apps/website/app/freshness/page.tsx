@@ -92,7 +92,7 @@ export default function FreshnessPage() {
         {/* Produce Grid */}
         <div className="space-y-4">
           <h3 className="text-lg font-bold text-slate-900 font-outfit">
-            Today's Fresh Harvest
+            Today&apos;s Fresh Harvest
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

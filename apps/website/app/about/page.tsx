@@ -20,7 +20,7 @@ export default function AboutPage() {
                 Our Mission to Deliver Freshness
               </h1>
               <p className="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
-                We believe that premium, organic quality shouldn't come at the cost of your time. Daily Basket bridges the gap between local fields and your kitchen counter, flawlessly and fast.
+                We believe that premium, organic quality shouldn&apos;t come at the cost of your time. Daily Basket bridges the gap between local fields and your kitchen counter, flawlessly and fast.
               </p>
             </div>
             <div className="w-full md:w-1/2 h-[300px] md:h-[420px] rounded-2xl overflow-hidden shadow-level-2 bg-surface-container-lowest flex items-center justify-center p-4 border border-outline-variant/20">
@@ -50,7 +50,7 @@ export default function AboutPage() {
                   From local farms to your doorstep
                 </h2>
                 <p className="font-body-lg text-body-lg text-on-surface-variant">
-                  Our journey began with a simple observation: urban professionals crave the quality of a farmer's market but lack the time to seek it out. We built a network of trusted, sustainable producers who share our uncompromising standards.
+                  Our journey began with a simple observation: urban professionals crave the quality of a farmer&apos;s market but lack the time to seek it out. We built a network of trusted, sustainable producers who share our uncompromising standards.
                 </p>
                 <p className="font-body-lg text-body-lg text-on-surface-variant">
                   By streamlining the supply chain and leveraging smart technology, we ensure that the crispness of the harvest morning is preserved all the way to your dining table.
@@ -75,7 +75,7 @@ export default function AboutPage() {
               </div>
               <h3 className="font-title-md text-title-md text-on-surface font-semibold" style={{ fontFamily: 'Outfit' }}>Uncompromising Quality</h3>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
-                Every item is hand-selected. If it doesn't meet our rigorous standards for freshness and appearance, it doesn't make it into your basket.
+                Every item is hand-selected. If it doesn&apos;t meet our rigorous standards for freshness and appearance, it doesn&apos;t make it into your basket.
               </p>
             </div>
 
