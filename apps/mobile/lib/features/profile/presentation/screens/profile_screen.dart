@@ -199,6 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               activeTrackColor: const Color(0xFF006B23),
                               onChanged: (val) => setState(() => _notificationsEnabled = val),
                             ),
+                            onTap: () => Navigator.of(context).pushNamed('/notification-preferences'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(

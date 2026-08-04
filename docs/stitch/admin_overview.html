@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daily Basket - Dashboard Overview</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface-container-high": "#e8e8ea",
+                      "tertiary-container": "#737575",
+                      "on-secondary-container": "#5e6660",
+                      "on-primary-fixed-variant": "#00531a",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#8cfa93",
+                      "on-tertiary-fixed": "#1a1c1c",
+                      "surface-container": "#eeeef0",
+                      "error-container": "#ffdad6",
+                      "secondary-fixed-dim": "#c0c9c1",
+                      "on-secondary-fixed": "#151d19",
+                      "on-secondary": "#ffffff",
+                      "surface-variant": "#e2e2e5",
+                      "secondary": "#58605a",
+                      "surface": "#f9f9fc",
+                      "primary-fixed-dim": "#70dd7a",
+                      "on-secondary-fixed-variant": "#404943",
+                      "surface-container-highest": "#e2e2e5",
+                      "on-tertiary-container": "#fcfcfc",
+                      "on-surface": "#1a1c1e",
+                      "inverse-surface": "#2f3133",
+                      "secondary-fixed": "#dce5dd",
+                      "on-primary-container": "#f7fff2",
+                      "on-surface-variant": "#3f4a3d",
+                      "tertiary-fixed-dim": "#c6c6c7",
+                      "primary-container": "#078730",
+                      "on-primary": "#ffffff",
+                      "inverse-on-surface": "#f0f0f3",
+                      "surface-bright": "#f9f9fc",
+                      "on-background": "#1a1c1e",
+                      "inverse-primary": "#70dd7a",
+                      "primary": "#006b23",
+                      "on-primary-fixed": "#002106",
+                      "error": "#ba1a1a",
+                      "on-tertiary": "#ffffff",
+                      "surface-container-low": "#f3f3f6",
+                      "outline": "#6e7a6c",
+                      "on-tertiary-fixed-variant": "#454747",
+                      "on-error-container": "#93000a",
+                      "tertiary": "#5a5c5c",
+                      "surface-tint": "#006e25",
+                      "surface-dim": "#dadadc",
+                      "background": "#f9f9fc",
+                      "tertiary-fixed": "#e2e2e2",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#dce5dd",
+                      "outline-variant": "#becab9"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {},
+              "fontFamily": {
+                      "headline": [
+                              "Outfit"
+                      ],
+                      "display": [
+                              "Outfit"
+                      ],
+                      "body": [
+                              "Inter"
+                      ],
+                      "label": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {}
+      },
+          },
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Outfit', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        /* Custom Scrollbar for better UI */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dadadc; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #becab9; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex">
+<!-- SideNavBar (Shared Component) -->
+<nav class="hidden md:flex flex-col h-full border-r border-outline-variant bg-surface-container-low dark:bg-surface-dim shadow-sm fixed left-0 top-0 h-screen w-64 z-50">
+<div class="p-6">
+<h1 class="text-headline-lg font-display font-bold text-primary dark:text-primary-fixed-dim">Daily Basket</h1>
+<p class="font-body text-body-sm text-on-surface-variant mt-1">Enterprise Admin</p>
+</div>
+<div class="flex-1 overflow-y-auto py-4">
+<!-- Active Navigation Item: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg mx-2 my-1 font-headline text-title-md font-semibold transition-all opacity-90 active:scale-95" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 font-body text-body-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 font-body text-body-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+                Orders
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 font-body text-body-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">group</span>
+                Customers
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 font-body text-body-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 font-body text-body-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</div>
+<div class="p-4 border-t border-outline-variant">
+<button class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-secondary-container text-on-secondary-container hover:bg-surface-container-high rounded-lg transition-colors font-body text-body-sm font-semibold">
+<span class="material-symbols-outlined text-[18px]">help_center</span>
+                Support Center
+            </button>
+<div class="mt-4 flex items-center gap-3 px-2">
+<div class="w-8 h-8 rounded-full bg-surface-dim overflow-hidden flex-shrink-0">
+<img alt="Daily Basket Admin Profile" class="w-full h-full object-cover" data-alt="A professional headshot of an administrator in a well-lit office environment, smiling warmly. Crisp lighting, clean modern corporate aesthetic, subtle natural background blur. The overall mood is confident and welcoming." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBzE723G0pvWAFrBrZ0bQMIbRX5q-MkCka9w2Fkgk__dGcqkeKhGd29trQc66tXTu1JkrYI4_YVBRidKk9aFqC1P35rtfp1flqM-DTp8ZKggK58tZNDwTgi3U_8g2LBj0HUUvHdydUbLQ0TphEhh2kX3TKCoWdSTpfWj3E9OXZcNI5bXH1-19GTaJLkr22ve2dm69yCYWqQNfAOvO12hVWYF6Q1rhCaDimc3NCmpDiqNFPgovbHw2km"/>
+</div>
+<div class="flex-1 min-w-0">
+<p class="text-sm font-semibold text-on-surface truncate">Admin User</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Area Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="flex items-center justify-between px-6 z-40 fixed top-0 right-0 w-[calc(100%-16rem)] h-16 bg-surface/80 dark:bg-background/80 backdrop-blur-md border-b border-outline-variant">
+<div class="flex-1 flex items-center">
+<!-- Search bar on left -->
+<div class="relative w-full max-w-md hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-md text-sm text-on-surface placeholder-on-surface-variant focus:ring-2 focus:ring-primary focus:bg-surface transition-all" placeholder="Search orders, products, or customers..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors rounded-full p-2 relative active:scale-95 duration-150">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-error rounded-full border border-surface"></span>
+</button>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors rounded-full p-2 active:scale-95 duration-150">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="ml-2 w-8 h-8 rounded-full overflow-hidden border border-outline-variant cursor-pointer">
+<img alt="Administrator Avatar" class="w-full h-full object-cover" data-alt="A professional headshot of an administrator in a well-lit office environment, smiling warmly. Crisp lighting, clean modern corporate aesthetic, subtle natural background blur. The overall mood is confident and welcoming." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_BhdEFeWhTFUcJ5PNfUhPruH9qopFQv32NAg5iqVL4wDIRr6MuQfNHuVaYXmy4FaDB_AAu8HdGknVtDdE8gfdD_2nnBFgTkxr-9Vn_M9usVfapAw-tMhURkEmdBe5YRa879Jvplte94eBrU8tRlzwSTI3r5Wtc32jnzm2Im5KoJFcLVqp_osLgcP7hqGEDh7fKmrErJ6g851Di2MT1S2irC8GEexo1cjijTVUXYuQjhBmTHhC6aNy"/>
+</div>
+</div>
+</header>
+<!-- Main Dashboard Content -->
+<main class="flex-1 p-6 md:p-8 mt-16 overflow-y-auto">
+<div class="max-w-[1280px] mx-auto space-y-8">
+<!-- Page Header & Quick Actions -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+<div>
+<h2 class="text-headline-lg font-headline font-semibold text-on-surface">Overview</h2>
+<p class="text-body-sm font-body text-on-surface-variant mt-1">Today's performance and real-time operations.</p>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<button class="px-4 py-2 bg-secondary-container text-on-secondary-container hover:bg-surface-container-high rounded-md font-label text-label-md transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">receipt_long</span>
+                            View Reports
+                        </button>
+<button class="px-4 py-2 bg-secondary-container text-on-secondary-container hover:bg-surface-container-high rounded-md font-label text-label-md transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">local_offer</span>
+                            Manage Coupons
+                        </button>
+<button class="px-4 py-2 bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container rounded-md font-label text-label-md transition-colors flex items-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                            Add Product
+                        </button>
+</div>
+</div>
+<!-- Metric Cards (Bento Grid Style) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Revenue -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-all">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="p-2 bg-primary-container/20 text-primary rounded-lg">
+<span class="material-symbols-outlined">payments</span>
+</div>
+<span class="inline-flex items-center gap-1 text-xs font-semibold text-primary bg-primary-container/20 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                                +12%
+                            </span>
+</div>
+<div class="relative z-10">
+<p class="text-body-sm font-body text-on-surface-variant mb-1">Total Revenue</p>
+<h3 class="text-display-lg font-headline font-bold text-on-surface">$124k</h3>
+</div>
+</div>
+<!-- Orders Today -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-all">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-secondary/5 rounded-full blur-xl group-hover:bg-secondary/10 transition-colors"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="p-2 bg-secondary-container/50 text-secondary rounded-lg">
+<span class="material-symbols-outlined">local_shipping</span>
+</div>
+<span class="inline-flex items-center gap-1 text-xs font-semibold text-primary bg-primary-container/20 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                                +5%
+                            </span>
+</div>
+<div class="relative z-10">
+<p class="text-body-sm font-body text-on-surface-variant mb-1">Orders Today</p>
+<h3 class="text-display-lg font-headline font-bold text-on-surface">1,240</h3>
+</div>
+</div>
+<!-- New Customers -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-all">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-inverse-primary/10 rounded-full blur-xl group-hover:bg-inverse-primary/20 transition-colors"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="p-2 bg-secondary-container/50 text-secondary rounded-lg">
+<span class="material-symbols-outlined">person_add</span>
+</div>
+<span class="inline-flex items-center gap-1 text-xs font-semibold text-primary bg-primary-container/20 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                                +8%
+                            </span>
+</div>
+<div class="relative z-10">
+<p class="text-body-sm font-body text-on-surface-variant mb-1">New Customers</p>
+<h3 class="text-display-lg font-headline font-bold text-on-surface">450</h3>
+</div>
+</div>
+<!-- Avg Delivery Time -->
+<div class="bg-surface-container-lowest rounded-xl p-5 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/30 flex flex-col justify-between relative overflow-hidden group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-all">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-tertiary/5 rounded-full blur-xl group-hover:bg-tertiary/10 transition-colors"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div class="p-2 bg-tertiary-container/20 text-tertiary rounded-lg">
+<span class="material-symbols-outlined">timer</span>
+</div>
+<span class="inline-flex items-center gap-1 text-xs font-semibold text-primary bg-primary-container/20 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]">trending_down</span>
+                                -2%
+                            </span>
+</div>
+<div class="relative z-10">
+<p class="text-body-sm font-body text-on-surface-variant mb-1">Avg Delivery Time</p>
+<h3 class="text-display-lg font-headline font-bold text-on-surface">18<span class="text-title-md text-on-surface-variant ml-1">m</span></h3>
+</div>
+</div>
+</div>
+<!-- Middle Section: Performance Chart & Inventory Alerts -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Performance Chart -->
+<div class="lg:col-span-2 bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/30 p-6 flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-title-md font-headline font-semibold text-on-surface">Weekly Sales Trend</h3>
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-full p-1 transition-colors">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<div class="flex-1 min-h-[250px] relative rounded-lg bg-surface-container-low/30 border border-outline-variant/20 flex items-end p-4 pb-8 justify-between gap-2">
+<!-- Faux Chart Bars -->
+<div class="w-full bg-primary/20 hover:bg-primary/30 transition-colors rounded-t-sm h-[40%] relative group cursor-pointer">
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-on-surface-variant font-medium">Mon</span>
+</div>
+<div class="w-full bg-primary/40 hover:bg-primary/50 transition-colors rounded-t-sm h-[65%] relative group cursor-pointer">
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-on-surface-variant font-medium">Tue</span>
+</div>
+<div class="w-full bg-primary/30 hover:bg-primary/40 transition-colors rounded-t-sm h-[50%] relative group cursor-pointer">
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-on-surface-variant font-medium">Wed</span>
+</div>
+<div class="w-full bg-primary/60 hover:bg-primary/70 transition-colors rounded-t-sm h-[80%] relative group cursor-pointer">
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-on-surface-variant font-medium">Thu</span>
+</div>
+<div class="w-full bg-primary/80 hover:bg-primary/90 transition-colors rounded-t-sm h-[95%] relative group cursor-pointer">
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-on-surface-variant font-medium">Fri</span>
+</div>
+<div class="w-full bg-primary hover:bg-primary-container transition-colors rounded-t-sm h-[75%] relative group cursor-pointer">
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-on-surface-variant font-medium">Sat</span>
+</div>
+<div class="w-full bg-primary/50 hover:bg-primary/60 transition-colors rounded-t-sm h-[60%] relative group cursor-pointer">
+<span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-on-surface-variant font-medium">Sun</span>
+</div>
+<!-- Chart Grid Lines -->
+<div class="absolute top-0 left-0 w-full border-t border-dashed border-outline-variant/30"></div>
+<div class="absolute top-1/4 left-0 w-full border-t border-dashed border-outline-variant/30"></div>
+<div class="absolute top-2/4 left-0 w-full border-t border-dashed border-outline-variant/30"></div>
+<div class="absolute top-3/4 left-0 w-full border-t border-dashed border-outline-variant/30"></div>
+</div>
+</div>
+<!-- Inventory Alerts -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/30 p-6 flex flex-col">
+<div class="flex justify-between items-center mb-6">
+<h3 class="text-title-md font-headline font-semibold text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-error">warning</span>
+                                Inventory Alerts
+                            </h3>
+</div>
+<div class="space-y-4 flex-1 overflow-y-auto pr-2">
+<!-- Alert Item 1 -->
+<div class="flex items-center gap-4 p-3 rounded-lg border border-error-container bg-error-container/10">
+<div class="w-12 h-12 rounded-md bg-surface overflow-hidden flex-shrink-0 border border-outline-variant/30">
+<img alt="Organic Bananas" class="w-full h-full object-cover" data-alt="A close-up studio shot of a bunch of fresh, bright yellow organic bananas. Clean white background, high-key lighting, crisp and appetizing." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAL6WQwWOyidj-uGC5MihlmdkxO7HYiw2NdhVyxZPGcsNSX5xchWpPGlWnFzmgcft2_UMD0NraeX1R8meFEjnbh3gdcCPxjz5Kz7fZ5Tw_A1UATKJIvTnGss0zjAWMD4lfGhB0Xdr7aO3fWkOUxvV8W1HN2pCi35KnrmtQfVie7YqRfw9bUOeJ63J2RAbrn8u8yY0u9GhL5_BQ3Js6eXEz6IoZwnzNFgnuHI1w2MfuCqHgUMASswQ1j"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="text-body-sm font-semibold text-on-surface truncate">Organic Bananas</h4>
+<p class="text-xs text-error font-medium">Low Stock: 12 bunches left</p>
+</div>
+<button class="text-primary hover:bg-primary-container/20 p-1.5 rounded-md transition-colors">
+<span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+</button>
+</div>
+<!-- Alert Item 2 -->
+<div class="flex items-center gap-4 p-3 rounded-lg border border-error-container bg-error-container/10">
+<div class="w-12 h-12 rounded-md bg-surface overflow-hidden flex-shrink-0 border border-outline-variant/30">
+<img alt="Whole Milk" class="w-full h-full object-cover" data-alt="A cold, condensation-covered glass bottle of whole milk. Clean white background, high-key lighting, fresh and pure aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdvHe9JME8yjpyBEH2WS-RpwF5xWfMGtShrSk76ggxjFRbpZ3zNgT0DIbeulVvP6aIjxw9kDujIQFx3817I-Is-7FuZPpCDGtx2UGD7ZsZ8PKEfchNalWgLUNSoIfGnLasutc9MF-aFGEj5pZCh4gYIVFCyuzg0mQrfzTPDZMEK3cx7EWtCQjH4kjUXaIGm8PZxPZJouOJI3A31yD1lzJIU19WEHMcytSrfCJ5zYv_5lTia-CKmmQj"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="text-body-sm font-semibold text-on-surface truncate">Whole Milk (1 Gal)</h4>
+<p class="text-xs text-error font-medium">Critical: 4 units left</p>
+</div>
+<button class="text-primary hover:bg-primary-container/20 p-1.5 rounded-md transition-colors">
+<span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+</button>
+</div>
+<!-- Alert Item 3 -->
+<div class="flex items-center gap-4 p-3 rounded-lg border border-outline-variant bg-surface-container-low">
+<div class="w-12 h-12 rounded-md bg-surface overflow-hidden flex-shrink-0 border border-outline-variant/30 flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">egg</span>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="text-body-sm font-semibold text-on-surface truncate">Free Range Eggs</h4>
+<p class="text-xs text-on-surface-variant">Reorder suggested soon</p>
+</div>
+<button class="text-primary hover:bg-primary-container/20 p-1.5 rounded-md transition-colors">
+<span class="material-symbols-outlined text-[20px]">add_shopping_cart</span>
+</button>
+</div>
+</div>
+<button class="w-full mt-4 py-2 text-sm font-semibold text-primary hover:bg-primary-container/10 rounded-md transition-colors border border-primary/20">
+                            View All Alerts
+                        </button>
+</div>
+</div>
+<!-- Bottom Section: Real-time Order Feed -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/30 overflow-hidden">
+<div class="p-6 border-b border-outline-variant/30 flex justify-between items-center bg-surface-bright">
+<h3 class="text-title-md font-headline font-semibold text-on-surface flex items-center gap-2">
+<span class="relative flex h-3 w-3 mr-1">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
+</span>
+                            Live Order Feed
+                        </h3>
+<div class="flex gap-2">
+<button class="text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low rounded-md px-3 py-1.5 text-sm font-medium transition-colors border border-outline-variant/50">Filter</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50 text-xs text-on-surface-variant uppercase tracking-wider font-label border-b border-outline-variant/30">
+<th class="px-6 py-4 font-semibold">Order ID</th>
+<th class="px-6 py-4 font-semibold">Customer</th>
+<th class="px-6 py-4 font-semibold">Items</th>
+<th class="px-6 py-4 font-semibold">Total</th>
+<th class="px-6 py-4 font-semibold">Status</th>
+<th class="px-6 py-4 font-semibold text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 bg-surface-container-lowest">
+<!-- Order Row: Pending -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-6 py-4 font-medium text-sm">#ORD-9021</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-primary flex items-center justify-center font-bold text-xs">SJ</div>
+<span class="text-sm font-medium">Sarah Jenkins</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">12 items</td>
+<td class="px-6 py-4 text-sm font-semibold">$84.50</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-tertiary-container/20 text-tertiary">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary"></span>
+                                            Pending
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:bg-primary-container/20 p-1.5 rounded-md transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Order Row: Packing -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-6 py-4 font-medium text-sm">#ORD-9020</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-secondary flex items-center justify-center font-bold text-xs">MR</div>
+<span class="text-sm font-medium">Marcus Rodriguez</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">5 items</td>
+<td class="px-6 py-4 text-sm font-semibold">$32.10</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#FFF3E0] text-[#E65100]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#E65100]"></span>
+                                            Packing
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:bg-primary-container/20 p-1.5 rounded-md transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Order Row: Out for Delivery -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-6 py-4 font-medium text-sm">#ORD-9019</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-secondary flex items-center justify-center font-bold text-xs">EL</div>
+<span class="text-sm font-medium">Emma Lawson</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">24 items</td>
+<td class="px-6 py-4 text-sm font-semibold">$156.80</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#E3F2FD] text-[#1565C0]">
+<span class="w-1.5 h-1.5 rounded-full bg-[#1565C0]"></span>
+                                            Out for Delivery
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:bg-primary-container/20 p-1.5 rounded-md transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</td>
+</tr>
+<!-- Order Row: Delivered -->
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-6 py-4 font-medium text-sm text-on-surface-variant">#ORD-9018</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant text-on-surface-variant flex items-center justify-center font-bold text-xs">DK</div>
+<span class="text-sm font-medium text-on-surface-variant">David Kim</span>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-on-surface-variant">8 items</td>
+<td class="px-6 py-4 text-sm font-semibold text-on-surface-variant">$45.00</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-primary-container/20 text-primary">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                            Delivered
+                                        </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:bg-primary-container/20 p-1.5 rounded-md transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

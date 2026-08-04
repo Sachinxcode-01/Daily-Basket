@@ -46,7 +46,11 @@ import 'features/support/presentation/screens/privacy_policy_screen.dart';
 import 'features/support/presentation/screens/terms_of_service_screen.dart';
 import 'features/settings/presentation/screens/app_theme_screen.dart';
 import 'features/notifications/presentation/screens/notification_center_screen.dart';
+import 'features/notifications/presentation/screens/notification_preferences_screen.dart';
 import 'features/wallet/presentation/screens/wallet_transactions_screen.dart';
+import 'features/referral/presentation/screens/offers_screen.dart';
+import 'features/referral/presentation/screens/referral_screen.dart';
+import 'features/referral/presentation/screens/referral_history_screen.dart';
 import 'features/membership/presentation/screens/daily_basket_plus_screen.dart';
 import 'features/freshness/presentation/screens/fresh_produce_explorer_screen.dart';
 import 'features/support/presentation/screens/about_app_screen.dart';
@@ -120,11 +124,15 @@ class DailyBasketApp extends StatelessWidget {
         '/terms-of-service': (context) => const TermsOfServiceScreen(),
         '/app-theme': (context) => const AppThemeScreen(),
         '/notifications': (context) => const NotificationCenterScreen(),
+        '/notification-preferences': (context) => const NotificationPreferencesScreen(),
         '/wallet': (context) => const WalletTransactionsScreen(),
         '/loyalty': (context) => const DailyBasketPlusScreen(),
         '/freshness': (context) => const FreshProduceExplorerScreen(),
         '/about': (context) => const AboutAppScreen(),
         '/delete-account': (context) => const DeleteAccountScreen(),
+        '/coupons': (context) => const OffersScreen(),
+        '/referral': (context) => const ReferralScreen(),
+        '/referral-history': (context) => const ReferralHistoryScreen(),
       },
     );
   }

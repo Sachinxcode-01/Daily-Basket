@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Edit Product - Daily Basket Admin</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f9f9fc",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed": "#151d19",
+                    "on-primary-fixed-variant": "#00531a",
+                    "on-surface-variant": "#3f4a3d",
+                    "primary-fixed": "#8cfa93",
+                    "on-tertiary-container": "#fcfcfc",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#70dd7a",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "secondary": "#58605a",
+                    "on-primary-fixed": "#002106",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#e8e8ea",
+                    "on-secondary-fixed-variant": "#404943",
+                    "surface-container-highest": "#e2e2e5",
+                    "primary-fixed-dim": "#70dd7a",
+                    "outline": "#6e7a6c",
+                    "surface-dim": "#dadadc",
+                    "surface-container": "#eeeef0",
+                    "on-secondary-container": "#5e6660",
+                    "on-primary-container": "#f7fff2",
+                    "background": "#f9f9fc",
+                    "tertiary": "#5a5c5c",
+                    "surface-container-low": "#f3f3f6",
+                    "secondary-fixed-dim": "#c0c9c1",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#2f3133",
+                    "outline-variant": "#becab9",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#1a1c1e",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "inverse-on-surface": "#f0f0f3",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "secondary-container": "#dce5dd",
+                    "on-background": "#1a1c1e",
+                    "surface-tint": "#006e25",
+                    "primary-container": "#078730",
+                    "primary": "#006b23",
+                    "surface-variant": "#e2e2e5",
+                    "surface-bright": "#f9f9fc",
+                    "tertiary-container": "#737575",
+                    "secondary-fixed": "#dce5dd",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#e2e2e2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Outfit"],
+                    "display": ["Outfit"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-headline { font-family: 'Outfit', sans-serif; }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background antialiased flex h-screen overflow-hidden">
+<!-- SideNavBar -->
+<nav class="h-screen w-64 fixed left-0 top-0 z-50 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant/20 flex flex-col p-4 gap-2 hidden md:flex">
+<div class="mb-8 px-4 py-2">
+<h1 class="font-headline font-bold text-primary text-title-md">Daily Basket</h1>
+<p class="text-body-sm text-on-surface-variant">Management Portal</p>
+</div>
+<button class="bg-primary text-on-primary rounded-lg py-3 px-4 flex items-center justify-center gap-2 mb-4 hover:bg-primary/90 transition-colors w-full font-label">
+<span class="material-symbols-outlined text-sm">add</span>
+            New Report
+        </button>
+<div class="flex-1 overflow-y-auto space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-label" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<!-- Active State: Inventory (since it's a Product Editor) -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-semibold hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-label" href="#">
+<span class="material-symbols-outlined">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-label" href="#">
+<span class="material-symbols-outlined">shopping_cart</span>
+                Orders
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-label" href="#">
+<span class="material-symbols-outlined">delivery_dining</span>
+                Riders
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-label" href="#">
+<span class="material-symbols-outlined">group</span>
+                Customers
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-label" href="#">
+<span class="material-symbols-outlined">campaign</span>
+                Marketing
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-label" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col md:ml-64 relative h-screen">
+<!-- TopNavBar -->
+<header class="w-full sticky top-0 z-40 bg-surface/80 dark:bg-surface-container/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm flex items-center justify-between px-6 py-3">
+<div class="flex items-center gap-4">
+<!-- Mobile Menu Button (hidden on desktop) -->
+<button class="md:hidden text-on-surface-variant p-2">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="font-headline font-semibold text-title-md text-primary dark:text-primary-fixed md:hidden">
+                    Daily Basket Admin
+                </div>
+<div class="hidden md:flex items-center bg-surface-container-low rounded-full px-4 py-2 border border-outline-variant/30 focus-within:border-primary/50 transition-colors w-64 lg:w-96">
+<span class="material-symbols-outlined text-on-surface-variant mr-2 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm w-full outline-none text-on-surface placeholder:text-on-surface-variant/50" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-secondary-container/50 transition-colors cursor-pointer active:scale-95 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-secondary-container/50 transition-colors cursor-pointer active:scale-95 rounded-full flex items-center justify-center hidden sm:flex">
+<span class="material-symbols-outlined">help</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-secondary-container/50 transition-colors cursor-pointer active:scale-95 rounded-full flex items-center justify-center hidden sm:flex">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-secondary-container ml-2 overflow-hidden border border-outline-variant/30 shrink-0 cursor-pointer">
+<img alt="Admin Profile" class="w-full h-full object-cover" data-alt="A professional headshot of an administrator in a modern office setting. The lighting is soft and natural, emphasizing approachability and competence. Modern corporate aesthetic with subtle greenery in the background, matching the organic freshness theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwMipWNUWrikXxwHefOknoMQ8WcCKqOYvjvg43sKSaWRO5YFtPxq4NfRDkMBg_djrxLrDW_vHHnb7Ttx2odv0W7JGLZRvk5OwTSa0hYH4vCgfwrl9f7s8GzpXhAZJfPdILvEsDeMTkgfrQqDI4jal7t-GgByMs-ZIQyhrN1WiOfrQNDkiwtYiZGMfxzPQccXOy06-V9lu7NlR6PU50OXnhUcYmAPeLIh3W_gtCWvhG_7-6VqL53HO6"/>
+</div>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 overflow-y-auto p-4 md:p-8 bg-surface-bright relative z-0">
+<div class="max-w-5xl mx-auto space-y-6 pb-24">
+<!-- Header Actions -->
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+<div>
+<div class="flex items-center gap-2 text-body-sm text-on-surface-variant mb-1">
+<a class="hover:text-primary transition-colors" href="#">Inventory</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span>Edit Product</span>
+</div>
+<h2 class="text-headline-lg text-on-surface font-headline font-semibold">Edit Product</h2>
+</div>
+<div class="flex items-center gap-3 w-full sm:w-auto">
+<button class="px-6 py-2.5 rounded-md text-primary bg-secondary-container hover:bg-secondary-container/80 transition-colors font-label text-label-md flex-1 sm:flex-none text-center h-[48px] flex items-center justify-center">Cancel</button>
+<button class="px-6 py-2.5 rounded-md text-on-primary bg-primary hover:bg-primary/90 shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-all font-label text-label-md flex-1 sm:flex-none text-center h-[48px] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                            Save Changes
+                        </button>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Column: Main Details -->
+<div class="lg:col-span-8 space-y-6">
+<!-- Basic Info Card -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20">
+<h3 class="text-title-md font-headline text-on-surface mb-6 border-b border-outline-variant/20 pb-4">Basic Information</h3>
+<div class="space-y-5">
+<div>
+<label class="block text-label-md font-label text-on-surface-variant mb-1.5">Product Name</label>
+<input class="w-full bg-surface-container-low border-none rounded-md px-4 py-3 text-body-lg text-on-surface focus:ring-2 focus:ring-primary focus:outline-none transition-all placeholder:text-on-surface-variant/50 h-[48px]" type="text" value="Organic Bananas, Cavendish"/>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+<div>
+<label class="block text-label-md font-label text-on-surface-variant mb-1.5">Category</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-none rounded-md pl-4 pr-10 py-3 text-body-lg text-on-surface focus:ring-2 focus:ring-primary focus:outline-none appearance-none h-[48px]">
+<option>Fresh Produce</option>
+<option>Dairy &amp; Eggs</option>
+<option>Bakery</option>
+<option>Pantry</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+<div>
+<label class="block text-label-md font-label text-on-surface-variant mb-1.5">Sub-category</label>
+<div class="relative">
+<select class="w-full bg-surface-container-low border-none rounded-md pl-4 pr-10 py-3 text-body-lg text-on-surface focus:ring-2 focus:ring-primary focus:outline-none appearance-none h-[48px]">
+<option>Fruit</option>
+<option>Vegetables</option>
+<option>Herbs</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">expand_more</span>
+</div>
+</div>
+</div>
+<div>
+<label class="block text-label-md font-label text-on-surface-variant mb-1.5">Description</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-md px-4 py-3 text-body-lg text-on-surface focus:ring-2 focus:ring-primary focus:outline-none transition-all resize-none" rows="4">Fresh, perfectly ripe organic Cavendish bananas. Sourced locally when possible. High in potassium and energy. Perfect for snacking, smoothies, or baking.</textarea>
+</div>
+</div>
+</div>
+<!-- Pricing & Inventory -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20">
+<h3 class="text-title-md font-headline text-on-surface mb-6 border-b border-outline-variant/20 pb-4">Pricing &amp; Inventory</h3>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+<div>
+<label class="block text-label-md font-label text-on-surface-variant mb-1.5">Base Price</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">$</span>
+<input class="w-full bg-surface-container-low border-none rounded-md pl-8 pr-4 py-3 text-body-lg text-on-surface focus:ring-2 focus:ring-primary focus:outline-none h-[48px]" type="text" value="3.99"/>
+</div>
+</div>
+<div>
+<label class="block text-label-md font-label text-on-surface-variant mb-1.5">Stock Level</label>
+<input class="w-full bg-surface-container-low border-none rounded-md px-4 py-3 text-body-lg text-on-surface focus:ring-2 focus:ring-primary focus:outline-none h-[48px]" type="number" value="142"/>
+</div>
+<div>
+<label class="block text-label-md font-label text-on-surface-variant mb-1.5">SKU</label>
+<input class="w-full bg-surface-container-low border-none rounded-md px-4 py-3 text-body-lg text-on-surface focus:ring-2 focus:ring-primary focus:outline-none font-mono text-sm h-[48px]" type="text" value="PRD-BNN-ORG-01"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Media & Meta -->
+<div class="lg:col-span-4 space-y-6">
+<!-- Product Image -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20">
+<h3 class="text-title-md font-headline text-on-surface mb-4">Product Image</h3>
+<div class="w-full aspect-square bg-surface-container-low rounded-lg border-2 border-dashed border-outline-variant/50 relative overflow-hidden group cursor-pointer hover:border-primary/50 transition-colors flex flex-col items-center justify-center">
+<!-- Image Preview -->
+<img alt="Organic Bananas" class="absolute inset-0 w-full h-full object-cover z-10" data-alt="A bunch of perfectly ripe, bright yellow organic bananas resting on a clean, crisp white surface. The lighting is studio-quality, high-key, casting a very soft shadow to emphasize freshness. The overall aesthetic is clean, premium grocery style, fitting perfectly into a modern corporate white-space design." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQIXuwN4J1kTkwDQqYKBFs9M7AtI230vcWxo6Z-fOe7QtCF7w8HyiG5o5CYMTfav0jA8k9AaAejtvlIbRHXtCdFOHJ46nGDqtDskMFy8Lc1L4ZpJCgR_XzM0WaWuyAntlOiAcBbubOgtZuAe1m2dNvs4FfB6T6OHyjEeSsCn72YIw-gdFIwJfNunhEzVj06f8ghyeUQT_yUc6yckFZv9-mDONLScU8rVi-7PQsnGdOw5Y16KCyh2Kp"/>
+<!-- Overlay on hover -->
+<div class="absolute inset-0 bg-inverse-surface/60 backdrop-blur-sm z-20 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-3xl mb-2">cloud_upload</span>
+<span class="font-label text-label-md">Replace Image</span>
+</div>
+</div>
+<div class="mt-3 text-center text-body-sm text-on-surface-variant">
+                                PNG, JPG up to 5MB
+                            </div>
+</div>
+<!-- Status & Meta -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 space-y-5">
+<div>
+<label class="block text-label-md font-label text-on-surface-variant mb-2">Status</label>
+<div class="flex items-center gap-2">
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-primary appearance-none cursor-pointer z-10 transition-transform translate-x-6" id="toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-primary cursor-pointer" for="toggle"></label>
+</div>
+<span class="text-body-lg text-on-surface font-semibold">Active</span>
+</div>
+<style>
+                                    /* Custom toggle styles to keep HTML clean */
+                                    .toggle-checkbox:checked { right: 0; border-color: #006b23; }
+                                    .toggle-checkbox:checked + .toggle-label { background-color: #006b23; }
+                                    .toggle-checkbox:not(:checked) { left: 0; border-color: #becab9; transform: translateX(0); }
+                                    .toggle-checkbox:not(:checked) + .toggle-label { background-color: #eeeef0; border: 1px solid #becab9; }
+                                </style>
+</div>
+<hr class="border-outline-variant/20"/>
+<div>
+<label class="block text-label-md font-label text-on-surface-variant mb-1.5">Tags (Comma separated)</label>
+<input class="w-full bg-surface-container-low border-none rounded-md px-4 py-2.5 text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:outline-none" type="text" value="Organic, Fair Trade, Produce"/>
+<div class="flex flex-wrap gap-2 mt-3">
+<span class="bg-secondary-container text-primary-container px-3 py-1 rounded-full text-[10px] font-label tracking-wider uppercase font-semibold">Organic</span>
+<span class="bg-secondary-container text-primary-container px-3 py-1 rounded-full text-[10px] font-label tracking-wider uppercase font-semibold">Fair Trade</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Details Sections -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+<!-- Nutritional Facts -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20">
+<h3 class="text-title-md font-headline text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">info</span>
+                            Nutritional Facts
+                        </h3>
+<textarea class="w-full bg-surface-container-low border-none rounded-md px-4 py-3 text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:outline-none transition-all resize-none placeholder:text-on-surface-variant/50" placeholder="Enter nutritional info (e.g. Calories: 105, Potassium: 422mg...)" rows="4">Serving Size: 1 medium banana (118g)
+Calories: 105
+Total Fat: 0.4g
+Potassium: 422mg
+Total Carbohydrate: 27g
+Protein: 1.3g</textarea>
+</div>
+<!-- Storage Instructions -->
+<div class="bg-surface-container-lowest rounded-lg p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20">
+<h3 class="text-title-md font-headline text-on-surface mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-xl">kitchen</span>
+                            Storage Instructions
+                        </h3>
+<textarea class="w-full bg-surface-container-low border-none rounded-md px-4 py-3 text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:outline-none transition-all resize-none placeholder:text-on-surface-variant/50" placeholder="How to store this product..." rows="4">Store at room temperature until ripe. 
+Once ripe, can be refrigerated to extend shelf life (skin will darken but fruit remains fresh).
+Keep away from direct sunlight.</textarea>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

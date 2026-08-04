@@ -77,6 +77,11 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
         ),
         centerTitle: true,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined, color: AppColors.primary),
+            tooltip: 'Notification Preferences',
+            onPressed: () => Navigator.of(context).pushNamed('/notification-preferences'),
+          ),
           TextButton.icon(
             onPressed: () {
               setState(() {

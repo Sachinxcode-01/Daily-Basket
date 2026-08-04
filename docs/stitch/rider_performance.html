@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Rider Performance Dashboard - Daily Basket</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#f9f9fc",
+                      "error": "#ba1a1a",
+                      "on-secondary-fixed": "#151d19",
+                      "on-primary-fixed-variant": "#00531a",
+                      "on-surface-variant": "#3f4a3d",
+                      "primary-fixed": "#8cfa93",
+                      "on-tertiary-container": "#fcfcfc",
+                      "on-error": "#ffffff",
+                      "inverse-primary": "#70dd7a",
+                      "on-tertiary-fixed": "#1a1c1c",
+                      "secondary": "#58605a",
+                      "on-primary-fixed": "#002106",
+                      "tertiary-fixed-dim": "#c6c6c7",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-container-high": "#e8e8ea",
+                      "on-secondary-fixed-variant": "#404943",
+                      "surface-container-highest": "#e2e2e5",
+                      "primary-fixed-dim": "#70dd7a",
+                      "outline": "#6e7a6c",
+                      "surface-dim": "#dadadc",
+                      "surface-container": "#eeeef0",
+                      "on-secondary-container": "#5e6660",
+                      "on-primary-container": "#f7fff2",
+                      "background": "#f9f9fc",
+                      "tertiary": "#5a5c5c",
+                      "surface-container-low": "#f3f3f6",
+                      "secondary-fixed-dim": "#c0c9c1",
+                      "on-secondary": "#ffffff",
+                      "inverse-surface": "#2f3133",
+                      "outline-variant": "#becab9",
+                      "on-primary": "#ffffff",
+                      "on-surface": "#1a1c1e",
+                      "on-tertiary-fixed-variant": "#454747",
+                      "inverse-on-surface": "#f0f0f3",
+                      "on-tertiary": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "secondary-container": "#dce5dd",
+                      "on-background": "#1a1c1e",
+                      "surface-tint": "#006e25",
+                      "primary-container": "#078730",
+                      "primary": "#006b23",
+                      "surface-variant": "#e2e2e5",
+                      "surface-bright": "#f9f9fc",
+                      "tertiary-container": "#737575",
+                      "secondary-fixed": "#dce5dd",
+                      "error-container": "#ffdad6",
+                      "tertiary-fixed": "#e2e2e2"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {},
+              "fontFamily": {
+                      "headline": ["Outfit"],
+                      "display": ["Outfit"],
+                      "body": ["Inter"],
+                      "label": ["Inter"]
+              },
+              "fontSize": {}
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body flex min-h-screen">
+<!-- SideNavBar (Shared Component) -->
+<nav class="h-screen w-64 fixed left-0 top-0 z-50 bg-surface-container-low dark:bg-surface-container-lowest border-r border-outline-variant/20 flex flex-col p-4 gap-2">
+<div class="px-4 py-6 flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-on-primary font-headline font-bold text-xl">
+                DB
+            </div>
+<div>
+<h1 class="font-headline font-bold text-primary text-title-md">Daily Basket</h1>
+<p class="text-on-surface-variant text-xs">Management Portal</p>
+</div>
+</div>
+<div class="flex-1 flex flex-col gap-1">
+<!-- Tabs. Intent mapping: "Riders" is the active tab. -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-headline text-title-md text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-headline text-title-md text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="inventory_2">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-headline text-title-md text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="shopping_cart">shopping_cart</span>
+                Orders
+            </a>
+<!-- Active Tab -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-semibold hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-headline text-title-md text-sm" href="#">
+<span class="material-symbols-outlined fill text-[20px]" data-icon="delivery_dining" data-weight="fill">delivery_dining</span>
+                Riders
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-headline text-title-md text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="group">group</span>
+                Customers
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-headline text-title-md text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="campaign">campaign</span>
+                Marketing
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg hover:bg-secondary-container/50 transition-all duration-200 ease-in-out font-headline text-title-md text-sm" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="settings">settings</span>
+                Settings
+            </a>
+</div>
+<button class="mt-auto flex items-center justify-center gap-2 bg-primary text-on-primary px-4 py-3 rounded-lg font-semibold shadow-sm hover:bg-surface-tint transition-colors">
+<span class="material-symbols-outlined text-[20px]">add</span>
+            New Report
+        </button>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 ml-64 flex flex-col min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm flex items-center justify-between px-6 py-3 font-body text-body-sm">
+<div class="flex items-center gap-4">
+<div class="font-headline font-semibold text-title-md text-primary dark:text-primary-fixed hidden">Daily Basket Admin</div>
+<!-- Search Bar (on_left) -->
+<div class="relative w-64 group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/60 group-focus-within:text-primary">search</span>
+<input class="w-full bg-secondary-container/30 border-none rounded-full py-2 pl-10 pr-4 focus:ring-2 focus:ring-primary focus:bg-surface transition-all text-on-surface placeholder:text-on-surface-variant/60" placeholder="Search riders, orders..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-secondary-container/50 transition-colors rounded-full cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-secondary-container/50 transition-colors rounded-full cursor-pointer active:scale-95">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-secondary-container/50 transition-colors rounded-full cursor-pointer active:scale-95 mr-2">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-px bg-outline-variant/30 mx-2"></div>
+<img alt="Admin Profile" class="w-9 h-9 rounded-full object-cover border border-outline-variant/50 cursor-pointer active:scale-95 transition-transform" data-alt="A small circular profile picture of an administrative user, featuring a professional adult with a friendly smile, well-lit in a modern office environment. High resolution, corporate aesthetic, subtle light-mode background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB-aq0lgDOeDYNTkDQenYKA0WNXMXsRF9yxJlgDog2VrsC3UUhLmsBIarBHcjtCAVirU0T-KOk6pdXv6BU7ojt2F-c7YL6ucVk1Le8XO28maKu6j-ODw-qqNx43_FBcc7whxLwG2mP2J6S0-JfTjKtubrE_Zb834eM8UH69wUSObzmLMfLNPJITIh5FEKBpCEhD41G6kIThBGZHh3A2lFqDMbkY8QgJvit97RW9fPvP0q2W2u-8uUYD"/>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<div class="p-6 md:p-8 flex flex-col gap-8 flex-1">
+<!-- Header -->
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-headline text-[32px] font-semibold text-on-surface leading-tight">Rider Performance</h2>
+<p class="text-on-surface-variant mt-1">Live metrics and fleet status for today.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 border border-outline-variant rounded-lg text-sm font-semibold text-on-surface-variant hover:bg-surface-variant/50 transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">calendar_today</span>
+                        Today
+                    </button>
+</div>
+</div>
+<!-- KPI Row -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- KPI Card 1 -->
+<div class="bg-surface rounded-xl p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-primary-container/20 rounded-full blur-2xl"></div>
+<div class="flex justify-between items-start">
+<div class="p-2 bg-primary-container text-on-primary-container rounded-lg">
+<span class="material-symbols-outlined">pedal_bike</span>
+</div>
+<span class="text-sm font-medium text-primary bg-primary-container/30 px-2 py-1 rounded-md">+12% vs yesterday</span>
+</div>
+<div>
+<div class="text-[32px] font-headline font-semibold text-on-surface">42 / 50</div>
+<div class="text-sm text-on-surface-variant mt-1 font-medium">Active Riders Online</div>
+</div>
+</div>
+<!-- KPI Card 2 -->
+<div class="bg-surface rounded-xl p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-secondary-container/30 rounded-full blur-2xl"></div>
+<div class="flex justify-between items-start">
+<div class="p-2 bg-secondary-container text-on-secondary-container rounded-lg">
+<span class="material-symbols-outlined">timer</span>
+</div>
+<span class="text-sm font-medium text-primary bg-primary-container/30 px-2 py-1 rounded-md">-2m improvement</span>
+</div>
+<div>
+<div class="text-[32px] font-headline font-semibold text-on-surface">14.5<span class="text-lg text-on-surface-variant ml-1">min</span></div>
+<div class="text-sm text-on-surface-variant mt-1 font-medium">Avg. Delivery Time</div>
+</div>
+</div>
+<!-- KPI Card 3 -->
+<div class="bg-surface rounded-xl p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-surface-variant/50 rounded-full blur-2xl"></div>
+<div class="flex justify-between items-start">
+<div class="p-2 bg-surface-variant text-on-surface-variant rounded-lg">
+<span class="material-symbols-outlined">local_mall</span>
+</div>
+<span class="text-sm font-medium text-primary bg-primary-container/30 px-2 py-1 rounded-md">+184 today</span>
+</div>
+<div>
+<div class="text-[32px] font-headline font-semibold text-on-surface">845</div>
+<div class="text-sm text-on-surface-variant mt-1 font-medium">Total Deliveries</div>
+</div>
+</div>
+</div>
+<!-- Map and Quick Stats Bento Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Map View -->
+<div class="lg:col-span-2 bg-surface rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 overflow-hidden flex flex-col h-[400px]">
+<div class="px-6 py-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface/50 backdrop-blur-md">
+<h3 class="font-headline font-semibold text-title-md text-on-surface">Live Fleet Map</h3>
+<div class="flex gap-2">
+<div class="flex items-center gap-1 text-xs font-medium text-on-surface-variant">
+<span class="w-2 h-2 rounded-full bg-primary block"></span> Active
+                            </div>
+<div class="flex items-center gap-1 text-xs font-medium text-on-surface-variant ml-2">
+<span class="w-2 h-2 rounded-full bg-secondary block"></span> Idle
+                            </div>
+</div>
+</div>
+<div class="flex-1 relative bg-surface-container">
+<!-- Map Image Placeholder -->
+<div class="absolute inset-0 bg-cover bg-center" data-alt="A detailed, clean, top-down map interface showing urban city streets in a light-mode color scheme. The map style is minimalist, using soft whites, light grays, and subtle mint greens for parks. It resembles a high-end delivery tracking interface without text labels." data-location="London" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCVy8ai8nmFcvqN-MovdZTOMWL9mIWrzqn7NMKN0tMyhFcCWgCjHYJOtpuykg6jl6CtLeVIbS_8b7DSXaE-0hFeyZG4ZNtVAa2beh-xnvHfITnmVzQ-OlihW5WZx95kiamXYgt4TnI5LC9gFI61fSUyfssQIYvhusFv3_GZ6GchmOk7EmcmqJMfw-Xc5R-kr0pvwwFr2U76YFIt1WID9vIp-yglwV8q9XthzO0qJ1GHqj8NUPGn9gYa')"></div>
+<!-- Simulated Map Markers -->
+<div class="absolute top-[30%] left-[45%] w-8 h-8 bg-primary rounded-full border-2 border-surface flex items-center justify-center text-on-primary shadow-md">
+<span class="material-symbols-outlined text-[16px]">pedal_bike</span>
+</div>
+<div class="absolute top-[50%] left-[25%] w-8 h-8 bg-primary rounded-full border-2 border-surface flex items-center justify-center text-on-primary shadow-md">
+<span class="material-symbols-outlined text-[16px]">pedal_bike</span>
+</div>
+<div class="absolute top-[65%] left-[60%] w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center animate-pulse">
+<div class="w-6 h-6 bg-primary rounded-full border-2 border-surface flex items-center justify-center text-on-primary shadow-md">
+<span class="text-xs font-bold">3</span>
+</div>
+</div>
+<div class="absolute top-[20%] left-[70%] w-6 h-6 bg-secondary rounded-full border-2 border-surface shadow-md"></div>
+</div>
+</div>
+<!-- Top Performers List -->
+<div class="bg-surface rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 flex flex-col h-[400px]">
+<div class="px-6 py-4 border-b border-outline-variant/20">
+<h3 class="font-headline font-semibold text-title-md text-on-surface">Top Performers Today</h3>
+</div>
+<div class="flex-1 overflow-y-auto p-4 flex flex-col gap-2">
+<!-- Performer Item -->
+<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A close up portrait of a young male delivery rider wearing a light green jacket and a helmet, smiling confidently. Bright daylight, professional commercial photography, shallow depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCgRPF7eR92asoL0yA94GReDyoFH1dGjCgGp05dzRTUHgrwWH_h7W4FaVUzWaedm7bn4_kzLyGJlIMjP3Tg1eOLNW_EFwGGH9Q-0zFkUbQpIf_PQIYmuWqLtKXPBmynP4bM-adgN4iMM_BcLy8o7J_ID1uAi9S2KLHb6WgP4bLCGO2jelVeKnMC_PKCr7aZEe4SMYys0PIp7wSOATl69zd5zQNUVQYPI-DjnSRIkJvCGuoT7lXDjx81"/>
+<div class="flex-1">
+<h4 class="text-sm font-semibold text-on-surface">Alex Mercer</h4>
+<div class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-[#f59e0b] fill">star</span>
+                                    4.9 (42 trips)
+                                </div>
+</div>
+<div class="text-right">
+<div class="text-sm font-semibold text-primary">$124</div>
+</div>
+</div>
+<!-- Performer Item -->
+<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A close up portrait of a female delivery rider with tied-back dark hair, wearing a high-vis vest over a dark green shirt, looking focused. Urban background slightly blurred out. Bright natural lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDtNvf-ma6_QsnAi841Idq60sZWf0OYNPz9GZIdJWQFXbRUvZKdL9dRiRFLXEGyZNuL7DUySwK3LmHt-vsM8e1omr4pkntG_tIrzlaHT9YZXp9vK2hwnIBd7L6j3KhjfJsO9h5bSBmtVQZW9rWuhviAPkW7C8NddA2ACrvrh7WE7egzfdxpMK3F4jq0QyBnwQVem68CyQYeOrsLW4Tt2k-pdTC12Wzo3Xz6AVg7BFajpb9tl3snndPX"/>
+<div class="flex-1">
+<h4 class="text-sm font-semibold text-on-surface">Sarah Chen</h4>
+<div class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-[#f59e0b] fill">star</span>
+                                    4.8 (38 trips)
+                                </div>
+</div>
+<div class="text-right">
+<div class="text-sm font-semibold text-primary">$118</div>
+</div>
+</div>
+<!-- Performer Item -->
+<div class="flex items-center gap-4 p-3 rounded-lg hover:bg-surface-container-low transition-colors cursor-pointer">
+<img class="w-10 h-10 rounded-full object-cover" data-alt="A portrait of an older male delivery rider with a grey beard, wearing a branded green cap and jacket, smiling warmly. Professional studio lighting with a neutral light background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHn0LsO7Xc4pDU9n-NEtrYq3_sZXIkpBoCqGVJ8PjEECydNs8826b2zHVUn7OYfQMdyJ4WVWORNH7G79gMrmdxSZmOuArsFChWebeBY9u05-0TtdQBSuWmJuWLdeKZmcxv5cAMsdvbtauLvKTREfVVBJu-YeY6zIubaC7y-k6_cm6Ev5YhbCcibOmC9m-Wizu8WXiWl0WuIXl7fq_P4YO1Kolgksa51cKsxvvnOy5zcvq3BsEYD3qx"/>
+<div class="flex-1">
+<h4 class="text-sm font-semibold text-on-surface">David Okafor</h4>
+<div class="text-xs text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-[#f59e0b] fill">star</span>
+                                    4.9 (35 trips)
+                                </div>
+</div>
+<div class="text-right">
+<div class="text-sm font-semibold text-primary">$105</div>
+</div>
+</div>
+<button class="mt-auto w-full py-2 text-sm font-semibold text-primary hover:bg-primary-container/20 rounded-md transition-colors">
+                            View All Rankings
+                        </button>
+</div>
+</div>
+</div>
+<!-- Detailed Table Section -->
+<div class="bg-surface rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 overflow-hidden">
+<div class="px-6 py-5 border-b border-outline-variant/20 flex justify-between items-center">
+<h3 class="font-headline font-semibold text-title-md text-on-surface">Fleet Directory</h3>
+<div class="flex gap-2">
+<button class="px-3 py-1.5 text-xs font-semibold rounded-full bg-primary-container text-on-primary-container">All</button>
+<button class="px-3 py-1.5 text-xs font-semibold rounded-full text-on-surface-variant hover:bg-surface-variant/50">Active</button>
+<button class="px-3 py-1.5 text-xs font-semibold rounded-full text-on-surface-variant hover:bg-surface-variant/50">Idle</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm text-on-surface">
+<thead class="bg-surface-container-low text-xs uppercase text-on-surface-variant border-b border-outline-variant/20">
+<tr>
+<th class="px-6 py-4 font-semibold" scope="col">Rider</th>
+<th class="px-6 py-4 font-semibold" scope="col">Status</th>
+<th class="px-6 py-4 font-semibold" scope="col">Vehicle</th>
+<th class="px-6 py-4 font-semibold" scope="col">Rating</th>
+<th class="px-6 py-4 font-semibold" scope="col">Earnings (Today)</th>
+<th class="px-6 py-4 font-semibold text-right" scope="col">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/10">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-semibold text-xs">AM</div>
+<span class="font-semibold text-on-surface">Alex Mercer</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-primary-container text-on-primary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                        Active
+                                    </span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">E-Bike</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-[#f59e0b] fill">star</span>
+<span class="font-medium">4.9</span>
+</div>
+</td>
+<td class="px-6 py-4 font-medium">$124.50</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-surface-tint font-medium">Manage</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary/10 flex items-center justify-center text-secondary font-semibold text-xs">SC</div>
+<span class="font-semibold text-on-surface">Sarah Chen</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-secondary-container text-on-secondary-container">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+                                        Idle
+                                    </span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">Moped</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-[#f59e0b] fill">star</span>
+<span class="font-medium">4.8</span>
+</div>
+</td>
+<td class="px-6 py-4 font-medium">$118.00</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-surface-tint font-medium">Manage</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant font-semibold text-xs">MJ</div>
+<span class="font-semibold text-on-surface">Marcus Johnson</span>
+</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 py-1 px-2.5 rounded-full text-xs font-medium bg-surface-variant text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                        Offline
+                                    </span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant">Bicycle</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px] text-[#f59e0b] fill">star</span>
+<span class="font-medium">4.6</span>
+</div>
+</td>
+<td class="px-6 py-4 font-medium">$0.00</td>
+<td class="px-6 py-4 text-right">
+<button class="text-primary hover:text-surface-tint font-medium">Manage</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-outline-variant/20 flex justify-center">
+<button class="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">Load More Riders</button>
+</div>
+</div>
+</div>
+</main>
+</body></html>

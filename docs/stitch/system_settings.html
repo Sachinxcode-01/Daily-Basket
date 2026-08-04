@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+
+<html class="h-full" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daily Basket - System Settings</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f9f9fc",
+                    "error": "#ba1a1a",
+                    "on-secondary-fixed": "#151d19",
+                    "on-primary-fixed-variant": "#00531a",
+                    "on-surface-variant": "#3f4a3d",
+                    "primary-fixed": "#8cfa93",
+                    "on-tertiary-container": "#fcfcfc",
+                    "on-error": "#ffffff",
+                    "inverse-primary": "#70dd7a",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "secondary": "#58605a",
+                    "on-primary-fixed": "#002106",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-high": "#e8e8ea",
+                    "on-secondary-fixed-variant": "#404943",
+                    "surface-container-highest": "#e2e2e5",
+                    "primary-fixed-dim": "#70dd7a",
+                    "outline": "#6e7a6c",
+                    "surface-dim": "#dadadc",
+                    "surface-container": "#eeeef0",
+                    "on-secondary-container": "#5e6660",
+                    "on-primary-container": "#f7fff2",
+                    "background": "#f9f9fc",
+                    "tertiary": "#5a5c5c",
+                    "surface-container-low": "#f3f3f6",
+                    "secondary-fixed-dim": "#c0c9c1",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#2f3133",
+                    "outline-variant": "#becab9",
+                    "on-primary": "#ffffff",
+                    "on-surface": "#1a1c1e",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "inverse-on-surface": "#f0f0f3",
+                    "on-tertiary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "secondary-container": "#dce5dd",
+                    "on-background": "#1a1c1e",
+                    "surface-tint": "#006e25",
+                    "primary-container": "#078730",
+                    "primary": "#006b23",
+                    "surface-variant": "#e2e2e5",
+                    "surface-bright": "#f9f9fc",
+                    "tertiary-container": "#737575",
+                    "secondary-fixed": "#dce5dd",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#e2e2e2"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Outfit", "sans-serif"],
+                    "display": ["Outfit", "sans-serif"],
+                    "body": ["Inter", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        /* Glassmorphism utilities */
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f9f9fc;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #becab9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6e7a6c;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface h-full flex antialiased font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- SideNavBar (Hidden on Mobile, Visible on md+) -->
+<nav class="hidden md:flex bg-surface-container-low h-screen w-64 fixed left-0 top-0 z-50 border-r border-outline-variant/20 flex-col h-full p-4 gap-2">
+<!-- Header -->
+<div class="flex items-center gap-3 px-4 py-6 mb-4">
+<img class="w-10 h-10 rounded-lg object-cover bg-surface-container-highest shadow-sm" data-alt="A stylized, modern geometric logo representing a fresh green basket, using smooth curves and crisp edges. The aesthetic is clean, flat corporate branding with a bright green hue, isolated on a stark white background. Minimalist and professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk4-T5BsNVHlF76s8SDdrKdU5TREZWVXSDeUBFleqgB5XKtP2c7uwunMbgtH8fBj9rQva6lwzQueFzJ_PDF85PkuILgIsAK26RBHX1Mt_zVyaJELS5qNXQbjcQVNuZymlwka4T8h5Kb_I-x7GkTPHlmWf2Cejvvj_w595kSSJy_CWx2OwV-Ksg3_xxa_1bpj44IfWtTDG8H6nynM9XC4Cr26iI7V48GIMWvge6l0q0qJ14DSGtRvtA"/>
+<div>
+<h1 class="font-headline text-title-md font-bold text-primary">Daily Basket</h1>
+<p class="text-label-md text-on-surface-variant font-medium tracking-wide">Management Portal</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg transition-all duration-200 ease-in-out font-body text-body-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg transition-all duration-200 ease-in-out font-body text-body-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="inventory_2">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg transition-all duration-200 ease-in-out font-body text-body-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="shopping_cart">shopping_cart</span>
+                Orders
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg transition-all duration-200 ease-in-out font-body text-body-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="delivery_dining">delivery_dining</span>
+                Riders
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg transition-all duration-200 ease-in-out font-body text-body-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="group">group</span>
+                Customers
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-secondary-container hover:bg-secondary-container/30 rounded-lg transition-all duration-200 ease-in-out font-body text-body-sm font-medium" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="campaign">campaign</span>
+                Marketing
+            </a>
+<!-- Active State: Settings -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-semibold transition-all duration-200 ease-in-out font-body text-body-sm" href="#">
+<span class="material-symbols-outlined text-[20px] fill" data-icon="settings" data-weight="fill">settings</span>
+                Settings
+            </a>
+</div>
+<!-- CTA -->
+<div class="mt-auto pt-4">
+<button class="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-on-primary font-label text-label-md py-3 rounded-lg transition-colors shadow-sm font-medium">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Report
+            </button>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 min-h-screen">
+<!-- TopNavBar -->
+<header class="w-full sticky top-0 z-40 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm flex items-center justify-between px-6 py-3 w-full font-body text-body-sm">
+<!-- Mobile Brand / Search placeholder -->
+<div class="flex items-center gap-4 flex-1">
+<button class="md:hidden text-on-surface p-1 rounded-md hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="font-headline font-semibold text-title-md text-primary hidden md:block">Daily Basket Admin</div>
+<div class="font-headline font-semibold text-title-md text-primary md:hidden">Settings</div>
+<!-- Search (on_left) -->
+<div class="hidden md:flex ml-8 items-center bg-surface-container-low rounded-lg px-3 py-1.5 border border-transparent focus-within:border-primary transition-colors max-w-xs w-full">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px] mr-2">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm text-on-surface placeholder-on-surface-variant w-full py-1" placeholder="Search settings..." type="text"/>
+</div>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-2 md:gap-4">
+<button aria-label="notifications" class="p-2 text-on-surface-variant hover:bg-secondary-container/50 rounded-full transition-colors cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button aria-label="help" class="p-2 text-on-surface-variant hover:bg-secondary-container/50 rounded-full transition-colors cursor-pointer active:scale-95 transition-transform hidden sm:block">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<button aria-label="settings" class="p-2 text-primary font-semibold bg-secondary-container/20 rounded-full transition-colors cursor-pointer active:scale-95 transition-transform">
+<span class="material-symbols-outlined fill" data-icon="settings" data-weight="fill">settings</span>
+</button>
+<div class="w-px h-6 bg-outline-variant/30 mx-1 hidden sm:block"></div>
+<button class="flex items-center gap-2 pl-2">
+<img alt="Admin Profile" class="w-8 h-8 rounded-full border border-outline-variant/30 object-cover" data-alt="A professional headshot of a corporate administrator, softly lit with a modern office background slightly blurred. The tone is approachable yet authoritative, representing a competent tech professional." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEo8cj_gUS4VusnpjQTVxU6fD5O4QmTHNs-r3qXasAn8uziBlMj4y8K7SfromiDi80hNOTFfAJr-SjZtGTJPUe6aWWp1pNGrf922NS0QYyLEG8f9znnL4icyKcxKwnGhWsvbHHvbj-j8r5RRA2Y1K-1fu3mhhlKsjzIIkRIWkIjM-_8hgYLtwcmCqqFurbCAAx9fDC5b0LQVgfUyAn2cXekLcIFV4S8wvQUHWmyviQ641z3FPN7kms"/>
+<span class="material-symbols-outlined text-on-surface-variant text-[16px] hidden sm:block">expand_more</span>
+</button>
+</div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
+<div class="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<h2 class="font-headline text-display-lg font-bold text-on-surface tracking-tight">System Settings</h2>
+<p class="font-body text-body-lg text-on-surface-variant mt-1">Manage global configurations for the Daily Basket platform.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 rounded-lg bg-surface-container font-label text-label-md text-on-surface hover:bg-surface-variant transition-colors border border-outline-variant/30 font-semibold shadow-sm">Discard Changes</button>
+<button class="px-4 py-2 rounded-lg bg-primary font-label text-label-md text-on-primary hover:bg-primary/90 transition-colors shadow-sm font-semibold flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                        Save All
+                    </button>
+</div>
+</div>
+<!-- Bento Layout Container -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+<!-- Left Nav / Categories (Sidebar-ish on Desktop, Tab-ish on Mobile) -->
+<div class="lg:col-span-3">
+<div class="sticky top-24 bg-surface-container-lowest rounded-xl p-2 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-1 hide-scrollbar">
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg bg-secondary-container/50 text-on-surface font-body text-body-sm font-semibold transition-colors whitespace-nowrap lg:whitespace-normal text-left min-w-fit w-full">
+<span class="material-symbols-outlined text-primary" data-icon="storefront">storefront</span>
+                            Store Operations
+                        </button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container text-on-surface-variant font-body text-body-sm font-medium transition-colors whitespace-nowrap lg:whitespace-normal text-left min-w-fit w-full group">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="local_shipping">local_shipping</span>
+                            Delivery Zones
+                        </button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container text-on-surface-variant font-body text-body-sm font-medium transition-colors whitespace-nowrap lg:whitespace-normal text-left min-w-fit w-full group">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="request_quote">request_quote</span>
+                            Taxes &amp; Fees
+                        </button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container text-on-surface-variant font-body text-body-sm font-medium transition-colors whitespace-nowrap lg:whitespace-normal text-left min-w-fit w-full group">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="notifications_active">notifications_active</span>
+                            Notifications
+                        </button>
+<button class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-surface-container text-on-surface-variant font-body text-body-sm font-medium transition-colors whitespace-nowrap lg:whitespace-normal text-left min-w-fit w-full group">
+<span class="material-symbols-outlined group-hover:text-on-surface transition-colors" data-icon="integration_instructions">integration_instructions</span>
+                            Integrations
+                        </button>
+</div>
+</div>
+<!-- Right Content Area -->
+<div class="lg:col-span-9 space-y-6">
+<!-- Section 1: Store Operations -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 overflow-hidden">
+<div class="border-b border-outline-variant/20 px-6 py-5 bg-surface/50">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-secondary-container rounded-lg text-primary">
+<span class="material-symbols-outlined">storefront</span>
+</div>
+<div>
+<h3 class="font-headline text-title-md font-semibold text-on-surface">Store Hours &amp; Operations</h3>
+<p class="font-body text-body-sm text-on-surface-variant">Configure standard operating hours and holiday schedules.</p>
+</div>
+</div>
+</div>
+<div class="p-6 space-y-6">
+<!-- Toggle -->
+<div class="flex items-center justify-between p-4 rounded-lg bg-surface-container-low border border-outline-variant/30">
+<div>
+<div class="font-body text-body-sm font-semibold text-on-surface">Accepting Orders</div>
+<div class="font-body text-label-md text-on-surface-variant font-normal">Temporarily pause all incoming orders.</div>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-dim peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<!-- Operating Hours Grid -->
+<div>
+<h4 class="font-body text-body-sm font-semibold text-on-surface mb-3 flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">schedule</span> Standard Hours
+                                </h4>
+<div class="space-y-3">
+<!-- Mon-Fri -->
+<div class="flex items-center gap-4">
+<div class="w-24 font-body text-body-sm font-medium text-on-surface-variant">Mon - Fri</div>
+<div class="flex-1 flex items-center gap-2">
+<input class="w-32 bg-secondary-container/30 border-none rounded-md font-body text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-2 px-3" type="time" value="08:00"/>
+<span class="text-on-surface-variant font-body text-body-sm">to</span>
+<input class="w-32 bg-secondary-container/30 border-none rounded-md font-body text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-2 px-3" type="time" value="22:00"/>
+</div>
+</div>
+<!-- Sat -->
+<div class="flex items-center gap-4">
+<div class="w-24 font-body text-body-sm font-medium text-on-surface-variant">Saturday</div>
+<div class="flex-1 flex items-center gap-2">
+<input class="w-32 bg-secondary-container/30 border-none rounded-md font-body text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-2 px-3" type="time" value="09:00"/>
+<span class="text-on-surface-variant font-body text-body-sm">to</span>
+<input class="w-32 bg-secondary-container/30 border-none rounded-md font-body text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-2 px-3" type="time" value="23:00"/>
+</div>
+</div>
+<!-- Sun -->
+<div class="flex items-center gap-4">
+<div class="w-24 font-body text-body-sm font-medium text-on-surface-variant">Sunday</div>
+<div class="flex-1 flex items-center gap-2">
+<input class="w-32 bg-secondary-container/30 border-none rounded-md font-body text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-2 px-3" type="time" value="09:00"/>
+<span class="text-on-surface-variant font-body text-body-sm">to</span>
+<input class="w-32 bg-secondary-container/30 border-none rounded-md font-body text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-2 px-3" type="time" value="21:00"/>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 2: Delivery Zones -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 overflow-hidden">
+<div class="border-b border-outline-variant/20 px-6 py-5 flex justify-between items-center bg-surface/50">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-secondary-container rounded-lg text-primary">
+<span class="material-symbols-outlined">local_shipping</span>
+</div>
+<div>
+<h3 class="font-headline text-title-md font-semibold text-on-surface">Delivery Zones</h3>
+<p class="font-body text-body-sm text-on-surface-variant">Manage active zip codes and delivery radii.</p>
+</div>
+</div>
+<button class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md bg-secondary-container/50 hover:bg-secondary-container text-on-secondary-container font-label text-label-md transition-colors">
+<span class="material-symbols-outlined text-[16px]">add</span>
+                                Add Zone
+                            </button>
+</div>
+<div class="p-6">
+<!-- Settings Form -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+<div>
+<label class="block font-body text-label-md font-semibold text-on-surface mb-1">Max Delivery Radius (Miles)</label>
+<input class="w-full bg-secondary-container/30 border-none rounded-md font-body text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-2 px-3" type="number" value="15"/>
+</div>
+<div>
+<label class="block font-body text-label-md font-semibold text-on-surface mb-1">Base Delivery Fee ($)</label>
+<input class="w-full bg-secondary-container/30 border-none rounded-md font-body text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-2 px-3" type="text" value="4.99"/>
+</div>
+</div>
+<!-- Zip Code List (Bento-style chips) -->
+<div>
+<h4 class="font-body text-body-sm font-semibold text-on-surface mb-3">Active Zip Codes</h4>
+<div class="flex flex-wrap gap-2">
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-body text-label-md shadow-sm border border-primary/20">
+                                        10001
+                                        <button class="hover:text-white transition-colors"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-body text-label-md shadow-sm border border-primary/20">
+                                        10002
+                                        <button class="hover:text-white transition-colors"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-body text-label-md shadow-sm border border-primary/20">
+                                        10003
+                                        <button class="hover:text-white transition-colors"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-body text-label-md shadow-sm border border-primary/20">
+                                        10004
+                                        <button class="hover:text-white transition-colors"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary-container text-on-primary-container font-body text-label-md shadow-sm border border-primary/20">
+                                        10011
+                                        <button class="hover:text-white transition-colors"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-body text-label-md hover:bg-surface-variant transition-colors cursor-pointer border border-dashed border-outline-variant">
+<span class="material-symbols-outlined text-[14px]">add</span>
+                                        Add New
+                                    </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section 3: Taxes & Notifications (Grid Layout) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Tax Rates -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 p-6 flex flex-col h-full">
+<div class="flex items-center gap-3 mb-4">
+<div class="p-2 bg-secondary-container rounded-lg text-primary">
+<span class="material-symbols-outlined">request_quote</span>
+</div>
+<h3 class="font-headline text-title-md font-semibold text-on-surface">Tax Rates</h3>
+</div>
+<div class="space-y-4 flex-1">
+<div>
+<label class="block font-body text-label-md font-semibold text-on-surface mb-1">State Tax (%)</label>
+<input class="w-full bg-secondary-container/30 border-none rounded-md font-body text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-2 px-3" type="text" value="8.875"/>
+</div>
+<div>
+<label class="block font-body text-label-md font-semibold text-on-surface mb-1">Local Grocery Tax (%)</label>
+<input class="w-full bg-secondary-container/30 border-none rounded-md font-body text-body-sm text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors py-2 px-3 text-on-surface-variant" type="text" value="0.00"/>
+</div>
+<div class="mt-4 p-3 bg-surface-container-low rounded-lg border border-outline-variant/20 flex gap-2 items-start">
+<span class="material-symbols-outlined text-outline text-[18px] mt-0.5">info</span>
+<p class="font-body text-label-md text-on-surface-variant font-normal leading-relaxed">Tax rates are applied automatically based on the delivery zip code and item category (e.g. prepared foods vs raw groceries).</p>
+</div>
+</div>
+</div>
+<!-- Notifications -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/20 p-6 flex flex-col h-full">
+<div class="flex items-center gap-3 mb-4">
+<div class="p-2 bg-secondary-container rounded-lg text-primary">
+<span class="material-symbols-outlined">notifications_active</span>
+</div>
+<h3 class="font-headline text-title-md font-semibold text-on-surface">Admin Alerts</h3>
+</div>
+<div class="space-y-4 flex-1">
+<!-- Alert 1 -->
+<label class="flex items-start gap-3 cursor-pointer group">
+<div class="relative flex items-center justify-center mt-0.5">
+<input checked="" class="peer appearance-none w-5 h-5 rounded-[4px] border-2 border-outline-variant checked:bg-primary checked:border-primary transition-colors focus:ring-2 focus:ring-primary/20 focus:outline-none" type="checkbox"/>
+<span class="material-symbols-outlined absolute text-white text-[16px] pointer-events-none opacity-0 peer-checked:opacity-100 font-bold transition-opacity">check</span>
+</div>
+<div>
+<div class="font-body text-body-sm font-semibold text-on-surface group-hover:text-primary transition-colors">Low Inventory Alerts</div>
+<div class="font-body text-label-md text-on-surface-variant font-normal">Notify when stock falls below 10 units.</div>
+</div>
+</label>
+<!-- Alert 2 -->
+<label class="flex items-start gap-3 cursor-pointer group">
+<div class="relative flex items-center justify-center mt-0.5">
+<input checked="" class="peer appearance-none w-5 h-5 rounded-[4px] border-2 border-outline-variant checked:bg-primary checked:border-primary transition-colors focus:ring-2 focus:ring-primary/20 focus:outline-none" type="checkbox"/>
+<span class="material-symbols-outlined absolute text-white text-[16px] pointer-events-none opacity-0 peer-checked:opacity-100 font-bold transition-opacity">check</span>
+</div>
+<div>
+<div class="font-body text-body-sm font-semibold text-on-surface group-hover:text-primary transition-colors">Large Order Flag</div>
+<div class="font-body text-label-md text-on-surface-variant font-normal">Notify for orders exceeding $250.</div>
+</div>
+</label>
+<!-- Alert 3 -->
+<label class="flex items-start gap-3 cursor-pointer group">
+<div class="relative flex items-center justify-center mt-0.5">
+<input class="peer appearance-none w-5 h-5 rounded-[4px] border-2 border-outline-variant checked:bg-primary checked:border-primary transition-colors focus:ring-2 focus:ring-primary/20 focus:outline-none" type="checkbox"/>
+<span class="material-symbols-outlined absolute text-white text-[16px] pointer-events-none opacity-0 peer-checked:opacity-100 font-bold transition-opacity">check</span>
+</div>
+<div>
+<div class="font-body text-body-sm font-semibold text-on-surface group-hover:text-primary transition-colors">Daily Summary Email</div>
+<div class="font-body text-label-md text-on-surface-variant font-normal">Receive an end-of-day sales report.</div>
+</div>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Spacer for mobile scroll -->
+<div class="h-24 md:h-8"></div>
+</main>
+</div>
+</body></html>

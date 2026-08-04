@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Customer Reviews &amp; Testimonials - Daily Basket</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-container": "#dce5dd",
+                    "on-secondary-container": "#5e6660",
+                    "on-primary-fixed": "#002106",
+                    "outline-variant": "#becab9",
+                    "on-surface-variant": "#3f4a3d",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#70dd7a",
+                    "on-secondary-fixed": "#151d19",
+                    "on-tertiary-fixed-variant": "#454747",
+                    "outline": "#6e7a6c",
+                    "surface-bright": "#f9f9fc",
+                    "on-error": "#ffffff",
+                    "inverse-surface": "#2f3133",
+                    "background": "#f9f9fc",
+                    "surface-container-lowest": "#ffffff",
+                    "surface": "#f9f9fc",
+                    "primary-container": "#078730",
+                    "inverse-on-surface": "#f0f0f3",
+                    "on-tertiary-container": "#fcfcfc",
+                    "on-error-container": "#93000a",
+                    "surface-container": "#eeeef0",
+                    "on-secondary-fixed-variant": "#404943",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#1a1c1c",
+                    "on-primary-fixed-variant": "#00531a",
+                    "on-background": "#1a1c1e",
+                    "surface-container-highest": "#e2e2e5",
+                    "secondary-fixed": "#dce5dd",
+                    "surface-tint": "#006e25",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-fixed": "#e2e2e2",
+                    "surface-dim": "#dadadc",
+                    "on-primary-container": "#f7fff2",
+                    "primary-fixed": "#8cfa93",
+                    "secondary-fixed-dim": "#c0c9c1",
+                    "tertiary": "#5a5c5c",
+                    "tertiary-fixed-dim": "#c6c6c7",
+                    "surface-container-high": "#e8e8ea",
+                    "surface-container-low": "#f3f3f6",
+                    "secondary": "#58605a",
+                    "inverse-primary": "#70dd7a",
+                    "surface-variant": "#e2e2e5",
+                    "primary": "#006b23",
+                    "tertiary-container": "#737575",
+                    "on-surface": "#1a1c1e",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "sm": "0.25rem",
+                    "md": "0.75rem",
+                    "lg": "1rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "md": "16px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "gutter": "16px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "48px"
+            },
+            "fontFamily": {
+                    "headline": [
+                            "Outfit"
+                    ],
+                    "display": [
+                            "Outfit"
+                    ],
+                    "body": [
+                            "Inter"
+                    ],
+                    "label": [
+                            "Inter"
+                    ]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                    "headline-lg": ["32px", { lineHeight: "40px", letterSpacing: "-0.01em", fontWeight: "600" }],
+                    "headline-lg-mobile": ["24px", { lineHeight: "32px", fontWeight: "600" }],
+                    "title-md": ["20px", { lineHeight: "28px", fontWeight: "500" }],
+                    "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                    "body-sm": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+                    "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "600" }]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #f9f9fc;
+            color: #1a1c1e;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .shadow-level-1 {
+            box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.04);
+        }
+        .shadow-level-2 {
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+        }
+    </style>
+</head>
+<body class="font-body antialiased min-h-screen flex flex-col pt-[88px]">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl shadow-sm transition-all duration-300 ease-in-out">
+<div class="flex justify-between items-center px-4 md:px-12 py-4 max-w-[1280px] mx-auto w-full">
+<div class="flex items-center gap-6">
+<a class="text-headline-lg font-headline font-bold text-primary dark:text-primary-fixed tracking-tight active:scale-95 transition-all duration-300" href="#">Daily Basket</a>
+<nav class="hidden md:flex gap-6">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors font-headline text-title-md font-medium hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 rounded-md px-3 py-1" href="#">Home</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors font-headline text-title-md font-medium hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 rounded-md px-3 py-1" href="#">Categories</a>
+<a class="text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed pb-1 font-headline text-title-md font-medium px-3 py-1" href="#">About</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors font-headline text-title-md font-medium hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 rounded-md px-3 py-1" href="#">Careers</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex bg-secondary-container rounded-md px-3 py-2 items-center gap-2 focus-within:ring-2 focus-within:ring-primary transition-all">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-lg text-on-surface placeholder:text-outline outline-none" placeholder="Search groceries..." type="text"/>
+</div>
+<button aria-label="Location" class="text-primary dark:text-primary-fixed hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 p-2 rounded-md transition-colors active:scale-95">
+<span class="material-symbols-outlined" data-icon="location_on" data-weight="fill" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</button>
+<button aria-label="Cart" class="text-primary dark:text-primary-fixed hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 p-2 rounded-md transition-colors active:scale-95 relative">
+<span class="material-symbols-outlined" data-icon="shopping_basket" data-weight="fill" style="font-variation-settings: 'FILL' 1;">shopping_basket</span>
+<span class="absolute top-1 right-1 w-2 h-2 bg-error rounded-full"></span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-[1280px] mx-auto px-4 md:px-12 py-lg flex flex-col gap-xl">
+<!-- Hero Section -->
+<section class="bg-surface-container-lowest rounded-xl shadow-level-1 p-lg md:p-xl flex flex-col md:flex-row items-center justify-between gap-lg">
+<div class="flex flex-col gap-sm md:w-1/2">
+<h1 class="font-headline text-display-lg text-on-surface">Hear from our Happy Shoppers</h1>
+<p class="font-body text-body-lg text-on-surface-variant">See why thousands of urban professionals trust Daily Basket for their daily fresh grocery needs. Quick, reliable, and always fresh.</p>
+<div class="flex items-center gap-4 mt-4">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-primary" data-icon="star_half" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+<span class="font-headline text-title-md text-on-surface">4.8/5</span>
+<span class="font-body text-body-sm text-outline">(2,451 Reviews)</span>
+</div>
+</div>
+<div class="md:w-1/3 flex flex-col gap-md items-center md:items-end">
+<button class="bg-primary text-on-primary font-label text-label-md px-6 py-3 rounded-md h-[48px] hover:bg-primary-container transition-colors shadow-level-2 flex items-center justify-center gap-2 w-full md:w-auto">
+<span class="material-symbols-outlined" data-icon="edit">edit</span>
+                    Write a Review
+                </button>
+</div>
+</section>
+<!-- Testimonials Grid -->
+<section class="flex flex-col gap-lg">
+<h2 class="font-headline text-headline-lg text-on-surface">Recent Reviews</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+<!-- Review Card 1 -->
+<div class="bg-surface-container-lowest rounded-lg p-md shadow-level-1 flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A close up portrait photo of a young professional woman smiling warmly in a well lit modern kitchen, representing a happy grocery delivery customer. Bright, clean, and optimistic mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvglM17qSwnOtMwYZPC1jpRO2yFqrX001rH-Ok2s1Noy4e_SPVgDOkOS-m4-wa5iwN2ZdRGPGMSsA55cUyTyHs-JV_XIrQQF9QkjIBm3hvGRoPWOf4ZcgLOszXiHZgOtDp988fu9nXqtH6ELmi-2rbLZC5mHj6P2OByHoqUhkk7B-sz-imD27sbAVxcOkhscKmTMWqMpXHS2TAL2TjnEkc3p9IMtY0Cojk-ihowuNPYida8U5MLHYu"/>
+<div>
+<h3 class="font-headline text-title-md text-on-surface">Sarah J.</h3>
+<div class="flex items-center gap-1 text-primary text-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-body text-body-sm">Verified Buyer</span>
+</div>
+</div>
+</div>
+<div class="flex text-primary">
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<h4 class="font-headline text-title-md font-semibold text-on-surface mt-2">Life-saver for busy weeks</h4>
+<p class="font-body text-body-sm text-on-surface-variant">The produce is always impeccably fresh. I love the organic selection and how quickly it arrives. It completely changed how I meal prep!</p>
+<span class="font-body text-xs text-outline mt-auto pt-2">2 days ago</span>
+</div>
+<!-- Review Card 2 -->
+<div class="bg-surface-container-lowest rounded-lg p-md shadow-level-1 flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A portrait of a middle aged man in business casual attire standing in a bright minimalist dining room, looking satisfied with his grocery delivery service. Soft, natural daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3RUR-uLOcM8FbI_X8doXvPKSHdqw9MCngiLBQyb0TSLG4NhKetUWu-4H8mq3eB7vnvwYAxzq_AzUlluY3DEJPEkCePeq-11ftS9pRb0uTJ9cuSjFTcnEIBDPtEqmzGrFvtioSXXViD6iYyz7ns3XyDbyKhnu6haKN6HCSGi253UHQkefdPtF-FizYXm_4r91zxyINQJsF2tAboVCvBgz3pkzEScYGPvggWNszcMRr2JIj7CAl24m-"/>
+<div>
+<h3 class="font-headline text-title-md text-on-surface">David M.</h3>
+<div class="flex items-center gap-1 text-primary text-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-body text-body-sm">Verified Buyer</span>
+</div>
+</div>
+</div>
+<div class="flex text-primary">
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star_half" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star_half</span>
+</div>
+</div>
+<h4 class="font-headline text-title-md font-semibold text-on-surface mt-2">Great app, fast delivery</h4>
+<p class="font-body text-body-sm text-on-surface-variant">The app is super intuitive. My only minor gripe was a missing item once, but their customer service refunded it instantly. Highly recommended.</p>
+<span class="font-body text-xs text-outline mt-auto pt-2">1 week ago</span>
+</div>
+<!-- Review Card 3 -->
+<div class="bg-surface-container-lowest rounded-lg p-md shadow-level-1 flex flex-col gap-sm">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A close-up lifestyle shot of a smiling young woman holding a reusable grocery bag filled with fresh green vegetables in a modern urban apartment setting. High key lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1K2j5flAO-x0dryLMitByUevs5waoXGDoQsIQEbpKim4sa6e2mjM6gPWla4WSgbbZDxMCCDk_MKmBlibBPxjoHlH2SZpaG8DOFy7JaVxwptam8lrrgjxk6gW0KVY39depln4xBZCtxHAOm00V9k_KXMkdtRAZ7cmAVsW8Tjaj03Ct2WimQNnwioHEeAUB46CkeuToiT1SKD4HLmlpOb59SXcQrnzdiHt4k_2mu5uxzQBdlcRfS9wr"/>
+<div>
+<h3 class="font-headline text-title-md text-on-surface">Elena R.</h3>
+<div class="flex items-center gap-1 text-primary text-xs">
+<span class="material-symbols-outlined text-[16px]" data-icon="verified" data-weight="fill" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-body text-body-sm">Verified Buyer</span>
+</div>
+</div>
+</div>
+<div class="flex text-primary">
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined text-[20px]" data-icon="star" data-weight="fill" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<h4 class="font-headline text-title-md font-semibold text-on-surface mt-2">The avocados are always perfect</h4>
+<p class="font-body text-body-sm text-on-surface-variant">I don't know how they do it, but the quality of the fresh produce is better than if I picked it myself at the store. 10/10.</p>
+<span class="font-body text-xs text-outline mt-auto pt-2">2 weeks ago</span>
+</div>
+</div>
+<div class="flex justify-center mt-4">
+<button class="bg-secondary-container text-primary font-label text-label-md px-6 py-3 rounded-md h-[48px] hover:bg-outline-variant transition-colors flex items-center justify-center gap-2">
+                    Load More Reviews
+                </button>
+</div>
+</section>
+<!-- Video Testimonials Section -->
+<section class="flex flex-col gap-lg bg-surface-container-low rounded-xl p-lg md:p-xl my-lg">
+<h2 class="font-headline text-headline-lg text-on-surface text-center">See Daily Basket in Action</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Video Card 1 -->
+<div class="relative rounded-lg overflow-hidden shadow-level-1 group cursor-pointer aspect-video bg-surface-container-highest flex items-center justify-center">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A still frame from a video showing a young couple unboxing fresh groceries from a Daily Basket paper bag in a modern, brightly lit kitchen. Focus on fresh green leafy vegetables." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSm4wwgUqsZjw6ENN7RalZ6zR_qqaHVTvRVJUjYWa3isQNDSN0ILK17Iuqpkp7GM1iYzS_ka6JyeRIcNLuxLbhuRdCsnpU-JIq6YRBiWzgrCN2gH_bQR8Vs2y1VH86dfvcPKZmLXIihN7xK9p0JtvtluvQjM9PozT9iepGK88n0IcKKuzhkPQJQd0heAclTtSnO2in016lXTKdfIMKZyj2uGY_chFPLxUR8Q9xEdXBLCTJjXZVWS3l"/>
+<div class="absolute inset-0 bg-on-surface/20 group-hover:bg-on-surface/10 transition-colors"></div>
+<button aria-label="Play Video" class="relative z-10 w-16 h-16 bg-surface-container-lowest/80 backdrop-blur-sm rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-level-2">
+<span class="material-symbols-outlined text-[32px]" data-icon="play_arrow" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-on-surface/80 to-transparent">
+<h4 class="font-headline text-title-md text-surface-container-lowest">Unboxing my weekly haul!</h4>
+<p class="font-body text-body-sm text-surface-container-lowest/80">@HealthyEatsWithJen</p>
+</div>
+</div>
+<!-- Video Card 2 -->
+<div class="relative rounded-lg overflow-hidden shadow-level-1 group cursor-pointer aspect-video bg-surface-container-highest flex items-center justify-center">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A still frame from a video of a professional chef preparing a salad with fresh ingredients on a wooden cutting board in a sleek commercial kitchen. Bright, crisp lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSiY78tqgt61DMHGl5EVcCKn-pwWzgZM-dkMb4KWbYWR8NLeoNYxuzl9rqxcrvUBrjqiIkXKwhNchbBwJz9pdtsElTAFDZsTeOopXmnw6pcU44RWmy9GMwFhKxhfdHSnBU1GMwUvQsDJwezA0GOHHMZfcQBzPzA-hXfe8i6tC-DkfqwcwMfdehdWMLdJZz-OgzUus-A90L2ADmhZnPyfH8KJyjhMdOBZ9i9E5N8Ja1g_D5Vcy4m16x"/>
+<div class="absolute inset-0 bg-on-surface/20 group-hover:bg-on-surface/10 transition-colors"></div>
+<button aria-label="Play Video" class="relative z-10 w-16 h-16 bg-surface-container-lowest/80 backdrop-blur-sm rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform shadow-level-2">
+<span class="material-symbols-outlined text-[32px]" data-icon="play_arrow" data-weight="fill" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+</button>
+<div class="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-on-surface/80 to-transparent">
+<h4 class="font-headline text-title-md text-surface-container-lowest">Why I use Daily Basket for meal prep</h4>
+<p class="font-body text-body-sm text-surface-container-lowest/80">@ChefMike</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="mt-auto bg-surface-container-low dark:bg-surface-container-lowest w-full rounded-t-xl transition-opacity duration-200 hover:opacity-80">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 md:px-12 py-12 max-w-[1280px] mx-auto w-full gap-6">
+<div class="text-title-md font-headline font-bold text-secondary dark:text-secondary-fixed">
+                Daily Basket
+            </div>
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 font-body text-body-sm transition-colors" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 font-body text-body-sm transition-colors" href="#">Terms of Service</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 font-body text-body-sm transition-colors" href="#">Cookie Policy</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 font-body text-body-sm transition-colors" href="#">Contact Us</a>
+</nav>
+<div class="font-body text-body-sm text-on-surface dark:text-on-surface-variant text-center md:text-right">
+                © 2024 Daily Basket Inc. Freshness delivered fast.
+            </div>
+</div>
+</footer>
+</body></html>

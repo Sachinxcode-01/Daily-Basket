@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Contact Us - Daily Basket</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#dce5dd",
+                        "on-secondary-container": "#5e6660",
+                        "on-primary-fixed": "#002106",
+                        "outline-variant": "#becab9",
+                        "on-surface-variant": "#3f4a3d",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#70dd7a",
+                        "on-secondary-fixed": "#151d19",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "outline": "#6e7a6c",
+                        "surface-bright": "#f9f9fc",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2f3133",
+                        "background": "#f9f9fc",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f9f9fc",
+                        "primary-container": "#078730",
+                        "inverse-on-surface": "#f0f0f3",
+                        "on-tertiary-container": "#fcfcfc",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#eeeef0",
+                        "on-secondary-fixed-variant": "#404943",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-primary-fixed-variant": "#00531a",
+                        "on-background": "#1a1c1e",
+                        "surface-container-highest": "#e2e2e5",
+                        "secondary-fixed": "#dce5dd",
+                        "surface-tint": "#006e25",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-dim": "#dadadc",
+                        "on-primary-container": "#f7fff2",
+                        "primary-fixed": "#8cfa93",
+                        "secondary-fixed-dim": "#c0c9c1",
+                        "tertiary": "#5a5c5c",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "surface-container-high": "#e8e8ea",
+                        "surface-container-low": "#f3f3f6",
+                        "secondary": "#58605a",
+                        "inverse-primary": "#70dd7a",
+                        "surface-variant": "#e2e2e5",
+                        "primary": "#006b23",
+                        "tertiary-container": "#737575",
+                        "on-surface": "#1a1c1e",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Outfit", "sans-serif"],
+                        "display": ["Outfit", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Base styles from design system */
+        body {
+            background-color: theme('colors.surface');
+            color: theme('colors.on-surface');
+            font-family: theme('fontFamily.body');
+        }
+        
+        /* Smooth scrolling for anchor links if any */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Glassmorphism utility */
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Form Input Customization based on design system */
+        .db-input {
+            background-color: theme('colors.secondary-container');
+            border: 2px solid transparent;
+            border-radius: theme('borderRadius.xl'); /* using xl which maps to 12px approximately in config */
+            color: theme('colors.on-surface');
+            caret-color: theme('colors.on-surface');
+            transition: all 0.2s ease-in-out;
+        }
+        .db-input:focus {
+            outline: none;
+            border-color: theme('colors.primary');
+            background-color: theme('colors.surface-container-lowest');
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col relative overflow-x-hidden pt-24">
+<!-- TopNavBar Component (Shared) -->
+<header class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl fixed top-0 w-full z-50 shadow-sm transition-all duration-300 ease-in-out">
+<div class="flex justify-between items-center px-4 md:px-12 py-4 max-w-[1280px] mx-auto w-full">
+<!-- Brand & Search Left -->
+<div class="flex items-center gap-6">
+<a class="text-headline-lg font-headline font-bold text-primary dark:text-primary-fixed tracking-tight flex items-center gap-2" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">eco</span>
+                    Daily Basket
+                </a>
+<!-- Search Bar (on_left logic) -->
+<div class="hidden md:flex relative items-center w-64">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant z-10 text-sm">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-secondary-container/50 border-none rounded-full text-sm font-body text-on-surface focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-colors db-input" placeholder="Search groceries..." style="border-radius: 9999px;" type="text"/>
+</div>
+</div>
+<!-- Navigation Links Center/Right -->
+<nav class="hidden md:flex items-center gap-6 font-headline text-title-md font-medium">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 rounded-md px-3 py-1" href="#">Home</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 rounded-md px-3 py-1" href="#">Categories</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 rounded-md px-3 py-1" href="#">About</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 rounded-md px-3 py-1" href="#">Careers</a>
+</nav>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4">
+<button aria-label="Location" class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors hover:bg-secondary-container/50 rounded-md p-2">
+<span class="material-symbols-outlined">location_on</span>
+</button>
+<button aria-label="Cart" class="flex items-center gap-2 bg-primary text-on-primary px-4 py-2 rounded-xl font-headline font-medium hover:opacity-90 transition-opacity active:scale-95 min-h-[48px]">
+<span class="material-symbols-outlined">shopping_basket</span>
+<span>$0.00</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-grow w-full max-w-[1280px] mx-auto px-4 md:px-12 py-12">
+<!-- Hero Header -->
+<div class="relative w-full rounded-3xl overflow-hidden mb-12 h-64 flex items-center justify-center isolate">
+<div class="absolute inset-0 bg-cover bg-center z-0 opacity-40" data-alt="A macro, top-down view of vibrant, fresh organic produce including dew-covered leafy greens, bright orange carrots, and deep red tomatoes, arranged neatly on a pristine white surface. The lighting is bright, natural, and soft, highlighting the textures and vibrant colors. The overall aesthetic is clean, modern, appetizing, and evokes a sense of health and premium quality grocery shopping." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAM9405R66tL_wtNBRN84svoP1dQ8CxuZ8OgjMV1-vTRL9rnKy-uBvkhj0Y0tLjOIbxiwnPnFtIWpJt0dEmgdcnefPdNgPLjXmcyIxe2iA-jEiHjL1MB250r1vOuYBYTEb872aqLoXtejHDvIvYeb2mySl-cHAakDQi3OpR5sAs9_ebeXE_pHZowsQilYP-H5cOrBWuFn35QotfOx-gGyb7ifpomTk2We9IzoYp-CxwnX8sVJmiWDvG')"></div>
+<div class="absolute inset-0 bg-gradient-to-t from-surface to-transparent z-10"></div>
+<div class="relative z-20 text-center px-4">
+<h1 class="font-display text-4xl md:text-5xl font-bold text-on-surface mb-4 tracking-tight">How can we help?</h1>
+<p class="font-body text-lg text-on-surface-variant max-w-2xl mx-auto">Whether you have a question about an order, want to partner with us, or just want to say hi, our team is ready to assist you with fresh solutions.</p>
+</div>
+</div>
+<!-- Bento Grid Layout for Contact Section -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Column: Form (Span 7) -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-3xl p-8 md:p-10 shadow-[0px_4px_12px_rgba(0,0,0,0.04)] border border-surface-container-highest">
+<h2 class="font-headline text-2xl font-semibold text-on-surface mb-2">Send us a message</h2>
+<p class="font-body text-sm text-on-surface-variant mb-8">We aim to respond to all inquiries within 2 hours during regular business hours.</p>
+<form class="space-y-6">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Name Input -->
+<div class="space-y-2">
+<label class="font-body text-sm font-medium text-on-surface-variant block" for="name">Full Name</label>
+<input class="w-full px-4 py-3 db-input font-body text-base" id="name" name="name" placeholder="Jane Doe" required="" type="text"/>
+</div>
+<!-- Email Input -->
+<div class="space-y-2">
+<label class="font-body text-sm font-medium text-on-surface-variant block" for="email">Email Address</label>
+<input class="w-full px-4 py-3 db-input font-body text-base" id="email" name="email" placeholder="jane@example.com" required="" type="email"/>
+</div>
+</div>
+<!-- Subject Select/Input -->
+<div class="space-y-2">
+<label class="font-body text-sm font-medium text-on-surface-variant block" for="subject">Subject</label>
+<select class="w-full px-4 py-3 db-input font-body text-base appearance-none cursor-pointer" id="subject" name="subject">
+<option disabled="" selected="" value="">Select a topic...</option>
+<option value="order">Order Support (Missing item, delayed delivery)</option>
+<option value="product">Product Inquiry (Sourcing, availability)</option>
+<option value="feedback">Feedback &amp; Suggestions</option>
+<option value="other">Other</option>
+</select>
+</div>
+<!-- Message Textarea -->
+<div class="space-y-2">
+<label class="font-body text-sm font-medium text-on-surface-variant block" for="message">Message</label>
+<textarea class="w-full px-4 py-3 db-input font-body text-base resize-none" id="message" name="message" placeholder="How can we help you today?" required="" rows="5"></textarea>
+</div>
+<!-- Submit Button -->
+<button class="w-full md:w-auto bg-primary text-on-primary font-headline font-semibold text-lg px-8 py-4 rounded-xl min-h-[48px] flex items-center justify-center gap-2 hover:bg-primary-container hover:text-on-primary-container transition-all duration-300 active:scale-[0.98] shadow-sm" type="submit">
+<span>Send Message</span>
+<span class="material-symbols-outlined text-lg">send</span>
+</button>
+</form>
+</div>
+<!-- Right Column: Info & Map (Span 5) -->
+<div class="lg:col-span-5 flex flex-col gap-8">
+<!-- Contact Info Card -->
+<div class="bg-secondary-container/30 rounded-3xl p-8 shadow-[0px_2px_8px_rgba(0,0,0,0.02)] border border-secondary-container">
+<h3 class="font-headline text-xl font-semibold text-on-surface mb-6">Get in Touch</h3>
+<ul class="space-y-6">
+<!-- Customer Support -->
+<li class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center flex-shrink-0 shadow-sm text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">support_agent</span>
+</div>
+<div>
+<h4 class="font-headline font-medium text-on-surface text-base">Customer Support</h4>
+<p class="font-body text-sm text-on-surface-variant mt-1">Available 7am - 10pm EST.</p>
+<a class="font-body text-sm font-semibold text-primary hover:underline mt-1 block" href="mailto:support@dailybasket.com">support@dailybasket.com</a>
+</div>
+</li>
+<!-- Help Center -->
+<li class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center flex-shrink-0 shadow-sm text-secondary">
+<span class="material-symbols-outlined">help</span>
+</div>
+<div>
+<h4 class="font-headline font-medium text-on-surface text-base">Help Center</h4>
+<p class="font-body text-sm text-on-surface-variant mt-1">Browse our FAQs for quick answers.</p>
+<a class="font-body text-sm font-semibold text-primary hover:underline mt-1 block flex items-center gap-1" href="#">
+                                    Visit Help Center
+                                    <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+</li>
+<!-- Business Inquiries -->
+<li class="flex items-start gap-4">
+<div class="w-12 h-12 rounded-full bg-surface-container-lowest flex items-center justify-center flex-shrink-0 shadow-sm text-outline">
+<span class="material-symbols-outlined">storefront</span>
+</div>
+<div>
+<h4 class="font-headline font-medium text-on-surface text-base">Business &amp; Partnerships</h4>
+<p class="font-body text-sm text-on-surface-variant mt-1">Interested in supplying or partnering?</p>
+<a class="font-body text-sm font-semibold text-primary hover:underline mt-1 block" href="mailto:partners@dailybasket.com">partners@dailybasket.com</a>
+</div>
+</li>
+</ul>
+</div>
+<!-- Map Card -->
+<div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-container-highest flex-grow min-h-[250px] relative group cursor-pointer">
+<!-- The map placeholder -->
+<img alt="Map of HQ" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-location="New York City" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1AAl4Z7e_VoUxKD5ROyQCvxV6hPnoeiZhm7-pPA394xjQjpZxtSO6aTJshmkQBttcF-KOdB8KwDE4k_K1856P_q5W3_X55_w47pMLOh1zqWs1wqH6grkP25ki_Op0Ngbm_vvWPYK-VoqVFFWU1ATKJoMLU5BH01RHBRiSldK5gaB0vopcACYBGWsphmGJ_dRc6E-GB7V0hH-N5W7t_P1Mjt4PwD4h9P-YBpE34Vh1q6ZsxvPcvuGx"/>
+<!-- Glassmorphism overlay for address -->
+<div class="absolute bottom-4 left-4 right-4 bg-surface/80 backdrop-blur-md rounded-xl p-4 border border-surface-container-highest/50 shadow-sm">
+<div class="flex items-center gap-2 mb-1 text-primary">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">location_on</span>
+<span class="font-headline font-medium text-sm">HQ Office</span>
+</div>
+<p class="font-body text-sm text-on-surface-variant">
+                            120 Fresh Avenue, Suite 400<br/>
+                            New York, NY 10011
+                        </p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Component (Shared) -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest w-full rounded-t-xl mt-auto border-t border-surface-container-highest/50">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 md:px-12 py-12 max-w-[1280px] mx-auto w-full gap-8">
+<!-- Brand & Copyright -->
+<div class="flex flex-col items-center md:items-start gap-2">
+<span class="text-title-md font-headline font-bold text-secondary dark:text-secondary-fixed flex items-center gap-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">eco</span>
+                    Daily Basket
+                </span>
+<p class="font-body text-body-sm text-on-surface dark:text-on-surface-variant text-center md:text-left text-sm">
+                    © 2024 Daily Basket Inc. Freshness delivered fast.
+                </p>
+</div>
+<!-- Footer Links -->
+<nav class="flex flex-wrap justify-center gap-6 font-body text-body-sm">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 transition-opacity duration-200 hover:opacity-80" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 transition-opacity duration-200 hover:opacity-80" href="#">Terms of Service</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 transition-opacity duration-200 hover:opacity-80" href="#">Cookie Policy</a>
+<!-- Active State Applied Here based on JSON logic -->
+<a class="text-primary font-bold hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 transition-opacity duration-200 hover:opacity-80" href="#">Contact Us</a>
+</nav>
+</div>
+</footer>
+</body></html>

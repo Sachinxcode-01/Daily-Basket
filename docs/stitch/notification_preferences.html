@@ -1,0 +1,276 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Daily Basket - Notification Preferences</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface": "#1a1c1e",
+                        "secondary-container": "#dce5dd",
+                        "primary-fixed-dim": "#70dd7a",
+                        "on-primary-fixed": "#002106",
+                        "on-error": "#ffffff",
+                        "surface-container": "#eeeef0",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e8e8ea",
+                        "secondary-fixed": "#dce5dd",
+                        "primary-fixed": "#8cfa93",
+                        "inverse-primary": "#70dd7a",
+                        "tertiary-container": "#737575",
+                        "on-tertiary-container": "#fcfcfc",
+                        "tertiary-fixed": "#e2e2e2",
+                        "secondary": "#58605a",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-primary-fixed-variant": "#00531a",
+                        "secondary-fixed-dim": "#c0c9c1",
+                        "on-background": "#1a1c1e",
+                        "on-primary": "#ffffff",
+                        "surface": "#f9f9fc",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed": "#151d19",
+                        "surface-bright": "#f9f9fc",
+                        "surface-tint": "#006e25",
+                        "on-primary-container": "#f7fff2",
+                        "on-secondary-fixed-variant": "#404943",
+                        "inverse-on-surface": "#f0f0f3",
+                        "error": "#ba1a1a",
+                        "primary-container": "#078730",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#5e6660",
+                        "surface-variant": "#e2e2e5",
+                        "primary": "#006b23",
+                        "outline-variant": "#becab9",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "on-surface-variant": "#3f4a3d",
+                        "inverse-surface": "#2f3133",
+                        "outline": "#6e7a6c",
+                        "surface-dim": "#dadadc",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-highest": "#e2e2e5",
+                        "tertiary": "#5a5c5c",
+                        "surface-container-low": "#f3f3f6",
+                        "background": "#f9f9fc",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-error-container": "#93000a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "margin-desktop": "48px",
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Outfit"],
+                        "body-sm": ["Inter"],
+                        "title-md": ["Outfit"],
+                        "headline-lg-mobile": ["Outfit"],
+                        "headline-lg": ["Outfit"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "title-md": ["20px", { "lineHeight": "28px", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: transparent;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: var(--tw-color-primary, #006b23);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24 font-body-lg">
+<!-- TopAppBar -->
+<header class="sticky top-0 w-full z-50 bg-surface/80 dark:bg-on-surface/80 backdrop-blur-xl shadow-sm">
+<div class="flex items-center justify-between px-margin-mobile h-16 w-full max-w-7xl mx-auto">
+<button class="text-on-surface-variant dark:text-outline-variant hover:bg-secondary-container/50 transition-colors active:scale-95 duration-200 ease-in-out p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-title-md text-title-md text-primary dark:text-primary-fixed-dim absolute left-1/2 -translate-x-1/2">
+                Notifications
+            </h1>
+<button class="text-on-surface-variant dark:text-outline-variant hover:bg-secondary-container/50 transition-colors active:scale-95 duration-200 ease-in-out p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<main class="px-margin-mobile pt-lg max-w-7xl mx-auto md:px-margin-desktop">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg lg:gap-xl">
+<!-- Order Updates Section -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] p-md">
+<div class="flex items-center mb-md border-b border-surface-variant pb-sm">
+<span class="material-symbols-outlined text-primary mr-sm" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+<h2 class="font-title-md text-title-md text-on-surface">Order Updates</h2>
+</div>
+<div class="space-y-md">
+<!-- Toggle Item -->
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-body-lg text-body-lg text-on-surface">Order Status</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Get notified when your order is placed, packed, and ready.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300 ease-in-out border-surface-variant checked:border-transparent checked:translate-x-6 focus:ring-0 focus:outline-none focus:ring-offset-0" id="toggle-order-status" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 ease-in-out" for="toggle-order-status"></label>
+</div>
+</div>
+<!-- Toggle Item -->
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-body-lg text-body-lg text-on-surface">Delivery Tracking</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Real-time updates when your driver is approaching.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300 ease-in-out border-surface-variant checked:border-transparent checked:translate-x-6 focus:ring-0 focus:outline-none focus:ring-offset-0" id="toggle-delivery" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 ease-in-out" for="toggle-delivery"></label>
+</div>
+</div>
+<!-- Toggle Item -->
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-body-lg text-body-lg text-on-surface">Daily Basket Receipts</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Receive a digital receipt via email after delivery.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300 ease-in-out border-surface-variant checked:border-transparent checked:translate-x-6 focus:ring-0 focus:outline-none focus:ring-offset-0" id="toggle-receipts" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 ease-in-out" for="toggle-receipts"></label>
+</div>
+</div>
+</div>
+</section>
+<!-- Promotions Section -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] p-md">
+<div class="flex items-center mb-md border-b border-surface-variant pb-sm">
+<span class="material-symbols-outlined text-primary mr-sm" style="font-variation-settings: 'FILL' 1;">sell</span>
+<h2 class="font-title-md text-title-md text-on-surface">Promotions &amp; Offers</h2>
+</div>
+<div class="space-y-md">
+<!-- Toggle Item -->
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-body-lg text-body-lg text-on-surface">Flash Deals</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Alerts for limited-time discounts on groceries.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300 ease-in-out border-surface-variant checked:border-transparent checked:translate-x-6 focus:ring-0 focus:outline-none focus:ring-offset-0" id="toggle-flash" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 ease-in-out" for="toggle-flash"></label>
+</div>
+</div>
+<!-- Toggle Item -->
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-body-lg text-body-lg text-on-surface">Personalized Discounts</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Offers tailored to your frequent purchases.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300 ease-in-out border-surface-variant checked:border-transparent checked:translate-x-6 focus:ring-0 focus:outline-none focus:ring-offset-0" id="toggle-personal" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 ease-in-out" for="toggle-personal"></label>
+</div>
+</div>
+<!-- Toggle Item -->
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-body-lg text-body-lg text-on-surface">Newsletter</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Weekly updates on new products and seasonal picks.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300 ease-in-out border-surface-variant checked:border-transparent checked:translate-x-6 focus:ring-0 focus:outline-none focus:ring-offset-0" id="toggle-news" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 ease-in-out" for="toggle-news"></label>
+</div>
+</div>
+</div>
+</section>
+<!-- Account Section -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] p-md md:col-span-2 lg:col-span-1">
+<div class="flex items-center mb-md border-b border-surface-variant pb-sm">
+<span class="material-symbols-outlined text-primary mr-sm" style="font-variation-settings: 'FILL' 1;">shield_person</span>
+<h2 class="font-title-md text-title-md text-on-surface">Account Activity</h2>
+</div>
+<div class="space-y-md">
+<!-- Toggle Item -->
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-body-lg text-body-lg text-on-surface">Security Alerts</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Important notifications about login attempts and password changes.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300 ease-in-out border-surface-variant checked:border-transparent checked:translate-x-6 focus:ring-0 focus:outline-none focus:ring-offset-0" disabled="" id="toggle-security" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 ease-in-out opacity-70" for="toggle-security"></label>
+</div>
+</div>
+<!-- Toggle Item -->
+<div class="flex items-center justify-between">
+<div class="pr-md">
+<h3 class="font-body-lg text-body-lg text-on-surface">Wallet Updates</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Balance changes and payment method expirations.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in flex-shrink-0">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 top-0 left-0 transition-all duration-300 ease-in-out border-surface-variant checked:border-transparent checked:translate-x-6 focus:ring-0 focus:outline-none focus:ring-offset-0" id="toggle-wallet" name="toggle" type="checkbox">
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer transition-colors duration-300 ease-in-out" for="toggle-wallet"></label>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar (Visible only on md:hidden per semantic shell rules for a destination/settings area if applicable, but per prompt instruction we include it with Account active) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 bg-surface/80 dark:bg-on-surface/80 backdrop-blur-xl shadow-md rounded-t-xl z-50">
+<!-- Inactive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-3 hover:bg-surface-container-high transition-all active:scale-90 duration-300 rounded-full" href="#">
+<span class="material-symbols-outlined">home</span>
+</a>
+<!-- Inactive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-3 hover:bg-surface-container-high transition-all active:scale-90 duration-300 rounded-full" href="#">
+<span class="material-symbols-outlined">search</span>
+</a>
+<!-- Inactive -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant p-3 hover:bg-surface-container-high transition-all active:scale-90 duration-300 rounded-full" href="#">
+<span class="material-symbols-outlined">notifications</span>
+</a>
+<!-- Active -->
+<a class="flex flex-col items-center justify-center bg-secondary-container dark:bg-on-secondary-fixed-variant text-on-secondary-container dark:text-secondary-fixed rounded-full p-3 hover:bg-surface-container-high transition-all active:scale-90 duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+</a>
+</nav>
+</body></html>

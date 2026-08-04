@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Customer Analytics &amp; Management | Daily Basket</title>
+<!-- Google Fonts: Outfit (Display/Headline) & Inter (Body/Label) -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS with Forms & Container Queries plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Design System Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-high": "#e8e8ea",
+                        "tertiary-container": "#737575",
+                        "on-secondary-container": "#5e6660",
+                        "on-primary-fixed-variant": "#00531a",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#8cfa93",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container": "#eeeef0",
+                        "error-container": "#ffdad6",
+                        "secondary-fixed-dim": "#c0c9c1",
+                        "on-secondary-fixed": "#151d19",
+                        "on-secondary": "#ffffff",
+                        "surface-variant": "#e2e2e5",
+                        "secondary": "#58605a",
+                        "surface": "#f9f9fc",
+                        "primary-fixed-dim": "#70dd7a",
+                        "on-secondary-fixed-variant": "#404943",
+                        "surface-container-highest": "#e2e2e5",
+                        "on-tertiary-container": "#fcfcfc",
+                        "on-surface": "#1a1c1e",
+                        "inverse-surface": "#2f3133",
+                        "secondary-fixed": "#dce5dd",
+                        "on-primary-container": "#f7fff2",
+                        "on-surface-variant": "#3f4a3d",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "primary-container": "#078730",
+                        "on-primary": "#ffffff",
+                        "inverse-on-surface": "#f0f0f3",
+                        "surface-bright": "#f9f9fc",
+                        "on-background": "#1a1c1e",
+                        "inverse-primary": "#70dd7a",
+                        "primary": "#006b23",
+                        "on-primary-fixed": "#002106",
+                        "error": "#ba1a1a",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f3f3f6",
+                        "outline": "#6e7a6c",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#5a5c5c",
+                        "surface-tint": "#006e25",
+                        "surface-dim": "#dadadc",
+                        "background": "#f9f9fc",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#dce5dd",
+                        "outline-variant": "#becab9"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "sm": "0.25rem",
+                        "md": "0.75rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Outfit", "sans-serif"],
+                        "display": ["Outfit", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #becab9; /* outline-variant */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: #6e7a6c; /* outline */
+        }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface antialiased overflow-hidden flex h-screen">
+<!-- SideNavBar Component (From JSON) -->
+<nav class="hidden md:flex fixed left-0 top-0 h-screen w-64 bg-surface-container-low dark:bg-surface-dim shadow-sm flex-col border-r border-outline-variant z-50">
+<!-- Header -->
+<div class="p-6 pb-2 border-b border-outline-variant/50 mb-4">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-lg">
+                    DB
+                </div>
+<div>
+<h1 class="text-headline-lg font-display font-bold text-primary dark:text-primary-fixed-dim text-xl tracking-tight leading-none">Daily Basket</h1>
+<p class="font-body text-body-sm text-on-surface-variant leading-snug">Enterprise Admin</p>
+</div>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex-1 overflow-y-auto px-2 space-y-1 font-body text-body-sm">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">inventory_2</span>
+                Inventory
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">shopping_cart</span>
+                Orders
+            </a>
+<!-- Active Navigation Item -->
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg mx-2 my-1 opacity-90 active:scale-95 transition-all font-semibold" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">group</span>
+                Customers
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 transition-colors duration-200" href="#">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+                Analytics
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-lg mx-2 my-1 transition-colors duration-200 mt-8" href="#">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+                Settings
+            </a>
+</div>
+<!-- CTA Footer -->
+<div class="p-4 border-t border-outline-variant/50">
+<button class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-surface-container border border-outline-variant rounded-md text-on-surface-variant text-sm font-medium hover:bg-surface-container-high transition-colors">
+<span class="material-symbols-outlined text-[18px]">support_agent</span>
+                Support Center
+            </button>
+</div>
+</nav>
+<!-- Main Layout Wrapper -->
+<div class="flex-1 ml-0 md:ml-64 flex flex-col h-screen relative">
+<!-- TopNavBar Component (From JSON) -->
+<header class="fixed top-0 md:right-0 w-full md:w-[calc(100%-16rem)] h-16 bg-surface/80 dark:bg-background/80 backdrop-blur-md border-b border-outline-variant flex items-center justify-between px-6 z-40">
+<!-- Left: Search/Title area -->
+<div class="flex items-center gap-4 flex-1">
+<button class="md:hidden p-2 text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<div class="hidden md:flex relative w-64">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container border-none rounded-full text-sm focus:ring-2 focus:ring-primary focus:bg-surface-container-lowest transition-all text-on-surface placeholder:text-on-surface-variant/70" placeholder="Search customers..." type="text"/>
+</div>
+</div>
+<!-- Right: Actions & Profile -->
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors rounded-full active:scale-95 duration-150 relative">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full border border-surface"></span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low dark:hover:bg-surface-container-high transition-colors rounded-full active:scale-95 duration-150 hidden sm:block">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+<div class="h-8 w-[1px] bg-outline-variant mx-2"></div>
+<img alt="Administrator Avatar" class="w-9 h-9 rounded-full object-cover border-2 border-surface-container bg-surface-container-highest cursor-pointer hover:border-primary transition-colors" data-alt="A small, circular profile avatar of an administrator. The portrait shows a young professional with a neutral, pleasant expression, warmly lit against a soft green background to match the Daily Basket brand aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvIuOA7_vZqEv-F7cGcm4vGUwznAwLOX2jdzgrArbwSubY9ukPuJOL4dr88DUXO8ByWfhg_koO5FTCZbcdJbbWA7D0USYpXwUtxuKDGINTMB8-6WRB8IR8r3BvgcqPA0WMo7JGWQrCTyYp5WdMBWAB7jsdmIxnEY3_9o0gz-B-w8CX-l_4zkpGfxfGgqaQZM5Z0NQGRfcF4fswnsTAzvUfqErqiy46ztNlm8c-KbuXyvK3Gobfrysv"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 mt-16 p-4 md:p-8 overflow-y-auto bg-surface relative">
+<!-- Page Header -->
+<div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+<div>
+<h2 class="font-headline text-headline-lg font-semibold text-on-surface tracking-tight">Customer Intelligence</h2>
+<p class="font-body text-on-surface-variant mt-1 text-sm">Analyze behavior, manage segments, and drive retention.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 bg-surface-container text-on-surface-variant font-medium text-sm rounded-md hover:bg-surface-container-high border border-outline-variant transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        Export CSV
+                    </button>
+<button class="px-4 py-2 bg-primary text-on-primary font-medium text-sm rounded-md hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        New Segment
+                    </button>
+</div>
+</div>
+<!-- Bento Grid: Engagement Metrics -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6 mb-8">
+<!-- Metric Card 1: Total Users & Growth -->
+<div class="md:col-span-4 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/40 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] flex flex-col justify-between">
+<div class="flex items-start justify-between mb-4">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined">group</span>
+</div>
+<span class="inline-flex items-center gap-1 text-xs font-medium text-primary bg-primary-container/20 px-2 py-1 rounded-full">
+<span class="material-symbols-outlined text-[14px]">trending_up</span>
+                            +12.5%
+                        </span>
+</div>
+<div>
+<p class="text-sm font-medium text-on-surface-variant mb-1">Total Active Customers</p>
+<h3 class="font-headline text-4xl font-bold text-on-surface tracking-tight">24,592</h3>
+</div>
+<p class="text-xs text-on-surface-variant mt-4">vs. last 30 days (21,850)</p>
+</div>
+<!-- Metric Card 2: Retention Rate (Asymmetric UI) -->
+<div class="md:col-span-4 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/40 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] relative overflow-hidden group">
+<div class="absolute -right-6 -top-6 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors duration-500"></div>
+<div class="relative z-10">
+<p class="text-sm font-medium text-on-surface-variant mb-1">90-Day Retention Rate</p>
+<div class="flex items-baseline gap-2 mb-6">
+<h3 class="font-headline text-4xl font-bold text-on-surface tracking-tight">68.4%</h3>
+<span class="text-sm text-primary font-medium">Healthy</span>
+</div>
+<!-- Minimalist Progress Bar representing retention -->
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[68.4%] rounded-full relative">
+<div class="absolute right-0 top-0 bottom-0 w-4 bg-white/30 blur-[2px]"></div>
+</div>
+</div>
+<div class="flex justify-between text-xs text-on-surface-variant mt-2">
+<span>Industry Avg: 45%</span>
+<span>Target: 75%</span>
+</div>
+</div>
+</div>
+<!-- Metric Card 3: CAC Chart Placeholder -->
+<div class="md:col-span-4 bg-surface-container-lowest rounded-xl p-6 border border-outline-variant/40 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] flex flex-col">
+<div class="flex justify-between items-center mb-4">
+<p class="text-sm font-medium text-on-surface-variant">Customer Acquisition Cost</p>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px] cursor-pointer hover:text-primary transition-colors">more_horiz</span>
+</div>
+<div class="flex items-baseline gap-2 mb-2">
+<h3 class="font-headline text-2xl font-bold text-on-surface tracking-tight">$14.20</h3>
+<span class="text-xs font-medium text-error flex items-center">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                            $1.05
+                        </span>
+</div>
+<!-- Minimalist CSS Chart visual -->
+<div aria-hidden="true" class="flex-1 flex items-end gap-2 mt-4 pt-2 border-b border-outline-variant/30 pb-1">
+<div class="w-1/6 bg-secondary-container h-[40%] rounded-t-sm"></div>
+<div class="w-1/6 bg-secondary-container h-[35%] rounded-t-sm"></div>
+<div class="w-1/6 bg-secondary-container h-[50%] rounded-t-sm"></div>
+<div class="w-1/6 bg-secondary-container h-[45%] rounded-t-sm"></div>
+<div class="w-1/6 bg-primary h-[70%] rounded-t-sm shadow-[0_0_8px_rgba(0,107,35,0.3)]"></div>
+<div class="w-1/6 bg-error-container h-[85%] rounded-t-sm"></div>
+</div>
+<div class="flex justify-between text-[10px] text-on-surface-variant mt-1 uppercase font-semibold">
+<span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+</div>
+</div>
+</div>
+<!-- Segments & Filters Section -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+<!-- Segment Pills -->
+<div class="flex overflow-x-auto pb-2 md:pb-0 hide-scrollbar gap-2">
+<button class="whitespace-nowrap px-4 py-1.5 bg-primary text-on-primary text-sm font-medium rounded-full shadow-sm">
+                        All Customers
+                    </button>
+<button class="whitespace-nowrap px-4 py-1.5 bg-surface-container-lowest border border-outline-variant text-on-surface text-sm font-medium rounded-full hover:bg-surface-container hover:border-outline transition-colors">
+                        Power Users <span class="ml-1 text-xs text-primary bg-primary-container/30 px-1.5 py-0.5 rounded-full">842</span>
+</button>
+<button class="whitespace-nowrap px-4 py-1.5 bg-surface-container-lowest border border-outline-variant text-on-surface text-sm font-medium rounded-full hover:bg-surface-container hover:border-outline transition-colors">
+                        Churn Risk <span class="ml-1 text-xs text-error bg-error-container/50 px-1.5 py-0.5 rounded-full">124</span>
+</button>
+<button class="whitespace-nowrap px-4 py-1.5 bg-surface-container-lowest border border-outline-variant text-on-surface text-sm font-medium rounded-full hover:bg-surface-container hover:border-outline transition-colors">
+                        New Signups
+                    </button>
+</div>
+<!-- Table View Controls -->
+<div class="flex items-center gap-2 text-on-surface-variant">
+<button class="p-1.5 rounded bg-surface-container-high text-on-surface">
+<span class="material-symbols-outlined text-[20px]">view_list</span>
+</button>
+<button class="p-1.5 rounded hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">grid_view</span>
+</button>
+<div class="h-6 w-[1px] bg-outline-variant mx-1"></div>
+<button class="flex items-center gap-1 text-sm font-medium hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                        Filter
+                    </button>
+</div>
+</div>
+<!-- Customer Data Table Container -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-outline-variant/40 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant/50 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+<th class="px-6 py-4 font-label">Customer</th>
+<th class="px-6 py-4 font-label">Total Orders</th>
+<th class="px-6 py-4 font-label">Lifetime Value</th>
+<th class="px-6 py-4 font-label">Loyalty Tier</th>
+<th class="px-6 py-4 font-label">Last Active</th>
+<th class="px-6 py-4 font-label text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/30 text-sm">
+<!-- Row 1: Power User -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="Eleanor Rigby Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant/30 bg-surface" data-alt="A detailed, clear headshot of a middle-aged woman with glasses, smiling warmly. The image is cropped as a small circular avatar, set against a pristine white background. The lighting is bright and modern, conveying a clean corporate aesthetic suited for a premium tech platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3qgawPNImG1CAk1zO36-if4b_vX-bo5-8NL35BN0cuU_HIccFdBlYN8OvVF7Rj6VHB-9ZsA9HD2ej2V9Pr-frVEp7ARKwK1Ih-UiV11meauOpcbvz1pgmyt0y96_T8shexNNd0WpnDQRznFfFk6Yb1NKib1G6kVDDfF_EN3s52nQ4THL6OR90abSZIJ2wvGCOsnGMbJPLSXFuU72SFNg2RCwfrKk2ZbGPHKqGX1FBPMYaeLcXwauW"/>
+<div>
+<p class="font-semibold text-on-surface">Eleanor Rigby</p>
+<p class="text-xs text-on-surface-variant">eleanor.r@example.com</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 font-medium text-on-surface">142</td>
+<td class="px-6 py-4 font-medium text-on-surface">$4,250.00</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-primary-container/20 text-primary border border-primary/20">
+<span class="material-symbols-outlined text-[14px] font-variation-settings-'FILL'-1">workspace_premium</span>
+                                        Platinum
+                                    </span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant text-sm">2 hours ago</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/20 rounded transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 2: Standard -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container font-semibold border border-outline-variant/30">
+                                            MJ
+                                        </div>
+<div>
+<p class="font-semibold text-on-surface">Marcus Johnson</p>
+<p class="text-xs text-on-surface-variant">marcus.j88@mail.com</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 font-medium text-on-surface">34</td>
+<td class="px-6 py-4 font-medium text-on-surface">$850.50</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-surface-container text-on-surface-variant border border-outline-variant/50">
+                                        Silver
+                                    </span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant text-sm">Yesterday</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/20 rounded transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Churn Risk -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<img alt="David Chen Profile" class="w-10 h-10 rounded-full object-cover border border-outline-variant/30 bg-surface" data-alt="A portrait of a young man with a short beard, wearing a casual grey shirt. The image serves as a user avatar, circular format, with flat, ambient lighting. The background is a soft, muted tone, fitting perfectly into a minimalist, light-mode dashboard UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgDuey2xWe9ceQ5UJoAlrPCxS_egPjt3oPnaWFeQz0U5pqi9T1sHpfQogsdXMIb2mLx_2XjdnIA_5ATVVUGlDoyNJAuf8kOWkjPKZumpbZi5HGE5r_EuLhyvnluAQd6iZRXkfWZJK7YwdtUV5y4Iv1oSQr3srKeu3O2GrDZInMlMHeJqlAzCGm8YgqCoed6MKDNu6a8SU9oKnST5bLnF6PgQGkisbI1XaH57HjPYz5sYmTekc8jidX"/>
+<div>
+<p class="font-semibold text-on-surface">David Chen</p>
+<p class="text-xs text-on-surface-variant">d.chen@work.org</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 font-medium text-on-surface">12</td>
+<td class="px-6 py-4 font-medium text-on-surface">$210.00</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-surface-container text-on-surface-variant border border-outline-variant/50">
+                                        Bronze
+                                    </span>
+</td>
+<td class="px-6 py-4">
+<span class="text-error font-medium text-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">warning</span>
+                                        28 days ago
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/20 rounded transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: New Signup -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-tertiary-container flex items-center justify-center text-on-tertiary-container font-semibold border border-outline-variant/30">
+                                            SA
+                                        </div>
+<div>
+<p class="font-semibold text-on-surface">Sarah Ahmed</p>
+<p class="text-xs text-on-surface-variant">sarah.a@studio.design</p>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 font-medium text-on-surface">2</td>
+<td class="px-6 py-4 font-medium text-on-surface">$65.20</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-container/50 text-secondary border border-secondary/20">
+                                        New Member
+                                    </span>
+</td>
+<td class="px-6 py-4 text-on-surface-variant text-sm">Today</td>
+<td class="px-6 py-4 text-right">
+<button class="p-1.5 text-on-surface-variant hover:text-primary hover:bg-primary-container/20 rounded transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">
+<span class="material-symbols-outlined text-[20px]">visibility</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination/Footer -->
+<div class="px-6 py-4 border-t border-outline-variant/30 bg-surface-container-lowest flex items-center justify-between">
+<p class="text-sm text-on-surface-variant">Showing <span class="font-medium text-on-surface">1</span> to <span class="font-medium text-on-surface">4</span> of <span class="font-medium text-on-surface">24,592</span> results</p>
+<div class="flex gap-1">
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container disabled:opacity-50" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="px-3 py-1 rounded bg-primary-container text-on-primary-container text-sm font-medium">1</button>
+<button class="px-3 py-1 rounded hover:bg-surface-container text-on-surface-variant text-sm font-medium transition-colors">2</button>
+<button class="px-3 py-1 rounded hover:bg-surface-container text-on-surface-variant text-sm font-medium transition-colors">3</button>
+<span class="px-2 py-1 text-on-surface-variant">...</span>
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

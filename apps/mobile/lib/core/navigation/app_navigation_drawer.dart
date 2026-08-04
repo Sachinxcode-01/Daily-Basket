@@ -107,6 +107,8 @@ class AppNavigationDrawer extends StatelessWidget {
                     _RouteItem('Rate Your Delivery', '/rate-delivery', Icons.star_rounded),
                     _RouteItem('Notification Center', '/notifications', Icons.notifications_rounded),
                     _RouteItem('Wallet & Transactions', '/wallet', Icons.account_balance_wallet_rounded),
+                    _RouteItem('Coupons & Promo Offers', '/coupons', Icons.local_offer_rounded),
+                    _RouteItem('Refer & Earn Rewards', '/referral', Icons.card_giftcard_rounded),
                     _RouteItem('Daily Basket Plus VIP', '/loyalty', Icons.workspace_premium_rounded),
                     _RouteItem('Help Center & Support', '/help', Icons.help_outline_rounded),
                   ],

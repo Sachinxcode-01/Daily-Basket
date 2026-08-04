@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Careers - Daily Basket</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal;
+            font-style: normal;
+            font-size: 24px;
+            line-height: 1;
+            letter-spacing: normal;
+            text-transform: none;
+            display: inline-block;
+            white-space: nowrap;
+            word-wrap: normal;
+            direction: ltr;
+            -webkit-font-feature-settings: 'liga';
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-container": "#dce5dd",
+                        "on-secondary-container": "#5e6660",
+                        "on-primary-fixed": "#002106",
+                        "outline-variant": "#becab9",
+                        "on-surface-variant": "#3f4a3d",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#70dd7a",
+                        "on-secondary-fixed": "#151d19",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "outline": "#6e7a6c",
+                        "surface-bright": "#f9f9fc",
+                        "on-error": "#ffffff",
+                        "inverse-surface": "#2f3133",
+                        "background": "#f9f9fc",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f9f9fc",
+                        "primary-container": "#078730",
+                        "inverse-on-surface": "#f0f0f3",
+                        "on-tertiary-container": "#fcfcfc",
+                        "on-error-container": "#93000a",
+                        "surface-container": "#eeeef0",
+                        "on-secondary-fixed-variant": "#404943",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-primary-fixed-variant": "#00531a",
+                        "on-background": "#1a1c1e",
+                        "surface-container-highest": "#e2e2e5",
+                        "secondary-fixed": "#dce5dd",
+                        "surface-tint": "#006e25",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#e2e2e2",
+                        "surface-dim": "#dadadc",
+                        "on-primary-container": "#f7fff2",
+                        "primary-fixed": "#8cfa93",
+                        "secondary-fixed-dim": "#c0c9c1",
+                        "tertiary": "#5a5c5c",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "surface-container-high": "#e8e8ea",
+                        "surface-container-low": "#f3f3f6",
+                        "secondary": "#58605a",
+                        "inverse-primary": "#70dd7a",
+                        "surface-variant": "#e2e2e5",
+                        "primary": "#006b23",
+                        "tertiary-container": "#737575",
+                        "on-surface": "#1a1c1e",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Outfit"],
+                        "display": ["Outfit"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    "fontSize": {}
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body antialiased pt-[72px]">
+<!-- TopNavBar Component -->
+<nav class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl shadow-sm">
+<div class="flex justify-between items-center px-4 md:px-12 py-4 max-w-[1280px] mx-auto w-full">
+<!-- Brand -->
+<a class="text-headline-lg font-headline font-bold text-primary dark:text-primary-fixed tracking-tight" href="#">
+                Daily Basket
+            </a>
+<!-- Navigation Links (Web) -->
+<div class="hidden md:flex items-center space-x-8 font-headline text-title-md font-medium">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Home</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Categories</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">About</a>
+<!-- Active Link -->
+<a class="text-primary dark:text-primary-fixed border-b-2 border-primary dark:border-primary-fixed pb-1" href="#">Careers</a>
+</div>
+<!-- Actions -->
+<div class="flex items-center space-x-4">
+<button aria-label="shopping_basket" class="text-primary dark:text-primary-fixed hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 rounded-md p-2 transition-all duration-300 ease-in-out active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">shopping_basket</span>
+</button>
+<button aria-label="location_on" class="text-primary dark:text-primary-fixed hover:bg-secondary-container/50 dark:hover:bg-on-secondary-fixed-variant/20 rounded-md p-2 transition-all duration-300 ease-in-out active:scale-95">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">location_on</span>
+</button>
+</div>
+</div>
+</nav>
+<main>
+<!-- Hero Section -->
+<section class="relative w-full min-h-[614px] flex items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0">
+<div class="bg-cover bg-center w-full h-full object-cover" data-alt="A bright, airy modern grocery warehouse interior bathed in natural sunlight. Workers in clean contemporary aprons are smiling and efficiently packing fresh organic produce into branded cardboard boxes. The setting feels fast-paced yet organized, with a clean aesthetic emphasizing crisp greens and bright whites. High-quality photography, professional and inviting tone, wide angle shot." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDi-RZC_6ktRsVN4ecQvblY34SQuYAKiGvW6248Dyg-KeWBcshp7iQWqHv7lvwNj0PR5mZHUxYXTMaoEjO2o08_vCS7PQHa7wpoSZYceIrA1-LP0hYy97x3V4EtVOmZq0x92A7THbOQjRxhlHY3mfj-AgEsZcZH2N76DTEIl9eDPmM-EGYz7LIdF4SQHyQZh0tI6Y_ymyQvC6AlCwP3ccr0QxkG9bIdPhzzSzwYnQABw0bPO6byrVn0')"></div>
+<div class="absolute inset-0 bg-surface/70 backdrop-blur-sm"></div>
+</div>
+<div class="relative z-10 max-w-[1280px] mx-auto px-4 md:px-12 text-center py-24">
+<h1 class="font-display text-4xl md:text-5xl lg:text-6xl font-bold text-on-surface mb-6 tracking-tight">
+                    Join the Freshness Revolution
+                </h1>
+<p class="font-body text-body-lg md:text-xl text-on-surface-variant max-w-2xl mx-auto mb-10">
+                    We're building the future of quick-commerce grocery. Be part of a team dedicated to delivering quality, health, and time back to our communities.
+                </p>
+<a class="inline-flex items-center justify-center h-12 px-8 rounded-md bg-primary text-on-primary font-label text-label-md uppercase tracking-wider hover:bg-primary-container hover:text-on-primary-container transition-colors shadow-sm" href="#openings">
+                    View Open Roles
+                </a>
+</div>
+</section>
+<!-- Our Values -->
+<section class="py-24 px-4 md:px-12 max-w-[1280px] mx-auto">
+<div class="text-center mb-16">
+<h2 class="font-headline text-3xl md:text-4xl font-semibold text-on-surface mb-4">Our Values</h2>
+<p class="font-body text-body-lg text-on-surface-variant max-w-xl mx-auto">The principles that drive our daily operations and long-term vision.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Value 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-variant transition-transform hover:-translate-y-1 duration-300">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center mb-6 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<h3 class="font-headline text-title-md font-semibold text-on-surface mb-3">Speed</h3>
+<p class="font-body text-body-sm text-on-surface-variant">We move with urgency. Efficiency in our logistics ensures our customers get their time back.</p>
+</div>
+<!-- Value 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-variant transition-transform hover:-translate-y-1 duration-300">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center mb-6 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<h3 class="font-headline text-title-md font-semibold text-on-surface mb-3">Quality</h3>
+<p class="font-body text-body-sm text-on-surface-variant">Never compromised. From our fresh produce to our software code, excellence is the baseline.</p>
+</div>
+<!-- Value 3 -->
+<div class="bg-surface-container-lowest rounded-xl p-8 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-variant transition-transform hover:-translate-y-1 duration-300">
+<div class="w-12 h-12 rounded-full bg-secondary-container flex items-center justify-center mb-6 text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">eco</span>
+</div>
+<h3 class="font-headline text-title-md font-semibold text-on-surface mb-3">Sustainability</h3>
+<p class="font-body text-body-sm text-on-surface-variant">Growing responsibly. We are committed to reducing waste and sourcing ethically.</p>
+</div>
+</div>
+</section>
+<!-- Benefits -->
+<section class="py-24 bg-secondary-container relative overflow-hidden">
+<!-- Decorative background element -->
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
+<div class="max-w-[1280px] mx-auto px-4 md:px-12 relative z-10">
+<div class="flex flex-col lg:flex-row gap-16 items-center">
+<div class="lg:w-1/2">
+<h2 class="font-headline text-3xl md:text-4xl font-semibold text-on-secondary-container mb-6">Working with us</h2>
+<p class="font-body text-body-lg text-on-secondary-container/80 mb-8">We believe that taking care of our team is the first step in taking care of our customers. Enjoy comprehensive benefits designed for modern life.</p>
+<div class="space-y-6">
+<div class="flex items-start gap-4">
+<div class="mt-1 text-primary">
+<span class="material-symbols-outlined">health_and_safety</span>
+</div>
+<div>
+<h4 class="font-headline text-title-md font-medium text-on-secondary-container">Premium Healthcare</h4>
+<p class="font-body text-body-sm text-on-secondary-container/70">Top-tier medical, dental, and vision coverage for you and your dependents.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="mt-1 text-primary">
+<span class="material-symbols-outlined">monitoring</span>
+</div>
+<div>
+<h4 class="font-headline text-title-md font-medium text-on-secondary-container">Equity Package</h4>
+<p class="font-body text-body-sm text-on-secondary-container/70">Own a piece of the revolution. Competitive equity grants for all full-time employees.</p>
+</div>
+</div>
+<div class="flex items-start gap-4">
+<div class="mt-1 text-primary">
+<span class="material-symbols-outlined">schedule</span>
+</div>
+<div>
+<h4 class="font-headline text-title-md font-medium text-on-secondary-container">Radical Flexibility</h4>
+<p class="font-body text-body-sm text-on-secondary-container/70">Hybrid remote options for corporate roles and flexible scheduling for operations.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="lg:w-1/2 w-full h-96 lg:h-[500px] rounded-xl overflow-hidden shadow-lg relative">
+<div class="bg-cover bg-center w-full h-full" data-alt="A diverse team of young professionals collaborating around a light wood table in a modern, sunlit office space. They are looking at a tablet, smiling and engaged. The environment is minimalist with subtle indoor plants and white walls, reflecting a clean, corporate yet welcoming culture. Soft lighting, high resolution, modern corporate aesthetic." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDEhW5NBlgwbcCnTkQQApmYHfbTMsEZ5TYwJK-9gtWB0Ppe2bIsVZnxeWdBhk3iW-UI9fM7hZPDvcufqsjkj5l9Mw-LYe6YbKBI8DD0-RhBiQecOFRXsJGY4Gfi2HUmj_0ufqxNUdIrErP-EMBtbfPp1vptxQvWK59PGV86OBnQKBS9yclUifAEAkFIwoIjJc6yRxGr0HZ0L3t3iP-iueXFTT4yXs2GOK5nCd9wvkewpCAXupxglx9e')"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Current Openings -->
+<section class="py-24 px-4 md:px-12 max-w-[1280px] mx-auto min-h-screen" id="openings">
+<h2 class="font-headline text-3xl md:text-4xl font-semibold text-on-surface mb-8">Current Openings</h2>
+<!-- Filters -->
+<div class="flex gap-3 mb-10 overflow-x-auto pb-4 scrollbar-hide">
+<button class="px-5 py-2 rounded-full bg-primary text-on-primary font-label text-label-md whitespace-nowrap shadow-sm">All Roles</button>
+<button class="px-5 py-2 rounded-full bg-surface border border-outline-variant text-on-surface-variant hover:bg-surface-container font-label text-label-md whitespace-nowrap transition-colors">Engineering</button>
+<button class="px-5 py-2 rounded-full bg-surface border border-outline-variant text-on-surface-variant hover:bg-surface-container font-label text-label-md whitespace-nowrap transition-colors">Operations</button>
+<button class="px-5 py-2 rounded-full bg-surface border border-outline-variant text-on-surface-variant hover:bg-surface-container font-label text-label-md whitespace-nowrap transition-colors">Logistics</button>
+</div>
+<!-- Job List -->
+<div class="space-y-4">
+<!-- Job Card 1 -->
+<div class="group bg-surface-container-lowest rounded-xl p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-variant hover:border-primary/30 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div>
+<h3 class="font-headline text-xl font-semibold text-on-surface group-hover:text-primary transition-colors">Fullstack Developer</h3>
+<div class="flex items-center gap-4 mt-2 font-body text-body-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">code</span> Engineering</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">location_on</span> Hybrid / New York</span>
+</div>
+</div>
+<button class="w-full md:w-auto px-6 py-2 rounded-md bg-secondary-container text-on-secondary-container font-label text-label-md uppercase hover:bg-primary hover:text-on-primary transition-colors">
+                        Apply Now
+                    </button>
+</div>
+<!-- Job Card 2 -->
+<div class="group bg-surface-container-lowest rounded-xl p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-variant hover:border-primary/30 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div>
+<h3 class="font-headline text-xl font-semibold text-on-surface group-hover:text-primary transition-colors">Logistics Manager</h3>
+<div class="flex items-center gap-4 mt-2 font-body text-body-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">local_shipping</span> Logistics</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">location_on</span> On-site / Chicago</span>
+</div>
+</div>
+<button class="w-full md:w-auto px-6 py-2 rounded-md bg-secondary-container text-on-secondary-container font-label text-label-md uppercase hover:bg-primary hover:text-on-primary transition-colors">
+                        Apply Now
+                    </button>
+</div>
+<!-- Job Card 3 -->
+<div class="group bg-surface-container-lowest rounded-xl p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-variant hover:border-primary/30 transition-all flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<div>
+<h3 class="font-headline text-xl font-semibold text-on-surface group-hover:text-primary transition-colors">Operations Associate</h3>
+<div class="flex items-center gap-4 mt-2 font-body text-body-sm text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">inventory_2</span> Operations</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[18px]">location_on</span> On-site / Miami</span>
+</div>
+</div>
+<button class="w-full md:w-auto px-6 py-2 rounded-md bg-secondary-container text-on-secondary-container font-label text-label-md uppercase hover:bg-primary hover:text-on-primary transition-colors">
+                        Apply Now
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer Component -->
+<footer class="bg-surface-container-low dark:bg-surface-container-lowest text-on-surface dark:text-on-surface-variant font-body text-body-sm w-full rounded-t-xl mt-12">
+<div class="flex flex-col md:flex-row justify-between items-center px-8 md:px-12 py-12 max-w-[1280px] mx-auto w-full gap-8 md:gap-0">
+<!-- Brand -->
+<div class="text-title-md font-headline font-bold text-secondary dark:text-secondary-fixed">
+                Daily Basket
+            </div>
+<!-- Links -->
+<nav class="flex flex-wrap justify-center gap-6">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 transition-opacity duration-200 hover:opacity-80" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 transition-opacity duration-200 hover:opacity-80" href="#">Terms of Service</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 transition-opacity duration-200 hover:opacity-80" href="#">Cookie Policy</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed underline decoration-2 underline-offset-4 transition-opacity duration-200 hover:opacity-80" href="#">Contact Us</a>
+</nav>
+<!-- Copyright -->
+<div class="text-center md:text-right">
+                © 2024 Daily Basket Inc. Freshness delivered fast.
+            </div>
+</div>
+</footer>
+</body></html>
