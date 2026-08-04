@@ -13,8 +13,6 @@ jobs:
   build-and-test-api:
     name: Build, Test & Push API Docker Image
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - uses: actions/checkout@v4
 
@@ -44,6 +42,8 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: pnpm --filter api run prisma:generate
 
       - name: Run API Unit Tests
