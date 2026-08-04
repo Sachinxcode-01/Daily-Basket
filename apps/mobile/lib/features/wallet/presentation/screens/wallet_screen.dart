@@ -35,7 +35,7 @@ class _WalletScreenState extends State<WalletScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_cart_outlined, color: Color(0xFF006B23)),
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).maybePop(),
           ),
         ],
       ),
@@ -133,7 +133,7 @@ class _WalletScreenState extends State<WalletScreen> {
                               child: SizedBox(
                                 height: 46,
                                 child: ElevatedButton.icon(
-                                  onPressed: () {},
+                                  onPressed: () => Navigator.of(context).pushNamed('/payment'),
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: const Color(0xFF1B8539),
                                     foregroundColor: Colors.white,
@@ -383,7 +383,7 @@ class _WalletScreenState extends State<WalletScreen> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {},
+                        onPressed: () => Navigator.of(context).pushNamed('/wallet'),
                         child: Text(
                           'View All',
                           style: GoogleFonts.inter(

@@ -134,7 +134,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded, color: Color(0xFF1A1C1E)),
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).pushNamed('/search'),
           ),
         ],
       ),

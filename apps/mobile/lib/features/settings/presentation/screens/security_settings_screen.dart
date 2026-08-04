@@ -14,7 +14,7 @@ class SecuritySettingsScreen extends StatelessWidget {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
-          onPressed: () {},
+          onPressed: () => Scaffold.of(context).openDrawer(),
         ),
         title: Row(
           mainAxisSize: MainAxisSize.min,
@@ -34,7 +34,7 @@ class SecuritySettingsScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF1A1C1E), size: 24),
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).pushNamed('/notifications'),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 14.0),
@@ -149,7 +149,7 @@ class SecuritySettingsScreen extends StatelessWidget {
                         const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
                       ],
                     ),
-                    onTap: () {},
+                    onTap: () => Navigator.of(context).pushNamed('/mfa-selection'),
                   ),
                 ],
               ),
@@ -181,7 +181,21 @@ class SecuritySettingsScreen extends StatelessWidget {
                     title: 'Active Devices',
                     subtitle: 'Manage devices logged into your account',
                     trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
-                    onTap: () {},
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Active Session'),
+                          content: const Text('Current Device: Flutter Mobile (Android/iOS)\nIP: 192.168.1.10\nStatus: Active Now'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
@@ -213,7 +227,11 @@ class SecuritySettingsScreen extends StatelessWidget {
                     title: 'Download Data',
                     subtitle: 'Request a copy of your personal data',
                     trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
-                    onTap: () {},
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Personal data download request submitted.')),
+                      );
+                    },
                   ),
                   const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                   _buildSettingTile(
@@ -224,7 +242,28 @@ class SecuritySettingsScreen extends StatelessWidget {
                     titleColor: const Color(0xFFBA1A1A),
                     subtitle: 'Permanently remove your account and data',
                     trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFFBA1A1A)),
-                    onTap: () {},
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Delete Account'),
+                          content: const Text('Are you sure you want to request permanent account deletion?'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(ctx),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                              },
+                              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

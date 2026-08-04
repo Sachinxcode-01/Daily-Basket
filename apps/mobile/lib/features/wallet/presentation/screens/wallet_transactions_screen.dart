@@ -155,7 +155,7 @@ class WalletTransactionsScreen extends StatelessWidget {
                       width: double.infinity,
                       height: 46,
                       child: ElevatedButton.icon(
-                        onPressed: () {},
+                        onPressed: () => Navigator.of(context).pushNamed('/payment'),
                         icon: const Icon(Icons.add_rounded, size: 20),
                         label: Text(
                           'Add Money',

@@ -163,7 +163,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen>
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
-                    onPressed: () {},
+                    onPressed: () => Navigator.of(context).pushNamed('/forgot-password'),
                     child: Text(
                       'Forgot Password?',
                       style: GoogleFonts.inter(

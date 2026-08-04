@@ -382,7 +382,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                   ),
                                   child: IconButton(
                                     icon: const Icon(Icons.chat_bubble_outline_rounded, color: Color(0xFF1A1C1E), size: 20),
-                                    onPressed: () {},
+                                    onPressed: () => Navigator.of(context).pushNamed('/help'),
                                   ),
                                 ),
                                 const SizedBox(width: 10),
@@ -395,7 +395,11 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                   ),
                                   child: IconButton(
                                     icon: const Icon(Icons.call_rounded, color: Colors.white, size: 20),
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text('Calling delivery partner Alex M...')),
+                                      );
+                                    },
                                   ),
                                 ),
                               ],

@@ -82,7 +82,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.shopping_basket_outlined, color: Color(0xFF006B23)),
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).pushNamed('/cart'),
           ),
         ],
       ),
@@ -188,7 +188,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                             const SizedBox(width: 8),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: () => Navigator.of(context).pushNamed('/saved-addresses'),
                               child: Text(
                                 'CHANGE',
                                 style: GoogleFonts.outfit(

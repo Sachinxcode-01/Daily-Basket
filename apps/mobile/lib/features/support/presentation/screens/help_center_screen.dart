@@ -287,7 +287,11 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                           child: SizedBox(
                             height: 44,
                             child: ElevatedButton.icon(
-                              onPressed: () {},
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Connecting to 24/7 Live Support Chat...')),
+                                );
+                              },
                               icon: const Icon(Icons.chat_bubble_outline_rounded,
                                   size: 18),
                               label: const Text('Live Chat'),
@@ -305,7 +309,11 @@ class _HelpCenterScreenState extends State<HelpCenterScreen> {
                           child: SizedBox(
                             height: 44,
                             child: TextButton.icon(
-                              onPressed: () {},
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Dialing Support Helpline: 1800-123-4567...')),
+                                );
+                              },
                               icon: const Icon(Icons.phone_outlined, size: 18),
                               label: const Text('Call Us'),
                               style: TextButton.styleFrom(

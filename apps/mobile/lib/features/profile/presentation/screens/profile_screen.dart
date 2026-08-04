@@ -34,7 +34,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () => Scaffold.of(context).openDrawer(),
                           icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
                         ),
                         Text(
@@ -46,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () => Navigator.of(context).pushNamed('/cart'),
                           icon: const Icon(Icons.shopping_basket_outlined, color: Color(0xFF006B23), size: 24),
                         ),
                       ],
@@ -231,6 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
                               ],
                             ),
+                            onTap: () => Navigator.of(context).pushNamed('/app-theme'),
                           ),
                         ],
                       ),
@@ -260,19 +261,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           _buildSettingTile(
                             icon: Icons.help_outline_rounded,
                             title: 'Help Center',
-                            trailing: const Icon(Icons.help_outline_rounded, color: Color(0xFF1A1C1E), size: 20),
+                            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
+                            onTap: () => Navigator.of(context).pushNamed('/help'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.description_outlined,
                             title: 'Terms of Service',
-                            trailing: const Icon(Icons.description_outlined, color: Color(0xFF1A1C1E), size: 20),
+                            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
+                            onTap: () => Navigator.of(context).pushNamed('/terms-of-service'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.shield_outlined,
                             title: 'Privacy Policy',
-                            trailing: const Icon(Icons.shield_outlined, color: Color(0xFF1A1C1E), size: 20),
+                            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
+                            onTap: () => Navigator.of(context).pushNamed('/privacy-policy'),
                           ),
                         ],
                       ),
@@ -372,33 +376,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required IconData icon,
     required String title,
     required Widget trailing,
+    VoidCallback? onTap,
   }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: const BoxDecoration(
-              color: Color(0xFFE8F5E9),
-              shape: BoxShape.circle,
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: const BoxDecoration(
+                color: Color(0xFFE8F5E9),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: const Color(0xFF006B23), size: 20),
             ),
-            child: Icon(icon, color: const Color(0xFF006B23), size: 20),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Text(
-              title,
-              style: GoogleFonts.outfit(
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                color: const Color(0xFF1A1C1E),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
+                title,
+                style: GoogleFonts.outfit(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF1A1C1E),
+                ),
               ),
             ),
-          ),
-          trailing,
-        ],
+            trailing,
+          ],
+        ),
       ),
     );
   }

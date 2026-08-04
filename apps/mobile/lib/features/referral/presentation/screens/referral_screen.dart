@@ -53,7 +53,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () => Scaffold.of(context).openDrawer(),
                           icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
                         ),
                         Text(
@@ -166,7 +166,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                             width: double.infinity,
                             height: 44,
                             child: OutlinedButton(
-                              onPressed: () {},
+                              onPressed: () => Navigator.of(context).pushNamed('/terms-of-service'),
                               style: OutlinedButton.styleFrom(
                                 backgroundColor: Colors.white,
                                 foregroundColor: const Color(0xFF1A1C1E),
@@ -430,7 +430,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                           const SizedBox(height: 14),
 
                           GestureDetector(
-                            onTap: () {},
+                            onTap: () => Navigator.of(context).pushNamed('/loyalty'),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [

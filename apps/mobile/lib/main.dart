@@ -42,6 +42,9 @@ import 'features/profile/presentation/screens/add_address_screen.dart';
 
 // Feature & Value-Add Screens
 import 'features/support/presentation/screens/help_center_screen.dart';
+import 'features/support/presentation/screens/privacy_policy_screen.dart';
+import 'features/support/presentation/screens/terms_of_service_screen.dart';
+import 'features/settings/presentation/screens/app_theme_screen.dart';
 import 'features/notifications/presentation/screens/notification_center_screen.dart';
 import 'features/wallet/presentation/screens/wallet_transactions_screen.dart';
 import 'features/membership/presentation/screens/daily_basket_plus_screen.dart';
@@ -111,6 +114,9 @@ class DailyBasketApp extends StatelessWidget {
         '/saved-addresses': (context) => const SavedAddressesScreen(),
         '/add-address': (context) => const AddAddressScreen(),
         '/help': (context) => const HelpCenterScreen(),
+        '/privacy-policy': (context) => const PrivacyPolicyScreen(),
+        '/terms-of-service': (context) => const TermsOfServiceScreen(),
+        '/app-theme': (context) => const AppThemeScreen(),
         '/notifications': (context) => const NotificationCenterScreen(),
         '/wallet': (context) => const WalletTransactionsScreen(),
         '/loyalty': (context) => const DailyBasketPlusScreen(),

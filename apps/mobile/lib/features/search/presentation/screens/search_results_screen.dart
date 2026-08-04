@@ -115,7 +115,34 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
               Icons.tune_rounded,
               color: AppColors.primary,
             ),
-            onPressed: () {},
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                ),
+                builder: (ctx) => Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Filter Results', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 8,
+                        children: [
+                          ChoiceChip(label: const Text('All'), selected: true, onSelected: (_) {}),
+                          ChoiceChip(label: const Text('Organic'), selected: false, onSelected: (_) {}),
+                          ChoiceChip(label: const Text('10-Min Fast'), selected: false, onSelected: (_) {}),
+                          ChoiceChip(label: const Text('Best Discount'), selected: false, onSelected: (_) {}),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),

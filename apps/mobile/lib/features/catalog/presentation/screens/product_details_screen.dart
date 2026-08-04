@@ -128,7 +128,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 ),
                                 const SizedBox(width: 10),
                                 GestureDetector(
-                                  onTap: () {},
+                                  onTap: () {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Product link copied to clipboard!')),
+                                    );
+                                  },
                                   child: Container(
                                     width: 42,
                                     height: 42,

@@ -49,7 +49,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined, color: Color(0xFF1A1C1E)),
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).pushNamed('/app-theme'),
           ),
         ],
       ),

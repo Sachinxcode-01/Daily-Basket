@@ -103,7 +103,7 @@ class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.help_outline_rounded, color: Color(0xFF1A1C1E)),
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).pushNamed('/help'),
           ),
         ],
       ),

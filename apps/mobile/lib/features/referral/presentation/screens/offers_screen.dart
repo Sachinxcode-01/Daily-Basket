@@ -97,7 +97,7 @@ class _OffersScreenState extends State<OffersScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          onPressed: () {},
+                          onPressed: () => Scaffold.of(context).openDrawer(),
                           icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
                         ),
                         Text(
@@ -112,7 +112,7 @@ class _OffersScreenState extends State<OffersScreen> {
                           clipBehavior: Clip.none,
                           children: [
                             IconButton(
-                              onPressed: () {},
+                              onPressed: () => Navigator.of(context).pushNamed('/cart'),
                               icon: const Icon(Icons.shopping_cart_outlined, color: Color(0xFF006B23), size: 24),
                             ),
                             Positioned(
@@ -189,7 +189,7 @@ class _OffersScreenState extends State<OffersScreen> {
                           ),
                         ),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () => Navigator.of(context).pushNamed('/categories'),
                           child: Text(
                             'View All',
                             style: GoogleFonts.inter(

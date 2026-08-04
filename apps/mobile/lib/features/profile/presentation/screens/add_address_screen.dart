@@ -146,7 +146,11 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                               ),
                             ),
                             TextButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Detecting current GPS location...')),
+                                );
+                              },
                               style: TextButton.styleFrom(padding: EdgeInsets.zero),
                               child: Text(
                                 'Change',
