@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 
 interface HeaderNavBarProps {
@@ -35,7 +36,7 @@ export default function HeaderNavBar({ cartCount = 0, onSearch }: HeaderNavBarPr
         <div className="flex items-center gap-4">
           <Link href="/" className="flex items-center gap-2.5 hover:opacity-95 transition-opacity">
             <div className="w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/30 flex items-center justify-center p-1 shadow-level-1">
-              <img src="/images/daily_basket_logo.png" alt="Daily Basket Logo" className="w-full h-full object-contain" />
+              <Image src="/images/daily_basket_logo.png" alt="Daily Basket Logo" width={32} height={32} className="w-full h-full object-contain" />
             </div>
             <span className="font-title-md text-xl font-extrabold text-primary hidden sm:inline-block" style={{ fontFamily: 'Outfit' }}>
               Daily Basket
