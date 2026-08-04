@@ -683,16 +683,19 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                     // Image + Tag
                                     Stack(
                                       children: [
-                                        AppNetworkImage(
-                                          imageUrl: item['image'] as String,
-                                          width: double.infinity,
-                                          height: 110,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
+                                         AppNetworkImage(
+                                           imageUrl: item['image'] as String,
+                                           width: double.infinity,
+                                           height: 110,
+                                           borderRadius:
+                                               BorderRadius.circular(12),
+                                           fallbackIcon:
+                                               Icons.shopping_basket_rounded,
+                                           fallbackBgColor:
+                                               const Color(0xFFF3F3F6),
+                                           fallbackIconColor:
+                                               AppColors.primary,
+                                         ),
                                         if (item.containsKey('tag'))
                                           Positioned(
                                             top: 6,

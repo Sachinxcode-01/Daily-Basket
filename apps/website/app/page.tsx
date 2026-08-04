@@ -141,40 +141,44 @@ export default function HomePage() {
         {/* ─── Hero Section ────────────────────────────────────────────────── */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Main 3D Hero Banner */}
-          <div className="lg:col-span-8 bg-primary text-on-primary rounded-3xl p-8 sm:p-10 shadow-level-2 relative overflow-hidden flex flex-col sm:flex-row items-center justify-between gap-6">
-            <div className="space-y-4 max-w-md text-center sm:text-left z-10">
-              <span className="inline-block px-3.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider text-white">
-                🥬 Farm Fresh Produce & Kirana
+          {/* Main Hero Card with full-card background image */}
+          <div className="lg:col-span-8 rounded-3xl p-8 sm:p-10 shadow-level-2 relative overflow-hidden min-h-[340px] flex items-center">
+            
+            {/* Full Card Background Image */}
+            <img
+              src="/illustrations/web_hero_banner_3d.png"
+              alt="Fresh Produce Background"
+              className="absolute inset-0 w-full h-full object-cover object-right z-0 transform hover:scale-105 transition-transform duration-700"
+            />
+
+            {/* Dark Green Gradient Overlay for crisp text contrast */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#006b23] via-[#006b23]/90 sm:via-[#006b23]/80 to-[#006b23]/40 sm:to-transparent z-0" />
+
+            {/* Hero Card Content */}
+            <div className="space-y-4 max-w-lg text-center sm:text-left z-10 relative">
+              <span className="inline-block px-3.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider text-white shadow-sm border border-white/20">
+                🥬 FARM FRESH PRODUCE & KIRANA
               </span>
-              <h1 className="text-3xl sm:text-5xl font-extrabold font-outfit leading-tight">
-                Delivered in <span className="text-secondary-container">10 Mins</span>
+              <h1 className="text-3xl sm:text-5xl font-extrabold font-outfit leading-tight text-white drop-shadow-sm">
+                Delivered in <span className="text-emerald-300">10 Mins</span>
               </h1>
-              <p className="text-white/90 text-xs sm:text-sm font-inter">
+              <p className="text-white/95 text-xs sm:text-sm font-inter leading-relaxed max-w-md drop-shadow-sm">
                 Directly harvested from local organic farms to your doorstep. Unbeatable prices & 100% fresh guarantee.
               </p>
               <div className="pt-2 flex flex-wrap gap-3 justify-center sm:justify-start">
                 <button
                   onClick={() => setSelectedCategory('Dairy')}
-                  className="bg-surface-container-lowest text-primary font-bold text-xs px-6 py-3 rounded-full hover:bg-surface-container-low transition-all shadow-level-1 active:scale-95"
+                  className="bg-white text-[#006b23] font-bold text-xs px-6 py-3 rounded-full hover:bg-emerald-50 transition-all shadow-lg active:scale-95"
                 >
                   Shop Fresh Milk & Dairy
                 </button>
                 <Link
                   href="/freshness"
-                  className="bg-white/10 hover:bg-white/20 text-white font-medium text-xs px-5 py-3 rounded-full transition-all border border-white/20"
+                  className="bg-black/30 hover:bg-black/40 backdrop-blur-md text-white font-medium text-xs px-5 py-3 rounded-full transition-all border border-white/30 shadow-md"
                 >
                   Trace Harvest Origin →
                 </Link>
               </div>
-            </div>
-
-            <div className="w-full sm:w-1/2 h-60 sm:h-72 relative flex items-center justify-center">
-              <img
-                src="/illustrations/web_hero_banner_3d.png"
-                alt="3D Fresh Produce Banner"
-                className="w-full h-full object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500"
-              />
             </div>
           </div>
 

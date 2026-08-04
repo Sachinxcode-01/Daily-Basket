@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
 
+import 'package:provider/provider.dart';
+import 'features/referral/providers/coupon_provider.dart';
+
 // Authentication Screens
 import 'features/auth/presentation/screens/splash_screen.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
@@ -62,7 +65,14 @@ import 'features/settings/presentation/screens/delete_account_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const DailyBasketApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => CouponProvider()),
+      ],
+      child: const DailyBasketApp(),
+    ),
+  );
 }
 
 class DailyBasketApp extends StatelessWidget {

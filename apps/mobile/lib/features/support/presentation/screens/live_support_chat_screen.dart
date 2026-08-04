@@ -599,11 +599,14 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen> {
                                       const Icon(Icons.two_wheeler_rounded,
                                           size: 16, color: AppColors.primary),
                                       const SizedBox(width: 6),
-                                      Text(
-                                        'Rider: ${data['riderName']} (${data['location']})',
-                                        style: GoogleFonts.inter(
-                                            fontSize: 12,
-                                            color: AppColors.onSurfaceVariant),
+                                      Expanded(
+                                        child: Text(
+                                          'Rider: ${data['riderName']} (${data['location']})',
+                                          overflow: TextOverflow.ellipsis,
+                                          style: GoogleFonts.inter(
+                                              fontSize: 12,
+                                              color: AppColors.onSurfaceVariant),
+                                        ),
                                       ),
                                     ],
                                   ),

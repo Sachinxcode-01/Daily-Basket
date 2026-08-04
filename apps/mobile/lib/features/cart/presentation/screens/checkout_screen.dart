@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../referral/providers/coupon_provider.dart';
 import 'payment_screen.dart';
 
 /// Checkout Summary / Confirm Order Screen — Google Stitch Design System Exact Replica
@@ -55,13 +57,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   double get _itemTotal => _basketItems.fold(
       0.0, (sum, item) => sum + ((item['price'] as double) * (item['qty'] as int)));
 
-  final double _deliveryFee = 1.99;
+  final double _baseDeliveryFee = 1.99;
   final double _taxes = 0.85;
-
-  double get _grandTotal => _itemTotal + _deliveryFee + _taxes;
 
   @override
   Widget build(BuildContext context) {
+    final couponProvider = context.watch<CouponProvider>();
+    final double discount = couponProvider.calculateDiscount(_itemTotal);
+    final double deliveryFee = couponProvider.calculateDeliveryFee(_baseDeliveryFee, _itemTotal);
+    final double grandTotal = (_itemTotal - discount + deliveryFee + _taxes).clamp(0.0, double.infinity);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       appBar: AppBar(
@@ -398,7 +403,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ],
                           ),
                           Text(
-                            '\$${_deliveryFee.toStringAsFixed(2)}',
+                            deliveryFee == 0 ? '\$0.00 (FREE)' : '\$${deliveryFee.toStringAsFixed(2)}',
                             style: GoogleFonts.inter(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -409,6 +414,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                       const SizedBox(height: 10),
                       _buildBillRow('Taxes & Charges', '\$${_taxes.toStringAsFixed(2)}'),
+                      if (discount > 0) ...[
+                        const SizedBox(height: 10),
+                        _buildBillRow(
+                          'Coupon Discount (${couponProvider.appliedCoupon!.code})',
+                          '-\$${discount.toStringAsFixed(2)}',
+                          isDiscount: true,
+                        ),
+                      ],
                       const Divider(color: Color(0xFFEEEEF0), height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -422,7 +435,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ),
                           Text(
-                            '\$${_grandTotal.toStringAsFixed(2)}',
+                            '\$${grandTotal.toStringAsFixed(2)}',
                             style: GoogleFonts.outfit(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
@@ -433,30 +446,83 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Apply Promo Code Box
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF3FBF4),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFFC0E8C7)),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.local_offer_outlined, color: Color(0xFF006B23), size: 18),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Text(
-                                'Apply Promo Code',
-                                style: GoogleFonts.inter(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF006B23),
+                      // Apply Promo Code Box / Active Coupon Tile
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pushNamed('/coupons'),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: couponProvider.appliedCoupon != null
+                                ? const Color(0xFFE8F5E9)
+                                : const Color(0xFFF3FBF4),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: couponProvider.appliedCoupon != null
+                                  ? const Color(0xFF006B23)
+                                  : const Color(0xFFC0E8C7),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                couponProvider.appliedCoupon != null
+                                    ? Icons.check_circle_rounded
+                                    : Icons.local_offer_outlined,
+                                color: const Color(0xFF006B23),
+                                size: 18,
+                              ),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      couponProvider.appliedCoupon != null
+                                          ? 'Coupon "${couponProvider.appliedCoupon!.code}" Active'
+                                          : 'Apply Promo Code / View Coupons',
+                                      style: GoogleFonts.inter(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                        color: const Color(0xFF006B23),
+                                      ),
+                                    ),
+                                    if (couponProvider.appliedCoupon != null && discount > 0)
+                                      Text(
+                                        'Saving \$${discount.toStringAsFixed(2)} on this order',
+                                        style: GoogleFonts.inter(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w600,
+                                          color: const Color(0xFF006B23),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
-                            ),
-                            const Icon(Icons.chevron_right_rounded, color: Color(0xFF006B23), size: 18),
-                          ],
+                              if (couponProvider.appliedCoupon != null)
+                                GestureDetector(
+                                  onTap: () {
+                                    couponProvider.removeCoupon();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('Coupon Removed'),
+                                        backgroundColor: Color(0xFF006B23),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  },
+                                  child: Text(
+                                    'REMOVE',
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFFD32F2F),
+                                    ),
+                                  ),
+                                )
+                              else
+                                const Icon(Icons.chevron_right_rounded, color: Color(0xFF006B23), size: 18),
+                            ],
+                          ),
                         ),
                       ),
                     ],
