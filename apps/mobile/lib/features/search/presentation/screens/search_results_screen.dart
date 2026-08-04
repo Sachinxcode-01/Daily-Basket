@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_network_image.dart';
 
 /// Search Results Screen — Exact Google Stitch Specification
 /// Matches:
@@ -682,27 +683,10 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                     // Image + Tag
                                     Stack(
                                       children: [
-                                        Container(
+                                        AppNetworkImage(
+                                          imageUrl: item['image'] as String,
                                           width: double.infinity,
                                           height: 110,
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFFF9F9FC),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                            child: Image.network(
-                                              item['image'],
-                                              fit: BoxFit.cover,
-                                              errorBuilder: (context, error, stackTrace) => Container(
-                                                color: const Color(0xFFF3F3F6),
-                                                child: const Center(
-                                                  child: Icon(
-                                                    Icons.shopping_basket_rounded,
-                                                    color: AppColors.primary,
-                                                    size: 28,
                                                   ),
                                                 ),
                                               ),

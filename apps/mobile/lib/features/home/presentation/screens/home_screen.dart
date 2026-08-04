@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../../core/widgets/app_network_image.dart';
 import '../../../categories/presentation/screens/browse_categories_screen.dart';
 import '../../../search/presentation/screens/search_results_screen.dart';
 import '../../../cart/presentation/screens/cart_screen.dart';
@@ -340,6 +341,31 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         }).toList()),
       );
 
+  IconData _getCategoryIcon(String category) {
+    switch (category) {
+      case 'Dairy':
+        return Icons.egg_alt_rounded;
+      case 'Beverages':
+        return Icons.local_drink_rounded;
+      case 'Confectionery':
+        return Icons.cookie_rounded;
+      case 'Personal Care':
+        return Icons.clean_hands_rounded;
+      case 'Household':
+        return Icons.soap_rounded;
+      case 'Staples':
+        return Icons.grain_rounded;
+      case 'Oil':
+        return Icons.oil_barrel_rounded;
+      case 'Spices':
+        return Icons.local_fire_department_rounded;
+      case 'Stationery':
+        return Icons.edit_rounded;
+      default:
+        return Icons.shopping_basket_rounded;
+    }
+  }
+
   Widget _buildCard(_Product p) {
     final qty = _cart[p.id] ?? 0;
     return Container(
@@ -354,10 +380,13 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           child: AspectRatio(
             aspectRatio: 1.3,
-            child: Image.network(
-              p.imageUrl, fit: BoxFit.cover,
-              loadingBuilder: (_, child, prog) => prog == null ? child : Container(color: const Color(0xFFF3F3F6), child: const Center(child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF006B23)))),
-              errorBuilder: (_, __, ___) => Container(color: const Color(0xFFF3F3F6), child: const Icon(Icons.image_not_supported_outlined, color: Color(0xFFBECAB9), size: 32)),
+            child: AppNetworkImage(
+              imageUrl: p.imageUrl,
+              fit: BoxFit.cover,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              fallbackIcon: _getCategoryIcon(p.category),
+              fallbackBgColor: const Color(0xFFF3F3F6),
+              fallbackIconColor: const Color(0xFF006B23),
             ),
           ),
         ),
