@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sustainability Impact - Daily Basket</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f9f9fc",
+                        "on-surface-variant": "#3f4a3d",
+                        "primary-fixed": "#8cfa93",
+                        "tertiary": "#5a5c5c",
+                        "surface-variant": "#e2e2e5",
+                        "primary": "#006b23",
+                        "on-background": "#1a1c1e",
+                        "surface-tint": "#006e25",
+                        "secondary-fixed": "#dce5dd",
+                        "tertiary-container": "#737575",
+                        "secondary-container": "#dce5dd",
+                        "on-primary-fixed-variant": "#00531a",
+                        "background": "#f9f9fc",
+                        "surface-container": "#eeeef0",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container-low": "#f3f3f6",
+                        "on-surface": "#1a1c1e",
+                        "on-primary-fixed": "#002106",
+                        "inverse-surface": "#2f3133",
+                        "on-tertiary-container": "#fcfcfc",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#151d19",
+                        "surface-container-high": "#e8e8ea",
+                        "on-secondary-container": "#5e6660",
+                        "tertiary-fixed": "#e2e2e2",
+                        "secondary-fixed-dim": "#c0c9c1",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "primary-fixed-dim": "#70dd7a",
+                        "inverse-primary": "#70dd7a",
+                        "secondary": "#58605a",
+                        "outline-variant": "#becab9",
+                        "on-primary-container": "#f7fff2",
+                        "inverse-on-surface": "#f0f0f3",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#404943",
+                        "outline": "#6e7a6c",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f9f9fc",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "primary-container": "#078730",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dadadc",
+                        "surface-container-highest": "#e2e2e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Outfit", "sans-serif"],
+                        "display": ["Outfit", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6, .font-display, .font-headline { font-family: 'Outfit', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .icon-filled { font-variation-settings: 'FILL' 1; }
+        
+        /* Subtle progress bar animation */
+        @keyframes fillProgress {
+            from { width: 0; }
+            to { width: var(--target-width); }
+        }
+        .progress-bar-fill {
+            animation: fillProgress 1s ease-out forwards;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24 pt-16 antialiased">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl shadow-sm dark:shadow-none flex justify-between items-center px-4 py-3 w-full">
+<button class="p-2 text-primary dark:text-primary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full active:scale-95 duration-200">
+<span class="material-symbols-outlined">location_on</span>
+</button>
+<h1 class="font-display text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed-dim tracking-tight">Daily Basket</h1>
+<button class="p-2 text-primary dark:text-primary-fixed-dim hover:bg-secondary-container dark:hover:bg-secondary-fixed-variant transition-colors rounded-full active:scale-95 duration-200">
+<span class="material-symbols-outlined">search</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-7xl mx-auto px-4 md:px-12 mt-6">
+<!-- Hero Section -->
+<section class="mb-8">
+<div class="flex items-center gap-4 mb-2">
+<span class="material-symbols-outlined text-primary text-3xl icon-filled">eco</span>
+<h2 class="font-headline text-headline-lg text-on-surface">Your Impact</h2>
+</div>
+<p class="font-body text-body-lg text-on-surface-variant">Together, we are making quick-commerce sustainable. Here is your lifetime contribution.</p>
+</section>
+<!-- Bento Grid Dashboard -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+<!-- Hero Metric: Overall Score -->
+<div class="col-span-1 md:col-span-2 lg:col-span-3 bg-primary text-on-primary rounded-xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between shadow-[0px_4px_12px_rgba(0,107,35,0.15)] relative overflow-hidden">
+<div class="absolute -right-12 -top-12 opacity-10 pointer-events-none">
+<span class="material-symbols-outlined icon-filled" style="font-size: 200px;">public</span>
+</div>
+<div class="z-10 w-full md:w-2/3">
+<p class="font-label text-label-md uppercase tracking-wider text-primary-fixed-dim mb-2">Current Status</p>
+<h3 class="font-headline text-display-lg leading-tight mb-2">Earth Champion</h3>
+<p class="font-body text-body-lg text-on-primary/90">You are in the top 5% of eco-conscious shoppers in your area this month.</p>
+</div>
+<div class="z-10 mt-6 md:mt-0 flex flex-col items-center">
+<div class="w-32 h-32 rounded-full border-4 border-primary-fixed-dim flex items-center justify-center relative">
+<svg class="absolute inset-0 w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="none" r="45" stroke="rgba(255,255,255,0.2)" stroke-width="8"></circle>
+<circle class="transition-all duration-1000 ease-out" cx="50" cy="50" fill="none" r="45" stroke="#8cfa93" stroke-dasharray="283" stroke-dashoffset="40" stroke-width="8"></circle>
+</svg>
+<span class="font-headline text-3xl font-bold">1,240</span>
+</div>
+<span class="font-label text-sm mt-2 text-primary-fixed-dim">Impact Points</span>
+</div>
+</div>
+<!-- Metric 1: Plastic Saved -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-container flex flex-col justify-between">
+<div class="flex justify-between items-start mb-6">
+<div>
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary mb-3">
+<span class="material-symbols-outlined">recycling</span>
+</div>
+<h4 class="font-headline text-title-md text-on-surface">Plastic Saved</h4>
+</div>
+<span class="font-headline text-2xl font-semibold text-primary">4.2 kg</span>
+</div>
+<div>
+<div class="flex justify-between font-label text-label-md text-on-surface-variant mb-2">
+<span>Goal: 5.0 kg</span>
+<span>84%</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-3 overflow-hidden">
+<div class="bg-primary h-3 rounded-full progress-bar-fill" style="--target-width: 84%;"></div>
+</div>
+<p class="font-body text-body-sm text-on-surface-variant mt-3 text-sm">Equivalent to saving 210 plastic bottles from landfills.</p>
+</div>
+</div>
+<!-- Metric 2: CO2 Reduced -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-container flex flex-col justify-between">
+<div class="flex justify-between items-start mb-6">
+<div>
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-primary mb-3">
+<span class="material-symbols-outlined">electric_moped</span>
+</div>
+<h4 class="font-headline text-title-md text-on-surface">CO2 Reduced</h4>
+</div>
+<span class="font-headline text-2xl font-semibold text-primary">12.5 kg</span>
+</div>
+<div>
+<div class="flex justify-between font-label text-label-md text-on-surface-variant mb-2">
+<span>via Electric Delivery</span>
+<span>+12% this mo</span>
+</div>
+<div class="w-full bg-surface-variant rounded-full h-3 overflow-hidden">
+<div class="bg-primary h-3 rounded-full progress-bar-fill" style="--target-width: 100%;"></div>
+</div>
+<p class="font-body text-body-sm text-on-surface-variant mt-3 text-sm">Thanks to our 100% electric delivery fleet in your zone.</p>
+</div>
+</div>
+<!-- Metric 3: Local Farms Supported -->
+<div class="col-span-1 md:col-span-2 lg:col-span-1 bg-secondary-container rounded-xl p-0 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] overflow-hidden relative group">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+<div class="absolute inset-0 bg-cover bg-center w-full h-full transition-transform duration-700 group-hover:scale-105" data-alt="A bright, sunlit aerial view of a lush, vibrant green organic vegetable farm with neat rows of crops. The scene is shot in a modern, high-contrast, clean corporate style with deep greens and bright whites, evoking health, vitality, and professional agricultural quality." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC9LqHojrCsI2Z3RzxHnAdCcZHeAY_3k99zS3YdZpAjSGfZh__7SSdXER2SNgZwKjxRsTSzb7OoViFNwczcKwCq_A0xwfybs33xMzp7JFoomWPfGRoUWKLr3I6OpH_aKEb7HE8LUkX1txUOE3EGpZFmF1xOiCBfdM-dTqwILUcumCLv5dQ4jqdir39tE0zFZOOns42lLesIkGy14L5PshVX0IujVlllfwtzgaPElveksnq8o3LCksk4')"></div>
+<div class="relative z-20 h-full min-h-[240px] p-6 flex flex-col justify-end">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest/20 backdrop-blur-md flex items-center justify-center text-white mb-2">
+<span class="material-symbols-outlined">agriculture</span>
+</div>
+<h4 class="font-headline text-title-md text-white mb-1">Local Farms Supported</h4>
+<div class="flex items-baseline gap-2">
+<span class="font-headline text-3xl font-bold text-white">8</span>
+<span class="font-body text-body-sm text-white/80">farms within 50 miles</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl shadow-[0px_-4px_12px_rgba(0,0,0,0.08)] rounded-t-xl md:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:opacity-80 transition-opacity active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label text-label-md font-semibold mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:opacity-80 transition-opacity active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-label text-label-md font-semibold mt-1">Categories</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:opacity-80 transition-opacity active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+<span class="font-label text-label-md font-semibold mt-1">Orders</span>
+</a>
+<!-- Active State for Profile (where Impact usually lives) -->
+<a class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed text-on-primary-container dark:text-on-primary-fixed rounded-full px-5 py-1.5 hover:opacity-80 transition-opacity active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined icon-filled">person</span>
+<span class="font-label text-label-md font-semibold mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

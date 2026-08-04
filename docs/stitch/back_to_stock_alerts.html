@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Back to Stock Alerts - Daily Basket</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "surface": "#f9f9fc",
+                      "on-surface-variant": "#3f4a3d",
+                      "primary-fixed": "#8cfa93",
+                      "tertiary": "#5a5c5c",
+                      "surface-variant": "#e2e2e5",
+                      "primary": "#006b23",
+                      "on-background": "#1a1c1e",
+                      "surface-tint": "#006e25",
+                      "secondary-fixed": "#dce5dd",
+                      "tertiary-container": "#737575",
+                      "secondary-container": "#dce5dd",
+                      "on-primary-fixed-variant": "#00531a",
+                      "background": "#f9f9fc",
+                      "surface-container": "#eeeef0",
+                      "on-tertiary-fixed": "#1a1c1c",
+                      "surface-container-low": "#f3f3f6",
+                      "on-surface": "#1a1c1e",
+                      "on-primary-fixed": "#002106",
+                      "inverse-surface": "#2f3133",
+                      "on-tertiary-container": "#fcfcfc",
+                      "error": "#ba1a1a",
+                      "surface-container-lowest": "#ffffff",
+                      "on-secondary-fixed": "#151d19",
+                      "surface-container-high": "#e8e8ea",
+                      "on-secondary-container": "#5e6660",
+                      "tertiary-fixed": "#e2e2e2",
+                      "secondary-fixed-dim": "#c0c9c1",
+                      "on-error": "#ffffff",
+                      "on-tertiary-fixed-variant": "#454747",
+                      "primary-fixed-dim": "#70dd7a",
+                      "inverse-primary": "#70dd7a",
+                      "secondary": "#58605a",
+                      "outline-variant": "#becab9",
+                      "on-primary-container": "#f7fff2",
+                      "inverse-on-surface": "#f0f0f3",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed-variant": "#404943",
+                      "outline": "#6e7a6c",
+                      "on-error-container": "#93000a",
+                      "on-tertiary": "#ffffff",
+                      "surface-bright": "#f9f9fc",
+                      "tertiary-fixed-dim": "#c6c6c7",
+                      "primary-container": "#078730",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "surface-dim": "#dadadc",
+                      "surface-container-highest": "#e2e2e5"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.5rem",
+                      "sm": "0.25rem",
+                      "md": "0.75rem",
+                      "lg": "1rem",
+                      "xl": "1.5rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                  "unit": "4px",
+                  "xs": "4px",
+                  "sm": "8px",
+                  "md": "16px",
+                  "lg": "24px",
+                  "xl": "32px",
+                  "gutter": "16px",
+                  "margin-mobile": "16px",
+                  "margin-desktop": "48px"
+              },
+              "fontFamily": {
+                      "headline": [
+                              "Outfit", "sans-serif"
+                      ],
+                      "display": [
+                              "Outfit", "sans-serif"
+                      ],
+                      "body": [
+                              "Inter", "sans-serif"
+                      ],
+                      "label": [
+                              "Inter", "sans-serif"
+                      ]
+              }
+            }
+          }
+        }
+      </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9fc; color: #1a1c1e; }
+        h1, h2, h3, h4, h5, h6, .font-headline, .font-display { font-family: 'Outfit', sans-serif; }
+        
+        /* Custom Toggle Switch Styles */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #006b23;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #006b23;
+        }
+        .toggle-checkbox:checked + .toggle-label:after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+        .toggle-label {
+            width: 3rem;
+            height: 1.5rem;
+            background-color: #e2e2e5;
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .toggle-label:after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: white;
+            border-radius: 50%;
+            transition: transform 0.2s ease-in-out;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-24 md:pb-8 flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-sm">
+<div class="flex justify-between items-center px-4 py-3 w-full max-w-7xl mx-auto">
+<button aria-label="Back" class="p-2 rounded-full hover:bg-secondary-container transition-colors text-on-surface-variant flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<h1 class="font-display text-headline-lg-mobile font-bold text-primary">Daily Basket</h1>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</div>
+</header>
+<main class="flex-grow pt-20 px-4 max-w-3xl mx-auto w-full">
+<div class="mb-8 mt-4">
+<h2 class="font-headline text-title-md font-semibold text-on-surface mb-2">Back to Stock Alerts</h2>
+<p class="font-body text-body-sm text-on-surface-variant">Manage your notifications for items that are currently unavailable. We'll let you know as soon as they're back on the shelves.</p>
+</div>
+<!-- Global Settings Card -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] p-4 md:p-6 mb-8 border border-surface-container">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="font-headline text-body-lg font-semibold text-on-surface">Enable All Alerts</h3>
+<p class="font-body text-label-md text-on-surface-variant mt-1">Receive push notifications for all watched items.</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 opacity-0" id="global-toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer" for="global-toggle"></label>
+</div>
+</div>
+</section>
+<!-- Watched Items List -->
+<section>
+<h3 class="font-headline text-body-lg font-semibold text-on-surface mb-4 px-2">Currently Watching</h3>
+<div class="flex flex-col gap-4">
+<!-- Product Item 1 -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] p-4 flex gap-4 items-center border border-surface-container transition-all hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)]">
+<div class="w-20 h-20 rounded-lg bg-surface-container-low flex-shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="A close up studio shot of fresh organic avocados on a clean white background, vibrant green skin, bright even lighting, soft shadows, modern grocery app aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaAzHrhDdIQ5thd9ZdGTevTctHxZhsnvbb5t2ZKJJv3HbpsIhF-wiww6OdUM0H38IFn29jk1K9eAVp4uc-eJQbUoBu4LqS49fZUpP91gu3VXz9nudjnHQo_dEkxCZzpSausZAiw06FJLIof9nPxLgn3CGkcoLPzq2MlEAhfvbW8a7VfIrsotuGgNGygdjrjTthy2p_2XyOoOOr04rXUEL2IkFtqQ8b1acQscUzLfwJA24blOO-seAc"/>
+<div class="absolute inset-0 bg-black/10"></div>
+<div class="absolute bottom-1 left-1 bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-0.5 rounded-full">
+<span class="font-label text-[10px] font-semibold text-error">Out of Stock</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="font-headline text-body-lg font-semibold text-on-surface truncate">Organic Hass Avocados</h4>
+<p class="font-body text-body-sm text-on-surface-variant mb-1">Pack of 4</p>
+<p class="font-body text-label-md text-primary font-medium">$5.99</p>
+</div>
+<div class="flex-shrink-0 ml-2">
+<div class="relative inline-block w-12 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 opacity-0" id="toggle-1" name="toggle-1" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer" for="toggle-1"></label>
+</div>
+</div>
+</div>
+<!-- Product Item 2 -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] p-4 flex gap-4 items-center border border-surface-container transition-all hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)]">
+<div class="w-20 h-20 rounded-lg bg-surface-container-low flex-shrink-0 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="A clean, bright studio photo of artisanal sourdough bread loaf on a white surface, crusty texture, natural lighting, modern minimalist food photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAA2fPZeVh6uGJrr9tpReoxbMHmphWeW1lxlnWrEUgF2lNGyhYlipC0GZjU6ZGp2sa8Ki_CKnknTwmInafThSRpQZzf02k-d_1-nrIIBREvb8KjLDa_ow39VksAkuEXlVfs55V1xbYrBMCYMX9XLwpZ30ptfVR7xHU9v2mdbFy702_3BFl5AlQV232HZ4x2P4bYOYybuvPxPuG8OzSRx2rH8QSHuqIJxp1zAGVNAztsG-J6iovXs95f"/>
+<div class="absolute inset-0 bg-black/10"></div>
+<div class="absolute bottom-1 left-1 bg-surface-container-lowest/90 backdrop-blur-sm px-2 py-0.5 rounded-full">
+<span class="font-label text-[10px] font-semibold text-error">Out of Stock</span>
+</div>
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="font-headline text-body-lg font-semibold text-on-surface truncate">Artisan Sourdough Loaf</h4>
+<p class="font-body text-body-sm text-on-surface-variant mb-1">Freshly Baked, 500g</p>
+<p class="font-body text-label-md text-primary font-medium">$6.49</p>
+</div>
+<div class="flex-shrink-0 ml-2">
+<div class="relative inline-block w-12 align-middle select-none">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 opacity-0" id="toggle-2" name="toggle-2" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer" for="toggle-2"></label>
+</div>
+</div>
+</div>
+<!-- Product Item 3 -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] p-4 flex gap-4 items-center border border-surface-container transition-all hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)]">
+<div class="w-20 h-20 rounded-lg bg-surface-container-low flex-shrink-0 overflow-hidden relative opacity-75">
+<img class="w-full h-full object-cover grayscale-[20%]" data-alt="A carton of organic oat milk standing upright on a clean, bright white background, crisp modern lighting, minimalist presentation, high resolution." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBrV2pg19QQPqRQrmCbukcmmfpnSA5f3y2D1vDWl348PwN8bPeHtXkZEXjbU4wvxMrrXMhjV3LLWAK5IQE0qTwbfjjjKBIQKDpTNTSMWB6-9p2ZLb5wCjxWDQLQgNon3KJPb-mydzrpfcDWtO8PRWgLvK2u48vIrX4qeFSSNMmZERCuCXAtN2PVrGxiSnnQ4fALrUoSdpgycVydeC7WDoFBFN0TP1lIO0825fW7Ou52p5SYTEynSmfs"/>
+<div class="absolute inset-0 bg-black/10"></div>
+</div>
+<div class="flex-grow min-w-0">
+<h4 class="font-headline text-body-lg font-semibold text-on-surface truncate opacity-80">Oatly Barista Edition</h4>
+<p class="font-body text-body-sm text-on-surface-variant mb-1">1 Liter</p>
+<p class="font-body text-label-md text-on-surface-variant font-medium">$4.99</p>
+</div>
+<div class="flex-shrink-0 ml-2">
+<div class="relative inline-block w-12 align-middle select-none">
+<input class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 opacity-0" id="toggle-3" name="toggle-3" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer" for="toggle-3"></label>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="mt-12 mb-8">
+<h3 class="font-headline text-body-lg font-semibold text-on-surface mb-4 px-2">Recently Viewed (Out of Stock)</h3>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+<!-- Recent Item 1 -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] p-3 border border-surface-container flex flex-col relative group">
+<div class="w-full aspect-square rounded-lg bg-surface-container-low mb-3 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Fresh organic blueberries in a small clear plastic punnet on a pure white background, bright studio lighting, clean fresh aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0qrjbMrgDerNXC7qg1-waS75mPErDKeBJ1TrL-RpWLkRN3FpJiDhpZ5fU2HON3CJX2i4bMYMHyDxy4K0NPoOQsNt5J-TFN1udsMGeLHQXNz91PfcsrYRM64n1kAF40tsaGQBHxJOCxyL-9ajg40M8t0n0u8WS49IilauiaPEz052xrx5JDVX801wNP77TDhs9-Awowbi7Vk5krKxNmNyjfbQyZuMzNc_IUaCoMZ1O_pVfTQ_k0oyY"/>
+</div>
+<h4 class="font-headline text-body-sm font-semibold text-on-surface line-clamp-1">Organic Blueberries</h4>
+<p class="font-body text-label-md text-on-surface-variant mt-1">$4.50</p>
+<button class="mt-3 w-full py-2 rounded-md bg-secondary-container text-primary font-label text-label-md font-semibold flex items-center justify-center gap-1 hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 0;">notifications</span>
+                        Notify Me
+                    </button>
+</div>
+<!-- Recent Item 2 -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.04)] p-3 border border-surface-container flex flex-col relative group">
+<div class="w-full aspect-square rounded-lg bg-surface-container-low mb-3 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A bunch of fresh green kale leaves isolated on a bright white background, crisp details, natural looking lighting, healthy food concept." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrLt4XyPeT0vnaie9mHpInvoyAH2jBsYo2qlBpLO41blOhI2XJ5q35Yd57ajfwH53ov2DHARrDSGhRa8CEvk6QnuoS_KDUQA7LzNqTYvk9Aq9vM2PriziEMC2q4Vix-RRS51HJGIRnzGdk4TD9zxbrOZm2CYd8qk6pifjAdqRv7YPEm24looyxpwpX3-kKCyeoly1pbSiU-v9EeGlvYld7DVtCxvVKhCTSVOLV8kZLySofp9-OlT97"/>
+</div>
+<h4 class="font-headline text-body-sm font-semibold text-on-surface line-clamp-1">Fresh Organic Kale</h4>
+<p class="font-body text-label-md text-on-surface-variant mt-1">$2.99</p>
+<button class="mt-3 w-full py-2 rounded-md bg-secondary-container text-primary font-label text-label-md font-semibold flex items-center justify-center gap-1 hover:bg-primary hover:text-on-primary transition-colors">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 0;">notifications</span>
+                        Notify Me
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Hidden on desktop as per rules, using full nav if needed, but this is a deep screen, so bottom nav is suppressed based on the destination rule - wait, profile/settings could be top level, but 'Back to Stock' is a sub-page with a 'Back' button. So navigation shell should be suppressed entirely. I'll omit it to prioritize canvas.) -->
+<script>
+        // Simple script to handle global toggle
+        const globalToggle = document.getElementById('global-toggle');
+        const itemToggles = [document.getElementById('toggle-1'), document.getElementById('toggle-2'), document.getElementById('toggle-3')];
+
+        globalToggle.addEventListener('change', (e) => {
+            const isChecked = e.target.checked;
+            itemToggles.forEach(toggle => {
+                if(toggle) toggle.checked = isChecked;
+            });
+        });
+    </script>
+</body></html>

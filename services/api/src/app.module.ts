@@ -33,6 +33,10 @@ import { AiModule } from './modules/ai/ai.module';
 import { EmailModule } from './modules/email/email.module';
 import { UsersModule } from './modules/users/users.module';
 import { ReferralsModule } from './modules/referrals/referrals.module';
+import { ImpactModule } from './modules/impact/impact.module';
+import { SupportModule } from './modules/support/support.module';
+import { QuickBuyModule } from './modules/quick-buy/quick-buy.module';
+import { StockAlertsModule } from './modules/stock-alerts/stock-alerts.module';
 
 @Module({
   imports: [
@@ -63,6 +67,10 @@ import { ReferralsModule } from './modules/referrals/referrals.module';
     ReviewsModule,
     AiModule,
     EmailModule,
+    ImpactModule,
+    SupportModule,
+    QuickBuyModule,
+    StockAlertsModule,
   ],
   providers: [
     PrismaService,

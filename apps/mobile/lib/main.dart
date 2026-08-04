@@ -52,6 +52,10 @@ import 'features/referral/presentation/screens/offers_screen.dart';
 import 'features/referral/presentation/screens/referral_screen.dart';
 import 'features/referral/presentation/screens/referral_history_screen.dart';
 import 'features/membership/presentation/screens/daily_basket_plus_screen.dart';
+import 'features/profile/presentation/screens/my_impact_dashboard_screen.dart';
+import 'features/support/presentation/screens/live_support_chat_screen.dart';
+import 'features/catalog/presentation/screens/quick_buy_essentials_screen.dart';
+import 'features/notifications/presentation/screens/back_to_stock_alerts_screen.dart';
 import 'features/freshness/presentation/screens/fresh_produce_explorer_screen.dart';
 import 'features/support/presentation/screens/about_app_screen.dart';
 import 'features/settings/presentation/screens/delete_account_screen.dart';
@@ -133,6 +137,10 @@ class DailyBasketApp extends StatelessWidget {
         '/coupons': (context) => const OffersScreen(),
         '/referral': (context) => const ReferralScreen(),
         '/referral-history': (context) => const ReferralHistoryScreen(),
+        '/my-impact': (context) => const MyImpactDashboardScreen(),
+        '/live-chat': (context) => const LiveSupportChatScreen(),
+        '/quick-buy': (context) => const QuickBuyEssentialsScreen(),
+        '/back-to-stock': (context) => const BackToStockAlertsScreen(),
       },
     );
   }

@@ -74,6 +74,10 @@ model User {
   deliveries   Order[]     @relation("DeliveryPartnerOrders")
   wallet       Wallet?
   reviews      Review[]
+  impact       UserImpact?
+  badges       UserBadge[]
+  tickets      SupportTicket[]
+  stockAlerts  StockAlert[]
 
   @@map("users")
 }
@@ -145,6 +149,7 @@ model ProductVariant {
   isAvailable   Boolean     @default(true)
   inventories   Inventory[]
   orderItems    OrderItem[]
+  stockAlerts   StockAlert[]
 
   @@map("product_variants")
 }
@@ -267,3 +272,78 @@ model Review {
 
   @@map("reviews")
 }
+
+model UserImpact {
+  id               String   @id @default(uuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  impactPoints     Int      @default(0)
+  plasticSavedKg   Float    @default(0)
+  co2ReducedKg     Float    @default(0)
+  paperBagsSaved   Int      @default(0)
+  ecoDeliveries    Int      @default(0)
+  greenOrders      Int      @default(0)
+  monthlyProgress  Float    @default(0)
+  yearlyProgress   Float    @default(0)
+  treesEquivalent  Float    @default(0)
+  level            String   @default("Earth Champion")
+  updatedAt        DateTime @updatedAt
+
+  @@map("user_impacts")
+}
+
+model UserBadge {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  tier        String
+  iconName    String
+  earnedAt    DateTime @default(now())
+
+  @@map("user_badges")
+}
+
+model SupportTicket {
+  id        String        @id @default(uuid())
+  userId    String
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subject   String
+  status    String        @default("OPEN") // OPEN, IN_PROGRESS, CLOSED
+  rating    Int?
+  messages  ChatMessage[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+
+  @@map("support_tickets")
+}
+
+model ChatMessage {
+  id            String        @id @default(uuid())
+  ticketId      String
+  ticket        SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId      String
+  senderName    String
+  text          String
+  isAgent       Boolean       @default(false)
+  attachmentUrl String?
+  createdAt     DateTime      @default(now())
+
+  @@map("chat_messages")
+}
+
+model StockAlert {
+  id         String         @id @default(uuid())
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  variantId  String
+  variant    ProductVariant @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  isEnabled  Boolean        @default(true)
+  status     String         @default("OUT_OF_STOCK") // OUT_OF_STOCK, RESTOCKED
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+
+  @@unique([userId, variantId])
+  @@map("stock_alerts")
+}
+

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daily Basket - Quick Buy</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f9f9fc",
+                        "on-surface-variant": "#3f4a3d",
+                        "primary-fixed": "#8cfa93",
+                        "tertiary": "#5a5c5c",
+                        "surface-variant": "#e2e2e5",
+                        "primary": "#006b23",
+                        "on-background": "#1a1c1e",
+                        "surface-tint": "#006e25",
+                        "secondary-fixed": "#dce5dd",
+                        "tertiary-container": "#737575",
+                        "secondary-container": "#dce5dd",
+                        "on-primary-fixed-variant": "#00531a",
+                        "background": "#f9f9fc",
+                        "surface-container": "#eeeef0",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container-low": "#f3f3f6",
+                        "on-surface": "#1a1c1e",
+                        "on-primary-fixed": "#002106",
+                        "inverse-surface": "#2f3133",
+                        "on-tertiary-container": "#fcfcfc",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#151d19",
+                        "surface-container-high": "#e8e8ea",
+                        "on-secondary-container": "#5e6660",
+                        "tertiary-fixed": "#e2e2e2",
+                        "secondary-fixed-dim": "#c0c9c1",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "primary-fixed-dim": "#70dd7a",
+                        "inverse-primary": "#70dd7a",
+                        "secondary": "#58605a",
+                        "outline-variant": "#becab9",
+                        "on-primary-container": "#f7fff2",
+                        "inverse-on-surface": "#f0f0f3",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#404943",
+                        "outline": "#6e7a6c",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f9f9fc",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "primary-container": "#078730",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dadadc",
+                        "surface-container-highest": "#e2e2e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Outfit"],
+                        "display": ["Outfit"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, .font-display, .font-headline { font-family: 'Outfit', sans-serif; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased pt-16 pb-24 min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-sm flex justify-between items-center px-4 py-3">
+<button class="text-on-surface-variant hover:bg-secondary-container transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+</button>
+<h1 class="font-display text-headline-lg-mobile font-bold text-primary tracking-tight">Daily Basket</h1>
+<button class="text-on-surface-variant hover:bg-secondary-container transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow px-4 md:px-12 py-6 max-w-5xl mx-auto w-full flex flex-col gap-8">
+<!-- Greeting / Context -->
+<section class="flex flex-col gap-1">
+<h2 class="font-headline text-title-md font-semibold text-on-surface">Good Morning!</h2>
+<p class="font-body text-body-sm text-on-surface-variant">Your essentials are ready to restock.</p>
+</section>
+<!-- Quick Buy Widget (Bento Grid Layout) -->
+<section class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="font-headline text-title-md font-semibold text-on-surface">Buy Again</h3>
+<button class="font-label text-label-md text-primary font-semibold tracking-wide uppercase hover:opacity-80 transition-opacity">View All</button>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<!-- Hero Item (Spans 2 cols) -->
+<div class="col-span-2 flex items-center bg-surface-container-lowest rounded-[1rem] p-4 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-variant/40 relative overflow-hidden group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-shadow duration-300">
+<div class="w-24 h-24 rounded-lg overflow-hidden bg-surface-container flex-shrink-0 mr-4">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A high-quality, professional product photograph of a chilled bottle of fresh whole milk, adorned with crisp water condensation droplets. The bottle sits on a clean, pristine white marble surface under bright, natural daylight streaming from an unseen window. The aesthetic is clean, modern, and refreshing, emphasizing purity and high-end grocery standards. The lighting is soft but vibrant, perfectly suited for a premium quick-commerce app UI." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQV7MGlfXjEloqnC9vKeAvMguy6FVRXfJROSvjYFv1hIeoZJBXHD1bbtp5gK9rHzTiFd0gVL6nxsa80MvizAOwGDE1eyvD9YkpftZQBUbcC8ZEVgIUQZ5qM4WfQxSCtuzAN3apNbrr50LR5JSu-BoL1jJQN8LETwA1jDC1jrIdKJ6KtJf5tpQ6qliUFxzVWkOBgOlXG9E1Ts-xaeAc7Z1zF8CZKPZ5yj1pO_1seWJ0ekMxqnTFp5MO"/>
+</div>
+<div class="flex flex-col justify-between h-full flex-grow py-1">
+<div>
+<span class="inline-block px-2 py-0.5 bg-secondary-container text-on-secondary-container font-label text-[10px] uppercase font-bold rounded-full mb-1">Express</span>
+<h4 class="font-body text-body-lg font-semibold text-on-surface leading-tight">Fresh Whole Milk</h4>
+<p class="font-body text-body-sm text-on-surface-variant mt-0.5">1 Gallon</p>
+</div>
+<div class="flex items-center justify-between mt-2">
+<span class="font-headline text-title-md font-bold text-primary">$4.29</span>
+</div>
+</div>
+<!-- Quick Add FAB inside Card -->
+<button class="absolute bottom-4 right-4 w-10 h-10 bg-primary text-on-primary rounded-full flex items-center justify-center shadow-md hover:bg-surface-tint active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<!-- Secondary Item 1 -->
+<div class="col-span-1 flex flex-col bg-surface-container-lowest rounded-[1rem] p-4 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-variant/40 relative overflow-hidden group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-shadow duration-300">
+<div class="w-full aspect-square rounded-lg overflow-hidden bg-surface-container mb-3">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A warm, inviting, top-down product shot of an artisanal loaf of sliced sourdough bread resting on a subtle, minimalist light-wood cutting board. The scene is brightly lit with high-key lighting, casting soft, diffuse shadows. The crust looks perfectly baked with a golden-brown hue, contrasting beautifully against the bright, clean, organic aesthetic of a modern grocery delivery platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoWWmLD9NmA6UTDqeCcQHrWWHV7JXrnzNpIqVZI1AT99oUutkm0PByGctIch0NRYNmkH73bxH3E25f--7yLQwV7_s8vRnqIhgjewm8_6D8kbYGAisVEZk0iYe08BcARY2XT7jgmf6RQiu2MvzJAKCNLELVg0wz1XM-YmZQ17UB-HFmntblYqxP1Sv_2gK9qogG3A-xw9WTcjI5bKyT_mokWPoduxo1RwR06zJAC-Il01b5CnOvGnyv"/>
+</div>
+<div class="flex flex-col flex-grow">
+<h4 class="font-body text-body-sm font-semibold text-on-surface leading-tight mb-1">Artisan Sliced Bread</h4>
+<p class="font-body text-xs text-on-surface-variant mb-2">24 oz</p>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-headline text-body-lg font-bold text-primary">$3.49</span>
+</div>
+</div>
+<button class="absolute bottom-3 right-3 w-8 h-8 bg-secondary-container text-primary rounded-full flex items-center justify-center hover:bg-primary hover:text-on-primary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</button>
+</div>
+<!-- Secondary Item 2 -->
+<div class="col-span-1 flex flex-col bg-surface-container-lowest rounded-[1rem] p-4 shadow-[0px_2px_8px_rgba(0,0,0,0.04)] border border-surface-variant/40 relative overflow-hidden group hover:shadow-[0px_4px_12px_rgba(0,0,0,0.08)] transition-shadow duration-300">
+<div class="w-full aspect-square rounded-lg overflow-hidden bg-surface-container mb-3 relative">
+<span class="absolute top-2 left-2 px-2 py-0.5 bg-primary/10 text-primary font-label text-[10px] uppercase font-bold rounded-full z-10 backdrop-blur-sm">Organic</span>
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A crisp, macro-focused product image of a half-open cardboard carton containing premium organic brown eggs. The eggs are perfectly uniform, resting on a stark white, seamless background. The lighting is studio-quality, highlighting the natural texture of the eggshells and conveying a sense of farm-fresh quality. The overall composition is minimal, modern, and aligned with a high-end, healthy lifestyle brand identity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUVvworrEpyYkCLDBJSw_U_PiR7RUiH0rycprKgIKuKZxiERiT8z41fViS7DwJ2QUTRzkn_wiP-fJPCue2mzVnQus2of79OC2BDo8w4aky2Nu1kKRaSuAaWfLPkbK88cOjcoAJHEs00V0wr-I-k9wJs96QL43ibpktm9cv_vCPT_1wMHOBJ8OWTpTVXszZXZv-IOgZyL7P7-9kKxKItiCJFukf8tY2j68BmN3WY6K1J2MnQfbZ6-R9"/>
+</div>
+<div class="flex flex-col flex-grow">
+<h4 class="font-body text-body-sm font-semibold text-on-surface leading-tight mb-1">Free-Range Brown Eggs</h4>
+<p class="font-body text-xs text-on-surface-variant mb-2">12 ct</p>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-headline text-body-lg font-bold text-primary">$5.99</span>
+</div>
+</div>
+<button class="absolute bottom-3 right-3 w-8 h-8 bg-secondary-container text-primary rounded-full flex items-center justify-center hover:bg-primary hover:text-on-primary active:scale-90 transition-all duration-200">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface/80 backdrop-blur-xl shadow-[0px_-4px_12px_rgba(0,0,0,0.08)] rounded-t-xl md:hidden">
+<!-- Active: Home -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-5 py-1.5 hover:opacity-80 transition-opacity active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label text-label-md font-semibold mt-0.5">Home</span>
+</button>
+<!-- Inactive: Categories -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:opacity-80 transition-opacity active:scale-90 duration-200 px-3 py-1.5">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="font-label text-label-md font-semibold mt-0.5">Categories</span>
+</button>
+<!-- Inactive: Orders -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:opacity-80 transition-opacity active:scale-90 duration-200 px-3 py-1.5">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label text-label-md font-semibold mt-0.5">Orders</span>
+</button>
+<!-- Inactive: Profile -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:opacity-80 transition-opacity active:scale-90 duration-200 px-3 py-1.5">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label text-label-md font-semibold mt-0.5">Profile</span>
+</button>
+</nav>
+<script>
+        // Micro-interaction for Add buttons
+        document.querySelectorAll('button[class*="absolute bottom-"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const icon = this.querySelector('span');
+                if(icon.textContent === 'add') {
+                    // Temporarily show checkmark
+                    icon.textContent = 'check';
+                    this.classList.add('bg-primary-container', 'text-primary');
+                    if(this.classList.contains('bg-primary')) {
+                       this.classList.remove('bg-primary', 'text-on-primary');
+                    }
+                    setTimeout(() => {
+                        icon.textContent = 'add';
+                        this.classList.remove('bg-primary-container', 'text-primary');
+                        // Restore original classes based on size
+                        if(this.classList.contains('w-10')) {
+                            this.classList.add('bg-primary', 'text-on-primary');
+                        }
+                    }, 1000);
+                }
+            });
+        });
+    </script>
+</body></html>

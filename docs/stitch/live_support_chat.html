@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>In-App Live Support - Daily Basket</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Outfit:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected from requirement -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#f9f9fc",
+                        "on-surface-variant": "#3f4a3d",
+                        "primary-fixed": "#8cfa93",
+                        "tertiary": "#5a5c5c",
+                        "surface-variant": "#e2e2e5",
+                        "primary": "#006b23",
+                        "on-background": "#1a1c1e",
+                        "surface-tint": "#006e25",
+                        "secondary-fixed": "#dce5dd",
+                        "tertiary-container": "#737575",
+                        "secondary-container": "#dce5dd",
+                        "on-primary-fixed-variant": "#00531a",
+                        "background": "#f9f9fc",
+                        "surface-container": "#eeeef0",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container-low": "#f3f3f6",
+                        "on-surface": "#1a1c1e",
+                        "on-primary-fixed": "#002106",
+                        "inverse-surface": "#2f3133",
+                        "on-tertiary-container": "#fcfcfc",
+                        "error": "#ba1a1a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#151d19",
+                        "surface-container-high": "#e8e8ea",
+                        "on-secondary-container": "#5e6660",
+                        "tertiary-fixed": "#e2e2e2",
+                        "secondary-fixed-dim": "#c0c9c1",
+                        "on-error": "#ffffff",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "primary-fixed-dim": "#70dd7a",
+                        "inverse-primary": "#70dd7a",
+                        "secondary": "#58605a",
+                        "outline-variant": "#becab9",
+                        "on-primary-container": "#f7fff2",
+                        "inverse-on-surface": "#f0f0f3",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#404943",
+                        "outline": "#6e7a6c",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f9f9fc",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "primary-container": "#078730",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#dadadc",
+                        "surface-container-highest": "#e2e2e5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Outfit"],
+                        "display": ["Outfit"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Hide scrollbar for clean UI on quick replies */
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface antialiased h-screen flex flex-col md:items-center md:justify-center md:bg-surface-container-high overflow-hidden">
+<!-- Mobile Wrapper / Desktop Container -->
+<div class="flex flex-col h-full w-full max-w-[480px] bg-surface md:rounded-2xl md:shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative overflow-hidden">
+<!-- Focused Task Header (Replaces global TopAppBar for this context) -->
+<header class="flex items-center justify-between px-4 py-3 bg-surface/90 backdrop-blur-xl border-b border-outline-variant/30 z-20 shrink-0">
+<div class="flex items-center gap-3">
+<button aria-label="Go back" class="p-2 -ml-2 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex items-center gap-3">
+<div class="relative">
+<img class="w-10 h-10 rounded-full object-cover shadow-sm ring-1 ring-outline-variant/20" data-alt="A professional yet friendly female customer support agent in her late 20s, smiling warmly. She has bright, clear eyes and is wearing a neat, modern corporate uniform in soft mint colors. The background is a slightly blurred, bright, clean modern office setting with natural light, adhering to a crisp, high-key light mode aesthetic with subtle organic elements." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkTLkP8AwKfZZUNVI6A3ReNMR1yuWSWPeiC2Sl7j1wcuMyy3BeLNocghX_v6Y49NVSB7Ft3wMEKUxT8pvCXpFYS8yuQkYMi_cY56EVoqI505f_I1djf3EfAwfDSpjMAC53f6YvY3IkTwAX7A0VcrTlean6ZHgag_-ucD5B20txDonADMRh1kGJ4S_ETWyRnHszLHJSxw_DlgsK0upxccMHfL3iEMG61nubjGPApLMWPtgh8TGpe_JK"/>
+<span aria-label="Online status" class="absolute bottom-0 right-0 w-3 h-3 bg-primary rounded-full border-2 border-surface"></span>
+</div>
+<div>
+<h1 class="font-headline text-[16px] leading-tight font-semibold text-on-surface">Sarah J.</h1>
+<p class="font-label text-[12px] font-medium text-primary tracking-wide">Support Agent</p>
+</div>
+</div>
+</div>
+<button aria-label="More options" class="p-2 -mr-2 rounded-full text-on-surface-variant hover:bg-surface-container transition-colors focus:outline-none focus:ring-2 focus:ring-primary focus:ring-inset">
+<span class="material-symbols-outlined">more_vert</span>
+</button>
+</header>
+<!-- Chat Canvas area -->
+<main class="flex-1 overflow-y-auto p-4 flex flex-col gap-6 bg-surface-container-lowest" id="chat-container">
+<!-- Timestamp -->
+<div class="flex justify-center mt-2">
+<span class="font-label text-[11px] font-medium text-on-surface-variant bg-surface-container px-3 py-1 rounded-full shadow-sm">Today, 10:42 AM</span>
+</div>
+<!-- Agent Message -->
+<div class="flex gap-2 max-w-[85%] self-start items-end">
+<img class="w-6 h-6 rounded-full object-cover shadow-sm hidden sm:block mb-1" data-alt="A professional yet friendly female customer support agent in her late 20s, smiling warmly. She has bright, clear eyes and is wearing a neat, modern corporate uniform in soft mint colors. The background is a slightly blurred, bright, clean modern office setting with natural light, adhering to a crisp, high-key light mode aesthetic with subtle organic elements." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0mkDSZBfrERhBOlDIaFo9Tg3x5F8fsi7EFK8CaYdE-qrwmLF27fJu0hHAemuBgFuC2MpbnPIxSr-CwYllLhM8WKkkK5MutCTCoozi3eyONIT_rf3MKQ08gE5YKMiI31F4yzgxnyEvlks-M4rUM6FRypnWBaWs2J825DAXtE2_FSnAKFO_UM0t1uy4wYNMkGa0DZQ9nSHtKO1l1gLEncgVkUNz3SEB4MFv0P1OK3ASjLHX7XQUncmx"/>
+<div class="flex flex-col gap-1">
+<span class="font-label text-[11px] text-on-surface-variant ml-1">Sarah J.</span>
+<div class="bg-surface-container text-on-surface p-3.5 rounded-[16px] rounded-bl-[4px] shadow-[0px_2px_8px_rgba(0,0,0,0.04)] text-[14px] leading-relaxed">
+                        Hi there! Thanks for reaching out to Daily Basket support. How can I help make your day a little fresher?
+                    </div>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex flex-col gap-1 max-w-[85%] self-end items-end mt-2">
+<div class="bg-primary text-on-primary p-3.5 rounded-[16px] rounded-br-[4px] shadow-[0px_2px_8px_rgba(0,0,0,0.08)] text-[14px] leading-relaxed">
+                    Hi, I just received my order (#DB-9824) but there seems to be a problem.
+                </div>
+<div class="flex items-center gap-1 mr-1">
+<span class="font-label text-[10px] text-on-surface-variant">10:44 AM</span>
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">done_all</span>
+</div>
+</div>
+<!-- Agent Typing Indicator (Simulated) -->
+<div class="flex gap-2 max-w-[85%] self-start items-end mt-2">
+<div class="bg-surface-container p-3.5 rounded-[16px] rounded-bl-[4px] shadow-[0px_2px_8px_rgba(0,0,0,0.04)] flex gap-1 items-center h-10">
+<div class="w-1.5 h-1.5 bg-outline rounded-full animate-bounce" style="animation-delay: 0ms;"></div>
+<div class="w-1.5 h-1.5 bg-outline rounded-full animate-bounce" style="animation-delay: 150ms;"></div>
+<div class="w-1.5 h-1.5 bg-outline rounded-full animate-bounce" style="animation-delay: 300ms;"></div>
+</div>
+</div>
+<!-- Spacer to ensure content doesn't hide behind absolute input if necessary -->
+<div class="h-2 w-full shrink-0"></div>
+</main>
+<!-- Input & Quick Replies Area -->
+<footer class="bg-surface/95 backdrop-blur-lg border-t border-outline-variant/30 p-3 pt-4 flex flex-col gap-3 shrink-0 z-20 pb-safe">
+<!-- Quick Replies -->
+<div class="flex gap-2 overflow-x-auto scrollbar-hide px-1" id="quick-replies">
+<button class="quick-reply-btn whitespace-nowrap px-4 py-2 bg-surface border border-outline-variant/50 rounded-full font-label text-[13px] font-medium text-on-surface hover:bg-secondary-container hover:border-transparent transition-all active:scale-95">Missing item</button>
+<button class="quick-reply-btn whitespace-nowrap px-4 py-2 bg-surface border border-outline-variant/50 rounded-full font-label text-[13px] font-medium text-on-surface hover:bg-secondary-container hover:border-transparent transition-all active:scale-95">Delivery delay</button>
+<button class="quick-reply-btn whitespace-nowrap px-4 py-2 bg-surface border border-outline-variant/50 rounded-full font-label text-[13px] font-medium text-on-surface hover:bg-secondary-container hover:border-transparent transition-all active:scale-95">Damaged product</button>
+</div>
+<!-- Text Input -->
+<div class="flex items-end gap-2">
+<button aria-label="Add attachment" class="p-2.5 text-on-surface-variant hover:text-primary hover:bg-primary/5 rounded-full transition-colors mb-0.5 focus:outline-none">
+<span class="material-symbols-outlined text-[24px]">add_circle</span>
+</button>
+<div class="flex-1 relative bg-surface-container-lowest border border-outline-variant/60 rounded-[20px] focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all shadow-sm">
+<textarea class="w-full bg-transparent border-none rounded-[20px] py-3 pl-4 pr-12 text-[14px] text-on-surface placeholder:text-on-surface-variant/60 resize-none focus:ring-0 max-h-[120px]" id="chat-input" placeholder="Type a message..." rows="1" style="min-height: 44px;"></textarea>
+<button aria-label="Send message" class="absolute right-2 bottom-2 p-1.5 text-primary/50 hover:text-primary transition-colors rounded-full focus:outline-none">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+</div>
+</footer>
+</div>
+<script>
+        // Simple interaction for Quick Replies
+        document.addEventListener('DOMContentLoaded', () => {
+            const quickReplies = document.querySelectorAll('.quick-reply-btn');
+            const chatInput = document.getElementById('chat-input');
+            
+            quickReplies.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    chatInput.value = btn.textContent;
+                    // Auto-focus input after selecting a quick reply
+                    chatInput.focus();
+                    
+                    // Simple auto-resize logic for textarea
+                    chatInput.style.height = 'auto';
+                    chatInput.style.height = (chatInput.scrollHeight) + 'px';
+                });
+            });
+
+            // Textarea auto-resize
+            chatInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+                
+                // Toggle send button color based on input
+                const sendBtn = this.nextElementSibling;
+                if (this.value.trim().length > 0) {
+                    sendBtn.classList.remove('text-primary/50');
+                    sendBtn.classList.add('text-primary');
+                } else {
+                    sendBtn.classList.add('text-primary/50');
+                    sendBtn.classList.remove('text-primary');
+                }
+            });
+        });
+    </script>
+</body></html>

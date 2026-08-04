@@ -260,6 +260,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Column(
                         children: [
                           _buildSettingTile(
+                            icon: Icons.chat_bubble_outline_rounded,
+                            title: 'Live Agent Chat',
+                            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
+                            onTap: () => Navigator.of(context).pushNamed('/live-chat'),
+                          ),
+                          const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
+                          _buildSettingTile(
+                            icon: Icons.eco_outlined,
+                            title: 'My Sustainability Impact',
+                            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
+                            onTap: () => Navigator.of(context).pushNamed('/my-impact'),
+                          ),
+                          const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
+                          _buildSettingTile(
                             icon: Icons.help_outline_rounded,
                             title: 'Help Center',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
