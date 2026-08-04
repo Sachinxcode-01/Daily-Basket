@@ -1,6 +1,5 @@
 import { Module, MiddlewareConsumer, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-// @ts-ignore
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 
@@ -32,6 +31,7 @@ import { LoyaltyModule } from './modules/loyalty/loyalty.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { AiModule } from './modules/ai/ai.module';
 import { EmailModule } from './modules/email/email.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -46,6 +46,7 @@ import { EmailModule } from './modules/email/email.module';
     UploadsModule,
     NotificationsModule,
     AuthModule,
+    UsersModule,
     ProductsModule,
     OrdersModule,
     CategoriesModule,

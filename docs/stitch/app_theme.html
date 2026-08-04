@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>App Theme - Daily Basket</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#737575",
+                        "on-surface-variant": "#3f4a3d",
+                        "surface-variant": "#e2e2e5",
+                        "primary-fixed": "#8cfa93",
+                        "surface-container-high": "#e8e8ea",
+                        "background": "#f9f9fc",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#002106",
+                        "on-primary-fixed-variant": "#00531a",
+                        "on-primary": "#ffffff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#f0f0f3",
+                        "on-error": "#ffffff",
+                        "tertiary": "#5a5c5c",
+                        "secondary-container": "#dce5dd",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "on-background": "#1a1c1e",
+                        "on-primary-container": "#f7fff2",
+                        "outline": "#6e7a6c",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "surface-tint": "#006e25",
+                        "surface-container-low": "#f3f3f6",
+                        "surface": "#f9f9fc",
+                        "on-secondary-fixed-variant": "#404943",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#151d19",
+                        "surface-bright": "#f9f9fc",
+                        "secondary": "#58605a",
+                        "primary-container": "#078730",
+                        "outline-variant": "#becab9",
+                        "inverse-surface": "#2f3133",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-container-highest": "#e2e2e5",
+                        "surface-container": "#eeeef0",
+                        "on-surface": "#1a1c1e",
+                        "inverse-primary": "#70dd7a",
+                        "primary-fixed-dim": "#70dd7a",
+                        "secondary-fixed-dim": "#c0c9c1",
+                        "error-container": "#ffdad6",
+                        "primary": "#006b23",
+                        "on-tertiary-container": "#fcfcfc",
+                        "secondary-fixed": "#dce5dd",
+                        "surface-dim": "#dadadc",
+                        "on-secondary-container": "#5e6660"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "sm": "0.25rem",
+                        "md": "0.75rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Outfit", "sans-serif"],
+                        "display": ["Outfit", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        h1, h2, h3, h4, h5, h6, .font-headline {
+            font-family: 'Outfit', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-filled {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col md:flex-row pb-20 md:pb-0">
+<!-- TopAppBar - Subpage Context (Back Button) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-xl shadow-sm flex items-center justify-between px-4 h-16 w-full">
+<button class="w-10 h-10 flex items-center justify-center text-primary dark:text-primary-fixed hover:bg-surface-variant/50 rounded-full transition-colors">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="font-headline text-headline-lg-mobile font-semibold text-on-surface">App Theme</div>
+<div class="w-10"></div> <!-- Spacer for centering -->
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 mt-20 px-4 md:px-8 max-w-3xl mx-auto w-full">
+<div class="mb-8">
+<p class="font-body text-body-lg text-on-surface-variant">Customize your Daily Basket experience. Choose how you want the app to look.</p>
+</div>
+<div class="space-y-4">
+<!-- Option: System Default -->
+<label class="block cursor-pointer group">
+<div class="relative bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border-2 border-transparent hover:border-surface-variant transition-colors flex items-start gap-4">
+<input checked="" class="peer sr-only" name="app_theme" type="radio" value="system"/>
+<!-- Icon Preview Area -->
+<div class="w-16 h-16 rounded-lg bg-surface-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-primary text-3xl">settings_brightness</span>
+</div>
+<!-- Content -->
+<div class="flex-1 pt-1">
+<div class="flex items-center justify-between mb-1">
+<h3 class="font-headline text-title-md text-on-surface font-semibold">System Default</h3>
+<!-- Custom Radio Indicator -->
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-on-primary text-sm opacity-0 peer-checked:opacity-100 transition-opacity" style="font-size: 16px;">check</span>
+</div>
+</div>
+<p class="font-body text-body-sm text-on-surface-variant">Automatically matches your device's display settings.</p>
+</div>
+<!-- Selected State Outline (Absolute overlay) -->
+<div class="absolute inset-0 rounded-xl border-2 border-primary opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
+</div>
+</label>
+<!-- Option: Light Mode -->
+<label class="block cursor-pointer group">
+<div class="relative bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border-2 border-transparent hover:border-surface-variant transition-colors flex items-start gap-4">
+<input class="peer sr-only" name="app_theme" type="radio" value="light"/>
+<!-- Icon Preview Area (Simulated UI) -->
+<div class="w-16 h-16 rounded-lg bg-[#ffffff] border border-surface-variant flex flex-col p-2 gap-1 flex-shrink-0 shadow-sm relative overflow-hidden">
+<div class="h-2 w-full bg-[#f3f3f6] rounded-sm"></div>
+<div class="h-2 w-3/4 bg-[#f3f3f6] rounded-sm"></div>
+<div class="mt-auto h-4 w-4 bg-[#006b23] rounded-sm self-end"></div>
+<span class="material-symbols-outlined absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[#1a1c1e] text-2xl opacity-20">light_mode</span>
+</div>
+<!-- Content -->
+<div class="flex-1 pt-1">
+<div class="flex items-center justify-between mb-1">
+<h3 class="font-headline text-title-md text-on-surface font-semibold">Light Mode</h3>
+<!-- Custom Radio Indicator -->
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-on-primary text-sm opacity-0 peer-checked:opacity-100 transition-opacity" style="font-size: 16px;">check</span>
+</div>
+</div>
+<p class="font-body text-body-sm text-on-surface-variant">Clean, crisp, and bright. Perfect for daytime shopping.</p>
+</div>
+<!-- Selected State Outline -->
+<div class="absolute inset-0 rounded-xl border-2 border-primary opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
+</div>
+</label>
+<!-- Option: Dark Mode -->
+<label class="block cursor-pointer group">
+<div class="relative bg-surface-container-lowest rounded-xl p-4 md:p-6 shadow-[0_2px_8px_rgba(0,0,0,0.04)] border-2 border-transparent hover:border-surface-variant transition-colors flex items-start gap-4">
+<input class="peer sr-only" name="app_theme" type="radio" value="dark"/>
+<!-- Icon Preview Area (Simulated UI) -->
+<div class="w-16 h-16 rounded-lg bg-[#1a1c1e] flex flex-col p-2 gap-1 flex-shrink-0 shadow-sm relative overflow-hidden">
+<div class="h-2 w-full bg-[#2f3133] rounded-sm"></div>
+<div class="h-2 w-3/4 bg-[#2f3133] rounded-sm"></div>
+<div class="mt-auto h-4 w-4 bg-[#8cfa93] rounded-sm self-end"></div>
+<span class="material-symbols-outlined absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[#f9f9fc] text-2xl opacity-20">dark_mode</span>
+</div>
+<!-- Content -->
+<div class="flex-1 pt-1">
+<div class="flex items-center justify-between mb-1">
+<h3 class="font-headline text-title-md text-on-surface font-semibold">Dark Mode</h3>
+<!-- Custom Radio Indicator -->
+<div class="w-6 h-6 rounded-full border-2 border-outline-variant peer-checked:border-primary peer-checked:bg-primary flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-on-primary text-sm opacity-0 peer-checked:opacity-100 transition-opacity" style="font-size: 16px;">check</span>
+</div>
+</div>
+<p class="font-body text-body-sm text-on-surface-variant">Easy on the eyes in low light, with high-contrast elements.</p>
+</div>
+<!-- Selected State Outline -->
+<div class="absolute inset-0 rounded-xl border-2 border-primary opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity"></div>
+</div>
+</label>
+</div>
+</main>
+<!-- Navigation logic: Excluded BottomNavBar and Top Nav shell because this is a contextual/sub-page intent (Settings/Theme selection), focusing on the transaction of changing a setting. -->
+</body></html>

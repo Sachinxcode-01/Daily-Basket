@@ -49,6 +49,8 @@ import 'features/notifications/presentation/screens/notification_center_screen.d
 import 'features/wallet/presentation/screens/wallet_transactions_screen.dart';
 import 'features/membership/presentation/screens/daily_basket_plus_screen.dart';
 import 'features/freshness/presentation/screens/fresh_produce_explorer_screen.dart';
+import 'features/support/presentation/screens/about_app_screen.dart';
+import 'features/settings/presentation/screens/delete_account_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -121,6 +123,8 @@ class DailyBasketApp extends StatelessWidget {
         '/wallet': (context) => const WalletTransactionsScreen(),
         '/loyalty': (context) => const DailyBasketPlusScreen(),
         '/freshness': (context) => const FreshProduceExplorerScreen(),
+        '/about': (context) => const AboutAppScreen(),
+        '/delete-account': (context) => const DeleteAccountScreen(),
       },
     );
   }
