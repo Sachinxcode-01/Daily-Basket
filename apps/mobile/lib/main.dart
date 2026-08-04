@@ -15,18 +15,37 @@ import 'features/auth/presentation/screens/otp_screen.dart';
 import 'features/auth/presentation/screens/enable_biometrics_screen.dart';
 import 'features/auth/presentation/screens/account_locked_screen.dart';
 
-// Store & Customer Screens
+// Store, Customer & Catalog Screens
 import 'features/home/presentation/screens/home_screen.dart';
 import 'features/search/presentation/screens/search_results_screen.dart';
 import 'features/categories/presentation/screens/browse_categories_screen.dart';
-import 'features/support/presentation/screens/help_center_screen.dart';
+import 'features/catalog/presentation/screens/product_details_screen.dart';
+
+// Cart & Checkout Screens
+import 'features/cart/presentation/screens/cart_screen.dart';
+import 'features/cart/presentation/screens/checkout_screen.dart';
+import 'features/cart/presentation/screens/payment_screen.dart';
+import 'features/cart/presentation/screens/empty_basket_screen.dart';
+
+// Orders & Tracking Screens
+import 'features/orders/presentation/screens/order_history_screen.dart';
+import 'features/orders/presentation/screens/order_details_screen.dart';
+import 'features/orders/presentation/screens/order_success_screen.dart';
 import 'features/orders/presentation/screens/delivery_tracking_screen.dart';
 import 'features/orders/presentation/screens/rate_delivery_screen.dart';
+
+// Profile & Settings Screens
+import 'features/profile/presentation/screens/profile_screen.dart';
+import 'features/profile/presentation/screens/personal_info_screen.dart';
+import 'features/profile/presentation/screens/saved_addresses_screen.dart';
+import 'features/profile/presentation/screens/add_address_screen.dart';
+
+// Feature & Value-Add Screens
+import 'features/support/presentation/screens/help_center_screen.dart';
 import 'features/notifications/presentation/screens/notification_center_screen.dart';
 import 'features/wallet/presentation/screens/wallet_transactions_screen.dart';
 import 'features/membership/presentation/screens/daily_basket_plus_screen.dart';
 import 'features/freshness/presentation/screens/fresh_produce_explorer_screen.dart';
-import 'features/cart/presentation/screens/empty_basket_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +64,22 @@ class DailyBasketApp extends StatelessWidget {
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.light,
       initialRoute: '/',
+      onGenerateRoute: (settings) {
+        if (settings.name == '/product-details') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => ProductDetailsScreen(
+              productId: args?['productId'] ?? 'prod_avocado',
+              productName: args?['productName'] ?? 'Organic Hass Avocados',
+              price: args?['price'] ?? '₹120',
+              mrp: args?['mrp'] ?? '₹150',
+              unitDetails: args?['unitDetails'] ?? '2 units (Approx. 400g)',
+              imageUrl: args?['imageUrl'] ?? 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=800&q=80',
+            ),
+          );
+        }
+        return null;
+      },
       routes: {
         '/': (context) => const SplashScreen(),
         '/login': (context) => const LoginScreen(),
@@ -62,14 +97,24 @@ class DailyBasketApp extends StatelessWidget {
         '/customer/home': (context) => const CustomerHomeScreen(),
         '/search': (context) => const SearchResultsScreen(),
         '/categories': (context) => const BrowseCategoriesScreen(),
-        '/help': (context) => const HelpCenterScreen(),
+        '/cart': (context) => const CartScreen(),
+        '/cart/empty': (context) => const EmptyBasketScreen(),
+        '/checkout': (context) => const CheckoutScreen(),
+        '/payment': (context) => const PaymentScreen(),
+        '/orders': (context) => const OrderHistoryScreen(),
+        '/order-details': (context) => const OrderDetailsScreen(),
+        '/order-success': (context) => const OrderSuccessScreen(),
         '/tracking': (context) => const DeliveryTrackingScreen(),
         '/rate-delivery': (context) => const RateDeliveryScreen(),
+        '/profile': (context) => const ProfileScreen(),
+        '/personal-info': (context) => const PersonalInfoScreen(),
+        '/saved-addresses': (context) => const SavedAddressesScreen(),
+        '/add-address': (context) => const AddAddressScreen(),
+        '/help': (context) => const HelpCenterScreen(),
         '/notifications': (context) => const NotificationCenterScreen(),
         '/wallet': (context) => const WalletTransactionsScreen(),
         '/loyalty': (context) => const DailyBasketPlusScreen(),
         '/freshness': (context) => const FreshProduceExplorerScreen(),
-        '/cart/empty': (context) => const EmptyBasketScreen(),
       },
     );
   }
