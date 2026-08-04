@@ -25,8 +25,8 @@ export default function HeaderNavBar({ cartCount = 0, onSearch, onCartClick }: H
     { label: 'Home', href: '/' },
     { label: 'Categories', href: '/categories' },
     { label: 'Freshness Explorer', href: '/freshness', badge: 'NEW' },
-    { label: 'Features', href: '/features' },
-    { label: 'How It Works', href: '/how-it-works' },
+    { label: 'Coupons & Offers', href: '/offers', badge: 'OFFERS' },
+    { label: 'Live Order Tracking', href: '/tracking' },
     { label: 'DB Plus VIP', href: '/loyalty', badge: 'VIP' },
     { label: 'About', href: '/about' },
   ];

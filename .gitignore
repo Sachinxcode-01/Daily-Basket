@@ -27,6 +27,8 @@ build/
 .env.production.local
 *.pem
 *.key
+*service-account*.json
+google-services.json
 
 # IDEs & System
 .vscode/

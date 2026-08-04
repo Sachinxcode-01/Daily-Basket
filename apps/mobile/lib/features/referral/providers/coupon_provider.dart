@@ -130,7 +130,7 @@ class CouponProvider extends ChangeNotifier {
 
   // Referral metrics & state
   final String referralCode = 'DAILY20-USER';
-  double _referralEarnings = 60.0;
+  final double _referralEarnings = 60.0;
   double get referralEarnings => _referralEarnings;
 
   final List<Map<String, dynamic>> _referrals = [

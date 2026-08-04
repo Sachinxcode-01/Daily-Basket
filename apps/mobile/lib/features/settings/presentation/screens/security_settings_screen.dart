@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
 
 /// Security Settings Screen — Google Stitch Design System Exact Replica
 class SecuritySettingsScreen extends StatelessWidget {
@@ -12,19 +13,24 @@ class SecuritySettingsScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF9F9FC),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
-          onPressed: () => Scaffold.of(context).openDrawer(),
-        ),
+        leading: Navigator.canPop(context)
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
+                onPressed: () => Navigator.of(context).maybePop(),
+              )
+            : IconButton(
+                icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
+                onPressed: () => AppNavigationDrawer.show(context),
+              ),
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             const Icon(Icons.shield_outlined, color: Color(0xFF006B23), size: 22),
             const SizedBox(width: 8),
             Text(
-              'Daily Basket',
+              'Security & Privacy',
               style: GoogleFonts.outfit(
-                fontSize: 22,
+                fontSize: 20,
                 fontWeight: FontWeight.w700,
                 color: const Color(0xFF006B23),
               ),
@@ -47,7 +53,7 @@ class SecuritySettingsScreen extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  'SA',
+                  'AS',
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -69,16 +75,16 @@ class SecuritySettingsScreen extends StatelessWidget {
 
             // Screen Header Title & Subtitle
             Text(
-              'Settings',
+              'Security Settings',
               style: GoogleFonts.outfit(
-                fontSize: 32,
+                fontSize: 28,
                 fontWeight: FontWeight.w800,
                 color: const Color(0xFF1A1C1E),
               ),
             ),
             const SizedBox(height: 4),
             Text(
-              'Manage your account security, devices, and privacy preferences.',
+              'Manage your account security, 2FA, devices, and privacy preferences.',
               style: GoogleFonts.inter(
                 fontSize: 14,
                 height: 20 / 14,
@@ -113,20 +119,14 @@ class SecuritySettingsScreen extends StatelessWidget {
                     subtitle: 'Update your account password regularly',
                     trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
                     onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Navigating to Change Password...'),
-                          backgroundColor: Color(0xFF006B23),
-                          behavior: SnackBarBehavior.floating,
-                        ),
-                      );
+                      Navigator.of(context).pushNamed('/reset-password');
                     },
                   ),
                   const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                   _buildSettingTile(
                     icon: Icons.shield_outlined,
                     title: 'Two-Factor Authentication',
-                    subtitle: 'Add an extra layer of security',
+                    subtitle: 'Add an extra layer of security via SMS/Authenticator',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -150,6 +150,14 @@ class SecuritySettingsScreen extends StatelessWidget {
                       ],
                     ),
                     onTap: () => Navigator.of(context).pushNamed('/mfa-selection'),
+                  ),
+                  const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
+                  _buildSettingTile(
+                    icon: Icons.fingerprint_rounded,
+                    title: 'Biometric Authentication',
+                    subtitle: 'Unlock app with Fingerprint / Face ID',
+                    trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
+                    onTap: () => Navigator.of(context).pushNamed('/enable-biometrics'),
                   ),
                 ],
               ),
@@ -185,12 +193,16 @@ class SecuritySettingsScreen extends StatelessWidget {
                       showDialog(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          title: const Text('Active Session'),
-                          content: const Text('Current Device: Flutter Mobile (Android/iOS)\nIP: 192.168.1.10\nStatus: Active Now'),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          title: Text('Active Session', style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
+                          content: Text(
+                            'Current Device: Daily Basket Mobile (Android / iOS)\nLocation: Bengaluru, India\nIP Address: 106.51.78.12\nStatus: Active Now',
+                            style: GoogleFonts.inter(fontSize: 13, height: 1.5),
+                          ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx),
-                              child: const Text('OK'),
+                              child: Text('OK', style: GoogleFonts.outfit(fontWeight: FontWeight.w700, color: const Color(0xFF006B23))),
                             ),
                           ],
                         ),
@@ -204,7 +216,7 @@ class SecuritySettingsScreen extends StatelessWidget {
             const SizedBox(height: 24),
 
             // ─── 3. Privacy Section ──────────────────────────────────────────
-            _buildSectionHeader('Privacy'),
+            _buildSectionHeader('Privacy & Data'),
             const SizedBox(height: 8),
 
             Container(
@@ -224,12 +236,16 @@ class SecuritySettingsScreen extends StatelessWidget {
                 children: [
                   _buildSettingTile(
                     icon: Icons.download_rounded,
-                    title: 'Download Data',
-                    subtitle: 'Request a copy of your personal data',
+                    title: 'Download My Data',
+                    subtitle: 'Request a copy of your order & profile data',
                     trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Personal data download request submitted.')),
+                        const SnackBar(
+                          content: Text('Data export request initiated. Check email shortly.'),
+                          backgroundColor: Color(0xFF006B23),
+                          behavior: SnackBarBehavior.floating,
+                        ),
                       );
                     },
                   ),
@@ -242,28 +258,7 @@ class SecuritySettingsScreen extends StatelessWidget {
                     titleColor: const Color(0xFFBA1A1A),
                     subtitle: 'Permanently remove your account and data',
                     trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFFBA1A1A)),
-                    onTap: () {
-                      showDialog(
-                        context: context,
-                        builder: (ctx) => AlertDialog(
-                          title: const Text('Delete Account'),
-                          content: const Text('Are you sure you want to request permanent account deletion?'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(ctx),
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(ctx);
-                                Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-                              },
-                              child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
+                    onTap: () => Navigator.of(context).pushNamed('/delete-account'),
                   ),
                 ],
               ),

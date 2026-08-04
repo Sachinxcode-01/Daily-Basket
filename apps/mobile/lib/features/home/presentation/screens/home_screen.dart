@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../categories/presentation/screens/browse_categories_screen.dart';
@@ -164,13 +165,24 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             ),
             SizedBox(
               height: 310,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: 4,
-                separatorBuilder: (_, __) => const SizedBox(width: 14),
-                itemBuilder: (_, i) => SizedBox(width: 170, child: _buildCard(_catalog[i])),
+              child: AnimationLimiter(
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: 4,
+                  separatorBuilder: (_, __) => const SizedBox(width: 14),
+                  itemBuilder: (_, i) => AnimationConfiguration.staggeredList(
+                    position: i,
+                    duration: const Duration(milliseconds: 375),
+                    child: SlideAnimation(
+                      horizontalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: SizedBox(width: 170, child: _buildCard(_catalog[i])),
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
             const SizedBox(height: 24),
@@ -185,15 +197,27 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, childAspectRatio: 0.54,
-                  crossAxisSpacing: 14, mainAxisSpacing: 14,
+              child: AnimationLimiter(
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2, childAspectRatio: 0.54,
+                    crossAxisSpacing: 14, mainAxisSpacing: 14,
+                  ),
+                  itemCount: _filtered.length,
+                  itemBuilder: (_, i) => AnimationConfiguration.staggeredGrid(
+                    position: i,
+                    duration: const Duration(milliseconds: 375),
+                    columnCount: 2,
+                    child: SlideAnimation(
+                      verticalOffset: 50.0,
+                      child: FadeInAnimation(
+                        child: _buildCard(_filtered[i]),
+                      ),
+                    ),
+                  ),
                 ),
-                itemCount: _filtered.length,
-                itemBuilder: (_, i) => _buildCard(_filtered[i]),
               ),
             ),
             const SizedBox(height: 32),

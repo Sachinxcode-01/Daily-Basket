@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../referral/providers/coupon_provider.dart';
+import '../../../wallet/providers/wallet_provider.dart';
 
 /// Your Basket / Cart Screen — Google Stitch Design System Exact Replica
 class CartScreen extends StatefulWidget {
@@ -306,10 +307,13 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     final couponProvider = context.watch<CouponProvider>();
+    final walletProvider = context.watch<WalletProvider>();
     final double itemTotalDouble = _itemTotal.toDouble();
     final double discount = couponProvider.calculateDiscount(itemTotalDouble);
     final double deliveryFee = couponProvider.calculateDeliveryFee(_baseDeliveryFee, itemTotalDouble);
-    final double toPay = (itemTotalDouble - discount + deliveryFee + _taxes).clamp(0.0, double.infinity);
+    final double toPayBeforeWallet = (itemTotalDouble - discount + deliveryFee + _taxes).clamp(0.0, double.infinity);
+    final double walletDeduction = walletProvider.calculateWalletDeduction(toPayBeforeWallet);
+    final double toPay = (toPayBeforeWallet - walletDeduction).clamp(0.0, double.infinity);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
@@ -693,6 +697,51 @@ class _CartScreenState extends State<CartScreen> {
                               color: Color(0xFF6E7A6C), size: 20),
                       ],
                     ),
+                  ),
+                ),
+
+                const SizedBox(height: 14),
+
+                // Wallet Balance Pay Tile
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: walletProvider.useWalletForPayment ? const Color(0xFFE8F5E9) : const Color(0xFFF3F3F6),
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(
+                      color: walletProvider.useWalletForPayment ? const Color(0xFF006B23) : Colors.transparent,
+                      width: 1.2,
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.account_balance_wallet_rounded, color: Color(0xFF006B23), size: 22),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Pay using Daily Basket Wallet',
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF1A1C1E),
+                              ),
+                            ),
+                            Text(
+                              'Available: \$${walletProvider.balance.toStringAsFixed(2)}',
+                              style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF6E7A6C)),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Switch.adaptive(
+                        value: walletProvider.useWalletForPayment,
+                        activeTrackColor: const Color(0xFF006B23),
+                        onChanged: (val) => walletProvider.toggleWalletPayment(val),
+                      ),
+                    ],
                   ),
                 ),
 

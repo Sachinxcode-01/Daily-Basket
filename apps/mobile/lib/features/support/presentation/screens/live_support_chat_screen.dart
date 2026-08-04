@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Professional Live Support Chat Screen — Google Stitch Specification
@@ -74,7 +75,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen> {
     final text = inputQuery ?? _messageController.text.trim();
     if (text.isEmpty) return;
 
-    final userTime = 'Just now';
+    const userTime = 'Just now';
     setState(() {
       _messages.add({
         'id': 'user_${DateTime.now().millisecondsSinceEpoch}',
@@ -436,40 +437,47 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen> {
           children: [
             // Chat Messages Canvas
             Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                itemCount: _messages.length + 1,
-                itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Center(
-                      child: Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFEEEEF0),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'Today • Priority Support Active',
-                          style: GoogleFonts.inter(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.onSurfaceVariant,
+              child: AnimationLimiter(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  itemCount: _messages.length + 1,
+                  itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Center(
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEEEEF0),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Today • Priority Support Active',
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.onSurfaceVariant,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  }
+                      );
+                    }
 
-                  final msg = _messages[index - 1];
-                  final isAgent = msg['isAgent'] as bool;
-                  final msgType = msg['type'] as String? ?? 'text';
-                  final data = msg['data'] as Map<String, dynamic>?;
+                    final msg = _messages[index - 1];
+                    final isAgent = msg['isAgent'] as bool;
+                    final msgType = msg['type'] as String? ?? 'text';
+                    final data = msg['data'] as Map<String, dynamic>?;
 
-                  return Align(
+                    return AnimationConfiguration.staggeredList(
+                      position: index,
+                      duration: const Duration(milliseconds: 300),
+                      child: SlideAnimation(
+                        verticalOffset: 30.0,
+                        child: FadeInAnimation(
+                          child: Align(
                     alignment:
                         isAgent ? Alignment.centerLeft : Alignment.centerRight,
                     child: Container(
@@ -755,10 +763,14 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen> {
                         ],
                       ),
                     ),
-                  );
-                },
+                  ),
+                ),
               ),
-            ),
+            );
+          },
+        ),
+      ),
+      ),
 
             // Quick Reply Action Chips
             SingleChildScrollView(

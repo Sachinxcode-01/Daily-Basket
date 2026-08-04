@@ -1,18 +1,151 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../tracking/providers/tracking_provider.dart';
 
 /// Real-time Delivery Tracking Screen — Exact Google Stitch Specification
-/// Matches:
-/// - Header: "Live Order Tracking #ORD-9824"
-/// - ETA Banner: "Arriving in 8 Mins" with express icon
-/// - Rider Profile Card (Ramesh Kumar, rating, call button)
-/// - Delivery Status Stepper (Placed, Packed, Out for Delivery, Delivered)
 class DeliveryTrackingScreen extends StatelessWidget {
   const DeliveryTrackingScreen({super.key});
 
+  void _showDriverContactModal(BuildContext context, TrackingProvider provider) {
+    final driver = provider.driverInfo;
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Container(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                CircleAvatar(
+                  radius: 26,
+                  backgroundColor: const Color(0xFFE8F5E9),
+                  child: Text(
+                    'RK',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        driver['name'] as String,
+                        style: GoogleFonts.outfit(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.onSurface,
+                        ),
+                      ),
+                      Text(
+                        '${driver['vehicleType']} • ${driver['vehicleNumber']}',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade100,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '★ ${driver['rating']}',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.amber.shade900,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Calling ${driver['name']} at ${driver['phone']}...'),
+                          backgroundColor: AppColors.primary,
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.phone_rounded, size: 18),
+                    label: Text(
+                      'Call Driver',
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Sent delivery instruction: "Leave at door"'),
+                          backgroundColor: Color(0xFF006B23),
+                          behavior: SnackBarBehavior.floating,
+                        ),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: const BorderSide(color: AppColors.primary, width: 1.5),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    icon: const Icon(Icons.message_rounded, size: 18),
+                    label: Text(
+                      'Send Note',
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final trackingProvider = context.watch<TrackingProvider>();
+    final driver = trackingProvider.driverInfo;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -82,7 +215,7 @@ class DeliveryTrackingScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
-                              'EXPRESS DELIVERY',
+                              'EXPRESS 10-MIN DELIVERY',
                               style: GoogleFonts.inter(
                                 fontSize: 10,
                                 fontWeight: FontWeight.w800,
@@ -93,7 +226,7 @@ class DeliveryTrackingScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Arriving in 8 Mins',
+                            trackingProvider.etaDisplay,
                             style: GoogleFonts.outfit(
                               fontSize: 24,
                               fontWeight: FontWeight.w800,
@@ -102,7 +235,7 @@ class DeliveryTrackingScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Your partner Ramesh is on the way!',
+                            'Your partner ${driver['name']} is on the way!',
                             style: GoogleFonts.inter(
                               fontSize: 12,
                               color: Colors.white.withValues(alpha: 0.90),
@@ -112,8 +245,8 @@ class DeliveryTrackingScreen extends StatelessWidget {
                       ),
                     ),
                     Container(
-                      width: 60,
-                      height: 60,
+                      width: 56,
+                      height: 56,
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.15),
                         shape: BoxShape.circle,
@@ -121,7 +254,7 @@ class DeliveryTrackingScreen extends StatelessWidget {
                       child: const Center(
                         child: Icon(
                           Icons.near_me_rounded,
-                          size: 32,
+                          size: 30,
                           color: Colors.white,
                         ),
                       ),
@@ -132,108 +265,202 @@ class DeliveryTrackingScreen extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              // ─── Rider Profile Card ──────────────────────────────────────
+              // ─── Live GPS Driver Map Card ──────────────────────────────────
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(16),
+                height: 170,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: const Color(0xFFE8F5E9),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: AppColors.outlineVariant.withValues(alpha: 0.20),
+                    color: AppColors.primary.withValues(alpha: 0.3),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+                ),
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
+                        child: Image.network(
+                          'https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800&q=80',
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.black.withValues(alpha: 0.25),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 14,
+                      left: 14,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.my_location_rounded, color: AppColors.primary, size: 14),
+                            const SizedBox(width: 6),
+                            Text(
+                              'GPS: ${trackingProvider.driverLat.toStringAsFixed(4)}, ${trackingProvider.driverLng.toStringAsFixed(4)}',
+                              style: GoogleFonts.inter(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary,
+                          borderRadius: BorderRadius.circular(9999),
+                          boxShadow: const [
+                            BoxShadow(color: Colors.black26, blurRadius: 8),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 18),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Partner Moving to You',
+                              style: GoogleFonts.outfit(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE8F5E9),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: AppColors.primary, width: 1.5),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'RK',
-                          style: GoogleFonts.outfit(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // ─── Rider Profile Card ──────────────────────────────────────
+              GestureDetector(
+                onTap: () => _showDriverContactModal(context, trackingProvider),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: AppColors.outlineVariant.withValues(alpha: 0.20),
                     ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                'Ramesh Kumar',
-                                style: GoogleFonts.outfit(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: AppColors.onSurface,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 2,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.amber.shade100,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  '★ 4.9',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.amber.shade900,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Vaccinated • 1,200+ Express Deliveries',
-                            style: GoogleFonts.inter(
-                              fontSize: 11,
-                              color: AppColors.onSurfaceVariant,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 48,
+                        height: 48,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFE8F5E9),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.primary, width: 1.5),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'RK',
+                            style: GoogleFonts.outfit(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.primary,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    Container(
-                      width: 42,
-                      height: 42,
-                      decoration: const BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.phone_rounded,
-                          size: 20,
-                          color: Colors.white,
                         ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  driver['name'] as String,
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.shade100,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    '★ ${driver['rating']}',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.amber.shade900,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              'Vaccinated • ${driver['totalDeliveries']} Express Deliveries',
+                              style: GoogleFonts.inter(
+                                fontSize: 11,
+                                color: AppColors.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => _showDriverContactModal(context, trackingProvider),
+                        icon: Container(
+                          width: 42,
+                          height: 42,
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.phone_rounded,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
 
@@ -271,18 +498,19 @@ class DeliveryTrackingScreen extends StatelessWidget {
                     _buildStepItem(
                       title: 'Packed at Dark Store',
                       time: '10:44 AM',
-                      isCompleted: true,
+                      isCompleted: trackingProvider.status.index >= DeliveryOrderStatus.packed.index,
                     ),
                     _buildStepItem(
                       title: 'Out for Delivery',
                       time: '10:46 AM',
-                      isCompleted: true,
-                      isCurrent: true,
+                      isCompleted: trackingProvider.status.index >= DeliveryOrderStatus.outForDelivery.index,
+                      isCurrent: trackingProvider.status == DeliveryOrderStatus.outForDelivery,
                     ),
                     _buildStepItem(
                       title: 'Delivered to Doorstep',
-                      time: 'Est. 10:50 AM',
-                      isCompleted: false,
+                      time: trackingProvider.status == DeliveryOrderStatus.delivered ? 'Just Now' : 'Est. 10:50 AM',
+                      isCompleted: trackingProvider.status == DeliveryOrderStatus.delivered,
+                      isCurrent: trackingProvider.status == DeliveryOrderStatus.delivered,
                       isLast: true,
                     ),
                   ],

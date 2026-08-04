@@ -20,7 +20,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       'subtitle': 'aarav.sharma@okaxis',
       'icon': Icons.bolt_rounded,
       'badge': 'PRIMARY',
-      'color': Color(0xFF006B23),
+      'color': const Color(0xFF006B23),
     },
     {
       'id': 'upi_phonepe',
@@ -29,7 +29,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       'subtitle': '9876543210@ybl',
       'icon': Icons.account_balance_wallet_rounded,
       'badge': null,
-      'color': Color(0xFF5E35B1),
+      'color': const Color(0xFF5E35B1),
     },
     {
       'id': 'card_hdfc',
@@ -38,7 +38,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       'subtitle': '•••• •••• •••• 4242 (Exp 08/28)',
       'icon': Icons.credit_card_rounded,
       'badge': null,
-      'color': Color(0xFF1976D2),
+      'color': const Color(0xFF1976D2),
     },
     {
       'id': 'net_icici',
@@ -47,7 +47,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       'subtitle': 'Aarav Sharma - Linked Account',
       'icon': Icons.account_balance_rounded,
       'badge': null,
-      'color': Color(0xFFE65100),
+      'color': const Color(0xFFE65100),
     },
     {
       'id': 'cod',
@@ -56,7 +56,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       'subtitle': 'Pay cash or UPI at delivery doorstep',
       'icon': Icons.payments_rounded,
       'badge': null,
-      'color': Color(0xFF2E7D32),
+      'color': const Color(0xFF2E7D32),
     },
   ];
 

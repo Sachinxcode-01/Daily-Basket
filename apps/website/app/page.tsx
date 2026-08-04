@@ -145,10 +145,12 @@ export default function HomePage() {
           <div className="lg:col-span-8 rounded-3xl p-8 sm:p-10 shadow-level-2 relative overflow-hidden min-h-[340px] flex items-center">
             
             {/* Full Card Background Image */}
-            <img
+            <Image
               src="/illustrations/web_hero_banner_3d.png"
               alt="Fresh Produce Background"
-              className="absolute inset-0 w-full h-full object-cover object-right z-0 transform hover:scale-105 transition-transform duration-700"
+              fill
+              unoptimized
+              className="object-cover object-right z-0 transform hover:scale-105 transition-transform duration-700"
             />
 
             {/* Dark Green Gradient Overlay for crisp text contrast */}
@@ -213,7 +215,7 @@ export default function HomePage() {
                 <Link href="/cart" className="text-xs text-primary font-bold hover:underline">Reorder All</Link>
               </div>
               <div className="flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/10 shadow-sm">
-                <img src={catalog[0].image} alt="Milk" className="w-12 h-12 rounded-xl object-cover" />
+                <Image src={catalog[0].image} alt="Milk" width={48} height={48} unoptimized className="w-12 h-12 rounded-xl object-cover" />
                 <div className="flex-1 min-w-0">
                   <div className="text-xs font-bold truncate">{catalog[0].name}</div>
                   <div className="text-[10px] text-on-surface-variant">{catalog[0].brand} • {catalog[0].unitName}</div>
@@ -324,10 +326,12 @@ export default function HomePage() {
                   <div>
                     {/* Image */}
                     <div className="relative w-full aspect-square bg-surface-container-low rounded-xl overflow-hidden mb-3">
-                      <img
+                      <Image
                         src={p.image}
                         alt={p.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        fill
+                        unoptimized
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
 
@@ -447,7 +451,7 @@ export default function HomePage() {
                   if (!prod) return null;
                   return (
                     <div key={id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                      <img src={prod.image} alt={prod.name} className="w-14 h-14 rounded-xl object-cover" />
+                      <Image src={prod.image} alt={prod.name} width={56} height={56} unoptimized className="w-14 h-14 rounded-xl object-cover" />
                       <div className="flex-1 min-w-0">
                         <div className="text-xs font-bold truncate">{prod.name}</div>
                         <div className="text-[10px] text-slate-500">{prod.unitName}</div>

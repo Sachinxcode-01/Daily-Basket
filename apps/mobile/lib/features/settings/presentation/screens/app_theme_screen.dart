@@ -1,20 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/app_theme_provider.dart';
 
 /// App Theme Screen — Exact Google Stitch Specification
-/// Screen ID: f6f93254f18c40cc99150e768b33f0f0
-class AppThemeScreen extends StatefulWidget {
+class AppThemeScreen extends StatelessWidget {
   const AppThemeScreen({super.key});
 
   @override
-  State<AppThemeScreen> createState() => _AppThemeScreenState();
-}
-
-class _AppThemeScreenState extends State<AppThemeScreen> {
-  String _selectedTheme = 'system';
-
-  @override
   Widget build(BuildContext context) {
+    final appThemeProvider = context.watch<AppThemeProvider>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       appBar: AppBar(
@@ -56,9 +52,11 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
 
                 // Option 1: System Default
                 _buildThemeCard(
+                  context,
                   value: 'system',
                   title: 'System Default',
                   description: 'Automatically matches your device\'s display settings.',
+                  selectedThemeKey: appThemeProvider.selectedThemeKey,
                   previewWidget: Container(
                     width: 64,
                     height: 64,
@@ -77,9 +75,11 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
 
                 // Option 2: Light Mode
                 _buildThemeCard(
+                  context,
                   value: 'light',
                   title: 'Light Mode',
                   description: 'Clean, crisp, and bright. Perfect for daytime shopping.',
+                  selectedThemeKey: appThemeProvider.selectedThemeKey,
                   previewWidget: Container(
                     width: 64,
                     height: 64,
@@ -111,9 +111,11 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
 
                 // Option 3: Dark Mode
                 _buildThemeCard(
+                  context,
                   value: 'dark',
                   title: 'Dark Mode',
                   description: 'Easy on the eyes in low light, with high-contrast elements.',
+                  selectedThemeKey: appThemeProvider.selectedThemeKey,
                   previewWidget: Container(
                     width: 64,
                     height: 64,
@@ -148,24 +150,25 @@ class _AppThemeScreenState extends State<AppThemeScreen> {
     );
   }
 
-  Widget _buildThemeCard({
+  Widget _buildThemeCard(
+    BuildContext context, {
     required String value,
     required String title,
     required String description,
+    required String selectedThemeKey,
     required Widget previewWidget,
   }) {
-    final isSelected = _selectedTheme == value;
+    final isSelected = selectedThemeKey == value;
 
     return InkWell(
       onTap: () {
-        setState(() {
-          _selectedTheme = value;
-        });
+        context.read<AppThemeProvider>().setTheme(value);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Theme set to $title'),
             duration: const Duration(seconds: 1),
             behavior: SnackBarBehavior.floating,
+            backgroundColor: const Color(0xFF006B23),
           ),
         );
       },

@@ -1,34 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/notification_provider.dart';
 
 /// Notification Preferences Screen — Exact Google Stitch Specification
-/// Screen ID: 33fdfcdbd6fa48479d2f59eedccdeccb
-class NotificationPreferencesScreen extends StatefulWidget {
+class NotificationPreferencesScreen extends StatelessWidget {
   const NotificationPreferencesScreen({super.key});
 
   @override
-  State<NotificationPreferencesScreen> createState() =>
-      _NotificationPreferencesScreenState();
-}
-
-class _NotificationPreferencesScreenState
-    extends State<NotificationPreferencesScreen> {
-  // Order Updates Toggles
-  bool _orderStatus = true;
-  bool _deliveryTracking = true;
-  bool _dailyBasketReceipts = true;
-
-  // Promotions & Offers Toggles
-  bool _flashDeals = false;
-  bool _personalizedDiscounts = true;
-  bool _newsletter = false;
-
-  // Account Activity Toggles
-  final bool _securityAlerts = true; // Always ON for account security
-  bool _walletUpdates = true;
-
-  @override
   Widget build(BuildContext context) {
+    final provider = context.watch<NotificationProvider>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       appBar: AppBar(
@@ -50,15 +32,6 @@ class _NotificationPreferencesScreenState
             color: const Color(0xFF006B23),
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.settings_outlined,
-              color: Color(0xFF1A1C1E),
-            ),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
@@ -76,26 +49,24 @@ class _NotificationPreferencesScreenState
                       title: 'Order Status',
                       subtitle:
                           'Get notified when your order is placed, packed, and ready.',
-                      value: _orderStatus,
-                      onChanged: (val) => setState(() => _orderStatus = val),
+                      value: provider.orderStatus,
+                      onChanged: (val) => provider.setOrderStatus(val),
                     ),
                     const Divider(color: Color(0xFFE2E2E5), height: 24),
                     _buildToggleRow(
                       title: 'Delivery Tracking',
                       subtitle:
                           'Real-time updates when your driver is approaching.',
-                      value: _deliveryTracking,
-                      onChanged: (val) =>
-                          setState(() => _deliveryTracking = val),
+                      value: provider.deliveryTracking,
+                      onChanged: (val) => provider.setDeliveryTracking(val),
                     ),
                     const Divider(color: Color(0xFFE2E2E5), height: 24),
                     _buildToggleRow(
                       title: 'Daily Basket Receipts',
                       subtitle:
                           'Receive a digital receipt via email after delivery.',
-                      value: _dailyBasketReceipts,
-                      onChanged: (val) =>
-                          setState(() => _dailyBasketReceipts = val),
+                      value: provider.receipts,
+                      onChanged: (val) => provider.setReceipts(val),
                     ),
                   ],
                 ),
@@ -110,24 +81,23 @@ class _NotificationPreferencesScreenState
                     _buildToggleRow(
                       title: 'Flash Deals',
                       subtitle: 'Alerts for limited-time discounts on groceries.',
-                      value: _flashDeals,
-                      onChanged: (val) => setState(() => _flashDeals = val),
+                      value: provider.flashDeals,
+                      onChanged: (val) => provider.setFlashDeals(val),
                     ),
                     const Divider(color: Color(0xFFE2E2E5), height: 24),
                     _buildToggleRow(
                       title: 'Personalized Discounts',
                       subtitle: 'Offers tailored to your frequent purchases.',
-                      value: _personalizedDiscounts,
-                      onChanged: (val) =>
-                          setState(() => _personalizedDiscounts = val),
+                      value: provider.personalizedDiscounts,
+                      onChanged: (val) => provider.setPersonalizedDiscounts(val),
                     ),
                     const Divider(color: Color(0xFFE2E2E5), height: 24),
                     _buildToggleRow(
                       title: 'Newsletter',
                       subtitle:
                           'Weekly updates on new products and seasonal picks.',
-                      value: _newsletter,
-                      onChanged: (val) => setState(() => _newsletter = val),
+                      value: provider.newsletter,
+                      onChanged: (val) => provider.setNewsletter(val),
                     ),
                   ],
                 ),
@@ -143,7 +113,7 @@ class _NotificationPreferencesScreenState
                       title: 'Security Alerts',
                       subtitle:
                           'Important notifications about login attempts and password changes.',
-                      value: _securityAlerts,
+                      value: true,
                       isDisabled: true,
                       onChanged: null,
                     ),
@@ -152,8 +122,8 @@ class _NotificationPreferencesScreenState
                       title: 'Wallet Updates',
                       subtitle:
                           'Balance changes and payment method expirations.',
-                      value: _walletUpdates,
-                      onChanged: (val) => setState(() => _walletUpdates = val),
+                      value: provider.walletUpdates,
+                      onChanged: (val) => provider.setWalletUpdates(val),
                     ),
                   ],
                 ),

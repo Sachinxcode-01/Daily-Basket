@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_network_image.dart';
 
@@ -647,20 +648,28 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                           ),
                         )
                       : Expanded(
-                          child: GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 0.72,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                            ),
-                            itemCount: filteredProducts.length,
-                            itemBuilder: (context, index) {
-                              final item = filteredProducts[index];
-                              final qty = _cartQuantities[item['id']] ?? 0;
+                          child: AnimationLimiter(
+                            child: GridView.builder(
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 0.72,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                              ),
+                              itemCount: filteredProducts.length,
+                              itemBuilder: (context, index) {
+                                final item = filteredProducts[index];
+                                final qty = _cartQuantities[item['id']] ?? 0;
 
-                              return Container(
+                                return AnimationConfiguration.staggeredGrid(
+                                  position: index,
+                                  duration: const Duration(milliseconds: 375),
+                                  columnCount: 2,
+                                  child: SlideAnimation(
+                                    verticalOffset: 50.0,
+                                    child: FadeInAnimation(
+                                      child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -820,8 +829,12 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                     ),
                                   ],
                                 ),
-                              );
-                            },
+                              ),
+                            ),
+                          ),
+                        );
+                              },
+                            ),
                           ),
                         ),
                 ],

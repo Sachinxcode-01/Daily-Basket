@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'core/theme/app_theme.dart';
-
 import 'package:provider/provider.dart';
+import 'core/theme/app_theme.dart';
+import 'core/providers/user_provider.dart';
+import 'core/providers/app_theme_provider.dart';
+import 'core/providers/language_provider.dart';
+import 'core/providers/notification_provider.dart';
 import 'features/referral/providers/coupon_provider.dart';
 
 // Authentication Screens
@@ -42,12 +45,15 @@ import 'features/profile/presentation/screens/profile_screen.dart';
 import 'features/profile/presentation/screens/personal_info_screen.dart';
 import 'features/profile/presentation/screens/saved_addresses_screen.dart';
 import 'features/profile/presentation/screens/add_address_screen.dart';
+import 'features/profile/presentation/screens/payment_methods_screen.dart';
+import 'features/settings/presentation/screens/security_settings_screen.dart';
+import 'features/settings/presentation/screens/app_theme_screen.dart';
+import 'features/settings/presentation/screens/delete_account_screen.dart';
 
-// Feature & Value-Add Screens
+// Support & Notifications Screens
 import 'features/support/presentation/screens/help_center_screen.dart';
 import 'features/support/presentation/screens/privacy_policy_screen.dart';
 import 'features/support/presentation/screens/terms_of_service_screen.dart';
-import 'features/settings/presentation/screens/app_theme_screen.dart';
 import 'features/notifications/presentation/screens/notification_center_screen.dart';
 import 'features/notifications/presentation/screens/notification_preferences_screen.dart';
 import 'features/wallet/presentation/screens/wallet_transactions_screen.dart';
@@ -61,9 +67,6 @@ import 'features/catalog/presentation/screens/quick_buy_essentials_screen.dart';
 import 'features/notifications/presentation/screens/back_to_stock_alerts_screen.dart';
 import 'features/freshness/presentation/screens/fresh_produce_explorer_screen.dart';
 import 'features/support/presentation/screens/about_app_screen.dart';
-import 'features/settings/presentation/screens/delete_account_screen.dart';
-
-import 'features/profile/providers/address_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,7 +74,10 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CouponProvider()),
-        ChangeNotifierProvider(create: (_) => AddressProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => AppThemeProvider()),
+        ChangeNotifierProvider(create: (_) => LanguageProvider()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
       ],
       child: const DailyBasketApp(),
     ),
@@ -83,12 +89,14 @@ class DailyBasketApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final appThemeProvider = context.watch<AppThemeProvider>();
+
     return MaterialApp(
       title: 'Daily Basket',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.light,
+      themeMode: appThemeProvider.themeMode,
       initialRoute: '/',
       onGenerateRoute: (settings) {
         if (settings.name == '/product-details') {
@@ -134,8 +142,10 @@ class DailyBasketApp extends StatelessWidget {
         '/rate-delivery': (context) => const RateDeliveryScreen(),
         '/profile': (context) => const ProfileScreen(),
         '/personal-info': (context) => const PersonalInfoScreen(),
+        '/security': (context) => const SecuritySettingsScreen(),
         '/saved-addresses': (context) => const SavedAddressesScreen(),
         '/add-address': (context) => const AddAddressScreen(),
+        '/payment-methods': (context) => const PaymentMethodsScreen(),
         '/help': (context) => const HelpCenterScreen(),
         '/privacy-policy': (context) => const PrivacyPolicyScreen(),
         '/terms-of-service': (context) => const TermsOfServiceScreen(),
