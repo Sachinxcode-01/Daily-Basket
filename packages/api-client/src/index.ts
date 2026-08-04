@@ -44,12 +44,55 @@ export class ApiClient {
     });
   }
 
-  public async verifyOtp(phoneNumber: string, code: string): Promise<{ token: string; user: any }> {
+  public async verifyOtp(phoneNumber: string, code: string): Promise<{ token: string; accessToken?: string; user: any }> {
     return this.fetcher(API_ROUTES.AUTH.VERIFY_OTP, {
       method: 'POST',
       body: JSON.stringify({ phoneNumber, code }),
     });
   }
+
+  public async loginEmail(data: { email: string; pass: string }): Promise<{ token: string; accessToken: string; user: any }> {
+    return this.fetcher('/auth/login-email', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async registerEmail(data: { email: string; pass: string; name: string }): Promise<{ success: boolean; message: string }> {
+    return this.fetcher('/auth/register-email', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async googleOAuthLogin(idToken: string): Promise<{ token: string; accessToken: string; user: any }> {
+    return this.fetcher('/auth/google-login', {
+      method: 'POST',
+      body: JSON.stringify({ idToken }),
+    });
+  }
+
+  public async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
+    return this.fetcher('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  }
+
+  public async resetPassword(token: string, newPass: string): Promise<{ success: boolean; message: string }> {
+    return this.fetcher('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPass }),
+    });
+  }
+
+  public async verifyEmailToken(token: string): Promise<{ success: boolean; message: string }> {
+    return this.fetcher('/auth/verify-email', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
+  }
+
 
   // Catalog Methods
   public async getCategories(): Promise<Category[]> {

@@ -146,20 +146,20 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            // Floating 3D Location Pin Illustration
+                            // Floating 3D Location Pin Illustration (Enlarged 290px)
                             SizedBox(
-                              width: 256,
-                              height: 256,
+                              width: 290,
+                              height: 290,
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
                                   Container(
-                                    width: 220,
-                                    height: 220,
+                                    width: 270,
+                                    height: 270,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
                                       color: AppColors.primaryFixedDim
-                                          .withValues(alpha: 0.20),
+                                          .withValues(alpha: 0.22),
                                     ),
                                   ),
                                   AnimatedBuilder(
@@ -172,14 +172,15 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen>
                                     },
                                     child: Image.asset(
                                       'assets/illustrations/location_pin_3d.png',
-                                      width: 220,
-                                      height: 220,
+                                      width: 270,
+                                      height: 270,
                                       fit: BoxFit.contain,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
+
 
                             const SizedBox(height: AppTheme.spacingLg),
 

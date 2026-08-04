@@ -154,4 +154,23 @@ export class AuthService {
       message: 'All active device sessions revoked. User logged out across all devices.',
     };
   }
+
+  async saveOnboardingPreferences(data: {
+    userId?: string;
+    locationGranted?: boolean;
+    notificationsGranted?: boolean;
+    completedAt?: string;
+  }) {
+    return {
+      success: true,
+      userId: data.userId || 'usr_guest',
+      preferences: {
+        locationGranted: data.locationGranted ?? true,
+        notificationsGranted: data.notificationsGranted ?? true,
+        onboardingCompleted: true,
+        savedAt: data.completedAt || new Date().toISOString(),
+      },
+    };
+  }
 }
+

@@ -139,24 +139,24 @@ class _NotificationPermissionScreenState
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          // Bell illustration with float animation + glow
+                          // Bell illustration with float animation + glow (Enlarged 290px)
                           SizedBox(
-                            width: 256,
-                            height: 256,
+                            width: 290,
+                            height: 290,
                             child: Stack(
                               alignment: Alignment.center,
                               children: [
                                 // Glow blob
                                 Container(
-                                  width: 240,
-                                  height: 240,
+                                  width: 270,
+                                  height: 270,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: AppColors.primaryContainer
-                                        .withValues(alpha: 0.20),
+                                        .withValues(alpha: 0.25),
                                   ),
                                 ),
-                                // Floating illustration
+                                // Floating 3D notification bell illustration
                                 AnimatedBuilder(
                                   animation: _hoverAnim,
                                   builder: (context, child) {
@@ -165,27 +165,19 @@ class _NotificationPermissionScreenState
                                       child: child,
                                     );
                                   },
-                                  child: Container(
-                                    width: 180,
-                                    height: 180,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          AppColors.secondaryContainer.withValues(alpha: 0.40),
-                                      shape: BoxShape.circle,
-                                      boxShadow: AppTheme.level2,
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Image.asset(
-                                        'assets/illustrations/notification_bell_3d.png',
-                                        fit: BoxFit.contain,
-                                      ),
+                                  child: SizedBox(
+                                    width: 260,
+                                    height: 260,
+                                    child: Image.asset(
+                                      'assets/illustrations/notification_bell_3d.png',
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
+
 
                           const SizedBox(height: AppTheme.spacingLg + 8),
 

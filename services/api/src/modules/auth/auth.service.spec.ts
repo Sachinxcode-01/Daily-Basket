@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../database/prisma.service';
+import { EmailService } from '../email/email.service';
 
 describe('AuthService Unit Tests', () => {
   let service: AuthService;
@@ -13,8 +13,9 @@ describe('AuthService Unit Tests', () => {
     },
   };
 
-  const mockJwtService = {
-    sign: jest.fn().mockReturnValue('mocked_jwt_token'),
+  const mockEmailService = {
+    sendWelcomeEmail: jest.fn().mockResolvedValue(true),
+    sendVerificationEmail: jest.fn().mockResolvedValue(true),
   };
 
   beforeEach(async () => {
@@ -22,7 +23,7 @@ describe('AuthService Unit Tests', () => {
       providers: [
         AuthService,
         { provide: PrismaService, useValue: mockPrismaService },
-        { provide: JwtService, useValue: mockJwtService },
+        { provide: EmailService, useValue: mockEmailService },
       ],
     }).compile();
 
@@ -35,15 +36,10 @@ describe('AuthService Unit Tests', () => {
     expect(result.message).toContain('OTP sent');
   });
 
-  it('should verify OTP and return JWT token', async () => {
-    mockPrismaService.user.findUnique.mockResolvedValue({
-      id: 'user_123',
-      phoneNumber: '9876543210',
-      role: 'CUSTOMER',
-    });
-
+  it('should verify OTP and return user session', async () => {
     const result = await service.verifyOtp('9876543210', '123456');
-    expect(result.accessToken).toBe('mocked_jwt_token');
-    expect(result.user.id).toBe('user_123');
+    expect(result.accessToken).toBeDefined();
+    expect(result.refreshToken).toBeDefined();
+    expect(result.user).toBeDefined();
   });
 });

@@ -171,72 +171,72 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // ─── Hero Graphic ──────────────────────────────────────
+                      // ─── Hero Graphic (Enlarged 240px) ──────────────────────────────
                       ScaleTransition(
                         scale: _popInScale,
                         child: FadeTransition(
                           opacity: _popInOpacity,
                           child: SizedBox(
-                            width: 192,
-                            height: 192,
+                            width: 240,
+                            height: 240,
                             child: Stack(
                               children: [
                                 // Glassmorphism backdrop circle
                                 Container(
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: AppColors.surface.withValues(alpha: 0.40),
+                                    color: AppColors.surface.withValues(alpha: 0.45),
                                     border: Border.all(
                                       color: AppColors.surfaceContainerHighest
-                                          .withValues(alpha: 0.50),
+                                          .withValues(alpha: 0.60),
                                     ),
                                     boxShadow: AppTheme.level2,
                                   ),
                                 ),
-                                  // Center White Container with Daily Basket Logo
-                                  Center(
-                                    child: Container(
-                                      width: 110,
-                                      height: 110,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: Colors.white,
-                                        boxShadow: AppTheme.level1,
-                                        border: Border.all(
-                                          color: AppColors.outlineVariant.withValues(alpha: 0.20),
-                                        ),
-                                      ),
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Image.asset(
-                                        'assets/images/daily_basket_logo.png',
-                                        fit: BoxFit.contain,
+                                // Center White Container with Daily Basket Logo
+                                Center(
+                                  child: Container(
+                                    width: 140,
+                                    height: 140,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                      boxShadow: AppTheme.level1,
+                                      border: Border.all(
+                                        color: AppColors.outlineVariant.withValues(alpha: 0.20),
                                       ),
                                     ),
-                                  ),
-                                  // 3D Location Pin Illustration Asset (Positioned floating above logo)
-                                  Positioned(
-                                    top: 4,
-                                    left: 0,
-                                    right: 0,
-                                    child: SizedBox(
-                                      height: 96,
-                                      child: Image.asset(
-                                        'assets/illustrations/location_pin_3d.png',
-                                        fit: BoxFit.contain,
-                                      ),
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Image.asset(
+                                      'assets/images/daily_basket_logo.png',
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
+                                ),
+                                // 3D Location Pin Illustration Asset (Positioned floating above logo)
+                                Positioned(
+                                  top: 0,
+                                  left: 0,
+                                  right: 0,
+                                  child: SizedBox(
+                                    height: 120,
+                                    child: Image.asset(
+                                      'assets/illustrations/location_pin_3d.png',
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
                                 // Decorative eco icon (float slow)
                                 AnimatedBuilder(
                                   animation: _floatSlowAnim,
                                   builder: (ctx, child) => Positioned(
-                                    bottom: 24 + _floatSlowAnim.value * 0.5,
-                                    left: 8,
+                                    bottom: 28 + _floatSlowAnim.value * 0.5,
+                                    left: 12,
                                     child: child!,
                                   ),
                                   child: const Icon(
                                     Icons.eco_rounded,
-                                    size: 24,
+                                    size: 28,
                                     color: AppColors.outline,
                                   ),
                                 ),
@@ -244,23 +244,23 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
                                 AnimatedBuilder(
                                   animation: _floatFastAnim,
                                   builder: (ctx, child) => Positioned(
-                                    top: 16 + _floatFastAnim.value * 0.5,
-                                    right: 16,
+                                    top: 20 + _floatFastAnim.value * 0.5,
+                                    right: 20,
                                     child: child!,
                                   ),
                                   child: const Icon(
                                     Icons.star_rounded,
-                                    size: 24,
+                                    size: 28,
                                     color: AppColors.primary,
                                   ),
                                 ),
                                 // Success badge
                                 Positioned(
-                                  bottom: 0,
-                                  right: 0,
+                                  bottom: 4,
+                                  right: 4,
                                   child: Container(
-                                    width: 48,
-                                    height: 48,
+                                    width: 54,
+                                    height: 54,
                                     decoration: BoxDecoration(
                                       color: AppColors.primary,
                                       shape: BoxShape.circle,
@@ -273,7 +273,7 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
                                     child: const Icon(
                                       Icons.check_rounded,
                                       color: AppColors.onPrimary,
-                                      size: 24,
+                                      size: 28,
                                     ),
                                   ),
                                 ),
@@ -282,6 +282,7 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
                           ),
                         ),
                       ),
+
 
                       const SizedBox(height: AppTheme.spacingXl),
 

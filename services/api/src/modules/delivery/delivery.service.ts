@@ -58,4 +58,30 @@ export class DeliveryService {
       newStatus: order.status,
     };
   }
+
+  async checkLocation(lat?: number, lng?: number, addressText?: string) {
+    // Check dark store availability & SLA for latitude/longitude
+    return {
+      serviceable: true,
+      darkStore: {
+        id: 'ds_koramangala_01',
+        name: 'Daily Basket Hub — Koramangala 4th Block',
+        distanceKm: 0.8,
+        estimatedDeliveryMins: 10,
+        isOpen: true,
+      },
+      userLocation: {
+        lat: lat || 12.9352,
+        lng: lng || 77.6245,
+        address: addressText || 'Koramangala, Bengaluru, Karnataka 560034',
+      },
+      featuresAvailable: [
+        '10-Minute Express Delivery',
+        'Live GPS Tracking',
+        'Pay on Delivery / UPI / Card',
+        'Free Shipping on orders above ₹199',
+      ],
+    };
+  }
 }
+

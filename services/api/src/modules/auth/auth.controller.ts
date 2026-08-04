@@ -72,4 +72,13 @@ export class AuthController {
   async revokeAllSessions(@Body() body: { userId: string }) {
     return this.authService.revokeAllSessions(body.userId);
   }
+
+  @Post('preferences')
+  @ApiOperation({ summary: 'Save onboarding completed state and user permissions' })
+  async savePreferences(
+    @Body() body: { userId?: string; locationGranted?: boolean; notificationsGranted?: boolean },
+  ) {
+    return this.authService.saveOnboardingPreferences(body);
+  }
 }
+

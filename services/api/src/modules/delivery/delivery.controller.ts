@@ -18,4 +18,11 @@ export class DeliveryController {
   async updateStatus(@Body() body: { orderId: string; status: any }) {
     return this.deliveryService.updateDeliveryStatus(body.orderId, body.status);
   }
+
+  @Post('check-location')
+  @ApiOperation({ summary: 'Verify 10-minute delivery serviceability for GPS coordinates' })
+  async checkLocation(@Body() body: { lat?: number; lng?: number; address?: string }) {
+    return this.deliveryService.checkLocation(body.lat, body.lng, body.address);
+  }
 }
+

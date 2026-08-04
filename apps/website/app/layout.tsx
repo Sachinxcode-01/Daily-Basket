@@ -2,6 +2,7 @@ import React from 'react';
 import { APP_NAME } from '@daily-basket/constants';
 import { QueryProvider } from '../providers/QueryProvider';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
+import QuickNavMenu from '../components/navigation/QuickNavMenu';
 import './globals.css';
 
 export const metadata = {
@@ -29,6 +30,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <QueryProvider>
             {children}
+            <QuickNavMenu />
           </QueryProvider>
         </ErrorBoundary>
       </body>

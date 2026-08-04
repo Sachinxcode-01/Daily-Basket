@@ -48,6 +48,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   late Animation<double> _enterFade;
   late Animation<Offset> _enterSlide;
 
+  late AnimationController _floatCtrl;
+  late Animation<double> _floatAnim;
+
   int _currentPage = 0;
 
   static const _pages = [
@@ -82,9 +85,9 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       bgColor2: AppColors.primaryFixed,
     ),
     _OnboardingPage(
-      title: 'Earn While You Shop',
+      title: 'Rewards, Offers & Savings',
       subtitle:
-          'Collect Daily Points on every order and redeem exclusive rewards, discounts, and free deliveries.',
+          'Earn loyalty points, unlock exclusive deals, cashback coupons, and save more on every order.',
       icon: Icons.card_giftcard_rounded,
       assetPath: 'assets/illustrations/gift_box_rewards_3d.png',
       iconColor: AppColors.primary,
@@ -111,6 +114,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: _enterCtrl, curve: Curves.easeOut));
 
+    _floatCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+
+    _floatAnim = Tween<double>(begin: 0, end: -12).animate(
+      CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut),
+    );
+
     _enterCtrl.forward();
   }
 
@@ -118,8 +130,10 @@ class _OnboardingScreenState extends State<OnboardingScreen>
   void dispose() {
     _pageController.dispose();
     _enterCtrl.dispose();
+    _floatCtrl.dispose();
     super.dispose();
   }
+
 
   void _goToNext() {
     if (_currentPage < _pages.length - 1) {
@@ -352,7 +366,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
           // Spacer for top nav
           const SizedBox(height: 72),
 
-          // ─── Illustration Area ───────────────────────────────────────────
+          // ─── Illustration Area (Enlarged Hero + Realtime Float Animation) ──
           Expanded(
             flex: 5,
             child: FadeTransition(
@@ -363,26 +377,27 @@ class _OnboardingScreenState extends State<OnboardingScreen>
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Glow blob behind illustration
+                      // Ambient Glow blob behind illustration
                       Container(
-                        width: 280,
-                        height: 280,
+                        width: 310,
+                        height: 310,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: page.bgColor1.withValues(alpha: 0.20),
+                          color: page.bgColor1.withValues(alpha: 0.25),
                         ),
                       ),
-                      // 3D PNG Illustration Asset
-                      Container(
-                        width: 240,
-                        height: 240,
-                        decoration: BoxDecoration(
-                          color: page.bgColor1.withValues(alpha: 0.25),
-                          shape: BoxShape.circle,
-                          boxShadow: AppTheme.level2,
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
+                      // Realtime Floating 3D PNG Illustration Asset (Enlarged 300px)
+                      AnimatedBuilder(
+                        animation: _floatAnim,
+                        builder: (context, child) {
+                          return Transform.translate(
+                            offset: Offset(0, _floatAnim.value),
+                            child: child,
+                          );
+                        },
+                        child: SizedBox(
+                          width: 300,
+                          height: 300,
                           child: Image.asset(
                             page.assetPath,
                             fit: BoxFit.contain,
@@ -395,6 +410,7 @@ class _OnboardingScreenState extends State<OnboardingScreen>
               ),
             ),
           ),
+
 
           // ─── Text Content (Glassmorphism card) ──────────────────────────
           FadeTransition(

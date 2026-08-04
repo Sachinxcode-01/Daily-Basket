@@ -3,12 +3,18 @@ FROM node:18-alpine AS builder
 WORKDIR /app
 RUN npm install -g pnpm
 
+# Copy workspace manifests first (for layer caching)
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY services/api/package.json services/api/
 COPY packages/ packages/
 
 RUN pnpm install --frozen-lockfile
 
+# Copy Prisma schema BEFORE build (required for prisma generate)
+COPY services/api/prisma/ services/api/prisma/
+RUN pnpm --filter api run prisma:generate
+
+# Copy application source
 COPY services/api/ services/api/
 RUN pnpm --filter api build
 
@@ -16,9 +22,12 @@ FROM node:18-alpine AS runner
 WORKDIR /app
 ENV NODE_ENV production
 
-COPY --from=builder /app/services/api/dist ./dist
+# Copy Prisma client (required at runtime)
+COPY --from=builder /app/services/api/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/services/api/dist ./dist
 COPY services/api/package.json ./
+COPY services/api/prisma/ ./prisma/
 
 EXPOSE 4000
 CMD ["node", "dist/main.js"]
