@@ -181,18 +181,7 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
                             height: 240,
                             child: Stack(
                               children: [
-                                // Glassmorphism backdrop circle
-                                Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: AppColors.surface.withValues(alpha: 0.45),
-                                    border: Border.all(
-                                      color: AppColors.surfaceContainerHighest
-                                          .withValues(alpha: 0.60),
-                                    ),
-                                    boxShadow: AppTheme.level2,
-                                  ),
-                                ),
+
                                 // Center White Container with Daily Basket Logo
                                 Center(
                                   child: Container(
@@ -213,19 +202,7 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
                                     ),
                                   ),
                                 ),
-                                // 3D Location Pin Illustration Asset (Positioned floating above logo)
-                                Positioned(
-                                  top: 0,
-                                  left: 0,
-                                  right: 0,
-                                  child: SizedBox(
-                                    height: 120,
-                                    child: Image.asset(
-                                      'assets/illustrations/location_pin_3d.png',
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
+
                                 // Decorative eco icon (float slow)
                                 AnimatedBuilder(
                                   animation: _floatSlowAnim,
