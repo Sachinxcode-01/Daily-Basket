@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Leaf, ShieldCheck, Sun, Plus, Award } from 'lucide-react';
 import { formatCurrency } from '@daily-basket/shared-utils';
+import HeaderNavBar from '../../components/navigation/HeaderNavBar';
 
 interface FreshProduce {
   id: string;
@@ -63,19 +64,8 @@ export default function FreshnessPage() {
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-24 text-slate-900">
       
-      {/* ─── Header ────────────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-4 sm:px-8 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="p-2 text-[#006b23] hover:bg-slate-100 rounded-full transition">
-              <ArrowLeft className="w-6 h-6" />
-            </Link>
-            <h1 className="text-xl font-extrabold text-slate-900 font-outfit">
-              Fresh Produce Explorer
-            </h1>
-          </div>
-        </div>
-      </header>
+      {/* ─── Unified Navigation Bar ────────────────────────────────────── */}
+      <HeaderNavBar />
 
       {/* ─── Main Content Canvas ────────────────────────────────────────── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 pt-6 space-y-8">

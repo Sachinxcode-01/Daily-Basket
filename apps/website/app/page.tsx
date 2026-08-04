@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { formatCurrency } from '@daily-basket/shared-utils';
+import HeaderNavBar from '../components/navigation/HeaderNavBar';
 
 interface Product {
   id: string;
@@ -173,72 +174,8 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background text-on-background font-body-lg antialiased pb-20">
 
-      {/* ─── Sticky Desktop Header ────────────────────────────────────────── */}
-      <header className="sticky top-0 z-50 bg-surface/90 backdrop-blur-md border-b border-outline-variant/20 shadow-sm">
-        <div className="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop h-20 flex items-center justify-between gap-6">
-
-          {/* Left: Logo & Location */}
-          <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/30 flex items-center justify-center p-1 shadow-level-1">
-                <img src="/images/daily_basket_logo.png" alt="Daily Basket Logo" className="w-full h-full object-contain" />
-              </div>
-              <span className="font-title-md text-xl font-extrabold text-primary hidden sm:inline-block" style={{ fontFamily: 'Outfit' }}>
-                Daily Basket
-              </span>
-            </Link>
-
-            {/* 10 MINS Badge */}
-            <div className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 border border-primary/20">
-              <span className="text-xs">⚡</span>
-              <span className="font-label-md text-xs text-primary font-bold tracking-wider">10 MINS DELIVERY</span>
-            </div>
-
-            {/* Location selector */}
-            <button className="hidden sm:flex flex-col text-left hover:opacity-80 transition-opacity">
-              <span className="text-[10px] text-on-surface-variant font-medium">Delivery to 📍</span>
-              <span className="text-xs font-bold text-on-surface truncate max-w-[170px]" style={{ fontFamily: 'Outfit' }}>
-                Koramangala 4th Block...
-              </span>
-            </button>
-          </div>
-
-          {/* Center: Desktop Navigation Bar */}
-          <nav className="hidden md:flex items-center gap-2">
-            <Link href="/" className="font-body-lg text-sm text-primary font-bold border-b-2 border-primary pb-0.5 rounded-lg px-3 py-2">Home</Link>
-            <Link href="/features" className="font-body-lg text-sm text-on-surface-variant hover:text-primary transition-colors hover:bg-secondary-container/50 rounded-lg px-3 py-2">Features</Link>
-            <Link href="/how-it-works" className="font-body-lg text-sm text-on-surface-variant hover:text-primary transition-colors hover:bg-secondary-container/50 rounded-lg px-3 py-2">How It Works</Link>
-            <Link href="/freshness" className="font-body-lg text-sm text-on-surface-variant hover:text-primary transition-colors hover:bg-secondary-container/50 rounded-lg px-3 py-2">Freshness</Link>
-            <Link href="/about" className="font-body-lg text-sm text-on-surface-variant hover:text-primary transition-colors hover:bg-secondary-container/50 rounded-lg px-3 py-2">About</Link>
-          </nav>
-
-          {/* Right: Search Bar & Cart Action */}
-          <div className="flex items-center gap-4 flex-1 md:flex-initial justify-end">
-            <div className="relative w-full max-w-xs hidden sm:block">
-              <svg className="w-4 h-4 text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-              </svg>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder='Search "milk", "tomatoes"...'
-                className="w-full bg-surface-container-low border border-outline-variant/30 rounded-full pl-9 pr-4 py-2 text-xs focus:outline-none focus:border-primary transition-colors"
-              />
-            </div>
-
-            {/* Cart Button */}
-            <button className="relative bg-primary text-on-primary font-label-md text-sm px-5 py-2.5 rounded-full hover:bg-surface-tint transition-all shadow-level-1 flex items-center gap-2 font-semibold">
-              <span>🛒 Basket</span>
-              {totalCartCount > 0 && (
-                <span className="w-5 h-5 bg-white text-primary rounded-full text-xs font-bold flex items-center justify-center">
-                  {totalCartCount}
-                </span>
-              )}
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* ─── Sticky Unified Desktop Header ────────────────────────────────── */}
+      <HeaderNavBar cartCount={totalCartCount} />
 
       {/* ─── Main Hero Canvas ────────────────────────────────────────────── */}
       <main className="max-w-[1280px] mx-auto px-margin-mobile md:px-margin-desktop space-y-12 pt-6">

@@ -2,32 +2,13 @@
 
 import React from 'react';
 import Link from 'next/link';
+import HeaderNavBar from '../../components/navigation/HeaderNavBar';
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background text-on-background font-body-lg antialiased">
-      {/* TopNavBar */}
-      <header className="sticky top-0 w-full shadow-sm z-50 bg-surface/80 backdrop-blur-md">
-        <div className="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-[1280px] mx-auto">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-surface-container-lowest border border-outline-variant/30 flex items-center justify-center p-1 shadow-level-1">
-              <img src="/images/daily_basket_logo.png" alt="Daily Basket Logo" className="w-full h-full object-contain" />
-            </div>
-            <span className="font-title-md text-title-md font-bold text-primary" style={{ fontFamily: 'Outfit' }}>Daily Basket</span>
-          </Link>
-          <nav className="hidden md:flex items-center gap-lg">
-            <Link href="/" className="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors hover:bg-secondary-container/50 rounded-lg px-3 py-2">Home</Link>
-            <Link href="/features" className="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors hover:bg-secondary-container/50 rounded-lg px-3 py-2">Features</Link>
-            <Link href="/how-it-works" className="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors hover:bg-secondary-container/50 rounded-lg px-3 py-2">How It Works</Link>
-            <Link href="/about" className="font-body-lg text-body-lg text-primary font-bold border-b-2 border-primary pb-1 rounded-lg px-3 py-2">About</Link>
-          </nav>
-          <div className="flex items-center gap-sm">
-            <Link href="/" className="bg-primary text-on-primary font-label-md text-label-md px-lg py-sm rounded-full hover:bg-surface-tint transition-all shadow-level-1">
-              Start Shopping
-            </Link>
-          </div>
-        </div>
-      </header>
+      {/* Unified Navigation Bar */}
+      <HeaderNavBar />
 
       <main>
         {/* Hero Section */}
