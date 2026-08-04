@@ -114,6 +114,23 @@ class AppNavigationDrawer extends StatelessWidget {
 
                 _buildCategorySection(
                   context,
+                  title: 'PROFILE & ACCOUNT SETTINGS',
+                  items: [
+                    _RouteItem('Customer Profile', '/profile', Icons.person_rounded),
+                    _RouteItem('Personal Information', '/personal-info', Icons.badge_rounded),
+                    _RouteItem('Saved Delivery Addresses', '/saved-addresses', Icons.location_on_rounded),
+                    _RouteItem('Add New Address', '/add-address', Icons.add_location_alt_rounded),
+                    _RouteItem('Security Settings', '/mfa-selection', Icons.shield_rounded),
+                    _RouteItem('App Theme Settings', '/app-theme', Icons.palette_rounded),
+                    _RouteItem('Privacy Policy', '/privacy-policy', Icons.privacy_tip_rounded),
+                    _RouteItem('Terms of Service', '/terms-of-service', Icons.description_rounded),
+                    _RouteItem('About Daily Basket', '/about', Icons.info_rounded),
+                    _RouteItem('Delete Account', '/delete-account', Icons.delete_forever_rounded),
+                  ],
+                ),
+
+                _buildCategorySection(
+                  context,
                   title: 'AUTHENTICATION & SECURITY',
                   items: [
                     _RouteItem('Login Options', '/login', Icons.login_rounded),
