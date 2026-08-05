@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../referral/providers/coupon_provider.dart';
+import '../../../../core/providers/cart_provider.dart';
 import 'payment_screen.dart';
 
 /// Checkout Summary / Confirm Order Screen — Google Stitch Design System Exact Replica
@@ -14,6 +15,31 @@ class CheckoutScreen extends StatefulWidget {
 
 class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _isBasketExpanded = true;
+  String _selectedSlot = 'Instant (10-15 mins)';
+  String _selectedInstruction = 'Ring Bell';
+  bool _isGiftOrder = false;
+  final TextEditingController _giftNoteCtrl = TextEditingController();
+
+  final List<String> _deliverySlots = [
+    'Instant (10-15 mins)',
+    'Today Evening (6 PM - 8 PM)',
+    'Tomorrow Morning (7 AM - 9 AM)',
+    'Tomorrow Evening (6 PM - 8 PM)',
+  ];
+
+  final List<String> _instructions = [
+    'Ring Bell',
+    'Leave at Door',
+    'Don\'t Ring Bell',
+    'Call on Arrival',
+    'Leave with Guard',
+  ];
+
+  @override
+  void dispose() {
+    _giftNoteCtrl.dispose();
+    super.dispose();
+  }
 
   final List<Map<String, dynamic>> _basketItems = [
     {
@@ -62,10 +88,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+    CartProvider? cartProvider;
+    try { cartProvider = context.watch<CartProvider>(); } catch (_) {}
     final couponProvider = context.watch<CouponProvider>();
-    final double discount = couponProvider.calculateDiscount(_itemTotal);
-    final double deliveryFee = couponProvider.calculateDeliveryFee(_baseDeliveryFee, _itemTotal);
-    final double grandTotal = (_itemTotal - discount + deliveryFee + _taxes).clamp(0.0, double.infinity);
+
+    final double effectiveItemTotal = (cartProvider != null && !cartProvider.isEmpty)
+        ? cartProvider.itemTotalDouble
+        : _itemTotal;
+
+    final double discount = couponProvider.calculateDiscount(effectiveItemTotal);
+    final double deliveryFee = couponProvider.calculateDeliveryFee(_baseDeliveryFee, effectiveItemTotal);
+    final double grandTotal = (effectiveItemTotal - discount + deliveryFee + _taxes).clamp(0.0, double.infinity);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
@@ -212,7 +245,133 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                 const SizedBox(height: 16),
 
-                // 2. Your Basket (3) Card
+                // 2. Schedule Delivery & Slot Selector Card
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Delivery Time Slot',
+                        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
+                      ),
+                      const SizedBox(height: 10),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: _deliverySlots.map((slot) {
+                            final isSel = _selectedSlot == slot;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: ChoiceChip(
+                                label: Text(slot),
+                                selected: isSel,
+                                selectedColor: const Color(0xFF006B23),
+                                backgroundColor: const Color(0xFFF3F3F6),
+                                labelStyle: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+                                  color: isSel ? Colors.white : const Color(0xFF1A1C1E),
+                                ),
+                                onSelected: (_) => setState(() => _selectedSlot = slot),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Delivery Instructions',
+                        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
+                      ),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: _instructions.map((inst) {
+                          final isSel = _selectedInstruction == inst;
+                          return ChoiceChip(
+                            label: Text(inst),
+                            selected: isSel,
+                            selectedColor: const Color(0xFFE8F5E9),
+                            backgroundColor: const Color(0xFFF3F3F6),
+                            labelStyle: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
+                              color: const Color(0xFF006B23),
+                            ),
+                            shape: StadiumBorder(
+                              side: BorderSide(
+                                color: isSel ? const Color(0xFF006B23) : Colors.transparent,
+                                width: 1.5,
+                              ),
+                            ),
+                            onSelected: (_) => setState(() => _selectedInstruction = inst),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 3. Gift Order Option Card
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.card_giftcard_rounded, color: Color(0xFF006B23), size: 22),
+                              const SizedBox(width: 10),
+                              Text(
+                                'Make this a Gift Order 🎁',
+                                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
+                              ),
+                            ],
+                          ),
+                          Switch(
+                            value: _isGiftOrder,
+                            activeThumbColor: const Color(0xFF006B23),
+                            onChanged: (v) => setState(() => _isGiftOrder = v),
+                          ),
+                        ],
+                      ),
+                      if (_isGiftOrder) ...[
+                        const SizedBox(height: 10),
+                        TextField(
+                          controller: _giftNoteCtrl,
+                          decoration: InputDecoration(
+                            hintText: 'Add a personalized gift message...',
+                            hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9EA59D)),
+                            filled: true,
+                            fillColor: const Color(0xFFF3F3F6),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 4. Your Basket (3) Card
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white,

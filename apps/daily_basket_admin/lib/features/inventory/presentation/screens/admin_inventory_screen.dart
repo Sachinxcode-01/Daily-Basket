@@ -440,7 +440,13 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> with Single
             const SizedBox(height: 20),
             _buildField('Product Name'),
             const SizedBox(height: 12),
-            _buildField('SKU Code'),
+            Row(children: [
+              Expanded(child: _buildField('SKU Code')),
+              const SizedBox(width: 12),
+              Expanded(child: _buildField('EAN / Barcode (890...)')),
+            ]),
+            const SizedBox(height: 12),
+            _buildField('Search Keywords & Brand Aliases'),
             const SizedBox(height: 12),
             Row(children: [
               Expanded(child: _buildField('Quantity')),

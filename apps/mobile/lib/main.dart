@@ -75,9 +75,17 @@ import 'features/tracking/providers/tracking_provider.dart';
 import 'core/providers/ai_chat_provider.dart';
 import 'core/providers/wishlist_provider.dart';
 import 'core/providers/favorites_provider.dart';
+import 'core/providers/categories_provider.dart';
 import 'core/providers/recently_viewed_provider.dart';
 import 'core/providers/search_history_provider.dart';
+import 'core/providers/visual_search_provider.dart';
+import 'core/providers/permissions_provider.dart';
 import 'features/catalog/presentation/screens/favorites_screen.dart';
+import 'features/search/presentation/screens/camera_search_screen.dart';
+import 'features/search/presentation/screens/visual_search_results_screen.dart';
+import 'features/onboarding/presentation/screens/location_permission_onboarding_screen.dart';
+import 'features/onboarding/presentation/screens/notification_permission_onboarding_screen.dart';
+import 'features/settings/presentation/screens/app_permissions_settings_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,8 +104,11 @@ void main() {
         ChangeNotifierProvider(create: (_) => AiChatProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProvider(create: (_) => CategoriesProvider()),
         ChangeNotifierProvider(create: (_) => RecentlyViewedProvider()),
         ChangeNotifierProvider(create: (_) => SearchHistoryProvider()),
+        ChangeNotifierProvider(create: (_) => VisualSearchProvider()),
+        ChangeNotifierProvider(create: (_) => PermissionsProvider()),
       ],
       child: const DailyBasketApp(),
     ),
@@ -194,6 +205,11 @@ class DailyBasketApp extends StatelessWidget {
         '/offers': (context) => const OffersScreen(),
         '/daily-basket-plus': (context) => const DailyBasketPlusScreen(),
         '/live-support': (context) => const LiveSupportChatScreen(),
+        '/camera-search': (context) => const CameraSearchScreen(),
+        '/visual-search-results': (context) => const VisualSearchResultsScreen(),
+        '/location-permission': (context) => const LocationPermissionOnboardingScreen(),
+        '/notification-permission': (context) => const NotificationPermissionOnboardingScreen(),
+        '/permissions-settings': (context) => const AppPermissionsSettingsScreen(),
       },
     );
   }

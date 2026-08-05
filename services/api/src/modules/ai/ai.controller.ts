@@ -127,7 +127,7 @@ export class AiController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('image'))
   async analyzeImage(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() body: { userId?: string; sessionId?: string; context?: string },
   ) {
     const userId = body.userId || 'user_demo_01';
@@ -161,7 +161,7 @@ export class AiController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(FileInterceptor('audio'))
   async transcribeVoice(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file: any,
     @Body() body: { userId?: string; sessionId?: string; languageCode?: string },
   ) {
     const userId = body.userId || 'user_demo_01';

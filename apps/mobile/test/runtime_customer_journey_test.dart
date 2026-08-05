@@ -23,7 +23,9 @@ import 'package:daily_basket_mobile/features/profile/presentation/screens/profil
 import 'package:daily_basket_mobile/features/wallet/providers/wallet_provider.dart';
 import 'package:daily_basket_mobile/core/providers/wishlist_provider.dart';
 import 'package:daily_basket_mobile/core/providers/favorites_provider.dart';
+import 'package:daily_basket_mobile/core/providers/categories_provider.dart';
 import 'package:daily_basket_mobile/core/providers/recently_viewed_provider.dart';
+import 'package:daily_basket_mobile/core/providers/visual_search_provider.dart';
 import 'package:daily_basket_mobile/features/catalog/presentation/screens/favorites_screen.dart';
 
 class _MockHttpOverrides extends HttpOverrides {}
@@ -46,7 +48,9 @@ void main() {
         ChangeNotifierProvider(create: (_) => WalletProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
+        ChangeNotifierProvider(create: (_) => CategoriesProvider()),
         ChangeNotifierProvider(create: (_) => RecentlyViewedProvider()),
+        ChangeNotifierProvider(create: (_) => VisualSearchProvider()),
       ],
       child: MaterialApp(home: child),
     );

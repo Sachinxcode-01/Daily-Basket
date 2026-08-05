@@ -1,281 +1,244 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/categories_provider.dart';
 import '../../../../core/widgets/app_network_image.dart';
-import '../../../catalog/presentation/screens/product_listing_screen.dart';
+import 'category_products_screen.dart';
 
 /// Browse Categories Screen — Exact Google Stitch Specification
-/// Matches:
-/// - Top App Bar: "Browse Categories"
-/// - Farm Fresh Guarantee promo banner strip
-/// - Grid of visual category cards with AppNetworkImage & fallback visual icons
+/// 18 Primary Indian Quick-Commerce Categories
 class BrowseCategoriesScreen extends StatelessWidget {
   const BrowseCategoriesScreen({super.key});
 
-  final List<Map<String, dynamic>> _categories = const [
-    {
-      'id': 'cat-1',
-      'name': 'Fruits & Vegetables',
-      'itemCount': '120+ items',
-      'bgColor': Color(0xFFE8F5E9),
-      'icon': Icons.eco_rounded,
-      'image':
-          'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=500&auto=format&fit=crop&q=80',
-    },
-    {
-      'id': 'cat-2',
-      'name': 'Dairy, Bread & Eggs',
-      'itemCount': '85+ items',
-      'bgColor': Color(0xFFFFF8E1),
-      'icon': Icons.egg_alt_rounded,
-      'image':
-          'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&auto=format&fit=crop&q=80',
-    },
-    {
-      'id': 'cat-3',
-      'name': 'Cold Drinks & Juices',
-      'itemCount': '60+ items',
-      'bgColor': Color(0xFFE0F7FA),
-      'icon': Icons.local_drink_rounded,
-      'image':
-          'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&auto=format&fit=crop&q=80',
-    },
-    {
-      'id': 'cat-4',
-      'name': 'Snacks & Munchies',
-      'itemCount': '140+ items',
-      'bgColor': Color(0xFFFFF3E0),
-      'icon': Icons.cookie_rounded,
-      'image':
-          'https://images.unsplash.com/photo-1566478989037-eec170784d0b?w=500&auto=format&fit=crop&q=80',
-    },
-    {
-      'id': 'cat-5',
-      'name': 'Bakery & Biscuits',
-      'itemCount': '70+ items',
-      'bgColor': Color(0xFFFFFDE7),
-      'icon': Icons.bakery_dining_rounded,
-      'image':
-          'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=500&auto=format&fit=crop&q=80',
-    },
-    {
-      'id': 'cat-6',
-      'name': 'Meat, Fish & Poultry',
-      'itemCount': '45+ items',
-      'bgColor': Color(0xFFFFEBEE),
-      'icon': Icons.kebab_dining_rounded,
-      'image':
-          'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=500&auto=format&fit=crop&q=80',
-    },
-  ];
+  IconData _getCategoryIcon(String iconName) {
+    switch (iconName) {
+      case 'eco': return Icons.eco_rounded;
+      case 'egg_alt': return Icons.egg_alt_rounded;
+      case 'fastfood': return Icons.fastfood_rounded;
+      case 'shopping_bag': return Icons.shopping_bag_rounded;
+      case 'opacity': return Icons.opacity_rounded;
+      case 'temple_hindu': return Icons.temple_hindu_rounded;
+      case 'cleaning_services': return Icons.cleaning_services_rounded;
+      case 'home_work': return Icons.home_work_rounded;
+      case 'face': return Icons.face_rounded;
+      case 'child_care': return Icons.child_care_rounded;
+      case 'pets': return Icons.pets_rounded;
+      case 'local_drink': return Icons.local_drink_rounded;
+      case 'coffee': return Icons.coffee_rounded;
+      case 'bakery_dining': return Icons.bakery_dining_rounded;
+      case 'icecream': return Icons.icecream_rounded;
+      case 'spa': return Icons.spa_rounded;
+      case 'ac_unit': return Icons.ac_unit_rounded;
+      case 'restaurant': return Icons.restaurant_rounded;
+      default: return Icons.category_rounded;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final categoriesProvider = context.watch<CategoriesProvider>();
+    final categories = categoriesProvider.categories;
+
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFF0F172A),
       appBar: AppBar(
-        backgroundColor: Colors.white.withValues(alpha: 0.90),
+        backgroundColor: const Color(0xFF1E293B),
         elevation: 0.5,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_rounded,
-            color: AppColors.primary,
+            color: Color(0xFF2DD4BF),
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Browse Categories',
+          'All Categories (${categories.length})',
           style: GoogleFonts.outfit(
-            fontSize: 22,
-            fontWeight: FontWeight.w800,
-            color: AppColors.onSurface,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
         centerTitle: true,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppTheme.marginMobile),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Promo Banner
+              // Promo Banner Strip
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(
-                    colors: [AppColors.primary, Color(0xFF047857)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+                    colors: [Color(0xFF0F766E), Color(0xFF14B8A6)],
                   ),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.25),
-                      blurRadius: 16,
-                      offset: const Offset(0, 6),
-                    ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: const [
+                    BoxShadow(color: Color(0x4014B8A6), blurRadius: 12, offset: Offset(0, 4)),
                   ],
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(
+                        color: Colors.white24,
+                        shape: BoxShape.circle,
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.20),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        'FRESH DAILY',
-                        style: GoogleFonts.inter(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white,
-                          letterSpacing: 1,
-                        ),
-                      ),
+                      child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 28),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Farm Fresh Guarantee',
-                      style: GoogleFonts.outfit(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Directly sourced from trusted local organic farms every morning.',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        color: Colors.white.withValues(alpha: 0.90),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Daily Basket Quick-Commerce Taxonomy',
+                            style: GoogleFonts.outfit(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '10-Minute Express Delivery across 18 specialized departments',
+                            style: GoogleFonts.inter(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 24),
-
-              Text(
-                'All Categories',
-                style: GoogleFonts.outfit(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.onSurface,
-                ),
-              ),
-
-              const SizedBox(height: 12),
+              const SizedBox(height: 20),
 
               // Categories Grid
               AnimationLimiter(
                 child: GridView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
+                  itemCount: categories.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 2,
-                    childAspectRatio: 0.85,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
+                    childAspectRatio: 0.82,
                   ),
-                  itemCount: _categories.length,
                   itemBuilder: (context, index) {
-                    final cat = _categories[index];
+                    final cat = categories[index];
+                    final icon = _getCategoryIcon(cat.iconName);
+
                     return AnimationConfiguration.staggeredGrid(
                       position: index,
                       duration: const Duration(milliseconds: 375),
                       columnCount: 2,
                       child: ScaleAnimation(
                         child: FadeInAnimation(
-                          child: GestureDetector(
+                          child: InkWell(
                             onTap: () {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => ProductListingScreen(
-                                    categoryId: cat['id'] as String,
-                                    categoryName: cat['name'] as String,
-                                  ),
+                                  builder: (_) => CategoryProductsScreen(categorySlug: cat.slug),
                                 ),
                               );
                             },
+                            borderRadius: BorderRadius.circular(16),
                             child: Container(
-                              padding: const EdgeInsets.all(12),
                               decoration: BoxDecoration(
-                                color: cat['bgColor'],
-                                borderRadius: BorderRadius.circular(20),
+                                color: const Color(0xFF1E293B),
+                                borderRadius: BorderRadius.circular(16),
                                 border: Border.all(
-                                  color: AppColors.outlineVariant.withValues(alpha: 0.15),
+                                  color: cat.isFeatured
+                                      ? const Color(0xFF2DD4BF).withValues(alpha: 0.6)
+                                      : const Color(0xFF334155),
+                                  width: cat.isFeatured ? 1.5 : 1,
                                 ),
                               ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Expanded(
-                                    child: Container(
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withValues(alpha: 0.80),
-                                        borderRadius: BorderRadius.circular(14),
-                                      ),
-                                      child: AppNetworkImage(
-                                        imageUrl: cat['image'] as String,
-                                        width: double.infinity,
-                                        height: double.infinity,
-                                        borderRadius: BorderRadius.circular(14),
-                                        fallbackIcon: cat['icon'] as IconData,
-                                        fallbackBgColor: (cat['bgColor'] as Color)
-                                            .withValues(alpha: 0.50),
-                                        fallbackIconColor: AppColors.primary,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    cat['name'],
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: GoogleFonts.outfit(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                      color: AppColors.onSurface,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  // Banner Image with Badge
+                                  Stack(
                                     children: [
-                                      Text(
-                                        cat['itemCount'],
-                                        style: GoogleFonts.inter(
-                                          fontSize: 11,
-                                          color: AppColors.onSurfaceVariant,
+                                      ClipRRect(
+                                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                        child: AppNetworkImage(
+                                          imageUrl: cat.imageUrl,
+                                          height: 110,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
                                         ),
                                       ),
-                                      Container(
-                                        width: 24,
-                                        height: 24,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.circle,
+                                      Positioned(
+                                        top: 8,
+                                        left: 8,
+                                        child: Container(
+                                          padding: const EdgeInsets.all(6),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF0F172A).withValues(alpha: 0.8),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: const Color(0xFF2DD4BF)),
+                                          ),
+                                          child: Icon(icon, color: const Color(0xFF2DD4BF), size: 16),
                                         ),
-                                        child: const Center(
-                                          child: Icon(
-                                            Icons.chevron_right_rounded,
-                                            size: 16,
-                                            color: AppColors.primary,
+                                      ),
+                                      if (cat.isFeatured)
+                                        Positioned(
+                                          top: 8,
+                                          right: 8,
+                                          child: Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFEC4899),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              'POPULAR',
+                                              style: GoogleFonts.outfit(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 9,
+                                              ),
+                                            ),
                                           ),
                                         ),
-                                      ),
                                     ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(10.0),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          cat.name,
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          '${cat.subcategories.length} subcategories',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 11,
+                                            color: const Color(0xFF94A3B8),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ],
                               ),

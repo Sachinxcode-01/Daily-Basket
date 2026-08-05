@@ -138,13 +138,18 @@ model Category {
   id          String     @id @default(uuid())
   name        String
   slug        String     @unique
+  description String?
   imageUrl    String?
+  bannerImage String?
   iconName    String?
   parentId    String?
   parent      Category?  @relation("SubCategories", fields: [parentId], references: [id])
   children    Category[] @relation("SubCategories")
   sortOrder   Int        @default(0)
+  isFeatured  Boolean    @default(false)
   isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
   products    Product[]
 
   @@map("categories")
@@ -159,14 +164,19 @@ model Product {
   name        String
   slug        String           @unique
   description String
-  images      String[]
-  isOrganic   Boolean          @default(false)
-  tags        String[]
-  variants    ProductVariant[]
-  reviews     Review[]
-  favorites   Favorite[]
-  createdAt   DateTime         @default(now())
-  updatedAt   DateTime         @updatedAt
+  images          String[]
+  packageImages   String[]         @default([])
+  barcode         String?          @unique
+  brand           String?
+  brandAliases    String[]         @default([])
+  searchKeywords  String[]         @default([])
+  isOrganic       Boolean          @default(false)
+  tags            String[]
+  variants        ProductVariant[]
+  reviews         Review[]
+  favorites       Favorite[]
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   @@map("products")
 }

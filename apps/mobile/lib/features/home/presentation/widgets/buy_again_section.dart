@@ -97,7 +97,7 @@ class BuyAgainSection extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         SizedBox(
-          height: 188,
+          height: 215,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
