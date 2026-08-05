@@ -1,0 +1,37 @@
+# Production Dockerfile for Daily Basket Delivery Partner Portal (Next.js)
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/delivery/package.json apps/delivery/
+COPY packages/ ./packages/
+
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
+
+COPY apps/delivery/ ./apps/delivery/
+
+WORKDIR /app/apps/delivery
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build
+
+# Production Runner Stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
+
+COPY --from=builder /app/apps/delivery/public ./public
+COPY --from=builder /app/apps/delivery/.next ./.next
+COPY --from=builder /app/apps/delivery/node_modules ./node_modules
+COPY --from=builder /app/apps/delivery/package.json ./package.json
+
+USER nextjs
+
+EXPOSE 3002
+
+ENV PORT=3002
+CMD ["npm", "start"]

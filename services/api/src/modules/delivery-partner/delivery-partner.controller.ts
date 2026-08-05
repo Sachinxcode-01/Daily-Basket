@@ -24,4 +24,35 @@ export class DeliveryPartnerController {
   async completeOrder(@Body() body: { orderId: string; otp: string }) {
     return this.partnerService.completeOrder(body.orderId, body.otp);
   }
+
+  @Get('route-optimization/:driverId')
+  @ApiOperation({ summary: 'Get optimized batch delivery route navigation' })
+  async getRouteOptimization(@Param('driverId') driverId: string) {
+    return this.partnerService.getRouteOptimization(driverId);
+  }
+
+  @Post('fuel-tracking')
+  @ApiOperation({ summary: 'Log rider distance and fuel consumption' })
+  async logFuelTracking(@Body() body: { driverId: string; distanceKm: number; fuelLiters?: number }) {
+    return this.partnerService.logFuelTracking(body.driverId, body.distanceKm, body.fuelLiters);
+  }
+
+  @Get('weekly-performance/:driverId')
+  @ApiOperation({ summary: 'Get weekly performance, earnings, tips, and rider ratings' })
+  async getWeeklyPerformance(@Param('driverId') driverId: string) {
+    return this.partnerService.getWeeklyPerformance(driverId);
+  }
+
+  @Get('incentives/:driverId')
+  @ApiOperation({ summary: 'Get active milestone bonus incentives' })
+  async getIncentives(@Param('driverId') driverId: string) {
+    return this.partnerService.getIncentives(driverId);
+  }
+
+  @Post('leave-request')
+  @ApiOperation({ summary: 'Submit leave request or log attendance' })
+  async submitLeaveRequest(@Body() body: { driverId: string; startDate: string; endDate: string; reason: string }) {
+    return this.partnerService.submitLeaveRequest(body.driverId, body.startDate, body.endDate, body.reason);
+  }
 }
+

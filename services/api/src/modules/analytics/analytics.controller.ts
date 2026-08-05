@@ -12,4 +12,29 @@ export class AnalyticsController {
   async getStoreAnalytics(@Param('storeId') storeId: string) {
     return this.analyticsService.getStoreAnalytics(storeId);
   }
+
+  @Get('admin/fraud-dashboard')
+  @ApiOperation({ summary: 'Get security fraud monitoring and risk alerts' })
+  async getFraudDashboard() {
+    return this.analyticsService.getFraudDashboard();
+  }
+
+  @Get('admin/heat-maps')
+  @ApiOperation({ summary: 'Get dark store delivery order density heat map' })
+  async getDeliveryHeatMaps() {
+    return this.analyticsService.getDeliveryHeatMaps();
+  }
+
+  @Get('admin/coupon-analytics')
+  @ApiOperation({ summary: 'Get promo coupon performance and redemption metrics' })
+  async getCouponAnalytics() {
+    return this.analyticsService.getCouponAnalytics();
+  }
+
+  @Get('admin/export-report')
+  @ApiOperation({ summary: 'Export store performance data report in CSV' })
+  async exportReport() {
+    return this.analyticsService.exportReport();
+  }
 }
+

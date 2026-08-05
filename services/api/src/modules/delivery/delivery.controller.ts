@@ -24,5 +24,18 @@ export class DeliveryController {
   async checkLocation(@Body() body: { lat?: number; lng?: number; address?: string }) {
     return this.deliveryService.checkLocation(body.lat, body.lng, body.address);
   }
+
+  @Post('reschedule')
+  @ApiOperation({ summary: 'Reschedule delivery time slot' })
+  async rescheduleDelivery(@Body() body: { orderId: string; newTimeSlot: string; date: string }) {
+    return this.deliveryService.rescheduleDelivery(body.orderId, body.newTimeSlot, body.date);
+  }
+
+  @Post('rate')
+  @ApiOperation({ summary: 'Submit delivery partner rating and feedback' })
+  async rateDelivery(@Body() body: { orderId: string; rating: number; feedback?: string; tipAmount?: number }) {
+    return this.deliveryService.rateDelivery(body.orderId, body.rating, body.feedback, body.tipAmount);
+  }
 }
+
 

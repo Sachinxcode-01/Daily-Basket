@@ -35,4 +35,44 @@ export class AnalyticsService {
       hourlyOrderDistribution,
     };
   }
+
+  async getFraudDashboard() {
+    return {
+      riskScore: 'LOW',
+      flaggedAccountsCount: 2,
+      suspiciousTransactions: [
+        { id: 'tx_091', userId: 'usr_882', reason: 'High velocity repeated OTP requests', riskLevel: 'MEDIUM', createdAt: new Date().toISOString() },
+      ],
+      botAttacksPrevented: 14,
+      rateLimitTriggers24h: 38,
+    };
+  }
+
+  async getDeliveryHeatMaps() {
+    return {
+      zones: [
+        { pincode: '560034', sector: 'Koramangala 4th Block', orderDensity: 94, averageDeliveryMins: 8.2 },
+        { pincode: '560095', sector: 'HSR Layout Sector 1', orderDensity: 88, averageDeliveryMins: 9.1 },
+        { pincode: '560037', sector: 'Indiranagar 100 Feet Rd', orderDensity: 76, averageDeliveryMins: 8.5 },
+      ],
+    };
+  }
+
+  async getCouponAnalytics() {
+    return {
+      totalRedemptions: 1420,
+      totalDiscountGranted: 142000,
+      topPerformingCode: 'DAILYFRESH100',
+      conversionRateMultiplier: 1.34,
+    };
+  }
+
+  async exportReport() {
+    return {
+      downloadUrl: 'https://dailybasket.local/exports/daily-analytics-2026.csv',
+      format: 'CSV',
+      generatedAt: new Date().toISOString(),
+    };
+  }
 }
+

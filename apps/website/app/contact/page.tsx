@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import {
@@ -12,11 +14,6 @@ import {
   Search,
   ShoppingBag,
 } from 'lucide-react';
-
-export const metadata = {
-  title: 'Contact Us | Daily Basket',
-  description: 'Get in touch with Daily Basket customer support, partnerships, and inquiry teams.',
-};
 
 export default function ContactUsPage() {
   return (

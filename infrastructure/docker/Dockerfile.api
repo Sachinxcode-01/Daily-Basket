@@ -1,33 +1,41 @@
-FROM node:18-alpine AS builder
+# Production Dockerfile for Daily Basket NestJS API
+FROM node:20-alpine AS builder
 
 WORKDIR /app
-RUN npm install -g pnpm
 
-# Copy workspace manifests first (for layer caching)
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+# Copy root and service package files
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY services/api/package.json services/api/
-COPY packages/ packages/
+COPY packages/ ./packages/
 
-RUN pnpm install --frozen-lockfile
+# Install dependencies
+RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
-# Copy Prisma schema BEFORE build (required for prisma generate)
-COPY services/api/prisma/ services/api/prisma/
-RUN pnpm --filter api run prisma:generate
+# Copy NestJS API source code
+COPY services/api/ ./services/api/
 
-# Copy application source
-COPY services/api/ services/api/
-RUN pnpm --filter api build
+# Generate Prisma Client & Build NestJS app
+WORKDIR /app/services/api
+RUN npx prisma generate
+RUN npm run build
 
-FROM node:18-alpine AS runner
+# Production Runner Stage
+FROM node:20-alpine AS runner
+
 WORKDIR /app
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
-# Copy Prisma client (required at runtime)
-COPY --from=builder /app/services/api/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules ./node_modules
+# Security: Add non-root user
+RUN addgroup -g 1001 -S nodejs && adduser -S nestjs -u 1001
+
+# Copy built application and node_modules from builder
 COPY --from=builder /app/services/api/dist ./dist
-COPY services/api/package.json ./
-COPY services/api/prisma/ ./prisma/
+COPY --from=builder /app/services/api/node_modules ./node_modules
+COPY --from=builder /app/services/api/package.json ./
+COPY --from=builder /app/services/api/prisma ./prisma
+
+USER nestjs
 
 EXPOSE 4000
-CMD ["node", "dist/main.js"]
+
+CMD ["node", "dist/main"]

@@ -37,6 +37,8 @@ import { ImpactModule } from './modules/impact/impact.module';
 import { SupportModule } from './modules/support/support.module';
 import { QuickBuyModule } from './modules/quick-buy/quick-buy.module';
 import { StockAlertsModule } from './modules/stock-alerts/stock-alerts.module';
+import { FinanceModule } from './modules/finance/finance.module';
+import { MarketingModule } from './modules/marketing/marketing.module';
 
 @Module({
   imports: [
@@ -71,7 +73,10 @@ import { StockAlertsModule } from './modules/stock-alerts/stock-alerts.module';
     SupportModule,
     QuickBuyModule,
     StockAlertsModule,
+    FinanceModule,
+    MarketingModule,
   ],
+
   providers: [
     PrismaService,
     { provide: APP_GUARD, useClass: ThrottlerGuard },

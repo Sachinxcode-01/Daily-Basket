@@ -61,28 +61,48 @@ model Store {
 }
 
 model User {
-  id           String      @id @default(uuid())
-  phoneNumber  String      @unique
-  email        String?     @unique
-  fullName     String
-  role         Role        @default(CUSTOMER)
-  avatarUrl    String?
-  isVerified   Boolean     @default(false)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  addresses    Address[]
-  orders       Order[]     @relation("CustomerOrders")
-  deliveries   Order[]     @relation("DeliveryPartnerOrders")
-  wallet       Wallet?
-  reviews      Review[]
-  impact       UserImpact?
-  badges       UserBadge[]
-  tickets      SupportTicket[]
-  stockAlerts  StockAlert[]
-  aiSessions   AiConversationSession[]
-  wishlist     Wishlist[]
-  recentlyViewed RecentlyViewed[]
-  deviceSessions DeviceSession[]
+  id                      String                  @id @default(uuid())
+  phoneNumber             String                  @unique
+  email                   String?                 @unique
+  fullName                String
+  passwordHash            String?
+  role                    Role                    @default(CUSTOMER)
+  avatarUrl               String?
+  isVerified              Boolean                 @default(false)
+  emailVerificationToken  String?                 @unique
+  emailVerificationExpires DateTime?
+  passwordResetToken      String?                 @unique
+  passwordResetExpires    DateTime?
+  mfaEnabled              Boolean                 @default(false)
+  mfaType                 String?                 // TOTP, EMAIL, SMS
+  mfaSecret               String?
+  mfaBackupCodes          String[]                @default([])
+  failedLoginAttempts     Int                     @default(0)
+  lockoutUntil            DateTime?
+  lastLoginAt             DateTime?
+  lastPasswordChange      DateTime?
+  termsAccepted           Boolean                 @default(true)
+  privacyAccepted         Boolean                 @default(true)
+  marketingConsent        Boolean                 @default(false)
+  referralCode            String?
+  createdAt               DateTime                @default(now())
+  updatedAt               DateTime                @updatedAt
+  addresses               Address[]
+  orders                  Order[]                 @relation("CustomerOrders")
+  deliveries              Order[]                 @relation("DeliveryPartnerOrders")
+  wallet                  Wallet?
+  reviews                 Review[]
+  impact                  UserImpact?
+  badges                  UserBadge[]
+  tickets                 SupportTicket[]
+  stockAlerts             StockAlert[]
+  aiSessions              AiConversationSession[]
+  wishlist                Wishlist[]
+  recentlyViewed          RecentlyViewed[]
+  deviceSessions          DeviceSession[]
+  otpVerifications        OtpVerification[]
+  securityAuditLogs       SecurityAuditLog[]
+  passwordHistories       PasswordHistory[]
 
   @@map("users")
 }
@@ -442,14 +462,59 @@ model DeviceSession {
   userId       String
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   deviceId     String
-  deviceModel  String?
+  deviceName   String?
+  platform     String?
+  osVersion    String?
   ipAddress    String?
+  location     String?
   refreshToken String   @unique
   isActive     Boolean  @default(true)
   lastActive   DateTime @default(now())
+  expiresAt    DateTime @default(now())
   createdAt    DateTime @default(now())
 
   @@map("device_sessions")
+}
+
+model OtpVerification {
+  id           String    @id @default(uuid())
+  identifier   String    // phone or email
+  otpHash      String
+  type         String    // LOGIN, REGISTRATION, PASSWORD_RESET, MFA
+  attempts     Int       @default(0)
+  maxAttempts  Int       @default(3)
+  expiresAt    DateTime
+  resendAfter  DateTime
+  consumedAt   DateTime?
+  userId       String?
+  user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+
+  @@index([identifier, type])
+  @@map("otp_verifications")
+}
+
+model SecurityAuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  event     String   // LOGIN_SUCCESS, LOGIN_FAILED, PASSWORD_CHANGE, EMAIL_CHANGE, PHONE_CHANGE, LOGOUT, LOGOUT_ALL, MFA_ENABLED, MFA_DISABLED, LOCKOUT, SESSION_REVOKED
+  ipAddress String?
+  userAgent String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@map("security_audit_logs")
+}
+
+model PasswordHistory {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  @@map("password_histories")
 }
 
 model OrderInvoice {

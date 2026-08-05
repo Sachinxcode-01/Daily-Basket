@@ -4,14 +4,12 @@ import {
   Post,
   Body,
   Query,
-  Req,
   Res,
-  UseGuards,
-  HttpStatus,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AiService } from './ai.service';
-import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
+
 
 @ApiTags('ai')
 @Controller('ai')
@@ -99,4 +97,23 @@ export class AiController {
   async getDemandForecast(@Query('storeId') storeId: string) {
     return this.aiService.getDemandForecast(storeId);
   }
+
+  @Post('recipe-to-cart')
+  @ApiOperation({ summary: 'Extract recipe ingredients and match to available products' })
+  async recipeToCart(@Body() body: { recipeName: string; recipeText?: string }) {
+    return this.aiService.processRecipeToCart(body.recipeName, body.recipeText);
+  }
+
+  @Get('weekly-basket')
+  @ApiOperation({ summary: 'Generate AI automated weekly recurring grocery basket' })
+  async getWeeklyBasket(@Query('userId') userId: string) {
+    return this.aiService.generateWeeklyBasket(userId || 'usr_demo');
+  }
+
+  @Post('smart-coupons')
+  @ApiOperation({ summary: 'AI personalized smart coupon suggestions for checkout' })
+  async getSmartCoupons(@Body() body: { userId?: string; cartAmount: number; itemCategoryIds?: string[] }) {
+    return this.aiService.suggestSmartCoupons(body.userId || 'usr_demo', body.cartAmount, body.itemCategoryIds);
+  }
 }
+

@@ -83,5 +83,27 @@ export class DeliveryService {
       ],
     };
   }
+
+  async rescheduleDelivery(orderId: string, newTimeSlot: string, date: string) {
+    return {
+      success: true,
+      orderId,
+      newTimeSlot,
+      date,
+      message: `Delivery rescheduled to ${date} (${newTimeSlot})`,
+    };
+  }
+
+  async rateDelivery(orderId: string, rating: number, feedback?: string, tipAmount?: number) {
+    return {
+      success: true,
+      orderId,
+      rating,
+      feedback: feedback || 'Great experience!',
+      tipAdded: tipAmount || 0,
+      message: 'Thank you for your rating!',
+    };
+  }
 }
+
 

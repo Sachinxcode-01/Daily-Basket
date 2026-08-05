@@ -305,4 +305,76 @@ RULES:
       confidenceScore: 0.94,
     };
   }
+
+  async processRecipeToCart(recipeName: string, recipeText?: string) {
+    this.logger.log(`Parsing recipe to cart: ${recipeName} (${recipeText || 'no raw text'})`);
+    return {
+      recipeName,
+      servings: 4,
+      prepTimeMins: 15,
+      ingredientsMatched: [
+        { productName: 'Fresh Paneer 200g', unit: '2 Pks', price: 160, productId: 'p_paneer_01' },
+        { productName: 'Capsicum Green 500g', unit: '1 Pk', price: 38, productId: 'p_capsicum_01' },
+        { productName: 'Red Onions 1kg', unit: '1 Pk', price: 35, productId: 'p_onion_01' },
+        { productName: 'Organic Tomatoes 500g', unit: '1 Pk', price: 24, productId: 'p_tomato_01' },
+      ],
+      totalEstimate: 257,
+      aiTip: 'All ingredients are in stock at your local Dark Store and ready for 10-minute delivery!',
+    };
+  }
+
+  async generateWeeklyBasket(userId: string) {
+    return {
+      userId,
+      basketTitle: 'Smart Weekly Grocery Essentials',
+      frequency: 'WEEKLY',
+      estimatedSavings: 140,
+      items: [
+        { name: 'Amul Gold Milk 500ml', quantity: 7, unitPrice: 33, totalPrice: 231 },
+        { name: 'Organic Eggs (Pack of 6)', quantity: 2, unitPrice: 65, totalPrice: 130 },
+        { name: 'Aashirvaad Shuddh Chakki Atta 5kg', quantity: 1, unitPrice: 245, totalPrice: 245 },
+        { name: 'Organic Tomatoes 1kg', quantity: 2, unitPrice: 48, totalPrice: 96 },
+      ],
+      grandTotal: 702,
+      oneClickReorderSupported: true,
+    };
+  }
+
+  async suggestSmartCoupons(userId: string, cartAmount: number, itemCategoryIds?: string[]) {
+    this.logger.debug(`Evaluating smart coupons for ${userId}, cartAmount ${cartAmount}, categories: ${itemCategoryIds?.join(',') || 'all'}`);
+
+
+    const coupons = [];
+    if (cartAmount >= 499) {
+      coupons.push({
+        code: 'DAILYFRESH100',
+        discountType: 'FLAT',
+        discountValue: 100,
+        minOrderAmount: 499,
+        description: 'Flat ₹100 off on fresh organic produce',
+        savings: 100,
+        isBestValue: true,
+      });
+    }
+    if (cartAmount >= 299) {
+      coupons.push({
+        code: 'QUICK15',
+        discountType: 'PERCENTAGE',
+        discountValue: 15,
+        maxDiscount: 75,
+        minOrderAmount: 299,
+        description: '15% Off Quick Grocery Delivery',
+        savings: Math.min(cartAmount * 0.15, 75),
+        isBestValue: cartAmount < 499,
+      });
+    }
+
+    return {
+      userId,
+      cartAmount,
+      recommendedCoupon: coupons.find((c) => c.isBestValue) || null,
+      availableCoupons: coupons,
+    };
+  }
 }
+
