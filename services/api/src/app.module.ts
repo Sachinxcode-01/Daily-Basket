@@ -39,6 +39,8 @@ import { QuickBuyModule } from './modules/quick-buy/quick-buy.module';
 import { StockAlertsModule } from './modules/stock-alerts/stock-alerts.module';
 import { FinanceModule } from './modules/finance/finance.module';
 import { MarketingModule } from './modules/marketing/marketing.module';
+import { EventsModule } from './modules/events/events.module';
+import { QueueModule } from './modules/queue/queue.module';
 
 @Module({
   imports: [
@@ -52,6 +54,8 @@ import { MarketingModule } from './modules/marketing/marketing.module';
     RedisModule,
     UploadsModule,
     NotificationsModule,
+    EventsModule,
+    QueueModule,
     AuthModule,
     UsersModule,
     ReferralsModule,
