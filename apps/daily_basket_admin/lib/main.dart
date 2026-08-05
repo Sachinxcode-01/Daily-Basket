@@ -24,6 +24,7 @@ import 'features/authentication/presentation/screens/admin_loading_screen.dart';
 import 'features/authentication/presentation/screens/admin_account_locked_screen.dart';
 
 // Operations Dashboard & Modules
+import 'features/dashboard/presentation/screens/admin_overview_screen.dart';
 import 'features/dashboard/presentation/screens/operational_insights_roi_screen.dart';
 import 'features/dashboard/presentation/screens/admin_dashboard_shell.dart';
 import 'features/orders/presentation/screens/admin_orders_screen.dart';
@@ -81,6 +82,7 @@ class DailyBasketAdminApp extends StatelessWidget {
 
         // Operational Dashboard & Modules
         '/admin/dashboard': (context) => const AdminDashboardShell(),
+        '/admin/overview': (context) => const AdminOverviewScreen(),
         '/admin/insights': (context) => const OperationalInsightsRoiScreen(),
         '/admin/orders': (context) => const AdminOrdersScreen(),
         '/admin/inventory': (context) => const AdminInventoryScreen(),
