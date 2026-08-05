@@ -48,18 +48,50 @@ export class GeminiProvider implements AIProvider {
     const startTime = Date.now();
     return RetryManager.executeWithRetry(async () => {
       const systemMsg = messages.find((m) => m.role === 'system')?.content || '';
+
+      // Build contents with optional multimodal (Vision) support
       const contents = messages
         .filter((m) => m.role !== 'system')
-        .map((m) => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: m.content }],
-        }));
+        .map((m) => {
+          const parts: any[] = [{ text: m.content }];
+
+          // Inject image inline_data part if this is the user message and image context exists
+          if (m.role === 'user' && context?.imageBase64) {
+            parts.push({
+              inline_data: {
+                mime_type: context.mimeType || 'image/jpeg',
+                data: context.imageBase64,
+              },
+            });
+          }
+
+          // Inject audio inline_data part for voice transcription context
+          if (m.role === 'user' && context?.audioBase64) {
+            parts.push({
+              inline_data: {
+                mime_type: 'audio/wav',
+                data: context.audioBase64,
+              },
+            });
+          }
+
+          return {
+            role: m.role === 'assistant' ? 'model' : 'user',
+            parts,
+          };
+        });
+
+      // Select vision-capable model if image/audio context is provided
+      const activeModel =
+        context?.imageBase64 || context?.audioBase64
+          ? 'gemini-1.5-pro'
+          : this.modelName;
 
       const body: any = {
         contents,
         generationConfig: {
           temperature: 0.3,
-          maxOutputTokens: 1000,
+          maxOutputTokens: 1200,
         },
       };
 
@@ -81,7 +113,7 @@ export class GeminiProvider implements AIProvider {
         ];
       }
 
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.modelName}:generateContent?key=${this.apiKey}`;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${this.apiKey}`;
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -149,16 +181,16 @@ export class GeminiProvider implements AIProvider {
       }
 
       if (response.content) {
-        // Stream out chunks for smooth typing effect
+        // Stream 1-2 words at a time for smooth typewriter effect
         const words = response.content.split(' ');
-        for (let i = 0; i < words.length; i += 3) {
-          const chunkText = words.slice(i, i + 3).join(' ') + ' ';
+        for (let i = 0; i < words.length; i++) {
+          const chunkText = words[i] + (i < words.length - 1 ? ' ' : '');
           yield {
             type: 'content',
             content: chunkText,
             providerUsed: this.getProviderName(),
           };
-          await new Promise((res) => setTimeout(res, 30));
+          await new Promise((res) => setTimeout(res, 35));
         }
       }
 

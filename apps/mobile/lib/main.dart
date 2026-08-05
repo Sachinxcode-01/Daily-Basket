@@ -74,7 +74,9 @@ import 'features/profile/providers/address_provider.dart';
 import 'features/tracking/providers/tracking_provider.dart';
 import 'core/providers/ai_chat_provider.dart';
 import 'core/providers/wishlist_provider.dart';
+import 'core/providers/favorites_provider.dart';
 import 'core/providers/recently_viewed_provider.dart';
+import 'features/catalog/presentation/screens/favorites_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -92,6 +94,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => TrackingProvider()),
         ChangeNotifierProvider(create: (_) => AiChatProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => RecentlyViewedProvider()),
       ],
       child: const DailyBasketApp(),
@@ -149,6 +152,8 @@ class DailyBasketApp extends StatelessWidget {
         '/customer/home': (context) => const CustomerHomeScreen(),
         '/search': (context) => const SearchResultsScreen(),
         '/categories': (context) => const BrowseCategoriesScreen(),
+        '/favorites': (context) => const FavoritesScreen(),
+        '/catalog/favorites': (context) => const FavoritesScreen(),
         '/cart': (context) => const CartScreen(),
         '/cart/empty': (context) => const EmptyBasketScreen(),
         '/checkout': (context) => const CheckoutScreen(),
@@ -183,6 +188,10 @@ class DailyBasketApp extends StatelessWidget {
         '/live-chat': (context) => const LiveSupportChatScreen(),
         '/quick-buy': (context) => const QuickBuyEssentialsScreen(),
         '/back-to-stock': (context) => const BackToStockAlertsScreen(),
+        // Quick Services aliases
+        '/offers': (context) => const OffersScreen(),
+        '/daily-basket-plus': (context) => const DailyBasketPlusScreen(),
+        '/live-support': (context) => const LiveSupportChatScreen(),
       },
     );
   }

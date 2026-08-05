@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import '../../../../core/widgets/staggered_animated_card.dart';
 
 /// Stitch Screen: Order Management - Live Feed
 /// ID: 627ff613f73045749bb33296881189d0
@@ -150,7 +152,10 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> with SingleTicker
       body: Column(
         children: [
           // Live counter strip
-          _buildLiveStrip(),
+          StaggeredAnimatedCard(
+            index: 0,
+            child: _buildLiveStrip(),
+          ),
           // Tab body
           Expanded(
             child: TabBarView(
@@ -213,125 +218,128 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> with SingleTicker
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.all(12),
-      itemCount: orders.length,
-      itemBuilder: (context, index) {
-        final order = orders[index];
-        return _buildOrderCard(order);
-      },
+    return AnimationLimiter(
+      child: ListView.builder(
+        padding: const EdgeInsets.all(12),
+        itemCount: orders.length,
+        itemBuilder: (context, index) {
+          final order = orders[index];
+          return StaggeredAnimatedCard(
+            index: index,
+            margin: const EdgeInsets.only(bottom: 12),
+            onTap: () => _showOrderDetail(context, order),
+            child: _buildOrderCard(order),
+          );
+        },
+      ),
     );
   }
 
   Widget _buildOrderCard(Map<String, dynamic> order) {
     final statusConfig = _getStatusConfig(order['status'] as String);
 
-    return GestureDetector(
-      onTap: () => _showOrderDetail(context, order),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: (statusConfig['color'] as Color).withOpacity(0.25)),
-        ),
-        child: Column(
-          children: [
-            // Order header
-            Padding(
-              padding: const EdgeInsets.all(14),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: (statusConfig['color'] as Color).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(statusConfig['icon'] as IconData, color: statusConfig['color'] as Color, size: 20),
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: (statusConfig['color'] as Color).withOpacity(0.25)),
+      ),
+      child: Column(
+        children: [
+          // Order header
+          Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: (statusConfig['color'] as Color).withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          order['id'] as String,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                        Text(
-                          '${order['customer']} • ${order['time']}',
-                          style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
+                  child: Icon(statusConfig['icon'] as IconData, color: statusConfig['color'] as Color, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '₹${(order['amount'] as double).toStringAsFixed(0)}',
-                        style: const TextStyle(color: Color(0xFF2DD4BF), fontWeight: FontWeight.bold, fontSize: 16),
+                        order['id'] as String,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
                       ),
-                      Container(
-                        margin: const EdgeInsets.only(top: 4),
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: (statusConfig['color'] as Color).withOpacity(0.15),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          statusConfig['label'] as String,
-                          style: TextStyle(
-                            color: statusConfig['color'] as Color,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                      Text(
+                        '${order['customer']} • ${order['time']}',
+                        style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
-            // Items
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              decoration: const BoxDecoration(
-                color: Color(0xFF0F172A),
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(18),
-                  bottomRight: Radius.circular(18),
                 ),
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.shopping_basket_outlined, color: Color(0xFF64748B), size: 14),
-                  const SizedBox(width: 6),
-                  Expanded(
-                    child: Text(
-                      (order['items'] as List).join(', '),
-                      style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '₹${(order['amount'] as double).toStringAsFixed(0)}',
+                      style: const TextStyle(color: Color(0xFF2DD4BF), fontWeight: FontWeight.bold, fontSize: 16),
                     ),
-                  ),
-                  if (order['rider'] != null) ...[
-                    const Icon(Icons.two_wheeler_rounded, color: Color(0xFF2DD4BF), size: 14),
-                    const SizedBox(width: 4),
-                    Text(order['rider'] as String, style: const TextStyle(color: Color(0xFF2DD4BF), fontSize: 11, fontWeight: FontWeight.w600)),
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: (statusConfig['color'] as Color).withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        statusConfig['label'] as String,
+                        style: TextStyle(
+                          color: statusConfig['color'] as Color,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ],
-                  if (order['eta'] != 'Done' && order['eta'] != '-') ...[
-                    const SizedBox(width: 8),
-                    const Icon(Icons.timer_outlined, color: Color(0xFFFBBF24), size: 14),
-                    const SizedBox(width: 2),
-                    Text('ETA: ${order['eta']}', style: const TextStyle(color: Color(0xFFFBBF24), fontSize: 11)),
-                  ],
-                ],
+                ),
+              ],
+            ),
+          ),
+          // Items
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+            decoration: const BoxDecoration(
+              color: Color(0xFF0F172A),
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(18),
+                bottomRight: Radius.circular(18),
               ),
             ),
-          ],
-        ),
+            child: Row(
+              children: [
+                const Icon(Icons.shopping_basket_outlined, color: Color(0xFF64748B), size: 14),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    (order['items'] as List).join(', '),
+                    style: const TextStyle(color: Color(0xFF64748B), fontSize: 11),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (order['rider'] != null) ...[
+                  const Icon(Icons.two_wheeler_rounded, color: Color(0xFF2DD4BF), size: 14),
+                  const SizedBox(width: 4),
+                  Text(order['rider'] as String, style: const TextStyle(color: Color(0xFF2DD4BF), fontSize: 11, fontWeight: FontWeight.w600)),
+                ],
+                if (order['eta'] != 'Done' && order['eta'] != '-') ...[
+                  const SizedBox(width: 8),
+                  const Icon(Icons.timer_outlined, color: Color(0xFFFBBF24), size: 14),
+                  const SizedBox(width: 2),
+                  Text('ETA: ${order['eta']}', style: const TextStyle(color: Color(0xFFFBBF24), fontSize: 11)),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -394,18 +402,25 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> with SingleTicker
               const SizedBox(height: 20),
               const Text('Items Ordered', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.8)),
               const SizedBox(height: 8),
-              ...(order['items'] as List).map((item) => Container(
-                margin: const EdgeInsets.only(bottom: 6),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(10)),
-                child: Row(
-                  children: [
-                    const Icon(Icons.circle, color: Color(0xFF2DD4BF), size: 6),
-                    const SizedBox(width: 10),
-                    Text(item as String, style: const TextStyle(color: Colors.white, fontSize: 13)),
-                  ],
-                ),
-              )),
+              ...(order['items'] as List).asMap().entries.map((entry) {
+                final idx = entry.key;
+                final item = entry.value as String;
+                return StaggeredAnimatedCard(
+                  index: idx,
+                  margin: const EdgeInsets.only(bottom: 6),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(color: const Color(0xFF0F172A), borderRadius: BorderRadius.circular(10)),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.circle, color: Color(0xFF2DD4BF), size: 6),
+                        const SizedBox(width: 10),
+                        Text(item, style: const TextStyle(color: Colors.white, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                );
+              }),
               const SizedBox(height: 20),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -415,33 +430,39 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> with SingleTicker
                 ],
               ),
               const SizedBox(height: 24),
-              // Action buttons
+              // Action buttons with StaggeredAnimatedButton
               if (order['status'] == 'PLACED')
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0F766E),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                    icon: const Icon(Icons.inventory_rounded, color: Colors.white),
-                    label: const Text('Mark as Packing', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: StaggeredAnimatedButton(
+                    index: 1,
+                    backgroundColor: const Color(0xFF0F766E),
                     onPressed: () => Navigator.pop(context),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.inventory_rounded, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text('Mark as Packing', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   ),
                 ),
               if (order['status'] == 'PACKING')
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3B82F6),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    ),
-                    icon: const Icon(Icons.local_shipping_rounded, color: Colors.white),
-                    label: const Text('Assign & Dispatch Rider', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  child: StaggeredAnimatedButton(
+                    index: 1,
+                    backgroundColor: const Color(0xFF3B82F6),
                     onPressed: () => Navigator.pop(context),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.local_shipping_rounded, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text('Assign & Dispatch Rider', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
                   ),
                 ),
             ],

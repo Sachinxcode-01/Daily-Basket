@@ -11,6 +11,10 @@ import '../../../search/presentation/widgets/voice_search_dialog.dart';
 import '../../../cart/presentation/screens/cart_screen.dart';
 import '../../../orders/presentation/screens/order_history_screen.dart';
 import '../../../profile/presentation/screens/profile_screen.dart';
+import '../../../../shared/widgets/favorite_button.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../catalog/presentation/screens/product_listing_screen.dart';
+import '../widgets/quick_services_section.dart';
 
 class _Product {
   final String id, name, brand, unit, price, mrp, imageUrl, category;
@@ -183,10 +187,13 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 _buildHeader(), const SizedBox(height: 12),
                 _buildAddressBar(), const SizedBox(height: 12),
-                _buildSearchBar(), const SizedBox(height: 20),
+                _buildSearchBar(), const SizedBox(height: 16),
               ]),
             ),
             Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _buildBanner()),
+            const SizedBox(height: 20),
+            // ─── Premium Quick Services Section ──────────────────────────────────
+            const QuickServicesSection(),
             const SizedBox(height: 24),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -264,7 +271,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   Widget _buildHeader() => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(onPressed: () => Scaffold.of(context).openDrawer(), icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26)),
+          IconButton(onPressed: () => AppNavigationDrawer.show(context), icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26)),
           Row(mainAxisSize: MainAxisSize.min, children: [
             Container(
               width: 28, height: 28, padding: const EdgeInsets.all(2),
@@ -390,20 +397,44 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         ],
       );
 
+
+
+
   Widget _buildCategoryChips() {
-    const chips = [('Fruits','🍌'),('Vegetables','🥦'),('Dairy','🥛'),('Bakery','🥐'),('Beverages','☕'),('Household','🧺'),('Spices','🌶️'),('Stationery','✏️')];
+    const chips = [
+      ('Fruits', 'cat-1', '🍌'),
+      ('Vegetables', 'cat-1', '🥦'),
+      ('Dairy', 'cat-2', '🥛'),
+      ('Bakery', 'cat-5', '🥐'),
+      ('Beverages', 'cat-3', '☕'),
+      ('Household', 'cat-6', '🧺'),
+      ('Spices', 'cat-1', '🌶️'),
+      ('Stationery', 'cat-4', '✏️'),
+    ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
-      child: Row(children: chips.map((c) => GestureDetector(
-        onTap: () => setState(() => _navIndex = 1),
-        child: Container(
-          margin: const EdgeInsets.only(right: 12),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(color: const Color(0xFFF3F3F6), borderRadius: BorderRadius.circular(16)),
-          child: Row(children: [Text(c.$2, style: const TextStyle(fontSize: 20)), const SizedBox(width: 8), Text(c.$1, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)))]),
-        ),
-      )).toList()),
+      child: Row(
+        children: chips.map((c) => GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProductListingScreen(
+                  categoryId: c.$2,
+                  categoryName: c.$1,
+                ),
+              ),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(color: const Color(0xFFF3F3F6), borderRadius: BorderRadius.circular(16)),
+            child: Row(children: [Text(c.$3, style: const TextStyle(fontSize: 20)), const SizedBox(width: 8), Text(c.$1, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)))]),
+          ),
+        )).toList(),
+      ),
     );
   }
 
@@ -464,19 +495,41 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))],
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        ClipRRect(
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-          child: AspectRatio(
-            aspectRatio: 1.3,
-            child: AppNetworkImage(
-              imageUrl: p.imageUrl,
-              fit: BoxFit.cover,
+        Stack(
+          children: [
+            ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              fallbackIcon: _getCategoryIcon(p.category),
-              fallbackBgColor: const Color(0xFFF3F3F6),
-              fallbackIconColor: const Color(0xFF006B23),
+              child: AspectRatio(
+                aspectRatio: 1.3,
+                child: AppNetworkImage(
+                  imageUrl: p.imageUrl,
+                  fit: BoxFit.cover,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  fallbackIcon: _getCategoryIcon(p.category),
+                  fallbackBgColor: const Color(0xFFF3F3F6),
+                  fallbackIconColor: const Color(0xFF006B23),
+                ),
+              ),
             ),
-          ),
+            Positioned(
+              top: 2,
+              right: 2,
+              child: FavoriteButton(
+                productId: p.id,
+                productDetails: {
+                  'id': p.id,
+                  'name': p.name,
+                  'brand': p.brand,
+                  'weight': p.unit,
+                  'price': double.tryParse(p.price.replaceAll('₹', '')) ?? 50.0,
+                  'mrp': double.tryParse(p.mrp.replaceAll('₹', '')) ?? 60.0,
+                  'category': p.category,
+                  'imageUrl': p.imageUrl,
+                },
+                size: 20,
+              ),
+            ),
+          ],
         ),
         Expanded(
           child: Padding(

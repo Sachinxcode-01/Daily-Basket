@@ -1,0 +1,160 @@
+version: '3.8'
+
+services:
+  # 1. PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: daily_basket_postgres_prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-prod_secure_password_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-daily_basket}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ../scripts/backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4096M
+
+  # 2. Redis Cache & BullMQ Queue Server
+  redis:
+    image: redis:7-alpine
+    container_name: daily_basket_redis_prod
+    restart: always
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis_prod_secure_pass_2026} --appendonly yes
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_prod_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2048M
+
+  # 3. NestJS Core API Service
+  api:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.api
+    container_name: daily_basket_api_prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-prod_secure_password_2026}@postgres:5432/${POSTGRES_DB:-daily_basket}?schema=public
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis_prod_secure_pass_2026}
+      JWT_SECRET: ${JWT_SECRET:-daily_basket_prod_jwt_super_secret_key_2026}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:4000/api/v1/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+
+  # 4. Next.js Customer Website
+  website:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.website
+    container_name: daily_basket_website_prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      NEXT_PUBLIC_API_URL: https://api.dailybasket.com/api/v1
+    depends_on:
+      - api
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+
+  # 5. Next.js Admin Dashboard
+  admin:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.admin
+    container_name: daily_basket_admin_prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      NEXT_PUBLIC_API_URL: https://api.dailybasket.com/api/v1
+    depends_on:
+      - api
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+
+  # 6. Next.js Delivery Partner Portal
+  delivery:
+    build:
+      context: ..
+      dockerfile: infrastructure/docker/Dockerfile.delivery
+    container_name: daily_basket_delivery_prod
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      NEXT_PUBLIC_API_URL: https://api.dailybasket.com/api/v1
+    depends_on:
+      - api
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+
+  # 7. Nginx Edge Reverse Proxy
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: daily_basket_nginx_prod
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - certbot_certs:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    depends_on:
+      - api
+      - website
+      - admin
+      - delivery
+
+volumes:
+  postgres_prod_data:
+  redis_prod_data:
+  certbot_certs:
+  certbot_www:

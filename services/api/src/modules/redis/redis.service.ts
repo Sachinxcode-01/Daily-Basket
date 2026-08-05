@@ -69,6 +69,15 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     } catch {}
   }
 
+  async delByPattern(pattern: string): Promise<void> {
+    try {
+      const keys = await this.client.keys(pattern);
+      if (keys.length > 0) {
+        await this.client.del(...keys);
+      }
+    } catch {}
+  }
+
   // ─── Distributed Redlock Algorithm for Inventory Locking ──────────────────
   async acquireLock(resource: string, ttlSeconds = 10): Promise<string | null> {
     const lockKey = `dailybasket:lock:${resource}`;

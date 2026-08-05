@@ -432,6 +432,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
                             onTap: () => Navigator.of(context).pushNamed('/privacy-policy'),
                           ),
+                          const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
+                          _buildSettingTile(
+                            icon: Icons.info_outline_rounded,
+                            title: 'About Daily Basket',
+                            trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
+                            onTap: () => Navigator.of(context).pushNamed('/about'),
+                          ),
                         ],
                       ),
                     ),
@@ -476,7 +483,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                     // App Version Text
                     Text(
-                      'Version 1.2.0',
+                      'Version 2.4.0 (Build 2026.08.05)',
                       style: GoogleFonts.inter(
                         fontSize: 12,
                         color: const Color(0xFF6E7A6C),

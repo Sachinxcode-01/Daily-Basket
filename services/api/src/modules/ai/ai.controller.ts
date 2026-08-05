@@ -5,10 +5,14 @@ import {
   Body,
   Query,
   Res,
+  Req,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
-import { Response } from 'express';
+import { Response, Request } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AiService } from './ai.service';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiConsumes } from '@nestjs/swagger';
 
 
 @ApiTags('ai')
@@ -114,6 +118,67 @@ export class AiController {
   @ApiOperation({ summary: 'AI personalized smart coupon suggestions for checkout' })
   async getSmartCoupons(@Body() body: { userId?: string; cartAmount: number; itemCategoryIds?: string[] }) {
     return this.aiService.suggestSmartCoupons(body.userId || 'usr_demo', body.cartAmount, body.itemCategoryIds);
+  }
+
+  // ─── Image Analysis ──────────────────────────────────────────────
+
+  @Post('image-analysis')
+  @ApiOperation({ summary: 'Analyze product image for quality/damage issues via Gemini Vision' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('image'))
+  async analyzeImage(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: { userId?: string; sessionId?: string; context?: string },
+  ) {
+    const userId = body.userId || 'user_demo_01';
+
+    if (!file) {
+      return {
+        finding: 'No image received.',
+        severity: 'NONE',
+        recommendation: 'Please attach an image of the product and try again.',
+        suggestRefund: false,
+        providerUsed: 'NONE',
+      };
+    }
+
+    const imageBase64 = file.buffer.toString('base64');
+    const mimeType = file.mimetype || 'image/jpeg';
+
+    return this.aiService.analyzeImage(
+      userId,
+      imageBase64,
+      mimeType,
+      body.sessionId,
+      body.context,
+    );
+  }
+
+  // ─── Voice Transcription ──────────────────────────────────────────
+
+  @Post('voice-transcribe')
+  @ApiOperation({ summary: 'Transcribe voice audio to text via Gemini Audio API' })
+  @ApiConsumes('multipart/form-data')
+  @UseInterceptors(FileInterceptor('audio'))
+  async transcribeVoice(
+    @UploadedFile() file: Express.Multer.File,
+    @Body() body: { userId?: string; sessionId?: string; languageCode?: string },
+  ) {
+    const userId = body.userId || 'user_demo_01';
+    const languageCode = body.languageCode || 'en-IN';
+
+    if (!file) {
+      return { transcription: '', detectedLanguage: languageCode };
+    }
+
+    const audioBase64 = file.buffer.toString('base64');
+
+    return this.aiService.transcribeVoice(
+      userId,
+      audioBase64,
+      languageCode,
+      body.sessionId,
+    );
   }
 }
 

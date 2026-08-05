@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_network_image.dart';
+import '../../../catalog/presentation/screens/product_listing_screen.dart';
 
 /// Browse Categories Screen — Exact Google Stitch Specification
 /// Matches:
@@ -194,77 +195,90 @@ class BrowseCategoriesScreen extends StatelessWidget {
                       columnCount: 2,
                       child: ScaleAnimation(
                         child: FadeInAnimation(
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: cat['bgColor'],
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: AppColors.outlineVariant.withValues(alpha: 0.15),
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductListingScreen(
+                                    categoryId: cat['id'] as String,
+                                    categoryName: cat['name'] as String,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: cat['bgColor'],
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: AppColors.outlineVariant.withValues(alpha: 0.15),
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.80),
-                                      borderRadius: BorderRadius.circular(14),
-                                    ),
-                                    child: AppNetworkImage(
-                                      imageUrl: cat['image'] as String,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(
+                                    child: Container(
                                       width: double.infinity,
-                                      height: double.infinity,
-                                      borderRadius: BorderRadius.circular(14),
-                                      fallbackIcon: cat['icon'] as IconData,
-                                      fallbackBgColor: (cat['bgColor'] as Color)
-                                          .withValues(alpha: 0.50),
-                                      fallbackIconColor: AppColors.primary,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  cat['name'],
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.onSurface,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      cat['itemCount'],
-                                      style: GoogleFonts.inter(
-                                        fontSize: 11,
-                                        color: AppColors.onSurfaceVariant,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withValues(alpha: 0.80),
+                                        borderRadius: BorderRadius.circular(14),
+                                      ),
+                                      child: AppNetworkImage(
+                                        imageUrl: cat['image'] as String,
+                                        width: double.infinity,
+                                        height: double.infinity,
+                                        borderRadius: BorderRadius.circular(14),
+                                        fallbackIcon: cat['icon'] as IconData,
+                                        fallbackBgColor: (cat['bgColor'] as Color)
+                                            .withValues(alpha: 0.50),
+                                        fallbackIconColor: AppColors.primary,
                                       ),
                                     ),
-                                    Container(
-                                      width: 24,
-                                      height: 24,
-                                      decoration: const BoxDecoration(
-                                        color: Colors.white,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: const Center(
-                                        child: Icon(
-                                          Icons.chevron_right_rounded,
-                                          size: 16,
-                                          color: AppColors.primary,
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    cat['name'],
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.onSurface,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        cat['itemCount'],
+                                        style: GoogleFonts.inter(
+                                          fontSize: 11,
+                                          color: AppColors.onSurfaceVariant,
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                      Container(
+                                        width: 24,
+                                        height: 24,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: const Center(
+                                          child: Icon(
+                                            Icons.chevron_right_rounded,
+                                            size: 16,
+                                            color: AppColors.primary,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),

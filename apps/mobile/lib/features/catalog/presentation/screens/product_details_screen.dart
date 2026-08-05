@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../shared/widgets/favorite_button.dart';
 
 /// Product Details Screen — Google Stitch Design System Exact Replica
 class ProductDetailsScreen extends StatefulWidget {
@@ -32,7 +33,6 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _quantity = 1;
-  bool _isWishlisted = false;
 
   void _updateQuantity(int delta) {
     setState(() {
@@ -104,28 +104,37 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                             Row(
                               children: [
-                                GestureDetector(
-                                  onTap: () => setState(() => _isWishlisted = !_isWishlisted),
-                                  child: Container(
-                                    width: 42,
-                                    height: 42,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.90),
-                                      shape: BoxShape.circle,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.08),
-                                          blurRadius: 8,
-                                        ),
-                                      ],
+                             Container(
+                                width: 42,
+                                height: 42,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.90),
+                                  shape: BoxShape.circle,
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.08),
+                                      blurRadius: 8,
                                     ),
-                                    child: Icon(
-                                      _isWishlisted ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                                      color: _isWishlisted ? const Color(0xFFBA1A1A) : const Color(0xFF1A1C1E),
-                                      size: 22,
-                                    ),
+                                  ],
+                                ),
+                                child: Center(
+                                  child: FavoriteButton(
+                                    productId: widget.productId,
+                                    productDetails: {
+                                      'id': widget.productId,
+                                      'name': widget.productName,
+                                      'brand': 'Organic India',
+                                      'weight': widget.unitDetails,
+                                      'price': double.tryParse(widget.price.replaceAll('₹', '')) ?? 120.0,
+                                      'mrp': double.tryParse(widget.mrp.replaceAll('₹', '')) ?? 150.0,
+                                      'category': widget.categoryTag,
+                                      'imageUrl': widget.imageUrl,
+                                    },
+                                    padding: EdgeInsets.zero,
+                                    size: 22,
                                   ),
                                 ),
+                              ),
                                 const SizedBox(width: 10),
                                 GestureDetector(
                                   onTap: () {

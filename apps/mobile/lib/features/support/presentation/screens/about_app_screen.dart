@@ -77,7 +77,7 @@ class AboutAppScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                'v1.0.0 (Build 2026.08.04)',
+                'v2.4.0 (Build 2026.08.05)',
                 style: GoogleFonts.outfit(
                   fontSize: 12,
                   fontWeight: FontWeight.w700,
@@ -105,7 +105,7 @@ class AboutAppScreen extends StatelessWidget {
                   subtitle: 'App is up to date',
                   onTap: () {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('You are on the latest version (v1.0.0)')),
+                      const SnackBar(content: Text('You are on the latest version (v2.4.0)')),
                     );
                   },
                 ),

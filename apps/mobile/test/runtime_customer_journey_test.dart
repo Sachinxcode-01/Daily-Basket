@@ -22,7 +22,9 @@ import 'package:daily_basket_mobile/features/wallet/presentation/screens/wallet_
 import 'package:daily_basket_mobile/features/profile/presentation/screens/profile_screen.dart';
 import 'package:daily_basket_mobile/features/wallet/providers/wallet_provider.dart';
 import 'package:daily_basket_mobile/core/providers/wishlist_provider.dart';
+import 'package:daily_basket_mobile/core/providers/favorites_provider.dart';
 import 'package:daily_basket_mobile/core/providers/recently_viewed_provider.dart';
+import 'package:daily_basket_mobile/features/catalog/presentation/screens/favorites_screen.dart';
 
 class _MockHttpOverrides extends HttpOverrides {}
 
@@ -43,6 +45,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => WalletProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => RecentlyViewedProvider()),
       ],
       child: MaterialApp(home: child),
@@ -91,6 +94,11 @@ void main() {
 
       await tester.pumpWidget(wrapWithProviders(const ProfileScreen()));
       await tester.pump(const Duration(milliseconds: 200));
+    });
+    testWidgets('6. Favorites Screen Test', (WidgetTester tester) async {
+      await tester.pumpWidget(wrapWithProviders(const FavoritesScreen()));
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.text('My Favorites ❤️'), findsWidgets);
     });
   });
 }

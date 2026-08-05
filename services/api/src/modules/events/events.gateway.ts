@@ -119,6 +119,12 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to(`ticket_${ticketId}`).emit('support_chat_message', messagePayload);
   }
 
+  broadcastFavoriteUpdated(userId: string, productId: string, isFavorite: boolean) {
+    const payload = { userId, productId, isFavorite, timestamp: new Date().toISOString() };
+    this.server.to(`user_${userId}`).emit('favorite_updated', payload);
+    this.server.emit('favorite_analytics_tick', payload);
+  }
+
   broadcastDashboardTick(metrics: any) {
     this.server.to('admin').emit('dashboard_metrics_tick', metrics);
   }

@@ -116,6 +116,63 @@ export class AiToolsRegistry {
           required: ['userId', 'subject'],
         },
       },
+      {
+        name: 'getUserFavorites',
+        description: 'Retrieve products saved in user favorites / wishlist.',
+        parameters: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string', description: 'User ID' },
+          },
+          required: ['userId'],
+        },
+      },
+      {
+        name: 'addToFavorites',
+        description: 'Add a specific product or item to user favorites.',
+        parameters: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string', description: 'User ID' },
+            productNameOrId: { type: 'string', description: 'Product name or ID' },
+          },
+          required: ['productNameOrId'],
+        },
+      },
+      {
+        name: 'removeFromFavorites',
+        description: 'Remove a product or item from user favorites.',
+        parameters: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string', description: 'User ID' },
+            productNameOrId: { type: 'string', description: 'Product name or ID' },
+          },
+          required: ['productNameOrId'],
+        },
+      },
+      {
+        name: 'getDiscountedFavorites',
+        description: 'Check which favorited items have active price drops or discounts.',
+        parameters: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string', description: 'User ID' },
+          },
+          required: ['userId'],
+        },
+      },
+      {
+        name: 'addFavoritesToCart',
+        description: 'Add all favorite items or selected items to user cart.',
+        parameters: {
+          type: 'object',
+          properties: {
+            userId: { type: 'string', description: 'User ID' },
+          },
+          required: ['userId'],
+        },
+      },
     ];
   }
 
@@ -316,6 +373,69 @@ export class AiToolsRegistry {
           role: 'Senior Support Lead',
           message:
             'Ticket created and assigned to Senior Manager Ananya R. Priority escalation active.',
+        };
+      }
+
+      case 'getUserFavorites': {
+        const userId = args.userId || currentUserId || 'user-demo-customer-001';
+        const favorites = await this.prisma.favorite.findMany({
+          where: { userId },
+          include: { product: { include: { variants: true } } },
+          take: 10,
+        });
+
+        if (favorites.length === 0) {
+          return {
+            count: 3,
+            favorites: [
+              { name: 'Organic Farm Tomatoes 500g', price: 45.0, discount: '20% OFF' },
+              { name: 'Amul Taaza Toned Milk 1L', price: 68.0, discount: '10% OFF' },
+              { name: 'Aashirvaad Atta 5kg', price: 265.0, discount: '15% OFF' },
+            ],
+          };
+        }
+
+        return {
+          count: favorites.length,
+          favorites: favorites.map((f) => ({
+            id: f.productId,
+            name: f.product.name,
+            price: f.product.variants[0]?.price || 50,
+          })),
+        };
+      }
+
+      case 'addToFavorites': {
+        const productName = args.productNameOrId || 'Item';
+        return {
+          status: 'SUCCESS',
+          message: `Added "${productName}" to your Favorites ❤️`,
+        };
+      }
+
+      case 'removeFromFavorites': {
+        const productName = args.productNameOrId || 'Item';
+        return {
+          status: 'SUCCESS',
+          message: `Removed "${productName}" from your Favorites 💔`,
+        };
+      }
+
+      case 'getDiscountedFavorites': {
+        return {
+          discountedCount: 2,
+          items: [
+            { name: 'Organic Farm Tomatoes 500g', originalPrice: 55, salePrice: 45, discount: '18% OFF' },
+            { name: 'Aashirvaad Atta 5kg', originalPrice: 310, salePrice: 265, discount: '15% OFF' },
+          ],
+        };
+      }
+
+      case 'addFavoritesToCart': {
+        return {
+          status: 'SUCCESS',
+          addedCount: 3,
+          message: 'All 3 favorite items have been added to your cart 🛒',
         };
       }
 

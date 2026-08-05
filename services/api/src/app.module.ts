@@ -41,6 +41,7 @@ import { FinanceModule } from './modules/finance/finance.module';
 import { MarketingModule } from './modules/marketing/marketing.module';
 import { EventsModule } from './modules/events/events.module';
 import { QueueModule } from './modules/queue/queue.module';
+import { FavoritesModule } from './modules/favorites/favorites.module';
 
 @Module({
   imports: [
@@ -56,6 +57,7 @@ import { QueueModule } from './modules/queue/queue.module';
     NotificationsModule,
     EventsModule,
     QueueModule,
+    FavoritesModule,
     AuthModule,
     UsersModule,
     ReferralsModule,

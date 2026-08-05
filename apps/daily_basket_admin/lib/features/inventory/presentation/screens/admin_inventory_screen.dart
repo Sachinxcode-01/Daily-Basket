@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import '../../../../core/widgets/staggered_animated_card.dart';
 
 /// Stitch Screen: Inventory - Stock & Expiry
 /// ID: 7104b640b2f24799946ab9a420d41e70
@@ -81,22 +83,9 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> with Single
       'alert': null,
     },
     {
-      'name': 'Hass Avocados x4',
-      'sku': 'SKU-AVO-006',
-      'shelf': 'Aisle-1-A6',
-      'stock': 22,
-      'minStock': 8,
-      'batchCode': 'BAT-6601',
-      'expiresIn': 4,
-      'category': 'Fresh Produce',
-      'buyPrice': 95.0,
-      'sellPrice': 149.0,
-      'alert': 'Near-Expiry',
-    },
-    {
-      'name': 'Cold-Pressed Almond Oil 500ml',
-      'sku': 'SKU-OIL-007',
-      'shelf': 'Aisle-5-E2',
+      'name': 'Fortune Sunlite Sunflower Oil 1L',
+      'sku': 'SKU-OIL-006',
+      'shelf': 'Aisle-4-D2',
       'stock': 3,
       'minStock': 10,
       'batchCode': 'BAT-5520',
@@ -159,7 +148,10 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> with Single
       body: Column(
         children: [
           // Inventory KPI header
-          _buildInventoryKpis(),
+          StaggeredAnimatedCard(
+            index: 0,
+            child: _buildInventoryKpis(),
+          ),
           // Search bar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -193,14 +185,23 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> with Single
             ),
           ),
           const SizedBox(height: 8),
-          // Product list
+          // Product list with staggered scrolling animation
           Expanded(
             child: _filteredProducts.isEmpty
               ? const Center(child: Text('No products found', style: TextStyle(color: Color(0xFF64748B))))
-              : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                  itemCount: _filteredProducts.length,
-                  itemBuilder: (context, index) => _buildProductCard(_filteredProducts[index]),
+              : AnimationLimiter(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    itemCount: _filteredProducts.length,
+                    itemBuilder: (context, index) {
+                      return StaggeredAnimatedCard(
+                        index: index,
+                        margin: const EdgeInsets.only(bottom: 10),
+                        onTap: () => _showProductDetail(context, _filteredProducts[index]),
+                        child: _buildProductCard(_filteredProducts[index]),
+                      );
+                    },
+                  ),
                 ),
           ),
         ],
@@ -209,7 +210,7 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> with Single
         backgroundColor: const Color(0xFF0F766E),
         icon: const Icon(Icons.post_add_rounded, color: Colors.white),
         label: const Text('New PO Request', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        onPressed: () {},
+        onPressed: () => _showAddProductSheet(context),
       ),
     );
   }
@@ -270,79 +271,75 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> with Single
       alertColor = const Color(0xFFEF4444);
     }
 
-    return GestureDetector(
-      onTap: () => _showProductDetail(context, product),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: const Color(0xFF1E293B),
-          borderRadius: BorderRadius.circular(16),
-          border: alert != null ? Border.all(color: alertColor.withOpacity(0.4)) : null,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(product['name'] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                      const SizedBox(height: 2),
-                      Text('${product['sku']} • ${product['shelf']} • ${product['category']}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 10)),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                if (alert != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(color: alertColor.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
-                    child: Text(alert, style: TextStyle(color: alertColor, fontSize: 9, fontWeight: FontWeight.bold)),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Stock: $stock units', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
-                          Text(expiresIn <= 3 ? 'Expires in $expiresIn day${expiresIn != 1 ? 's' : ''}' : '$expiresIn days shelf life', style: TextStyle(color: alertColor, fontSize: 10, fontWeight: FontWeight.bold)),
-                        ],
-                      ),
-                      const SizedBox(height: 4),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(4),
-                        child: LinearProgressIndicator(
-                          value: stockPercent,
-                          backgroundColor: const Color(0xFF334155),
-                          valueColor: AlwaysStoppedAnimation<Color>(stock <= minStock ? const Color(0xFFEF4444) : const Color(0xFF10B981)),
-                          minHeight: 5,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(16),
+        border: alert != null ? Border.all(color: alertColor.withOpacity(0.4)) : null,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('₹${(product['sellPrice'] as double).toStringAsFixed(0)}', style: const TextStyle(color: Color(0xFF2DD4BF), fontWeight: FontWeight.bold, fontSize: 14)),
-                    Text('buy ₹${(product['buyPrice'] as double).toStringAsFixed(0)}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 10)),
+                    Text(product['name'] as String, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 2),
+                    Text('${product['sku']} • ${product['shelf']} • ${product['category']}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 10)),
                   ],
                 ),
-              ],
-            ),
-          ],
-        ),
+              ),
+              const SizedBox(width: 12),
+              if (alert != null)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(color: alertColor.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                  child: Text(alert, style: TextStyle(color: alertColor, fontSize: 9, fontWeight: FontWeight.bold)),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Stock: $stock units', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+                        Text(expiresIn <= 3 ? 'Expires in $expiresIn day${expiresIn != 1 ? 's' : ''}' : '$expiresIn days shelf life', style: TextStyle(color: alertColor, fontSize: 10, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: LinearProgressIndicator(
+                        value: stockPercent,
+                        backgroundColor: const Color(0xFF334155),
+                        valueColor: AlwaysStoppedAnimation<Color>(stock <= minStock ? const Color(0xFFEF4444) : const Color(0xFF10B981)),
+                        minHeight: 5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 16),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text('₹${(product['sellPrice'] as double).toStringAsFixed(0)}', style: const TextStyle(color: Color(0xFF2DD4BF), fontWeight: FontWeight.bold, fontSize: 14)),
+                  Text('buy ₹${(product['buyPrice'] as double).toStringAsFixed(0)}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 10)),
+                ],
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -377,29 +374,36 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> with Single
             Row(
               children: [
                 Expanded(
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF2DD4BF),
-                      side: const BorderSide(color: Color(0xFF2DD4BF)),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    icon: const Icon(Icons.edit_rounded, size: 16),
-                    label: const Text('Adjust Stock'),
+                  child: StaggeredAnimatedButton(
+                    index: 0,
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: const Color(0xFF2DD4BF),
+                    borderSide: const BorderSide(color: Color(0xFF2DD4BF)),
                     onPressed: () => Navigator.pop(context),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.edit_rounded, size: 16),
+                        SizedBox(width: 6),
+                        Text('Adjust Stock'),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0F766E),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                    icon: const Icon(Icons.local_offer_rounded, color: Colors.white, size: 16),
-                    label: const Text('Flash Sale', style: TextStyle(color: Colors.white)),
+                  child: StaggeredAnimatedButton(
+                    index: 1,
+                    backgroundColor: const Color(0xFF0F766E),
                     onPressed: () => Navigator.pop(context),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.local_offer_rounded, color: Colors.white, size: 16),
+                        SizedBox(width: 6),
+                        Text('Flash Sale', style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -452,8 +456,9 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> with Single
             const SizedBox(height: 20),
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F766E), padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+              child: StaggeredAnimatedButton(
+                index: 0,
+                backgroundColor: const Color(0xFF0F766E),
                 onPressed: () => Navigator.pop(context),
                 child: const Text('Save GRN Entry', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),

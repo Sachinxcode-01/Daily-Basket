@@ -73,7 +73,7 @@ class _CartScreenState extends State<CartScreen> {
   final double _baseDeliveryFee = 50.0;
   final double _taxes = 30.0;
 
-  void _showCouponSheet(BuildContext context, CouponProvider? couponProvider) {
+  void _showCouponSheet(BuildContext context, CouponProvider? couponProvider, double currentItemTotal) {
     if (couponProvider == null) return;
     showModalBottomSheet(
       context: context,
@@ -131,7 +131,7 @@ class _CartScreenState extends State<CartScreen> {
                       controller: _promoController,
                       textCapitalization: TextCapitalization.characters,
                       decoration: InputDecoration(
-                        hintText: 'Enter Promo Code (e.g. ORGANIC15)',
+                        hintText: 'Enter Promo Code (e.g. WELCOME100, FRESH20)',
                         hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9EA59D)),
                         filled: true,
                         fillColor: Colors.white,
@@ -156,7 +156,7 @@ class _CartScreenState extends State<CartScreen> {
                     onPressed: () {
                       final result = couponProvider.applyCouponByCode(
                         _promoController.text,
-                        _itemTotal.toDouble(),
+                        currentItemTotal,
                       );
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -197,7 +197,7 @@ class _CartScreenState extends State<CartScreen> {
                   itemBuilder: (context, idx) {
                     final coupon = couponProvider.availableCoupons[idx];
                     final isCurrent = couponProvider.appliedCoupon?.code == coupon.code;
-                    final isEligible = _itemTotal >= coupon.minOrderAmount;
+                    final isEligible = currentItemTotal >= coupon.minOrderAmount;
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 12),
@@ -276,7 +276,7 @@ class _CartScreenState extends State<CartScreen> {
                                   ),
                                 );
                               } else {
-                                final res = couponProvider.applyCoupon(coupon, _itemTotal.toDouble());
+                                final res = couponProvider.applyCoupon(coupon, currentItemTotal);
                                 Navigator.pop(ctx);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
@@ -685,7 +685,7 @@ color: Color(0xFF6E7A6C),
 
                 // 5. Apply Coupon Card / Active Coupon Tile
                 GestureDetector(
-                  onTap: () => _showCouponSheet(context, couponProvider),
+                  onTap: () => _showCouponSheet(context, couponProvider, itemTotalDouble),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 14),
@@ -846,8 +846,10 @@ color: Color(0xFF6E7A6C),
                         ),
                       ),
                       const SizedBox(height: 14),
-                      _buildBillRow('Item Total ($_totalCount items)',
-                          '₹$_itemTotal'),
+                      _buildBillRow(
+                        'Item Total (${cartProvider?.totalCount ?? _totalCount} items)',
+                        '₹${itemTotalDouble.toStringAsFixed(0)}',
+                      ),
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,

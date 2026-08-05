@@ -104,6 +104,7 @@ model User {
   stockAlerts             StockAlert[]
   aiSessions              AiConversationSession[]
   wishlist                Wishlist[]
+  favorites               Favorite[]
   recentlyViewed          RecentlyViewed[]
   deviceSessions          DeviceSession[]
   otpVerifications        OtpVerification[]
@@ -163,6 +164,7 @@ model Product {
   tags        String[]
   variants    ProductVariant[]
   reviews     Review[]
+  favorites   Favorite[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
@@ -533,6 +535,21 @@ model OrderInvoice {
   issuedAt      DateTime @default(now())
 
   @@map("order_invoices")
+}
+
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+  @@index([userId])
+  @@index([productId])
+  @@map("favorites")
 }
 
 
