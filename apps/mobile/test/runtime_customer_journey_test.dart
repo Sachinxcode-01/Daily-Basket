@@ -8,6 +8,7 @@ import 'package:daily_basket_mobile/core/providers/user_provider.dart';
 import 'package:daily_basket_mobile/core/providers/app_theme_provider.dart';
 import 'package:daily_basket_mobile/core/providers/language_provider.dart';
 import 'package:daily_basket_mobile/core/providers/notification_provider.dart';
+import 'package:daily_basket_mobile/core/providers/cart_provider.dart';
 import 'package:daily_basket_mobile/features/profile/providers/address_provider.dart';
 import 'package:daily_basket_mobile/features/auth/presentation/screens/splash_screen.dart';
 import 'package:daily_basket_mobile/features/home/presentation/screens/home_screen.dart';
@@ -19,6 +20,9 @@ import 'package:daily_basket_mobile/features/orders/presentation/screens/order_s
 import 'package:daily_basket_mobile/features/orders/presentation/screens/order_history_screen.dart';
 import 'package:daily_basket_mobile/features/wallet/presentation/screens/wallet_transactions_screen.dart';
 import 'package:daily_basket_mobile/features/profile/presentation/screens/profile_screen.dart';
+import 'package:daily_basket_mobile/features/wallet/providers/wallet_provider.dart';
+import 'package:daily_basket_mobile/core/providers/wishlist_provider.dart';
+import 'package:daily_basket_mobile/core/providers/recently_viewed_provider.dart';
 
 class _MockHttpOverrides extends HttpOverrides {}
 
@@ -30,12 +34,16 @@ void main() {
   Widget wrapWithProviders(Widget child) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CouponProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => AddressProvider()),
         ChangeNotifierProvider(create: (_) => AppThemeProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => WalletProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(create: (_) => RecentlyViewedProvider()),
       ],
       child: MaterialApp(home: child),
     );

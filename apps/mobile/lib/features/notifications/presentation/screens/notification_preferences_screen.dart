@@ -40,6 +40,86 @@ class NotificationPreferencesScreen extends StatelessWidget {
             constraints: const BoxConstraints(maxWidth: 800),
             child: Column(
               children: [
+                // 0. Master Push Notification Toggle Card
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: provider.notificationsEnabled ? const Color(0xFFE8F5E9) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: provider.notificationsEnabled ? const Color(0xFF006B23) : const Color(0xFFE2E2E5),
+                      width: provider.notificationsEnabled ? 1.5 : 1.0,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: provider.notificationsEnabled ? const Color(0xFF006B23) : const Color(0xFFF3F3F6),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          provider.notificationsEnabled ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
+                          color: provider.notificationsEnabled ? Colors.white : const Color(0xFF6E7A6C),
+                          size: 22,
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Push Notifications',
+                              style: GoogleFonts.outfit(
+                                fontSize: 17,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF1A1C1E),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              provider.notificationsEnabled
+                                  ? 'Notifications are enabled for all updates'
+                                  : 'All push notifications are turned off',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: const Color(0xFF6E7A6C),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Switch(
+                        value: provider.notificationsEnabled,
+                        activeTrackColor: const Color(0xFF006B23),
+                        onChanged: (val) {
+                          provider.setNotificationsEnabled(val);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(val ? 'Push Notifications Enabled' : 'Push Notifications Disabled'),
+                              backgroundColor: val ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
+                              behavior: SnackBarBehavior.floating,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
                 // 1. Order Updates Section
                 _buildSectionCard(
                   icon: Icons.local_shipping_rounded,

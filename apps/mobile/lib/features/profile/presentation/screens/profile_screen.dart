@@ -19,6 +19,8 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   void _showLanguagePickerModal(BuildContext context) {
     final languageProvider = context.read<LanguageProvider>();
+    final availableLangs = languageProvider.availableLanguages;
+    final currentLang = languageProvider.selectedLanguage;
 
     showModalBottomSheet(
       context: context,
@@ -45,7 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Select Language',
+              languageProvider.translate('select_language'),
               style: GoogleFonts.outfit(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
@@ -56,37 +58,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Flexible(
               child: ListView.separated(
                 shrinkWrap: true,
-                itemCount: languageProvider.availableLanguages.length,
-                separatorBuilder: (_, __) => const Divider(height: 1),
+                itemCount: availableLangs.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
-                  final lang = languageProvider.availableLanguages[index];
-                  final isSelected = lang['name'] == languageProvider.selectedLanguage;
+                  final lang = availableLangs[index];
+                  final isSelected = lang['name'] == currentLang;
 
-                  return ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: Text(
-                      '${lang['name']} (${lang['native']})',
-                      style: GoogleFonts.outfit(
-                        fontSize: 16,
-                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                        color: isSelected ? const Color(0xFF006B23) : const Color(0xFF1A1C1E),
-                      ),
-                    ),
-                    trailing: isSelected
-                        ? const Icon(Icons.check_circle_rounded, color: Color(0xFF006B23))
-                        : null,
+                  return InkWell(
                     onTap: () {
-                      context.read<LanguageProvider>().setLanguage(lang['name']!);
+                      languageProvider.setLanguage(lang['name']!);
                       Navigator.pop(ctx);
+                      final updatedToast = languageProvider.translate('language_changed_toast');
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('App language changed to ${lang['name']}'),
+                          content: Text('$updatedToast ${lang['name']} (${lang['native']})'),
                           backgroundColor: const Color(0xFF006B23),
                           behavior: SnackBarBehavior.floating,
-                          duration: const Duration(seconds: 1),
+                          duration: const Duration(seconds: 2),
                         ),
                       );
                     },
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: isSelected ? const Color(0xFFE8F5E9) : const Color(0xFFF9F9FC),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                          color: isSelected ? const Color(0xFF006B23) : const Color(0xFFBECAB9).withValues(alpha: 0.3),
+                          width: isSelected ? 1.5 : 1,
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${lang['name']} (${lang['native']})',
+                            style: GoogleFonts.outfit(
+                              fontSize: 16,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color: isSelected ? const Color(0xFF006B23) : const Color(0xFF1A1C1E),
+                            ),
+                          ),
+                          if (isSelected)
+                            const Icon(Icons.check_circle_rounded, color: Color(0xFF006B23), size: 22),
+                        ],
+                      ),
+                    ),
                   );
                 },
               ),
@@ -99,10 +117,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userProvider = context.watch<UserProvider>();
-    final appThemeProvider = context.watch<AppThemeProvider>();
-    final languageProvider = context.watch<LanguageProvider>();
-    final notificationProvider = context.watch<NotificationProvider>();
+    UserProvider? userProvider;
+    AppThemeProvider? appThemeProvider;
+    LanguageProvider? languageProvider;
+    NotificationProvider? notificationProvider;
+
+    try { userProvider = context.watch<UserProvider>(); } catch (_) {}
+    try { appThemeProvider = context.watch<AppThemeProvider>(); } catch (_) {}
+    try { languageProvider = context.watch<LanguageProvider>(); } catch (_) {}
+    try { notificationProvider = context.watch<NotificationProvider>(); } catch (_) {}
+
+    final name = userProvider?.name ?? 'Alex Morgan';
+    final phone = userProvider?.phone ?? '+91 98765 43210';
+    final profileImageUrl = userProvider?.profileImageUrl ?? 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+    final selectedThemeLabel = appThemeProvider?.selectedThemeLabel ?? 'Light Mode';
+    final selectedLanguage = languageProvider?.selectedLanguage ?? 'English';
+    final notificationsEnabled = notificationProvider?.notificationsEnabled ?? true;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
@@ -166,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(9999),
                                     child: Image.network(
-                                      userProvider.profileImageUrl,
+                                      profileImageUrl,
                                       fit: BoxFit.cover,
                                       errorBuilder: (_, __, ___) => Container(
                                         color: const Color(0xFFE8F5E9),
@@ -194,7 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            userProvider.name,
+                            name,
                             style: GoogleFonts.outfit(
                               fontSize: 22,
                               fontWeight: FontWeight.w700,
@@ -203,7 +233,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            userProvider.phone,
+                            phone,
                             style: GoogleFonts.inter(
                               fontSize: 13,
                               color: const Color(0xFF6E7A6C),
@@ -216,7 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 24),
 
                     // ─── 3. SECTION 1: ACCOUNT SETTINGS ────────────────────────
-                    _buildSectionHeader('ACCOUNT SETTINGS'),
+                    _buildSectionHeader(languageProvider?.translate('account_settings', 'ACCOUNT SETTINGS') ?? 'ACCOUNT SETTINGS'),
                     const SizedBox(height: 8),
 
                     Container(
@@ -236,28 +266,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           _buildSettingTile(
                             icon: Icons.person_outline_rounded,
-                            title: 'Personal Information',
+                            title: languageProvider?.translate('personal_info', 'Personal Information') ?? 'Personal Information',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
                             onTap: () => Navigator.of(context).pushNamed('/personal-info'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.shield_outlined,
-                            title: 'Security',
+                            title: languageProvider?.translate('security', 'Security') ?? 'Security',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
                             onTap: () => Navigator.of(context).pushNamed('/security'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.location_on_outlined,
-                            title: 'Saved Addresses',
+                            title: languageProvider?.translate('saved_addresses', 'Saved Addresses') ?? 'Saved Addresses',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
                             onTap: () => Navigator.of(context).pushNamed('/saved-addresses'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.credit_card_rounded,
-                            title: 'Payment Methods',
+                            title: languageProvider?.translate('payment_methods', 'Payment Methods') ?? 'Payment Methods',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
                             onTap: () => Navigator.of(context).pushNamed('/payment-methods'),
                           ),
@@ -268,7 +298,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 24),
 
                     // ─── 4. SECTION 2: PREFERENCES ──────────────────────────────
-                    _buildSectionHeader('PREFERENCES'),
+                    _buildSectionHeader(languageProvider?.translate('preferences', 'PREFERENCES') ?? 'PREFERENCES'),
                     const SizedBox(height: 8),
 
                     Container(
@@ -288,23 +318,36 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           _buildSettingTile(
                             icon: Icons.notifications_none_rounded,
-                            title: 'Notification Settings',
-                            trailing: Switch(
-                              value: notificationProvider.notificationsEnabled,
-                              activeTrackColor: const Color(0xFF006B23),
-                              onChanged: (val) => notificationProvider.setNotificationsEnabled(val),
+                            title: languageProvider?.translate('notification_settings', 'Notification Settings') ?? 'Notification Settings',
+                            trailing: GestureDetector(
+                              onTap: () {}, // Stop tap propagation to tile onTap
+                              child: Switch(
+                                value: notificationsEnabled,
+                                activeTrackColor: const Color(0xFF006B23),
+                                onChanged: (val) {
+                                  notificationProvider?.setNotificationsEnabled(val);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(val ? 'Push Notifications Enabled' : 'Push Notifications Disabled'),
+                                      backgroundColor: val ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
+                                      behavior: SnackBarBehavior.floating,
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                             onTap: () => Navigator.of(context).pushNamed('/notification-preferences'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.language_rounded,
-                            title: 'Language',
+                            title: languageProvider?.translate('language', 'Language') ?? 'Language',
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  languageProvider.selectedLanguage,
+                                  selectedLanguage,
                                   style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF6E7A6C)),
                                 ),
                                 const SizedBox(width: 4),
@@ -316,12 +359,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.palette_outlined,
-                            title: 'App Theme',
+                            title: languageProvider?.translate('app_theme', 'App Theme') ?? 'App Theme',
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  appThemeProvider.selectedThemeLabel,
+                                  selectedThemeLabel,
                                   style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF6E7A6C)),
                                 ),
                                 const SizedBox(width: 4),
@@ -337,7 +380,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 24),
 
                     // ─── 5. SECTION 3: SUPPORT & LEGAL ──────────────────────────
-                    _buildSectionHeader('SUPPORT & LEGAL'),
+                    _buildSectionHeader(languageProvider?.translate('support_legal', 'SUPPORT & LEGAL') ?? 'SUPPORT & LEGAL'),
                     const SizedBox(height: 8),
 
                     Container(
@@ -357,7 +400,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           _buildSettingTile(
                             icon: Icons.chat_bubble_outline_rounded,
-                            title: 'Live Agent Chat',
+                            title: languageProvider?.translate('live_chat', 'Live Agent Chat') ?? 'Live Agent Chat',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
                             onTap: () => Navigator.of(context).pushNamed('/live-chat'),
                           ),
@@ -371,21 +414,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.help_outline_rounded,
-                            title: 'Help Center',
+                            title: languageProvider?.translate('help_center', 'Help Center') ?? 'Help Center',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
                             onTap: () => Navigator.of(context).pushNamed('/help'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.description_outlined,
-                            title: 'Terms of Service',
+                            title: languageProvider?.translate('terms_of_service', 'Terms of Service') ?? 'Terms of Service',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
                             onTap: () => Navigator.of(context).pushNamed('/terms-of-service'),
                           ),
                           const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
                           _buildSettingTile(
                             icon: Icons.shield_outlined,
-                            title: 'Privacy Policy',
+                            title: languageProvider?.translate('privacy_policy', 'Privacy Policy') ?? 'Privacy Policy',
                             trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF1A1C1E), size: 20),
                             onTap: () => Navigator.of(context).pushNamed('/privacy-policy'),
                           ),
@@ -419,7 +462,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         icon: const Icon(Icons.logout_rounded, color: Color(0xFFBA1A1A), size: 20),
                         label: Text(
-                          'Log Out',
+                          languageProvider?.translate('logout', 'Log Out') ?? 'Log Out',
                           style: GoogleFonts.outfit(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -456,9 +499,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  _buildBottomNavItem(context, 0, Icons.storefront_rounded, 'Shop', route: '/customer/home'),
-                  _buildBottomNavItem(context, 1, Icons.search_rounded, 'Search', route: '/search'),
-                  _buildBottomNavItem(context, 2, Icons.person_rounded, 'Account', isSelected: true, route: '/profile'),
+                  _buildBottomNavItem(context, 0, Icons.storefront_rounded, languageProvider?.translate('shop', 'Shop') ?? 'Shop', route: '/customer/home'),
+                  _buildBottomNavItem(context, 1, Icons.search_rounded, languageProvider?.translate('search', 'Search') ?? 'Search', route: '/search'),
+                  _buildBottomNavItem(context, 2, Icons.person_rounded, languageProvider?.translate('account', 'Account') ?? 'Account', isSelected: true, route: '/profile'),
                 ],
               ),
             ),

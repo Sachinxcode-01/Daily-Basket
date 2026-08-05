@@ -5,6 +5,7 @@ import 'core/providers/user_provider.dart';
 import 'core/providers/app_theme_provider.dart';
 import 'core/providers/language_provider.dart';
 import 'core/providers/notification_provider.dart';
+import 'core/providers/cart_provider.dart';
 import 'features/referral/providers/coupon_provider.dart';
 
 // Authentication Screens
@@ -68,16 +69,30 @@ import 'features/notifications/presentation/screens/back_to_stock_alerts_screen.
 import 'features/freshness/presentation/screens/fresh_produce_explorer_screen.dart';
 import 'features/support/presentation/screens/about_app_screen.dart';
 
+import 'features/wallet/providers/wallet_provider.dart';
+import 'features/profile/providers/address_provider.dart';
+import 'features/tracking/providers/tracking_provider.dart';
+import 'core/providers/ai_chat_provider.dart';
+import 'core/providers/wishlist_provider.dart';
+import 'core/providers/recently_viewed_provider.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CouponProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => AppThemeProvider()),
         ChangeNotifierProvider(create: (_) => LanguageProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => WalletProvider()),
+        ChangeNotifierProvider(create: (_) => AddressProvider()),
+        ChangeNotifierProvider(create: (_) => TrackingProvider()),
+        ChangeNotifierProvider(create: (_) => AiChatProvider()),
+        ChangeNotifierProvider(create: (_) => WishlistProvider()),
+        ChangeNotifierProvider(create: (_) => RecentlyViewedProvider()),
       ],
       child: const DailyBasketApp(),
     ),
@@ -89,14 +104,17 @@ class DailyBasketApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appThemeProvider = context.watch<AppThemeProvider>();
+    AppThemeProvider? appThemeProvider;
+    try {
+      appThemeProvider = context.watch<AppThemeProvider>();
+    } catch (_) {}
 
     return MaterialApp(
       title: 'Daily Basket',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: appThemeProvider.themeMode,
+      themeMode: appThemeProvider?.themeMode ?? ThemeMode.light,
       initialRoute: '/',
       onGenerateRoute: (settings) {
         if (settings.name == '/product-details') {
@@ -152,6 +170,7 @@ class DailyBasketApp extends StatelessWidget {
         '/app-theme': (context) => const AppThemeScreen(),
         '/notifications': (context) => const NotificationCenterScreen(),
         '/notification-preferences': (context) => const NotificationPreferencesScreen(),
+        '/notification-settings': (context) => const NotificationPreferencesScreen(),
         '/wallet': (context) => const WalletTransactionsScreen(),
         '/loyalty': (context) => const DailyBasketPlusScreen(),
         '/freshness': (context) => const FreshProduceExplorerScreen(),

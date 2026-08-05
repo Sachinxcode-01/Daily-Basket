@@ -1,33 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/notification_provider.dart';
 
 /// Notification Settings Screen — Google Stitch Design System Exact Replica
-class NotificationSettingsScreen extends StatefulWidget {
+class NotificationSettingsScreen extends StatelessWidget {
   const NotificationSettingsScreen({super.key});
 
   @override
-  State<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
-}
-
-class _NotificationSettingsScreenState extends State<NotificationSettingsScreen> {
-  // Order Updates Switches
-  bool _orderStatus = true;
-  bool _deliveryTracking = true;
-  bool _dailyReceipts = true;
-
-  // Promotions & Offers Switches
-  bool _flashDeals = false;
-  bool _personalizedDiscounts = true;
-  bool _newsletter = false;
-
-  // Account Activity Switches
-  bool _securityAlerts = true;
-  bool _walletUpdates = true;
-
-  int _bottomNavIndex = 3; // Account active
-
-  @override
   Widget build(BuildContext context) {
+    final provider = context.watch<NotificationProvider>();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       appBar: AppBar(
@@ -63,7 +46,56 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                 children: [
                   const SizedBox(height: 12),
 
-                  // ─── 1. Order Updates Card ───────────────────────────────
+                  // 0. Master Push Notification Card
+                  Container(
+                    padding: const EdgeInsets.all(18),
+                    decoration: BoxDecoration(
+                      color: provider.notificationsEnabled ? const Color(0xFFE8F5E9) : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: provider.notificationsEnabled ? const Color(0xFF006B23) : const Color(0xFFBECAB9).withValues(alpha: 0.3),
+                        width: provider.notificationsEnabled ? 1.5 : 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          provider.notificationsEnabled ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
+                          color: const Color(0xFF006B23),
+                          size: 24,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Push Notifications',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF1A1C1E),
+                                ),
+                              ),
+                              Text(
+                                provider.notificationsEnabled ? 'Enabled' : 'Disabled',
+                                style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF6E7A6C)),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Switch(
+                          value: provider.notificationsEnabled,
+                          activeTrackColor: const Color(0xFF006B23),
+                          onChanged: (val) => provider.setNotificationsEnabled(val),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // 1. Order Updates Card
                   _buildCategoryCard(
                     icon: Icons.local_shipping_outlined,
                     title: 'Order Updates',
@@ -71,29 +103,29 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                       _buildSwitchTile(
                         title: 'Order Status',
                         subtitle: 'Get notified when your order is placed, packed, and ready.',
-                        value: _orderStatus,
-                        onChanged: (val) => setState(() => _orderStatus = val),
+                        value: provider.orderStatus,
+                        onChanged: (val) => provider.setOrderStatus(val),
                       ),
                       const Divider(color: Color(0xFFEEEEF0), height: 24),
                       _buildSwitchTile(
                         title: 'Delivery Tracking',
                         subtitle: 'Real-time updates when your driver is approaching.',
-                        value: _deliveryTracking,
-                        onChanged: (val) => setState(() => _deliveryTracking = val),
+                        value: provider.deliveryTracking,
+                        onChanged: (val) => provider.setDeliveryTracking(val),
                       ),
                       const Divider(color: Color(0xFFEEEEF0), height: 24),
                       _buildSwitchTile(
                         title: 'Daily Basket Receipts',
                         subtitle: 'Receive a digital receipt via email after delivery.',
-                        value: _dailyReceipts,
-                        onChanged: (val) => setState(() => _dailyReceipts = val),
+                        value: provider.receipts,
+                        onChanged: (val) => provider.setReceipts(val),
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 16),
 
-                  // ─── 2. Promotions & Offers Card ─────────────────────────
+                  // 2. Promotions & Offers Card
                   _buildCategoryCard(
                     icon: Icons.local_offer_outlined,
                     title: 'Promotions & Offers',
@@ -101,29 +133,29 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                       _buildSwitchTile(
                         title: 'Flash Deals',
                         subtitle: 'Alerts for limited-time discounts on groceries.',
-                        value: _flashDeals,
-                        onChanged: (val) => setState(() => _flashDeals = val),
+                        value: provider.flashDeals,
+                        onChanged: (val) => provider.setFlashDeals(val),
                       ),
                       const Divider(color: Color(0xFFEEEEF0), height: 24),
                       _buildSwitchTile(
                         title: 'Personalized Discounts',
                         subtitle: 'Offers tailored to your frequent purchases.',
-                        value: _personalizedDiscounts,
-                        onChanged: (val) => setState(() => _personalizedDiscounts = val),
+                        value: provider.personalizedDiscounts,
+                        onChanged: (val) => provider.setPersonalizedDiscounts(val),
                       ),
                       const Divider(color: Color(0xFFEEEEF0), height: 24),
                       _buildSwitchTile(
                         title: 'Newsletter',
                         subtitle: 'Weekly updates on new products and seasonal picks.',
-                        value: _newsletter,
-                        onChanged: (val) => setState(() => _newsletter = val),
+                        value: provider.newsletter,
+                        onChanged: (val) => provider.setNewsletter(val),
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 16),
 
-                  // ─── 3. Account Activity Card ────────────────────────────
+                  // 3. Account Activity Card
                   _buildCategoryCard(
                     icon: Icons.shield_outlined,
                     title: 'Account Activity',
@@ -131,15 +163,15 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                       _buildSwitchTile(
                         title: 'Security Alerts',
                         subtitle: 'Important notifications about login attempts and password changes.',
-                        value: _securityAlerts,
-                        onChanged: (val) => setState(() => _securityAlerts = val),
+                        value: true,
+                        onChanged: null,
                       ),
                       const Divider(color: Color(0xFFEEEEF0), height: 24),
                       _buildSwitchTile(
                         title: 'Wallet Updates',
                         subtitle: 'Balance changes and payment method expirations.',
-                        value: _walletUpdates,
-                        onChanged: (val) => setState(() => _walletUpdates = val),
+                        value: provider.walletUpdates,
+                        onChanged: (val) => provider.setWalletUpdates(val),
                       ),
                     ],
                   ),
@@ -150,7 +182,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             ),
           ),
 
-          // ─── 4. Persistent Bottom Navigation Bar ──────────────────────────
+          // 4. Persistent Bottom Navigation Bar
           Container(
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
             decoration: const BoxDecoration(
@@ -160,10 +192,10 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildBottomNavItem(0, Icons.home_outlined, 'Home'),
-                _buildBottomNavItem(1, Icons.search_rounded, 'Search'),
-                _buildBottomNavItem(2, Icons.notifications_none_rounded, 'Notifications'),
-                _buildBottomNavItem(3, Icons.person_rounded, 'Account'),
+                _buildBottomNavItem(context, 0, Icons.home_outlined, 'Home', route: '/customer/home'),
+                _buildBottomNavItem(context, 1, Icons.search_rounded, 'Search', route: '/search'),
+                _buildBottomNavItem(context, 2, Icons.notifications_none_rounded, 'Notifications', route: '/notifications'),
+                _buildBottomNavItem(context, 3, Icons.person_rounded, 'Account', isSelected: true, route: '/profile'),
               ],
             ),
           ),
@@ -223,7 +255,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     required String title,
     required String subtitle,
     required bool value,
-    required ValueChanged<bool> onChanged,
+    required ValueChanged<bool>? onChanged,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,10 +294,13 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
     );
   }
 
-  Widget _buildBottomNavItem(int index, IconData icon, String label) {
-    final isSelected = _bottomNavIndex == index;
+  Widget _buildBottomNavItem(BuildContext context, int index, IconData icon, String label, {bool isSelected = false, String? route}) {
     return GestureDetector(
-      onTap: () => setState(() => _bottomNavIndex = index),
+      onTap: () {
+        if (!isSelected && route != null) {
+          Navigator.of(context).pushReplacementNamed(route);
+        }
+      },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),

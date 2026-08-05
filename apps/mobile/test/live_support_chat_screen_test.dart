@@ -2,7 +2,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:daily_basket_mobile/features/support/presentation/screens/live_support_chat_screen.dart';
+import 'package:daily_basket_mobile/core/providers/ai_chat_provider.dart';
 
 class _MockHttpOverrides extends HttpOverrides {}
 
@@ -11,6 +13,15 @@ void main() {
   HttpOverrides.global = _MockHttpOverrides();
   GoogleFonts.config.allowRuntimeFetching = false;
 
+  Widget createTestWidget() {
+    return ChangeNotifierProvider<AiChatProvider>(
+      create: (_) => AiChatProvider(),
+      child: const MaterialApp(
+        home: LiveSupportChatScreen(),
+      ),
+    );
+  }
+
   group('LiveSupportChatScreen Test Suite', () {
     testWidgets('1. Initial Chat renders Sarah J. and welcome message',
         (WidgetTester tester) async {
@@ -18,11 +29,7 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: LiveSupportChatScreen(),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.text('Sarah J.'), findsWidgets);
@@ -36,11 +43,7 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: LiveSupportChatScreen(),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pump(const Duration(milliseconds: 200));
 
       // Tap 'Delivery delay' quick reply chip
@@ -63,14 +66,13 @@ void main() {
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: LiveSupportChatScreen(),
-        ),
-      );
+      await tester.pumpWidget(createTestWidget());
       await tester.pump(const Duration(milliseconds: 200));
 
       // Scroll to and tap 'Talk to Manager' chip
+      await tester.drag(find.byType(SingleChildScrollView).last, const Offset(-400, 0));
+      await tester.pumpAndSettle();
+
       final managerChip = find.widgetWithText(ActionChip, 'Talk to Manager');
       expect(managerChip, findsOneWidget);
       await tester.ensureVisible(managerChip);

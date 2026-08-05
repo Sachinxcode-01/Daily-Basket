@@ -51,10 +51,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
     },
   ];
 
+  bool _isProcessing = false;
+
   void _processPayment() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (_) => const OrderSuccessScreen()),
-    );
+    setState(() => _isProcessing = true);
+    Future.delayed(const Duration(milliseconds: 1200), () {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const OrderSuccessScreen()),
+        );
+      }
+    });
   }
 
   @override
@@ -342,7 +350,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           ),
                         ),
                         Text(
-                          '\$${widget.totalAmount.toStringAsFixed(2)}',
+                          '₹${widget.totalAmount.toStringAsFixed(2)}',
                           style: GoogleFonts.outfit(
                             fontSize: 22,
                             fontWeight: FontWeight.w800,
@@ -354,7 +362,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                     SizedBox(
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: _processPayment,
+                        onPressed: _isProcessing ? null : _processPayment,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF006B23),
                           foregroundColor: Colors.white,
@@ -364,19 +372,28 @@ class _PaymentScreenState extends State<PaymentScreen> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Text(
-                              'Pay Now',
-                              style: GoogleFonts.outfit(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
+                        child: _isProcessing
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2.5,
+                                  color: Colors.white,
+                                ),
+                              )
+                            : Row(
+                                children: [
+                                  Text(
+                                    'Pay Now',
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 20),
+                                ],
                               ),
-                            ),
-                            const SizedBox(width: 8),
-                            const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 20),
-                          ],
-                        ),
                       ),
                     ),
                   ],

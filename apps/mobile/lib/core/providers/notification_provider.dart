@@ -12,16 +12,39 @@ class NotificationProvider extends ChangeNotifier {
   bool _walletUpdates = true;
 
   bool get notificationsEnabled => _notificationsEnabled;
-  bool get orderStatus => _orderStatus;
-  bool get deliveryTracking => _deliveryTracking;
-  bool get receipts => _receipts;
-  bool get flashDeals => _flashDeals;
-  bool get personalizedDiscounts => _personalizedDiscounts;
-  bool get newsletter => _newsletter;
-  bool get walletUpdates => _walletUpdates;
+  bool get orderStatus => _notificationsEnabled && _orderStatus;
+  bool get deliveryTracking => _notificationsEnabled && _deliveryTracking;
+  bool get receipts => _notificationsEnabled && _receipts;
+  bool get flashDeals => _notificationsEnabled && _flashDeals;
+  bool get personalizedDiscounts => _notificationsEnabled && _personalizedDiscounts;
+  bool get newsletter => _notificationsEnabled && _newsletter;
+  bool get walletUpdates => _notificationsEnabled && _walletUpdates;
+
+  bool get rawOrderStatus => _orderStatus;
+  bool get rawDeliveryTracking => _deliveryTracking;
+  bool get rawReceipts => _receipts;
+  bool get rawFlashDeals => _flashDeals;
+  bool get rawPersonalizedDiscounts => _personalizedDiscounts;
+  bool get rawNewsletter => _newsletter;
+  bool get rawWalletUpdates => _walletUpdates;
 
   void setNotificationsEnabled(bool val) {
     _notificationsEnabled = val;
+    if (val) {
+      _orderStatus = true;
+      _deliveryTracking = true;
+      _receipts = true;
+      _personalizedDiscounts = true;
+      _walletUpdates = true;
+    } else {
+      _orderStatus = false;
+      _deliveryTracking = false;
+      _receipts = false;
+      _flashDeals = false;
+      _personalizedDiscounts = false;
+      _newsletter = false;
+      _walletUpdates = false;
+    }
     notifyListeners();
   }
 
@@ -56,6 +79,18 @@ class NotificationProvider extends ChangeNotifier {
   }
 
   void setWalletUpdates(bool val) {
+    _walletUpdates = val;
+    notifyListeners();
+  }
+
+  void toggleAllNotifications(bool val) {
+    _notificationsEnabled = val;
+    _orderStatus = val;
+    _deliveryTracking = val;
+    _receipts = val;
+    _flashDeals = val;
+    _personalizedDiscounts = val;
+    _newsletter = val;
     _walletUpdates = val;
     notifyListeners();
   }

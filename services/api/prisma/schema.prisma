@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -78,6 +79,10 @@ model User {
   badges       UserBadge[]
   tickets      SupportTicket[]
   stockAlerts  StockAlert[]
+  aiSessions   AiConversationSession[]
+  wishlist     Wishlist[]
+  recentlyViewed RecentlyViewed[]
+  deviceSessions DeviceSession[]
 
   @@map("users")
 }
@@ -346,4 +351,118 @@ model StockAlert {
   @@unique([userId, variantId])
   @@map("stock_alerts")
 }
+
+model AiConversationSession {
+  id             String          @id @default(uuid())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentRoute   String?
+  contextData    Json?           // Dynamic app state context (order, cart, product)
+  status         String          @default("ACTIVE") // ACTIVE, ESCALATED, CLOSED
+  activeProvider String          @default("GEMINI")
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  messages       AiChatMessage[]
+  auditLogs      AiAuditLog[]
+
+  @@map("ai_conversation_sessions")
+}
+
+model AiChatMessage {
+  id           String                @id @default(uuid())
+  sessionId    String
+  session      AiConversationSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  senderRole   String                // USER, ASSISTANT, SYSTEM, TOOL
+  content      String
+  toolCalls    Json?                 // Tool call details if any
+  cardType     String?               // order_status, refund_card, item_complaint, etc.
+  cardData     Json?                 // Structured data for UI card
+  tokensUsed   Int?
+  latencyMs    Int?
+  providerUsed String?
+  createdAt    DateTime              @default(now())
+
+  @@map("ai_chat_messages")
+}
+
+model AiAuditLog {
+  id         String                 @id @default(uuid())
+  userId     String
+  sessionId  String?
+  session    AiConversationSession? @relation(fields: [sessionId], references: [id], onDelete: SetNull)
+  action     String
+  toolName   String
+  parameters Json?
+  ipAddress  String?
+  status     String                 @default("SUCCESS") // SUCCESS, DENIED, FAILED
+  createdAt  DateTime               @default(now())
+
+  @@map("ai_audit_logs")
+}
+
+model AiAnalyticsMetric {
+  id               String   @id @default(uuid())
+  provider         String
+  model            String
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  costUsd          Float    @default(0.0)
+  latencyMs        Int      @default(0)
+  success          Boolean  @default(true)
+  feedbackRating   Int?     // 1-5 rating if provided by user
+  createdAt        DateTime @default(now())
+
+  @@map("ai_analytics_metrics")
+}
+
+model Wishlist {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@map("wishlists")
+}
+
+model RecentlyViewed {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  viewedAt  DateTime @default(now())
+
+  @@unique([userId, productId])
+  @@map("recently_viewed")
+}
+
+model DeviceSession {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceId     String
+  deviceModel  String?
+  ipAddress    String?
+  refreshToken String   @unique
+  isActive     Boolean  @default(true)
+  lastActive   DateTime @default(now())
+  createdAt    DateTime @default(now())
+
+  @@map("device_sessions")
+}
+
+model OrderInvoice {
+  id            String   @id @default(uuid())
+  orderId       String   @unique
+  invoiceNumber String   @unique
+  pdfUrl        String
+  taxAmount     Float    @default(0.0)
+  totalAmount   Float
+  issuedAt      DateTime @default(now())
+
+  @@map("order_invoices")
+}
+
+
 

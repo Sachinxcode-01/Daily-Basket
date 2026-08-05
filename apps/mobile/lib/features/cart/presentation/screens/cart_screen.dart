@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/providers/language_provider.dart';
+import '../../../../core/providers/cart_provider.dart';
 import '../../../referral/providers/coupon_provider.dart';
 import '../../../wallet/providers/wallet_provider.dart';
 
@@ -48,6 +50,8 @@ class _CartScreenState extends State<CartScreen> {
     super.dispose();
   }
 
+  String _selectedSubstitution = 'Call me for replacement';
+
   void _updateQuantity(int index, int delta) {
     setState(() {
       final current = _items[index]['qty'] as int;
@@ -69,7 +73,8 @@ class _CartScreenState extends State<CartScreen> {
   final double _baseDeliveryFee = 50.0;
   final double _taxes = 30.0;
 
-  void _showCouponSheet(BuildContext context, CouponProvider couponProvider) {
+  void _showCouponSheet(BuildContext context, CouponProvider? couponProvider) {
+    if (couponProvider == null) return;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -306,14 +311,39 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final couponProvider = context.watch<CouponProvider>();
-    final walletProvider = context.watch<WalletProvider>();
-    final double itemTotalDouble = _itemTotal.toDouble();
-    final double discount = couponProvider.calculateDiscount(itemTotalDouble);
-    final double deliveryFee = couponProvider.calculateDeliveryFee(_baseDeliveryFee, itemTotalDouble);
+    CouponProvider? couponProvider;
+    WalletProvider? walletProvider;
+    LanguageProvider? languageProvider;
+    CartProvider? cartProvider;
+
+    try { couponProvider = context.watch<CouponProvider>(); } catch (_) {}
+    try { walletProvider = context.watch<WalletProvider>(); } catch (_) {}
+    try { languageProvider = context.watch<LanguageProvider>(); } catch (_) {}
+    try { cartProvider = context.watch<CartProvider>(); } catch (_) {}
+
+    final List<Map<String, dynamic>> activeItems = cartProvider != null
+        ? cartProvider.items.map((i) => {
+              'id': i.id,
+              'name': i.name,
+              'subtitle': i.subtitle,
+              'price': i.price.round(),
+              'qty': i.qty,
+              'image': i.image,
+            }).toList()
+        : _items;
+
+    final double itemTotalDouble = cartProvider != null
+        ? cartProvider.itemTotalDouble
+        : _itemTotal.toDouble();
+
+    final double discount = couponProvider?.calculateDiscount(itemTotalDouble) ?? 0.0;
+    final double deliveryFee = couponProvider?.calculateDeliveryFee(_baseDeliveryFee, itemTotalDouble) ?? _baseDeliveryFee;
     final double toPayBeforeWallet = (itemTotalDouble - discount + deliveryFee + _taxes).clamp(0.0, double.infinity);
-    final double walletDeduction = walletProvider.calculateWalletDeduction(toPayBeforeWallet);
+    final double walletDeduction = walletProvider?.calculateWalletDeduction(toPayBeforeWallet) ?? 0.0;
     final double toPay = (toPayBeforeWallet - walletDeduction).clamp(0.0, double.infinity);
+
+    final bool isWalletActive = walletProvider?.useWalletForPayment ?? false;
+    final double walletBalance = walletProvider?.balance ?? 150.0;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
@@ -326,7 +356,7 @@ class _CartScreenState extends State<CartScreen> {
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
-          'Cart',
+          languageProvider?.translate('cart', 'Cart') ?? 'Cart',
           style: GoogleFonts.outfit(
             fontSize: 22,
             fontWeight: FontWeight.w700,
@@ -413,18 +443,14 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                       const Icon(
                         Icons.chevron_right_rounded,
-                        color: Color(0xFF6E7A6C),
+color: Color(0xFF6E7A6C),
                         size: 22,
                       ),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 20),
-
-                // 2. Section Title
                 Text(
-                  'Your Items',
+                  languageProvider?.translate('your_items', 'Your Items') ?? 'Your Items',
                   style: GoogleFonts.outfit(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
@@ -435,179 +461,223 @@ class _CartScreenState extends State<CartScreen> {
                 const SizedBox(height: 10),
 
                 // 3. Your Items Container (White Card with Dividers)
+                activeItems.isEmpty
+                    ? Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(24),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFBECAB9).withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Column(
+                          children: [
+                            const Icon(Icons.shopping_basket_outlined, size: 48, color: Color(0xFF6E7A6C)),
+                            const SizedBox(height: 12),
+                            Text(
+                              languageProvider?.translate('empty_cart', 'Your basket is empty') ?? 'Your basket is empty',
+                              style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFBECAB9).withValues(alpha: 0.3),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.03),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: List.generate(activeItems.length, (index) {
+                            final item = activeItems[index];
+                            final isLast = index == activeItems.length - 1;
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(14.0),
+                                  child: Row(
+                                    children: [
+                                      // Thumbnail
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(12),
+                                        child: Image.network(
+                                          item['image'],
+                                          width: 54,
+                                          height: 54,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __, ___) => Container(
+                                            width: 54,
+                                            height: 54,
+                                            color: const Color(0xFFF3F3F6),
+                                            child: const Icon(
+                                              Icons.shopping_basket_rounded,
+                                              color: Color(0xFF006B23),
+                                              size: 28,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+
+                                      // Title & Price
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              item['name'],
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                                color: const Color(0xFF1A1C1E),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              item['subtitle'],
+                                              style: GoogleFonts.inter(
+                                                fontSize: 12,
+                                                color: const Color(0xFF6E7A6C),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              '₹${item['price']}',
+                                              style: GoogleFonts.outfit(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w700,
+                                                color: const Color(0xFF1A1C1E),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      // Stepper Pill (- 1 +)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF3F3F6),
+                                          borderRadius: BorderRadius.circular(9999),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                if (cartProvider != null) {
+                                                  cartProvider.updateQuantity(index, -1);
+                                                } else {
+                                                  _updateQuantity(index, -1);
+                                                }
+                                              },
+                                              child: Padding(
+                                                padding: const EdgeInsets.all(4.0),
+                                                child: Icon(
+                                                  isLast && item['qty'] == 1
+                                                      ? Icons.delete_outline_rounded
+                                                      : Icons.remove_rounded,
+                                                  size: 16,
+                                                  color: const Color(0xFF6E7A6C),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              '${item['qty']}',
+                                              style: GoogleFonts.inter(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w700,
+                                                color: const Color(0xFF1A1C1E),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 6),
+                                            GestureDetector(
+                                              onTap: () {
+                                                if (cartProvider != null) {
+                                                  cartProvider.updateQuantity(index, 1);
+                                                } else {
+                                                  _updateQuantity(index, 1);
+                                                }
+                                              },
+                                              child: const Padding(
+                                                padding: EdgeInsets.all(4.0),
+                                                child: Icon(
+                                                  Icons.add_rounded,
+                                                  size: 16,
+                                                  color: Color(0xFF006B23),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (!isLast)
+                                  const Divider(
+                                    color: Color(0xFFEEEEF0),
+                                    height: 1,
+                                    indent: 80,
+                                    endIndent: 16,
+                                  ),
+                              ],
+                            );
+                          }),
+                        ),
+                      ),
+
+                const SizedBox(height: 14),
+
+                // Item Substitution Preferences Card
                 Container(
+                  padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: const Color(0xFFBECAB9).withValues(alpha: 0.3),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
                   ),
                   child: Column(
-                    children: List.generate(_items.length, (index) {
-                      final item = _items[index];
-                      final isLast = index == _items.length - 1;
-                      return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.all(14.0),
-                            child: Row(
-                              children: [
-                                // Thumbnail
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    item['image'],
-                                    width: 54,
-                                    height: 54,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (_, __, ___) => Container(
-                                      width: 54,
-                                      height: 54,
-                                      color: const Color(0xFFF3F3F6),
-                                      child: const Icon(
-                                        Icons.shopping_basket_rounded,
-                                        color: Color(0xFF006B23),
-                                        size: 28,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-
-                                // Title & Price
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        item['name'],
-                                        style: GoogleFonts.outfit(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF1A1C1E),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 2),
-                                      Text(
-                                        item['subtitle'],
-                                        style: GoogleFonts.inter(
-                                          fontSize: 12,
-                                          color: const Color(0xFF6E7A6C),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '₹${item['price']}',
-                                        style: GoogleFonts.outfit(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w700,
-                                          color: const Color(0xFF1A1C1E),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-
-                                // Stepper Pill (- 1 +)
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF3F3F6),
-                                    borderRadius: BorderRadius.circular(9999),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () =>
-                                            _updateQuantity(index, -1),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(4.0),
-                                          child: Icon(
-                                            index == _items.length - 1 &&
-                                                    item['qty'] == 1
-                                                ? Icons.delete_outline_rounded
-                                                : Icons.remove_rounded,
-                                            size: 16,
-                                            color: const Color(0xFF6E7A6C),
-                                          ),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        '${item['qty']}',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          color: const Color(0xFF1A1C1E),
-                                        ),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      GestureDetector(
-                                        onTap: () => _updateQuantity(index, 1),
-                                        child: const Padding(
-                                          padding: EdgeInsets.all(4.0),
-                                          child: Icon(
-                                            Icons.add_rounded,
-                                            size: 16,
-                                            color: Color(0xFF006B23),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
+                          const Icon(Icons.published_with_changes_rounded, color: Color(0xFF006B23), size: 20),
+                          const SizedBox(width: 8),
+                          Text(
+                            'If items are out of stock:',
+                            style: GoogleFonts.outfit(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF1A1C1E),
                             ),
                           ),
-                          if (!isLast)
-                            const Divider(
-                              color: Color(0xFFEEEEF0),
-                              height: 1,
-                              indent: 14,
-                              endIndent: 14,
-                            ),
                         ],
-                      );
-                    }),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-
-                // 4. "Add More Items" Outlined Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 48,
-                  child: OutlinedButton.icon(
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    style: OutlinedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: const Color(0xFF006B23),
-                      side: const BorderSide(
-                          color: Color(0xFF006B23), width: 1.2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ),
-                    icon: const Icon(Icons.add_circle_outline_rounded,
-                        size: 20),
-                    label: Text(
-                      'Add more items',
-                      style: GoogleFonts.outfit(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          _buildSubstitutionChip('Call me for replacement'),
+                          const SizedBox(width: 8),
+                          _buildSubstitutionChip('Replace with organic'),
+                          const SizedBox(width: 8),
+                          _buildSubstitutionChip('Refund missing item'),
+                        ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
 
@@ -620,12 +690,12 @@ class _CartScreenState extends State<CartScreen> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 14),
                     decoration: BoxDecoration(
-                      color: couponProvider.appliedCoupon != null
+                      color: couponProvider?.appliedCoupon != null
                           ? const Color(0xFFE8F5E9)
                           : const Color(0xFFF3F3F6),
                       borderRadius: BorderRadius.circular(14),
                       border: Border.all(
-                        color: couponProvider.appliedCoupon != null
+                        color: couponProvider?.appliedCoupon != null
                             ? const Color(0xFF006B23)
                             : Colors.transparent,
                         width: 1.2,
@@ -634,7 +704,7 @@ class _CartScreenState extends State<CartScreen> {
                     child: Row(
                       children: [
                         Icon(
-                          couponProvider.appliedCoupon != null
+                          couponProvider?.appliedCoupon != null
                               ? Icons.check_circle_rounded
                               : Icons.local_offer_outlined,
                           color: const Color(0xFF006B23),
@@ -646,8 +716,8 @@ class _CartScreenState extends State<CartScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                couponProvider.appliedCoupon != null
-                                    ? 'Coupon "${couponProvider.appliedCoupon!.code}" Applied'
+                                couponProvider?.appliedCoupon != null
+                                    ? 'Coupon "${couponProvider!.appliedCoupon!.code}" Applied'
                                     : 'Apply Coupon / Promo Code',
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
@@ -655,12 +725,12 @@ class _CartScreenState extends State<CartScreen> {
                                   color: const Color(0xFF1A1C1E),
                                 ),
                               ),
-                              if (couponProvider.appliedCoupon != null) ...[
+                              if (couponProvider?.appliedCoupon != null) ...[
                                 const SizedBox(height: 2),
                                 Text(
                                   discount > 0
                                       ? 'You saved ₹${discount.toStringAsFixed(2)} with this coupon'
-                                      : couponProvider.appliedCoupon!.subtitle,
+                                      : couponProvider!.appliedCoupon!.subtitle,
                                   style: GoogleFonts.inter(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
@@ -671,10 +741,10 @@ class _CartScreenState extends State<CartScreen> {
                             ],
                           ),
                         ),
-                        if (couponProvider.appliedCoupon != null)
+                        if (couponProvider?.appliedCoupon != null)
                           TextButton(
                             onPressed: () {
-                              couponProvider.removeCoupon();
+                              couponProvider?.removeCoupon();
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text('Coupon Removed'),
@@ -706,10 +776,10 @@ class _CartScreenState extends State<CartScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                   decoration: BoxDecoration(
-                    color: walletProvider.useWalletForPayment ? const Color(0xFFE8F5E9) : const Color(0xFFF3F3F6),
+                    color: isWalletActive ? const Color(0xFFE8F5E9) : const Color(0xFFF3F3F6),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: walletProvider.useWalletForPayment ? const Color(0xFF006B23) : Colors.transparent,
+                      color: isWalletActive ? const Color(0xFF006B23) : Colors.transparent,
                       width: 1.2,
                     ),
                   ),
@@ -722,7 +792,7 @@ class _CartScreenState extends State<CartScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Pay using Daily Basket Wallet',
+                              languageProvider?.translate('pay_using_wallet', 'Pay using Daily Basket Wallet') ?? 'Pay using Daily Basket Wallet',
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -730,16 +800,16 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                             ),
                             Text(
-                              'Available: \$${walletProvider.balance.toStringAsFixed(2)}',
+                              '${languageProvider?.translate('available_balance', 'Available') ?? 'Available'}: ₹${walletBalance.toStringAsFixed(2)}',
                               style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF6E7A6C)),
                             ),
                           ],
                         ),
                       ),
                       Switch.adaptive(
-                        value: walletProvider.useWalletForPayment,
+                        value: isWalletActive,
                         activeTrackColor: const Color(0xFF006B23),
-                        onChanged: (val) => walletProvider.toggleWalletPayment(val),
+                        onChanged: (val) => walletProvider?.toggleWalletPayment(val),
                       ),
                     ],
                   ),
@@ -825,7 +895,7 @@ class _CartScreenState extends State<CartScreen> {
                       if (discount > 0) ...[
                         const SizedBox(height: 10),
                         _buildBillRow(
-                          'Coupon Discount (${couponProvider.appliedCoupon!.code})',
+                          'Coupon Discount (${couponProvider?.appliedCoupon?.code ?? ""})',
                           '-₹${discount.toStringAsFixed(2)}',
                           isDiscount: true,
                         ),
@@ -949,6 +1019,35 @@ class _CartScreenState extends State<CartScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSubstitutionChip(String label) {
+    final isSelected = _selectedSubstitution == label;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => setState(() => _selectedSubstitution = label),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+          decoration: BoxDecoration(
+            color: isSelected ? const Color(0xFFE8F5E9) : const Color(0xFFF3F3F6),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected ? const Color(0xFF006B23) : Colors.transparent,
+              width: 1.2,
+            ),
+          ),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: GoogleFonts.inter(
+              fontSize: 11,
+              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              color: isSelected ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
+            ),
+          ),
+        ),
       ),
     );
   }
