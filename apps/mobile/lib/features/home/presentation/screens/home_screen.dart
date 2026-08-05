@@ -4,6 +4,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/providers/language_provider.dart';
+import '../../../../core/providers/recently_viewed_provider.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../categories/presentation/screens/browse_categories_screen.dart';
 import '../../../search/presentation/screens/search_results_screen.dart';
@@ -15,6 +16,8 @@ import '../../../../shared/widgets/favorite_button.dart';
 import '../../../../core/navigation/app_navigation_drawer.dart';
 import '../../../catalog/presentation/screens/product_listing_screen.dart';
 import '../widgets/quick_services_section.dart';
+import '../widgets/recently_viewed_section.dart';
+import '../widgets/buy_again_section.dart';
 
 class _Product {
   final String id, name, brand, unit, price, mrp, imageUrl, category;
@@ -263,6 +266,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 ),
               ),
             ),
+            // ─── Buy Again ──────────────────────────────────────────────
+            const SizedBox(height: 28),
+            const BuyAgainSection(),
+            // ─── Recently Viewed ───────────────────────────────────────
+            const SizedBox(height: 28),
+            const RecentlyViewedSection(),
             const SizedBox(height: 32),
           ],
         ),
@@ -487,96 +496,126 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   Widget _buildCard(_Product p, [CartProvider? cartProvider]) {
     final qty = _getItemQty(p.id, cartProvider);
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))],
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Stack(
-          children: [
-            ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              child: AspectRatio(
-                aspectRatio: 1.3,
-                child: AppNetworkImage(
-                  imageUrl: p.imageUrl,
-                  fit: BoxFit.cover,
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  fallbackIcon: _getCategoryIcon(p.category),
-                  fallbackBgColor: const Color(0xFFF3F3F6),
-                  fallbackIconColor: const Color(0xFF006B23),
+    return GestureDetector(
+      onTap: () {
+        try {
+          context.read<RecentlyViewedProvider>().addRecentlyViewed({
+            'id': p.id,
+            'name': p.name,
+            'brand': p.brand,
+            'unit': p.unit,
+            'price': p.price,
+            'mrp': p.mrp,
+            'imageUrl': p.imageUrl,
+          });
+        } catch (_) {}
+        Navigator.pushNamed(
+          context,
+          '/product-details',
+          arguments: {
+            'productId': p.id,
+            'categoryTag': p.category.toUpperCase(),
+            'productName': p.name,
+            'price': p.price,
+            'mrp': p.mrp,
+            'discountPercentage': '20% OFF',
+            'unitDetails': p.unit,
+            'deliveryTime': '8 mins',
+            'imageUrl': p.imageUrl,
+          },
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))],
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                child: AspectRatio(
+                  aspectRatio: 1.3,
+                  child: AppNetworkImage(
+                    imageUrl: p.imageUrl,
+                    fit: BoxFit.cover,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                    fallbackIcon: _getCategoryIcon(p.category),
+                    fallbackBgColor: const Color(0xFFF3F3F6),
+                    fallbackIconColor: const Color(0xFF006B23),
+                  ),
                 ),
               ),
-            ),
-            Positioned(
-              top: 2,
-              right: 2,
-              child: FavoriteButton(
-                productId: p.id,
-                productDetails: {
-                  'id': p.id,
-                  'name': p.name,
-                  'brand': p.brand,
-                  'weight': p.unit,
-                  'price': double.tryParse(p.price.replaceAll('₹', '')) ?? 50.0,
-                  'mrp': double.tryParse(p.mrp.replaceAll('₹', '')) ?? 60.0,
-                  'category': p.category,
-                  'imageUrl': p.imageUrl,
-                },
-                size: 20,
+              Positioned(
+                top: 2,
+                right: 2,
+                child: FavoriteButton(
+                  productId: p.id,
+                  productDetails: {
+                    'id': p.id,
+                    'name': p.name,
+                    'brand': p.brand,
+                    'weight': p.unit,
+                    'price': double.tryParse(p.price.replaceAll('₹', '')) ?? 50.0,
+                    'mrp': double.tryParse(p.mrp.replaceAll('₹', '')) ?? 60.0,
+                    'category': p.category,
+                    'imageUrl': p.imageUrl,
+                  },
+                  size: 20,
+                ),
               ),
-            ),
-          ],
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(10, 7, 10, 10),
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(p.brand, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF006B23)), maxLines: 1, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 2),
-              Text(p.name, style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)), maxLines: 2, overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 1),
-              Text(p.unit, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C))),
-              const SizedBox(height: 4),
-              Row(children: [
-                const Icon(Icons.star_rounded, size: 12, color: Color(0xFFF59E0B)),
-                const SizedBox(width: 2),
-                Text(p.rating.toStringAsFixed(1), style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E))),
-                const SizedBox(width: 3),
-                Flexible(child: Text('(${_fmt(p.reviews)})', style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C)), overflow: TextOverflow.ellipsis)),
-              ]),
-              const Spacer(),
-              Row(children: [
-                Text(p.price, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF006B23))),
-                const SizedBox(width: 5),
-                Text(p.mrp, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C), decoration: TextDecoration.lineThrough)),
-              ]),
-              const SizedBox(height: 7),
-              qty == 0
-                  ? SizedBox(
-                      width: double.infinity, height: 32,
-                      child: ElevatedButton(
-                        onPressed: () => _updateProductQty(p, 1, cartProvider),
-                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF006B23), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: EdgeInsets.zero),
-                        child: Text('Add', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600)),
-                      ),
-                    )
-                  : Container(
-                      height: 32,
-                      decoration: BoxDecoration(color: const Color(0xFF006B23), borderRadius: BorderRadius.circular(8)),
-                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                        GestureDetector(onTap: () => _updateProductQty(p, -1, cartProvider), child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.remove, color: Colors.white, size: 16))),
-                        Text('$qty', style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
-                        GestureDetector(onTap: () => _updateProductQty(p, 1, cartProvider), child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.add, color: Colors.white, size: 16))),
-                      ]),
-                    ),
-            ]),
+            ],
           ),
-        ),
-      ]),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 7, 10, 10),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(p.brand, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF006B23)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(p.name, style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)), maxLines: 2, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 1),
+                Text(p.unit, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C))),
+                const SizedBox(height: 4),
+                Row(children: [
+                  const Icon(Icons.star_rounded, size: 12, color: Color(0xFFF59E0B)),
+                  const SizedBox(width: 2),
+                  Text(p.rating.toStringAsFixed(1), style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E))),
+                  const SizedBox(width: 3),
+                  Flexible(child: Text('(${_fmt(p.reviews)})', style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C)), overflow: TextOverflow.ellipsis)),
+                ]),
+                const Spacer(),
+                Row(children: [
+                  Text(p.price, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF006B23))),
+                  const SizedBox(width: 5),
+                  Text(p.mrp, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C), decoration: TextDecoration.lineThrough)),
+                ]),
+                const SizedBox(height: 7),
+                qty == 0
+                    ? SizedBox(
+                        width: double.infinity, height: 32,
+                        child: ElevatedButton(
+                          onPressed: () => _updateProductQty(p, 1, cartProvider),
+                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF006B23), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: EdgeInsets.zero),
+                          child: Text('Add', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600)),
+                        ),
+                      )
+                    : Container(
+                        height: 32,
+                        decoration: BoxDecoration(color: const Color(0xFF006B23), borderRadius: BorderRadius.circular(8)),
+                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
+                          GestureDetector(onTap: () => _updateProductQty(p, -1, cartProvider), child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.remove, color: Colors.white, size: 16))),
+                          Text('$qty', style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
+                          GestureDetector(onTap: () => _updateProductQty(p, 1, cartProvider), child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.add, color: Colors.white, size: 16))),
+                        ]),
+                      ),
+              ]),
+            ),
+          ),
+        ]),
+      ),
     );
   }
 

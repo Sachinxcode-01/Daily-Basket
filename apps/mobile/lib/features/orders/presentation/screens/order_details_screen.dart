@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/cart_provider.dart';
 
 /// Order Details Screen — Google Stitch Design System Exact Replica
 class OrderDetailsScreen extends StatelessWidget {
@@ -491,13 +493,42 @@ class OrderDetailsScreen extends StatelessWidget {
                       height: 50,
                       child: ElevatedButton.icon(
                         onPressed: () {
+                          try {
+                            context.read<CartProvider>().reorderItems([
+                              CartItem(
+                                id: 'c1',
+                                name: 'Organic Hass Avocados',
+                                subtitle: '2 pcs (approx. 400g)',
+                                price: 180.0,
+                                qty: 1,
+                                image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=200&q=80',
+                              ),
+                              CartItem(
+                                id: 'c2',
+                                name: 'Farm Fresh Milk',
+                                subtitle: '1 Litre',
+                                price: 70.0,
+                                qty: 2,
+                                image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=200&q=80',
+                              ),
+                              CartItem(
+                                id: 'c3',
+                                name: 'Whole Wheat Bread',
+                                subtitle: '400g',
+                                price: 50.0,
+                                qty: 1,
+                                image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&q=80',
+                              ),
+                            ]);
+                          } catch (_) {}
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('All 3 items reordered and added to cart!'),
+                              content: Text('All items reordered and added to cart!'),
                               backgroundColor: Color(0xFF006B23),
                               behavior: SnackBarBehavior.floating,
                             ),
                           );
+                          Navigator.pushNamed(context, '/cart');
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF006B23),
@@ -519,36 +550,83 @@ class OrderDetailsScreen extends StatelessWidget {
 
                     const SizedBox(height: 10),
 
-                    // Secondary Outlined Download Invoice Button
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: OutlinedButton.icon(
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Downloading Tax Invoice PDF...'),
-                              backgroundColor: Color(0xFF006B23),
-                              behavior: SnackBarBehavior.floating,
+                    Row(
+                      children: [
+                        // Download Invoice Button
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Downloading Tax Invoice PDF...'),
+                                  backgroundColor: Color(0xFF006B23),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFF006B23),
+                              side: const BorderSide(color: Color(0xFF006B23), width: 1.5),
+                              shape: const StadiumBorder(),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF006B23),
-                          side: const BorderSide(
-                              color: Color(0xFF006B23), width: 1.5),
-                          shape: const StadiumBorder(),
-                        ),
-                        icon: const Icon(Icons.download_rounded,
-                            color: Color(0xFF006B23), size: 20),
-                        label: Text(
-                          'Download Invoice',
-                          style: GoogleFonts.outfit(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                            icon: const Icon(Icons.download_rounded, color: Color(0xFF006B23), size: 18),
+                            label: Text(
+                              'Invoice',
+                              style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700),
+                            ),
                           ),
                         ),
-                      ),
+                        const SizedBox(width: 10),
+                        // Cancel Order Button
+                        Expanded(
+                          child: OutlinedButton.icon(
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text('Cancel Order?', style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
+                                  content: Text(
+                                    'Are you sure you want to cancel Order $orderId? A full refund of ₹320 will be credited back to your wallet.',
+                                    style: GoogleFonts.inter(fontSize: 14),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(ctx),
+                                      child: const Text('No, Keep Order'),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(ctx);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Order Cancelled. Refund of ₹320 initiated to wallet.'),
+                                            backgroundColor: Color(0xFFD32F2F),
+                                            behavior: SnackBarBehavior.floating,
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFD32F2F)),
+                                      child: const Text('Yes, Cancel Order', style: TextStyle(color: Colors.white)),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: const Color(0xFFD32F2F),
+                              side: const BorderSide(color: Color(0xFFD32F2F), width: 1.5),
+                              shape: const StadiumBorder(),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            icon: const Icon(Icons.cancel_outlined, color: Color(0xFFD32F2F), size: 18),
+                            label: Text(
+                              'Cancel',
+                              style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

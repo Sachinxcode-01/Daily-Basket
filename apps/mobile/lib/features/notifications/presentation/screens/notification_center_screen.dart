@@ -167,79 +167,96 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
                   bgColor = const Color(0xFFE3F2FD);
                 }
 
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isUnread ? Colors.white : const Color(0xFFF8FAFC),
-                    borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                      color: isUnread
-                          ? AppColors.primary.withValues(alpha: 0.30)
-                          : AppColors.outlineVariant.withValues(alpha: 0.15),
+                return GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      item['unread'] = false;
+                    });
+                    final title = (item['title'] as String).toLowerCase();
+                    if (title.contains('order') || category == 'Orders') {
+                      Navigator.pushNamed(context, '/orders');
+                    } else if (title.contains('wallet') || title.contains('cashback')) {
+                      Navigator.pushNamed(context, '/wallet');
+                    } else if (title.contains('sale') || category == 'Offers') {
+                      Navigator.pushNamed(context, '/offers');
+                    } else {
+                      Navigator.pushNamed(context, '/notifications');
+                    }
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: isUnread ? Colors.white : const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isUnread
+                            ? AppColors.primary.withValues(alpha: 0.30)
+                            : AppColors.outlineVariant.withValues(alpha: 0.15),
+                      ),
+                      boxShadow: isUnread
+                          ? [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.03),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              )
+                            ]
+                          : null,
                     ),
-                    boxShadow: isUnread
-                        ? [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
-                            )
-                          ]
-                        : null,
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          color: bgColor,
-                          shape: BoxShape.circle,
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: bgColor,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Center(
+                            child: Icon(icon, color: iconColor, size: 20),
+                          ),
                         ),
-                        child: Center(
-                          child: Icon(icon, color: iconColor, size: 20),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  item['title'],
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.onSurface,
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    item['title'],
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.onSurface,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  item['time'],
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    color: AppColors.onSurfaceVariant,
+                                  Text(
+                                    item['time'],
+                                    style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      color: AppColors.onSurfaceVariant,
+                                    ),
                                   ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              item['message'],
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                height: 16 / 12,
-                                color: AppColors.onSurfaceVariant,
+                                ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 4),
+                              Text(
+                                item['message'],
+                                style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  height: 16 / 12,
+                                  color: AppColors.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },

@@ -76,6 +76,7 @@ import 'core/providers/ai_chat_provider.dart';
 import 'core/providers/wishlist_provider.dart';
 import 'core/providers/favorites_provider.dart';
 import 'core/providers/recently_viewed_provider.dart';
+import 'core/providers/search_history_provider.dart';
 import 'features/catalog/presentation/screens/favorites_screen.dart';
 
 void main() {
@@ -96,6 +97,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => FavoritesProvider()),
         ChangeNotifierProvider(create: (_) => RecentlyViewedProvider()),
+        ChangeNotifierProvider(create: (_) => SearchHistoryProvider()),
       ],
       child: const DailyBasketApp(),
     ),

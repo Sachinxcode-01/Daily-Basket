@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../../../shared/widgets/favorite_button.dart';
+import '../../../../core/providers/cart_provider.dart';
+import '../../../../core/providers/recently_viewed_provider.dart';
 
-/// Product Details Screen — Google Stitch Design System Exact Replica
+/// Product Details Screen — Google Stitch Design System Exact Replica + Rich Product Info
 class ProductDetailsScreen extends StatefulWidget {
   final String productId;
   final String categoryTag;
@@ -33,6 +36,27 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _quantity = 1;
+  bool _priceDropAlert = false;
+  int _helpfulVotes = 42;
+  bool _votedHelpful = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      try {
+        context.read<RecentlyViewedProvider>().addRecentlyViewed({
+          'id': widget.productId,
+          'name': widget.productName,
+          'brand': 'Organic Produce',
+          'unit': widget.unitDetails,
+          'price': widget.price,
+          'mrp': widget.mrp,
+          'imageUrl': widget.imageUrl,
+        });
+      } catch (_) {}
+    });
+  }
 
   void _updateQuantity(int delta) {
     setState(() {
@@ -42,6 +66,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    CartProvider? cartProvider;
+    try { cartProvider = context.watch<CartProvider>(); } catch (_) {}
+
+    final numericPrice = double.tryParse(widget.price.replaceAll('₹', '')) ?? 120.0;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       body: Stack(
@@ -104,42 +133,45 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                             Row(
                               children: [
-                             Container(
-                                width: 42,
-                                height: 42,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.90),
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.08),
-                                      blurRadius: 8,
+                                Container(
+                                  width: 42,
+                                  height: 42,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withValues(alpha: 0.90),
+                                    shape: BoxShape.circle,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.08),
+                                        blurRadius: 8,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Center(
+                                    child: FavoriteButton(
+                                      productId: widget.productId,
+                                      productDetails: {
+                                        'id': widget.productId,
+                                        'name': widget.productName,
+                                        'brand': 'Organic India',
+                                        'weight': widget.unitDetails,
+                                        'price': numericPrice,
+                                        'mrp': double.tryParse(widget.mrp.replaceAll('₹', '')) ?? 150.0,
+                                        'category': widget.categoryTag,
+                                        'imageUrl': widget.imageUrl,
+                                      },
+                                      padding: EdgeInsets.zero,
+                                      size: 22,
                                     ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: FavoriteButton(
-                                    productId: widget.productId,
-                                    productDetails: {
-                                      'id': widget.productId,
-                                      'name': widget.productName,
-                                      'brand': 'Organic India',
-                                      'weight': widget.unitDetails,
-                                      'price': double.tryParse(widget.price.replaceAll('₹', '')) ?? 120.0,
-                                      'mrp': double.tryParse(widget.mrp.replaceAll('₹', '')) ?? 150.0,
-                                      'category': widget.categoryTag,
-                                      'imageUrl': widget.imageUrl,
-                                    },
-                                    padding: EdgeInsets.zero,
-                                    size: 22,
                                   ),
                                 ),
-                              ),
                                 const SizedBox(width: 10),
                                 GestureDetector(
                                   onTap: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Product link copied to clipboard!')),
+                                      const SnackBar(
+                                        content: Text('Product link copied to clipboard! Share with friends.'),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
                                     );
                                   },
                                   child: Container(
@@ -264,6 +296,38 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 color: const Color(0xFF6E7A6C),
                               ),
                             ),
+
+                            const SizedBox(height: 14),
+                            // Price Drop Alert Toggle
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Row(
+                                  children: [
+                                    const Icon(Icons.notifications_active_outlined, size: 18, color: Color(0xFF006B23)),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      'Notify on Price Drop',
+                                      style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)),
+                                    ),
+                                  ],
+                                ),
+                                Switch(
+                                  value: _priceDropAlert,
+                                  activeThumbColor: const Color(0xFF006B23),
+                                  onChanged: (val) {
+                                    setState(() => _priceDropAlert = val);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(val ? 'Price drop alert set!' : 'Price drop alert removed.'),
+                                        duration: const Duration(seconds: 2),
+                                        behavior: SnackBarBehavior.floating,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -346,7 +410,36 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                       const SizedBox(height: 20),
 
-                      // 5. Nutritional Value Card
+                      // 5. Product Information & Attributes Grid
+                      Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Product Information',
+                              style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
+                            ),
+                            const SizedBox(height: 12),
+                            _buildInfoRow('Shelf Life', '3 to 5 days'),
+                            const Divider(color: Color(0xFFEEEFEF), height: 16),
+                            _buildInfoRow('Country of Origin', 'India'),
+                            const Divider(color: Color(0xFFEEEFEF), height: 16),
+                            _buildInfoRow('Storage Instructions', 'Store at room temperature until ripe'),
+                            const Divider(color: Color(0xFFEEEFEF), height: 16),
+                            _buildInfoRow('Return Policy', 'Eligible for 24-hr replacement'),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 20),
+
+                      // 6. Nutritional Value Card
                       Container(
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
@@ -369,7 +462,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 const Icon(Icons.eco_outlined, color: Color(0xFF006B23), size: 20),
                                 const SizedBox(width: 8),
                                 Text(
-                                  'Nutritional Value',
+                                  'Nutritional Value (Per 100g)',
                                   style: GoogleFonts.outfit(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w700,
@@ -390,6 +483,108 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
 
+                      const SizedBox(height: 20),
+
+                      // 7. Customer Ratings & Reviews
+                      Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Ratings & Reviews',
+                                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
+                                ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF006B23),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.star, color: Colors.white, size: 14),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        '4.8',
+                                        style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 12),
+                            Text('128 verified ratings', style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF6E7A6C))),
+                            const Divider(color: Color(0xFFEEEFEF), height: 20),
+
+                            // Sample Review Card
+                            Row(
+                              children: [
+                                const CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor: Color(0xFFE8F5E9),
+                                  child: Icon(Icons.person, size: 18, color: Color(0xFF006B23)),
+                                ),
+                                const SizedBox(width: 10),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text('Priya S.', style: GoogleFonts.outfit(fontWeight: FontWeight.w700, fontSize: 14)),
+                                        const SizedBox(width: 6),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFE8F5E9),
+                                            borderRadius: BorderRadius.circular(4),
+                                          ),
+                                          child: Text('Verified Buyer', style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF006B23), fontWeight: FontWeight.w600)),
+                                        ),
+                                      ],
+                                    ),
+                                    Text('2 days ago', style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF6E7A6C))),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Super fresh avocados! They were perfectly ripe in two days just like promised.',
+                              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF3F4A3D)),
+                            ),
+                            const SizedBox(height: 10),
+                            GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _votedHelpful = !_votedHelpful;
+                                  _helpfulVotes += _votedHelpful ? 1 : -1;
+                                });
+                              },
+                              child: Row(
+                                children: [
+                                  Icon(_votedHelpful ? Icons.thumb_up : Icons.thumb_up_outlined, size: 14, color: const Color(0xFF006B23)),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Helpful ($_helpfulVotes)',
+                                    style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF006B23)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
                       const SizedBox(height: 110),
                     ],
                   ),
@@ -398,7 +593,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ),
           ),
 
-          // ─── 6. Fixed Bottom Action Bar ────────────────────────────────────
+          // ─── 8. Fixed Bottom Action Bar ────────────────────────────────────
           Positioned(
             left: 0,
             right: 0,
@@ -460,6 +655,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         height: 52,
                         child: ElevatedButton(
                           onPressed: () {
+                            if (cartProvider != null) {
+                              cartProvider.updateQuantityById(
+                                id: widget.productId,
+                                name: widget.productName,
+                                subtitle: widget.unitDetails,
+                                price: numericPrice,
+                                image: widget.imageUrl,
+                                delta: _quantity,
+                              );
+                            }
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Added $_quantity x ${widget.productName} to cart!'),
@@ -477,7 +682,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                           ),
                           child: Text(
-                            'Add to Cart • ${widget.price}',
+                            'Add to Cart • ₹${(numericPrice * _quantity).round()}',
                             style: GoogleFonts.outfit(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -500,19 +705,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: const Color(0xFF6E7A6C),
-          ),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF1A1C1E),
+        Text(label, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF6E7A6C))),
+        Text(value, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E))),
+      ],
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF6E7A6C))),
+        Flexible(
+          child: Text(
+            value,
+            textAlign: TextAlign.end,
+            style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)),
           ),
         ),
       ],

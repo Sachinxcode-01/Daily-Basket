@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_network_image.dart';
+import '../../../../core/providers/search_history_provider.dart';
 
 /// Search Results Screen — Exact Google Stitch Specification
-/// Matches:
-/// - Sticky Search bar with clear button & filter sliders icon
-/// - Filter Chips horizontal scroll bar (All, Organic, 10-Min Fast, Best Discount, Under ₹50)
-/// - Real-time Filter Results Bottom Sheet with Prominent Call-To-Action (CTA) Button
-/// - 2-Column Product Card Grid with tags, high-res images, prices, and + buttons
 class SearchResultsScreen extends StatefulWidget {
   const SearchResultsScreen({super.key});
 
@@ -18,12 +15,38 @@ class SearchResultsScreen extends StatefulWidget {
 }
 
 class _SearchResultsScreenState extends State<SearchResultsScreen> {
-  final TextEditingController _searchCtrl =
-      TextEditingController(text: 'Tomatoes');
-  
+  final TextEditingController _searchCtrl = TextEditingController();
+  bool _initializedFromArgs = false;
+
   String _selectedFilter = 'All';
   String _selectedSort = 'Relevance';
   final Map<String, int> _cartQuantities = {};
+
+  static const List<String> _trendingSearches = [
+    'Tomatoes',
+    'Amul Milk',
+    'Atta 5kg',
+    'Farm Eggs',
+    'Paneer',
+    'Brown Bread',
+    'Dark Chocolate',
+    'Organic Honey',
+  ];
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initializedFromArgs) {
+      _initializedFromArgs = true;
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is String && args.isNotEmpty) {
+        _searchCtrl.text = args;
+        try {
+          context.read<SearchHistoryProvider>().addQuery(args);
+        } catch (_) {}
+      }
+    }
+  }
 
   final List<String> _filters = [
     'All',
@@ -715,6 +738,34 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (_searchCtrl.text.isEmpty) ...[
+                    Text(
+                      '🔥 Trending Searches',
+                      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.onSurface),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _trendingSearches.map((term) {
+                        return ActionChip(
+                          label: Text(term),
+                          labelStyle: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.primary),
+                          backgroundColor: const Color(0xFFE8F5E9),
+                          shape: const StadiumBorder(side: BorderSide(color: AppColors.primary, width: 0.5)),
+                          onPressed: () {
+                            setState(() {
+                              _searchCtrl.text = term;
+                            });
+                            try {
+                              context.read<SearchHistoryProvider>().addQuery(term);
+                            } catch (_) {}
+                          },
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

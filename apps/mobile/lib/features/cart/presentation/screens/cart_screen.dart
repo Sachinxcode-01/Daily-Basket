@@ -322,7 +322,7 @@ class _CartScreenState extends State<CartScreen> {
     try { cartProvider = context.watch<CartProvider>(); } catch (_) {}
 
     final List<Map<String, dynamic>> activeItems = cartProvider != null
-        ? cartProvider.items.map((i) => {
+        ? cartProvider.items.map((i) => <String, dynamic>{
               'id': i.id,
               'name': i.name,
               'subtitle': i.subtitle,
@@ -553,13 +553,40 @@ color: Color(0xFF6E7A6C),
                                               ),
                                             ),
                                             const SizedBox(height: 4),
-                                            Text(
-                                              '₹${item['price']}',
-                                              style: GoogleFonts.outfit(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w700,
-                                                color: const Color(0xFF1A1C1E),
-                                              ),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  '₹${item['price']}',
+                                                  style: GoogleFonts.outfit(
+                                                    fontSize: 15,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: const Color(0xFF1A1C1E),
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    if (cartProvider != null) {
+                                                      cartProvider.saveForLater(item['id']);
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        const SnackBar(
+                                                          content: Text('Moved to Saved for Later'),
+                                                          duration: Duration(seconds: 2),
+                                                          behavior: SnackBarBehavior.floating,
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                  child: Text(
+                                                    'Save for later',
+                                                    style: GoogleFonts.inter(
+                                                      fontSize: 11,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: const Color(0xFF006B23),
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ],
                                         ),
@@ -639,6 +666,84 @@ color: Color(0xFF6E7A6C),
                           }),
                         ),
                       ),
+
+                if (cartProvider != null && cartProvider.savedForLater.isNotEmpty) ...[
+                  const SizedBox(height: 20),
+                  Text(
+                    'Saved For Later (${cartProvider.savedForLater.length})',
+                    style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF1A1C1E),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFBECAB9).withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Column(
+                      children: cartProvider.savedForLater.map((sItem) {
+                        return Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.network(
+                                  sItem.image,
+                                  width: 48,
+                                  height: 48,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => Container(
+                                    width: 48, height: 48, color: const Color(0xFFF3F3F6),
+                                    child: const Icon(Icons.shopping_basket, size: 24, color: Color(0xFF006B23)),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      sItem.name,
+                                      style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)),
+                                    ),
+                                    Text(
+                                      '₹${sItem.price.round()}',
+                                      style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF006B23)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              OutlinedButton(
+                                onPressed: () {
+                                  if (cartProvider != null) {
+                                    cartProvider.moveToCart(sItem.id);
+                                  }
+                                },
+                                style: OutlinedButton.styleFrom(
+                                  side: const BorderSide(color: Color(0xFF006B23)),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                ),
+                                child: Text(
+                                  'Move to Cart',
+                                  style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF006B23)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
 
                 const SizedBox(height: 14),
 
