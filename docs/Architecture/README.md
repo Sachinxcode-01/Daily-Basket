@@ -1,5 +1,7 @@
 # Monorepo & System Architecture — Daily Basket
 
+> **Authoritative Specification**: Please refer to the primary architecture document at [`docs/ARCHITECTURE.md`](../ARCHITECTURE.md) and system design document at [`docs/SYSTEM_DESIGN.md`](../SYSTEM_DESIGN.md).
+
 ```mermaid
 graph TD
     subgraph Frontend Applications
@@ -17,7 +19,7 @@ graph TD
     subgraph Data & Infra
         PG[(PostgreSQL 16)]
         Redis[(Redis 7 Cache)]
-        Razorpay[Razorpay Gateway]
+        BullMQ[(BullMQ Queues)]
     end
 
     Mobile --> NGINX
@@ -28,14 +30,5 @@ graph TD
     NGINX --> Nest
     Nest --> PG
     Nest --> Redis
-    Nest --> Razorpay
+    Nest --> BullMQ
 ```
-
----
-
-## Clean Architecture Layers (NestJS Backend)
-
-1. **Domain Layer**: Core business models & entities (`prisma/schema.prisma`).
-2. **Application Layer**: Business logic services (`orders.service.ts`, `payments.service.ts`, `delivery.service.ts`).
-3. **Infrastructure Layer**: Database connectors (`prisma.service.ts`), Redis cache (`redis.service.ts`), third-party SDKs (Razorpay, S3 uploads).
-4. **Presentation Layer**: REST API controllers with OpenAPI annotations (`orders.controller.ts`, `payments.controller.ts`).

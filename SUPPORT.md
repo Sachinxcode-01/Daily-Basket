@@ -1,20 +1,32 @@
-# Support Guidelines
+# Technical Support & Community — Daily Basket
 
-Welcome to the **Daily Basket** Support Portal!
-
----
-
-## 💬 Getting Help
-
-If you need assistance with setting up or deploying Daily Basket:
-
-1. **Check Documentation**: Explore the [`docs/`](docs/) directory for PRD, TRD, API Reference, and Deployment Guides.
-2. **GitHub Discussions**: Post questions or architectural ideas under GitHub Discussions.
-3. **GitHub Issues**: If you encounter a bug, create an issue using the bug report template.
+Thank you for building with **Daily Basket**! We provide several channels for technical assistance, bug reports, and community discussion.
 
 ---
 
-## 📧 Enterprise Support
+## 🛠️ Support Channels
 
-For commercial deployment assistance, enterprise SLA support, or custom Kirana dark store integrations, contact us at:
-**`support@dailybasket.com`**
+| Support Type | Channel | Primary Use Case | Response Time |
+| :--- | :--- | :--- | :--- |
+| **Bug Reports** | [GitHub Issues](https://github.com/Sachinxcode-01/Daily-Basket/issues) | Software bugs, reproducible errors, regressions | 24 - 48 hours |
+| **Feature Requests** | [GitHub Discussions](https://github.com/Sachinxcode-01/Daily-Basket/discussions) | Product proposals, new features, architectural feedback | Community review |
+| **Security Issues** | Email `security@dailybasket.com` | Vulnerability disclosure, auth bugs, payment flaws | < 24 hours |
+| **Documentation** | [Enterprise Docs](docs/README.md) | Self-serve architecture, API, setup, & deployment guides | Instant |
+
+---
+
+## 🔍 Self-Serve Troubleshooting Checklist
+
+Before opening an issue, check the following resources:
+
+1. **Troubleshooting Guide**: Review [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) for solutions to common runtime errors.
+2. **Frequently Asked Questions**: See [`docs/FAQ.md`](docs/FAQ.md).
+3. **Environment Setup**: Ensure your `.env` configuration matches [`docs/ENVIRONMENT.md`](docs/ENVIRONMENT.md).
+4. **Health Check**: Run `curl http://localhost:4000/api/v1/health` to verify API liveness.
+
+---
+
+## 💬 Community & Social
+
+- **GitHub Repository**: [Sachinxcode-01/Daily-Basket](https://github.com/Sachinxcode-01/Daily-Basket)
+- **Developer Contact**: `support@dailybasket.com`

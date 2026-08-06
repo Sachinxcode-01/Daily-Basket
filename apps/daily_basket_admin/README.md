@@ -1,17 +1,21 @@
-# daily_basket_admin
+# 🏢 Daily Basket — Flutter Admin Mobile Application (`apps/daily_basket_admin`)
 
-A new Flutter project.
+The **Daily Basket Flutter Admin App** is a companion mobile application for dark store operations managers, allowing on-the-go inventory audits, rider dispatch management, and order monitoring directly from an Android or iOS device.
 
-## Getting Started
+---
 
-This project is a starting point for a Flutter application.
+## 🏗️ Technical Specifications
 
-A few resources to get you started if this is your first Flutter project:
+- **Framework**: Flutter 3.19 / Dart 3.3
+- **Design Standard**: Google Stitch Design Source of Truth
+- **Key Modules**: Real-time Order Stream, Stock Adjuster, Delivery Partner Duty Monitor
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+---
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## ⚡ Running Locally
+
+```bash
+cd apps/daily_basket_admin
+flutter pub get
+flutter run
+```

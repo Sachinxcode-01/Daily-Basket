@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Daily Basket — 10-Minute Grocery Delivery Platform" width="100%" />
+  <img src="assets/banner.png" alt="Daily Basket — Enterprise 10-Minute Grocery Delivery Platform" width="100%" />
 </p>
 
 <p align="center">
@@ -7,294 +7,284 @@
   <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.19.x-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" /></a>
   <a href="https://nestjs.com"><img src="https://img.shields.io/badge/NestJS-10.3-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" /></a>
   <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" /></a>
-  <a href="https://github.com/Sachinxcode-01/Daily-Basket/actions"><img src="https://img.shields.io/badge/CI%2FCD-Passing-22c55e?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI/CD" /></a>
-  <img src="https://img.shields.io/badge/Build-Production%20Ready-006b23?style=for-the-badge" alt="Production Ready" />
+  <a href="https://prisma.io"><img src="https://img.shields.io/badge/Prisma-5.10-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" /></a>
+  <a href="https://redis.io"><img src="https://img.shields.io/badge/Redis-7.2-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis" /></a>
+  <a href="https://github.com/Sachinxcode-01/Daily-Basket/actions"><img src="https://img.shields.io/badge/CI%2FCD-Passing-22c55e?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI/CD Status" /></a>
+  <img src="https://img.shields.io/badge/Production-Ready-006b23?style=for-the-badge" alt="Production Ready" />
 </p>
 
 <br/>
 
-> **Daily Basket** is a production-grade, enterprise quick-commerce platform delivering groceries in 10 minutes. Built as a full-stack monorepo with Clean Architecture — powering a Flutter mobile app, three Next.js web portals, and a NestJS microservice backend. Designed for real Kirana dark stores, Gadag & beyond.
+> **Daily Basket** is an enterprise-grade, hyper-local 10-minute quick-commerce platform delivering fresh groceries, vegetables, dairy, and household essentials. Built as a clean-architecture monorepo, it powers a cross-platform Flutter customer app, three Next.js 14 web portals (Customer, Store Admin, Delivery Partner PWA), and a NestJS microservices backend with real-time WebSockets, Redis caching, BullMQ job queues, and multi-provider AI engine.
+
+---
+
+## 📋 Table of Contents
+
+- [Platform Overview](#-platform-overview)
+- [Single Source of Truth (Google Stitch)](#-single-source-of-truth-google-stitch)
+- [System Architecture](#-system-architecture)
+- [Monorepo Directory Structure](#-monorepo-directory-structure)
+- [Feature Matrix](#-feature-matrix)
+  - [Customer Mobile App](#1-customer-mobile-app-appsmobile)
+  - [Customer Web Portal](#2-customer-web-portal-appswebsite)
+  - [Store Admin Dashboard](#3-store-admin-dashboard-appsadmin)
+  - [Delivery Partner PWA](#4-delivery-partner-pwa-appsdelivery)
+  - [Backend Services](#5-backend-microservices-servicesapi)
+- [Tech Stack](#-tech-stack)
+- [Quick Start & Local Setup](#-quick-start--local-setup)
+- [API Directory Overview](#-api-directory-overview)
+- [AI Engine Architecture](#-ai-engine-architecture)
+- [Security & Compliance](#-security--compliance)
+- [Testing & Quality Assurance](#-testing--quality-assurance)
+- [DevOps & CI/CD Pipeline](#-devops--cicd-pipeline)
+- [Enterprise Documentation Hub](#-enterprise-documentation-hub)
+- [Roadmap](#-roadmap)
+- [License & Author](#-license--author)
 
 ---
 
 ## 📱 Platform Overview
 
-<table>
-<tr>
-<td align="center" width="25%">
-<strong>📱 Customer App</strong><br/>
-Flutter Mobile
-</td>
-<td align="center" width="25%">
-<strong>🌐 Customer Website</strong><br/>
-Next.js Web Portal
-</td>
-<td align="center" width="25%">
-<strong>🏢 Admin Dashboard</strong><br/>
-Store Management
-</td>
-<td align="center" width="25%">
-<strong>🛵 Delivery PWA</strong><br/>
-Rider App
-</td>
-</tr>
-<tr>
-<td align="center">Flutter 3.19 + Dart 3<br/>Material Design 3</td>
-<td align="center">Next.js 14 App Router<br/>TailwindCSS + TanStack Query</td>
-<td align="center">Next.js 14 + Zustand<br/>Real-time fulfillment queue</td>
-<td align="center">Next.js PWA<br/>GPS + OTP verification</td>
-</tr>
-</table>
+Daily Basket seamlessly integrates local Kirana dark store hubs with real-time customer ordering, automated rider dispatch, and doorstep OTP verification.
+
+| Application | Platform | Key Capabilities | Directory |
+| :--- | :--- | :--- | :--- |
+| **📱 Customer App** | Flutter 3.19 (Android / iOS) | 10-min delivery, live GPS tracking, phone OTP, Razorpay, Wallet, AI assistant | [`apps/mobile`](apps/mobile) |
+| **🌐 Customer Website** | Next.js 14 (React 18 + Tailwind) | Flash deals, full catalog explorer, dark theme, Razorpay checkout, live map | [`apps/website`](apps/website) |
+| **🏢 Store Admin** | Next.js 14 (Zustand + Motion) | Real-time fulfillment queue (`CONFIRMED` → `DELIVERED`), stock management, KPIs | [`apps/admin`](apps/admin) |
+| **🛵 Delivery Partner** | Next.js 14 PWA | Duty switch (`ONLINE`/`OFFLINE`), turn-by-turn map navigation, doorstep OTP verification | [`apps/delivery`](apps/delivery) |
+| **⚙️ Backend API** | NestJS 10 + Prisma + Redis | JWT rotation, RBAC, WebSockets, BullMQ queues, multi-provider AI fallback | [`services/api`](services/api) |
 
 ---
 
-## ✨ Features
+## 🎨 Single Source of Truth (Google Stitch)
 
-### 📱 Customer Mobile App (`apps/mobile`)
+All user interface components, layouts, typography hierarchies, design tokens, color palettes, micro-animations, and visual flows are strictly anchored to the **Google Stitch Design Project**.
 
-| Feature | Description |
-|---------|-------------|
-| 🏠 **Home Feed** | Hero delivery ETA bar, live location selector, category grid, flash deals carousel, and trending products |
-| 🔍 **Smart Search** | Debounced full-text search with trending tags, voice-ready input, and instant results grid |
-| 🛒 **Shopping Cart** | Interactive cart drawer with free-delivery threshold meter, coupon code entry, and live subtotal |
-| 📦 **Browse Categories** | Taxonomy grid — Produce, Dairy, Bakery, Snacks, Beverages, Household, Personal Care |
-| 💳 **Checkout** | Multi-step checkout with address selector, slot booking, UPI / Card / COD / Net Banking via Razorpay |
-| 📍 **Live Tracking** | Real-time WebSocket order telemetry with driver GPS map route and animated ETA countdown |
-| 🔔 **Notification Center** | In-app push feed for order updates, deals, and delivery alerts with read/unread states |
-| 💰 **Wallet & Transactions** | Daily Basket Wallet ledger with credit/debit history and one-tap refill |
-| ⭐ **Rate Your Delivery** | Post-delivery rating with star selector, quick-tag chips, and photo upload |
-| 🌿 **Fresh Produce Explorer** | Freshness-score browser with origin-farm details, 3D product previews, and quality badges |
-| 🥇 **Daily Basket Plus** | VIP membership screen with free-delivery perks, exclusive flash sales, and priority support |
-| 🛒 **Empty Basket State** | Smart empty state with curated "You might like" suggestions to re-engage shoppers |
-| 🔐 **Authentication Suite** | Phone OTP login, email/password, Google OAuth, MFA selection, biometric enable, account lock, email verification |
-| 🗺️ **Onboarding Flow** | Animated multi-step intro → location permission → notification permission → ready-to-shop |
-| ❓ **Help Center** | Searchable FAQ accordion with live chat trigger and ticket submission |
-| 📋 **Order History** | Full order receipts with item breakdown, delivery timeline, and re-order one tap |
+- Visual consistency is maintained across Flutter, Next.js web applications, and shared UI component packages.
+- Shared design tokens are distributed via `@daily-basket/design-system` and `@daily-basket/theme`.
+- Detailed UI guidelines are available in [`docs/GOOGLE_STITCH.md`](docs/GOOGLE_STITCH.md) and [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md).
 
 ---
 
-### 🌐 Customer Website (`apps/website`)
-
-| Feature | Description |
-|---------|-------------|
-| 🏠 **Homepage** | Hero section, category shortcuts, flash deal timer, testimonials, app download CTA |
-| 🔍 **Search Results** | Filtered product grid with sorting, price range, and category filter chips |
-| 🛒 **Cart & Checkout** | Dark-themed checkout flow with Razorpay payment integration |
-| 📍 **Live Tracking** | Real-time delivery map tracker with step-by-step status timeline |
-| 🔔 **Notifications** | Notification center with grouped alerts (Orders, Offers, System) |
-| 💰 **Wallet** | Digital wallet with transaction history and quick-add funds |
-| ⭐ **Rate Delivery** | Web-based delivery rating with emoji picker |
-| 🌿 **Fresh Produce Explorer** | Freshness explorer with animated quality indicators |
-| 🥇 **Daily Basket Plus** | Membership upgrade page with benefit cards and billing toggle |
-| 🗂️ **Browse Categories** | Full category taxonomy explorer with sub-category depth |
-| 🛡️ **Account Security** | Security settings, active session manager, and 2FA toggle |
-| 📱 **How It Works** | Illustrated 3-step explainer page |
-| 📄 **Legal Pages** | Privacy Policy, Terms of Service |
-| 🔐 **Auth Pages** | Login, Register, Forgot Password, Reset Password, OTP, Email Verify, Account Locked, Enable Biometrics |
-
----
-
-### 🏢 Store Admin Dashboard (`apps/admin`)
-
-| Feature | Description |
-|---------|-------------|
-| 📊 **KPI Overview** | Today's Revenue, Orders Count, Avg Dispatch Time, Customer Satisfaction score |
-| 📋 **Fulfillment Queue** | Real-time order queue: `NEW → ACCEPT → PACK → READY → DISPATCH` with one-tap action buttons |
-| 📦 **Inventory Manager** | Stock level viewer, low-stock alerts, quick-adjust quantity, and SKU search |
-| 🏆 **Top Products** | Best sellers by units sold and revenue with trend indicators |
-| 👥 **Customer Insights** | Repeat customer rate, new customer count, average basket size |
-| ⚡ **Live Activity Feed** | Real-time stream of order events and inventory changes |
-
----
-
-### 🛵 Delivery Partner App (`apps/delivery`)
-
-| Feature | Description |
-|---------|-------------|
-| 🟢 **Duty Toggle** | Online/Offline toggle with GPS tracking activation |
-| 📋 **Active Delivery Queue** | Store pickup details, customer drop-off address, and order item manifest |
-| 🗺️ **Navigation Trigger** | One-tap Google Maps route launch for pickup and delivery |
-| 🔑 **Delivery OTP** | Customer OTP verification at doorstep before marking delivered |
-| 💰 **Earnings Ledger** | Today's earnings breakdown: base pay + incentives + order count |
-| 📈 **Performance Stats** | Acceptance rate, on-time delivery %, and weekly earnings graph |
-
----
-
-## 🛠️ Technology Stack
-
-| Layer | Technologies |
-|---|---|
-| **Mobile App** | ![Flutter](https://img.shields.io/badge/Flutter-02569B?style=flat&logo=flutter&logoColor=white) ![Dart](https://img.shields.io/badge/Dart-0175C2?style=flat&logo=dart&logoColor=white) ![Material Design 3](https://img.shields.io/badge/Material%20Design%203-757575?style=flat&logo=materialdesign&logoColor=white) |
-| **Customer Web** | ![Next.js](https://img.shields.io/badge/Next.js-000?style=flat&logo=nextdotjs&logoColor=white) ![React](https://img.shields.io/badge/React-61DAFB?style=flat&logo=react&logoColor=black) ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white) ![TanStack Query](https://img.shields.io/badge/TanStack_Query-FF4154?style=flat&logo=reactquery&logoColor=white) |
-| **Admin & Delivery** | ![Next.js](https://img.shields.io/badge/Next.js-000?style=flat&logo=nextdotjs&logoColor=white) ![Zustand](https://img.shields.io/badge/Zustand-brown?style=flat) ![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=flat&logo=framer&logoColor=white) |
-| **Backend API** | ![NestJS](https://img.shields.io/badge/NestJS-E0234E?style=flat&logo=nestjs&logoColor=white) ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white) ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat&logo=nodedotjs&logoColor=white) |
-| **Database & ORM** | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white) ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat&logo=prisma&logoColor=white) |
-| **Cache & Queues** | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat&logo=redis&logoColor=white) ![BullMQ](https://img.shields.io/badge/BullMQ-CC0000?style=flat) ![WebSockets](https://img.shields.io/badge/WebSockets-010101?style=flat) |
-| **Payments** | ![Razorpay](https://img.shields.io/badge/Razorpay-02042B?style=flat&logo=razorpay&logoColor=blue) |
-| **DevOps & CI/CD** | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white) ![NGINX](https://img.shields.io/badge/NGINX-009639?style=flat&logo=nginx&logoColor=white) ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=flat&logo=githubactions&logoColor=white) |
-| **Package Manager** | ![pnpm](https://img.shields.io/badge/pnpm-F69220?style=flat&logo=pnpm&logoColor=white) Monorepo Workspaces |
-| **UI Design** | ![Google Stitch](https://img.shields.io/badge/Google_Stitch-4285F4?style=flat&logo=google&logoColor=white) Single Source of Truth |
-
----
-
-## 📂 Monorepo Structure
-
-```
-daily-basket/
-├── apps/
-│   ├── mobile/             # 📱 Flutter Customer Mobile App (35+ screens)
-│   ├── website/            # 🌐 Next.js Customer Web Portal (31 pages)
-│   ├── admin/              # 🏢 Next.js Dark Store Admin Dashboard
-│   └── delivery/           # 🛵 Next.js Delivery Partner PWA
-│
-├── services/
-│   └── api/                # ⚙️  NestJS API Gateway + Microservices
-│       ├── src/modules/
-│       │   ├── auth/       #    JWT, OTP, OAuth, Sessions
-│       │   ├── products/   #    Catalog, Search, Categories
-│       │   ├── orders/     #    Checkout, Fulfillment, Tracking
-│       │   ├── payments/   #    Razorpay Integration + Webhooks
-│       │   ├── delivery/   #    GPS Telemetry + Driver Assignment
-│       │   ├── wallet/     #    Balance, Transactions
-│       │   ├── notifications/ # Push Notification Service
-│       │   └── analytics/  #    Store KPIs + Reporting
-│       └── prisma/         #    PostgreSQL Schema + Migrations
-│
-├── packages/
-│   ├── api-client/         # Shared Axios SDK Client
-│   ├── shared-types/       # TypeScript DTOs & Interfaces
-│   ├── shared-utils/       # Formatting & Currency Utilities
-│   ├── design-system/      # Web Design Tokens
-│   ├── constants/          # Business Logic Constants
-│   ├── theme/              # Branding & Theme Config
-│   └── shared-ui/          # React Component Library
-│
-├── infrastructure/
-│   ├── docker/             # Production Dockerfiles
-│   ├── nginx/              # Reverse Proxy Config
-│   └── docker-compose.yml  # Local Multi-Container Dev
-│
-├── docs/                   # PRD, TRD, Architecture & API Docs
-├── scripts/                # DB Seeding & Setup Automation
-└── .github/workflows/      # CI/CD — Lint, Test, Build, Deploy
-```
-
----
-
-## 🏗️ Architecture
+## 🏗️ System Architecture
 
 ```mermaid
 graph TD
-    Client[📱 Flutter App / 🌐 Next.js Web] -->|HTTPS| NGINX[NGINX Reverse Proxy]
-    Admin[🏢 Admin Portal] -->|HTTPS| NGINX
-    Rider[🛵 Delivery PWA] -->|HTTPS| NGINX
-    NGINX -->|HTTP + WSS| NestJS[NestJS API Gateway]
+    subgraph Client Applications
+        Mobile["📱 Flutter Mobile App\n(Android / iOS)"]
+        Web["🌐 Next.js Customer Web\n(Tailwind + React Query)"]
+        Admin["🏢 Next.js Admin Dashboard\n(Real-time Order Queue)"]
+        Rider["🛵 Delivery Partner PWA\n(GPS + OTP Verification)"]
+    end
 
-    NestJS --> Auth[Auth Module\nJWT · OTP · OAuth]
-    NestJS --> Products[Products Module\nSearch · Catalog]
-    NestJS --> Orders[Orders Module\nCheckout · Fulfillment]
-    NestJS --> Payments[Payments Module\nRazorpay · Webhooks]
-    NestJS --> Delivery[Delivery Module\nGPS · Assignment]
+    subgraph API Gateway & Ingress
+        NGINX["🛡️ NGINX Reverse Proxy\n(SSL Termination + Rate Limit)"]
+        NestGateway["⚙️ NestJS API Gateway\n(Global Auth Guards & Throttler)"]
+    end
 
-    NestJS -->|Prisma ORM| PG[(PostgreSQL 16)]
-    NestJS -->|Cache · Pub/Sub| Redis[(Redis 7)]
-    NestJS -->|Background Jobs| Bull[BullMQ Workers]
-    NestJS -->|WebSocket| WS[Live Tracking]
+    subgraph Core Backend Microservices
+        AuthModule["🔐 Auth & Security Module\n(OTP, JWT, OAuth, MFA, Audit Logs)"]
+        CatalogModule["📦 Catalog & Search Module\n(Categories, Brand Aliases, Keywords)"]
+        OrdersModule["🛒 Orders & Quick-Buy Service\n(Cart, Subtotal, Fulfillment Queue)"]
+        PaymentsModule["💳 Payments Service\n(Razorpay, HMAC Verification, Wallet)"]
+        DeliveryModule["📍 Delivery Telemetry Service\n(GPS Tracking, Rider Assignment)"]
+        AiEngine["🤖 Multi-Provider AI Engine\n(Gemini, Grok, OpenRouter, Local AI)"]
+    end
+
+    subgraph Persistence & Infrastructure
+        PostgresDB[("🐘 PostgreSQL 16\n(Prisma ORM Models)")]
+        RedisCache[("⚡ Redis 7\n(Session Store & Pub/Sub)")]
+        BullMQWorkers["📩 BullMQ Queue Workers\n(Async Notification & Jobs)"]
+        SocketServer["⚡ Socket.IO Gateways\n(Live Telemetry & Support Chat)"]
+    end
+
+    Mobile -->|HTTPS / WSS| NGINX
+    Web -->|HTTPS / WSS| NGINX
+    Admin -->|HTTPS / WSS| NGINX
+    Rider -->|HTTPS / WSS| NGINX
+
+    NGINX --> NestGateway
+
+    NestGateway --> AuthModule
+    NestGateway --> CatalogModule
+    NestGateway --> OrdersModule
+    NestGateway --> PaymentsModule
+    NestGateway --> DeliveryModule
+    NestGateway --> AiEngine
+
+    AuthModule --> PostgresDB
+    CatalogModule --> PostgresDB
+    OrdersModule --> PostgresDB
+    PaymentsModule --> PostgresDB
+    DeliveryModule --> PostgresDB
+
+    NestGateway --> RedisCache
+    NestGateway --> BullMQWorkers
+    NestGateway --> SocketServer
 ```
 
 ---
 
-## 🔌 Core API Endpoints
+## 📂 Monorepo Directory Structure
 
-| Module | Method | Endpoint | Description |
-|--------|--------|----------|-------------|
-| **Auth** | `POST` | `/api/v1/auth/login-otp` | Request 6-digit phone OTP |
-| **Auth** | `POST` | `/api/v1/auth/verify-otp` | Verify OTP & receive JWT pair |
-| **Auth** | `POST` | `/api/v1/auth/google` | Google OAuth login |
-| **Auth** | `POST` | `/api/v1/auth/register` | Email + password registration |
-| **Products** | `GET` | `/api/v1/products/home-feed` | Home page deals & categories |
-| **Products** | `GET` | `/api/v1/products/search?query=` | Debounced catalog search |
-| **Orders** | `POST` | `/api/v1/orders` | Create new order |
-| **Orders** | `GET` | `/api/v1/orders/:id` | Order details & status |
-| **Payments** | `POST` | `/api/v1/payments/initiate` | Create Razorpay Order intent |
-| **Payments** | `POST` | `/api/v1/payments/verify` | HMAC SHA-256 signature verify |
-| **Payments** | `POST` | `/api/v1/payments/webhook` | Razorpay webhook handler |
-| **Delivery** | `GET` | `/api/v1/delivery/track/:id` | Live GPS telemetry & ETA |
-| **Wallet** | `GET` | `/api/v1/wallet/:userId` | Wallet balance & transactions |
-| **Analytics** | `GET` | `/api/v1/analytics/:storeId` | Store KPIs & fulfillment stats |
-| **Notifications** | `GET` | `/api/v1/notifications/:userId` | User notification feed |
+```
+daily-basket/
+├── .agents/                        # Workspace rules & customization configs
+├── apps/
+│   ├── admin/                      # 🏢 Next.js Dark Store Admin Dashboard
+│   ├── daily_basket_admin/         # 🏢 Flutter Admin App
+│   ├── delivery/                   # 🛵 Next.js Delivery Partner PWA
+│   ├── mobile/                     # 📱 Flutter Customer Mobile App (Clean Architecture)
+│   └── website/                    # 🌐 Next.js Customer Web Portal (App Router)
+├── assets/                         # Graphic banners, logos, and UI screenshot assets
+├── docs/                           # 📘 Enterprise Documentation Hub
+│   ├── features/                   # Feature specification guides (Products, Inventory, Payments, Notifications)
+│   ├── ARCHITECTURE.md             # End-to-End System Architecture
+│   ├── API.md                      # Comprehensive REST API Directory
+│   ├── DATABASE.md                 # PostgreSQL Database Schema & Prisma Models
+│   ├── AI.md                       # AI Engine Architecture & Provider Fallbacks
+│   ├── DEPLOYMENT.md               # Production Deployment Specs (Docker, Compose, NGINX, K8s)
+│   └── ...                         # Dedicated engineering, security & operations docs
+├── infrastructure/
+│   ├── docker/                     # Multi-stage production Dockerfiles
+│   ├── k8s/                        # Kubernetes deployment manifests
+│   ├── nginx/                      # NGINX reverse proxy configuration
+│   ├── docker-compose.yml          # Local multi-container development environment
+│   └── docker-compose.prod.yml     # Production orchestration compose setup
+├── packages/
+│   ├── api-client/                 # Shared Axios API SDK Client
+│   ├── constants/                  # Business logic constants and enums
+│   ├── design-system/              # Web design tokens and utilities
+│   ├── shared-types/               # TypeScript interfaces & DTO contracts
+│   ├── shared-ui/                  # Shared React UI component library
+│   ├── shared-utils/               # Currency, date, and validation utilities
+│   └── theme/                      # Daily Basket branding and color palette definitions
+├── scripts/                        # Database seeding, backup & setup automation scripts
+├── services/
+│   └── api/                        # ⚙️ NestJS API Gateway & Microservices Backend
+│       ├── prisma/                 # Database schema definitions & migrations
+│       └── src/                    # NestJS modules (auth, products, orders, payments, delivery, AI)
+├── CHANGELOG.md                    # Keep a Changelog version history
+├── CONTRIBUTING.md                 # Developer contribution guidelines
+├── CODE_OF_CONDUCT.md              # Contributor code of conduct
+├── LICENSE                         # MIT License
+├── ROADMAP.md                      # Feature & milestone roadmap
+├── SECURITY.md                     # Security vulnerability disclosure policy
+└── SUPPORT.md                      # Technical support & community channels
+```
 
 ---
 
-## ⚡ Quickstart
+## ✨ Feature Matrix
+
+### 1. Customer Mobile App (`apps/mobile`)
+- **Authentication**: Phone OTP verification, Email/Password login, Google OAuth, TOTP MFA, Biometric login support.
+- **Home Feed**: Live delivery ETA timer badge, delivery address selector, dynamic categories, flash deals carousel.
+- **Smart Catalog & Search**: Instant debounced catalog search with trending keywords, brand alias matching, and category filtering.
+- **Cart & Checkout**: Interactive cart drawer with free delivery progress meter, instant coupon validation (`DAILY100`), Razorpay payment gateway (UPI, Card, NetBanking, COD).
+- **Live GPS Order Tracking**: Animated step-by-step order progress timeline, driver contact trigger, and live GPS map routing via Socket.IO.
+- **Wallet & Loyalty**: Digital Daily Basket Wallet balance, transaction ledger, instant refill, and Daily Basket Plus VIP perks.
+- **AI Voice & Visual Search**: Voice search interface and camera image recognition powered by backend multi-provider AI.
+
+### 2. Customer Web Portal (`apps/website`)
+- **Responsive Web Portal**: Built using Next.js 14 App Router, React 18, and TailwindCSS.
+- **Dark Mode Aesthetic**: Google Stitch compliant dark-mode design system with rich micro-interactions.
+- **Order Management**: Order placement, address management, coupon redemption, active delivery map, and delivery feedback rating.
+- **Account Security Hub**: Active session device management, password reset, 2FA toggle, and security audit activity log.
+
+### 3. Store Admin Dashboard (`apps/admin`)
+- **Fulfillment Queue**: Real-time order dispatch stream (`NEW` → `CONFIRMED` → `PACKING` → `READY_FOR_PICKUP` → `DISPATCHED`).
+- **Inventory Control**: Live stock adjustments, low-stock threshold alerts, SKU search, and catalog editor.
+- **Store KPIs**: Real-time revenue analytics, average packing time, driver dispatch efficiency, and customer satisfaction metrics.
+
+### 4. Delivery Partner PWA (`apps/delivery`)
+- **Duty Controller**: One-tap `ONLINE`/`OFFLINE` toggle with automated GPS telemetry broadcast.
+- **Active Orders Queue**: Dark store pickup location, customer drop-off instructions, item packing manifest.
+- **Doorstep Verification**: Customer OTP PIN verification before marking orders as `DELIVERED`.
+- **Earnings Ledger**: Daily base pay, surge incentives, tip breakdown, and performance stats.
+
+### 5. Backend Microservices (`services/api`)
+- **NestJS Clean Architecture**: Decoupled controllers, domain services, custom guards, logging interceptors, and exception filters.
+- **Database & Cache**: PostgreSQL 16 managed by Prisma ORM 5 paired with Redis 7 caching and session storage.
+- **Queues & Realtime**: BullMQ job processing for notifications and email triggers alongside Socket.IO event gateways.
+- **Multi-Provider AI Engine**: Primary Gemini model with automatic fallback to Grok, OpenRouter, and local models.
+
+---
+
+## 🛠️ Tech Stack
+
+| Domain | Technology | Details |
+| :--- | :--- | :--- |
+| **Mobile App** | Flutter 3.19 / Dart 3.3 | Provider pattern, Clean Architecture, Material 3 |
+| **Web Applications** | Next.js 14 / React 18 | App Router, TailwindCSS, TanStack Query, Framer Motion |
+| **Backend API** | NestJS 10 / Node.js 20 | TypeScript 5.3, `@nestjs/swagger`, `@nestjs/throttler` |
+| **Database & ORM** | PostgreSQL 16 / Prisma 5 | Parameterized queries, UUID primary keys, spatial coordinates |
+| **Caching & Messaging** | Redis 7.2 / BullMQ 5 | Session caching, Pub/Sub events, async queue processing |
+| **Real-time Engine** | Socket.IO 4 | Dual-way WebSocket telemetry for live tracking & support chat |
+| **Payment Gateway** | Razorpay SDK | Razorpay Order intent, HMAC SHA-256 webhook signature verification |
+| **AI Integration** | Google Gemini / Grok / OpenRouter | Automated fallback manager, security sanitization, AI tool calling |
+| **DevOps & Infra** | Docker / NGINX / K8s | Multi-stage Docker build, reverse proxy, GitHub Actions CI/CD |
+
+---
+
+## ⚡ Quick Start & Local Setup
 
 ### Prerequisites
+- Node.js >= 18.18.0
+- pnpm >= 8.15.0
+- Flutter SDK >= 3.19.0
+- Docker & Docker Compose
 
-```
-Node.js >= 18.0.0
-Flutter SDK >= 3.19.0
-pnpm >= 8.0.0
-Docker & Docker Compose
-PostgreSQL 16 (via Docker)
-Redis 7 (via Docker)
-```
-
-### 1. Clone the Repository
-
+### 1. Clone & Install Dependencies
 ```bash
 git clone https://github.com/Sachinxcode-01/Daily-Basket.git
 cd Daily-Basket
+pnpm install
 ```
 
-### 2. Configure Environment
-
-Create `services/api/.env`:
-
+### 2. Configure Environment Variables
+Copy template `.env` file to API service:
+```bash
+cp .env.production.example services/api/.env
+```
+Ensure database credentials match local or container settings:
 ```env
 PORT=4000
 NODE_ENV=development
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/daily_basket?schema=public"
 REDIS_HOST="localhost"
 REDIS_PORT=6379
-JWT_SECRET="your_jwt_secret_here"
-RAZORPAY_KEY_ID="rzp_test_xxxx"
-RAZORPAY_KEY_SECRET="your_razorpay_secret"
+JWT_SECRET="super-secret-jwt-key"
+RAZORPAY_KEY_ID="rzp_test_sample"
+RAZORPAY_KEY_SECRET="sample_secret"
 ```
 
 ### 3. Start Infrastructure (PostgreSQL + Redis)
-
 ```bash
-docker-compose -f infrastructure/docker-compose.yml up -d
+docker compose -f infrastructure/docker-compose.yml up -d
 ```
 
-### 4. Install All Dependencies
-
-```bash
-pnpm install
-```
-
-### 5. Run Database Migrations & Seed
-
+### 4. Initialize Database
 ```bash
 cd services/api
 npx prisma db push
 npx prisma generate
 ```
 
-### 6. Start All Services in Parallel
-
+### 5. Run Web & API Applications
 ```bash
-# From monorepo root — starts API + Website + Admin + Delivery simultaneously
+# From root directory — runs API, Website, Admin, and Delivery applications concurrently
 pnpm dev
-
-# Or start individually:
-pnpm dev:api        # NestJS API on :4000
-pnpm dev:website    # Customer Web on :3005
-pnpm dev:admin      # Admin Dashboard on :3001
 ```
+- **API Gateway**: `http://localhost:4000/api/v1`
+- **Swagger Documentation**: `http://localhost:4000/api/docs`
+- **Customer Web**: `http://localhost:3005`
+- **Admin Dashboard**: `http://localhost:3001`
+- **Delivery PWA**: `http://localhost:3002`
 
-### 7. Run Flutter Mobile App
-
+### 6. Run Flutter Mobile App
 ```bash
 cd apps/mobile
 flutter pub get
@@ -303,57 +293,150 @@ flutter run
 
 ---
 
-## 🔒 Security & Quality
+## 🔌 API Directory Overview
 
-| Safeguard | Implementation |
-|-----------|---------------|
-| **Payment Security** | Razorpay HMAC SHA-256 webhook signature verification |
-| **Authentication** | JWT access + refresh token rotation, bcrypt hashing |
-| **SQL Protection** | Prisma parameterized queries (zero raw SQL) |
-| **Rate Limiting** | NestJS Throttler — 100 req/min on all public endpoints |
-| **Static Analysis** | `flutter analyze` — **0 Errors, 0 Warnings** |
-| **TypeScript** | Strict mode, zero `any` in production code |
-| **CI/CD Checks** | ESLint + TypeCheck + Unit Tests required to merge |
+Below is a summary of primary API routes. For full details, see [`docs/API.md`](docs/API.md) or access Swagger UI at `/api/docs`.
+
+| Module | Method | Endpoint Route | Description | Auth / Role |
+| :--- | :--- | :--- | :--- | :--- |
+| **Auth** | `POST` | `/api/v1/auth/login-otp` | Request 6-digit phone verification OTP | Public |
+| **Auth** | `POST` | `/api/v1/auth/verify-otp` | Verify OTP & receive JWT token pair | Public |
+| **Auth** | `POST` | `/api/v1/auth/google` | Authenticate using Google OAuth token | Public |
+| **Products** | `GET` | `/api/v1/products/home-feed` | Fetch home page flash deals & categories | Public |
+| **Products** | `GET` | `/api/v1/products/search?query=` | Debounced full-text catalog search | Public |
+| **Orders** | `POST` | `/api/v1/orders` | Create new 10-minute grocery order | Customer |
+| **Payments** | `POST` | `/api/v1/payments/initiate` | Create Razorpay payment order intent | Customer |
+| **Payments** | `POST` | `/api/v1/payments/verify` | Verify Razorpay HMAC SHA-256 signature | Customer |
+| **Delivery** | `GET` | `/api/v1/delivery/track/:id` | Fetch real-time GPS telemetry & ETA | Customer |
+| **Analytics** | `GET` | `/api/v1/analytics/:storeId` | Dark Store revenue & packing KPIs | Admin / Store Manager |
 
 ---
 
-## 🤖 CI/CD Pipeline
+## 🤖 AI Engine Architecture
+
+Daily Basket integrates a multi-provider LLM engine capable of processing natural language customer support, recipe recommendations, voice search, and package image freshness analysis.
+
+```mermaid
+graph LR
+    Client["Client Request\n(Text / Voice / Image)"] --> Security["AiSecurityService\n(Prompt Sanitization)"]
+    Security --> ProviderMgr["ProviderManager\n(Health & Routing)"]
+
+    ProviderMgr -->|Primary| Gemini["Google Gemini 1.5 Flash"]
+    ProviderMgr -->|Fallback 1| Grok["xAI Grok Provider"]
+    ProviderMgr -->|Fallback 2| OpenRouter["OpenRouter API"]
+    ProviderMgr -->|Fallback 3| Local["Local Ollama Provider"]
+
+    Gemini -->|Failure / Timeout| FallbackMgr["FallbackManager"]
+    FallbackMgr --> Grok
+
+    ProviderMgr --> ToolReg["AiToolsRegistry\n(Function Calling)"]
+    ToolReg --> Execute["Execute Store Actions\n(Check Inventory / Track Order)"]
+```
+
+See [`docs/AI.md`](docs/AI.md) for full provider failover and tool registration details.
+
+---
+
+## 🔒 Security & Compliance
+
+- **Authentication & JWT Rotation**: Short-lived JWT access tokens paired with secure HTTP-only refresh tokens.
+- **Role-Based Access Control (RBAC)**: Enforced across controllers using `@Roles()` decorator and `RolesGuard`.
+- **Payment Security**: Strict HMAC SHA-256 signature validation on Razorpay payments and webhooks.
+- **Throttling & Helmet**: NestJS Throttler protects endpoints from brute force and DDoS attacks.
+- **Database Safety**: Prisma ORM enforces parameterized SQL queries, eliminating SQL injection.
+- **Detailed Security Specs**: See [`docs/SECURITY_ARCHITECTURE.md`](docs/SECURITY_ARCHITECTURE.md) and [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md).
+
+---
+
+## 🧪 Testing & Quality Assurance
+
+- **Flutter Static Analysis**: `flutter analyze` — **0 Errors, 0 Warnings**.
+- **Flutter Unit & Widget Tests**: `flutter test` — Complete coverage for providers, services, and core UI widgets.
+- **NestJS Unit Tests**: `pnpm --filter api test` — Jest test suites covering authentication, product catalog, cart calculation, and AI fallback managers.
+- **Comprehensive Guide**: See [`docs/TESTING.md`](docs/TESTING.md).
+
+---
+
+## 🚀 DevOps & CI/CD Pipeline
+
+The GitHub Actions automated pipeline validates all pull requests and deployment commits:
 
 ```yaml
-# Runs on every push to main and develop
-CI Jobs:
-  ✅ Lint & Typecheck   — ESLint + tsc --noEmit (website, admin, delivery)
-  ✅ Unit Tests          — NestJS Jest (2 suites, 3+ tests)
-  ✅ Flutter CI          — flutter analyze + flutter test
-
-CD Jobs (on main push):
-  ✅ Customer Website    — lint → typecheck → next build (31 pages)
-  ✅ Admin Dashboard     — lint → typecheck → next build (5 pages)
-  ✅ API Service         — prisma generate → jest → nest build → Docker
+Pipeline Workflow:
+  1. Lint & Typecheck:
+     - Next.js apps (website, admin, delivery): ESLint + tsc --noEmit
+     - NestJS API service: ESLint + tsc
+  2. Automated Test Execution:
+     - Flutter Customer App: flutter analyze + flutter test
+     - NestJS API Service: pnpm test (Jest)
+  3. Container Build & Push:
+     - Multi-stage Docker build for NGINX, API, Website, Admin, and Delivery apps
 ```
+
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) and [`docs/DEVOPS.md`](docs/DEVOPS.md) for deployment runbooks.
+
+---
+
+## 📚 Enterprise Documentation Hub
+
+Every document in the Daily Basket repository is fully detailed and maintained:
+
+| Document Category | Document Link | Description |
+| :--- | :--- | :--- |
+| **Documentation Matrix** | [`docs/README.md`](docs/README.md) | Complete documentation index & navigation hub |
+| **Architecture** | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | End-to-end system topology & component hierarchy |
+| **System Design** | [`docs/SYSTEM_DESIGN.md`](docs/SYSTEM_DESIGN.md) | Low-level design, data pipelines & state management |
+| **REST API Reference** | [`docs/API.md`](docs/API.md) | Endpoint specifications, DTOs, & validation schemas |
+| **OpenAPI / Swagger** | [`docs/OPENAPI.md`](docs/OPENAPI.md) | Interactive Swagger UI setup & OpenAPI spec |
+| **Database & ERD** | [`docs/DATABASE.md`](docs/DATABASE.md) / [`docs/ERD.md`](docs/ERD.md) | PostgreSQL Prisma models, constraints & ER diagrams |
+| **Product Specs (PRD)** | [`docs/PRD.md`](docs/PRD.md) | Product vision, personas, features & user stories |
+| **Technical Specs (TRD)** | [`docs/TRD.md`](docs/TRD.md) | SLA benchmarks, tech stack specs & quality targets |
+| **Google Stitch UI** | [`docs/GOOGLE_STITCH.md`](docs/GOOGLE_STITCH.md) | Single source of truth design system & assets |
+| **Design Tokens** | [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) | Color palettes, typography, icons, & shared components |
+| **Backend API Spec** | [`docs/BACKEND.md`](docs/BACKEND.md) | NestJS microservices, controllers, & ORM layer |
+| **Frontend Architecture** | [`docs/FRONTEND.md`](docs/FRONTEND.md) | Next.js App Router, SSR/ISR, Zustand, & packages |
+| **Mobile Architecture** | [`docs/MOBILE.md`](docs/MOBILE.md) | Flutter Clean Architecture, Provider state, & native features |
+| **Customer Web App** | [`docs/WEBSITE.md`](docs/WEBSITE.md) | Next.js Customer Web portal technical breakdown |
+| **Admin Dashboard** | [`docs/ADMIN_APP.md`](docs/ADMIN_APP.md) | Dark Store Admin Dashboard fulfillment queue |
+| **Delivery PWA** | [`docs/DELIVERY_APP.md`](docs/DELIVERY_APP.md) | Rider PWA, GPS tracking, & doorstep OTP logic |
+| **Auth & Security** | [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md) | Phone OTP, JWT rotation, TOTP MFA, & OAuth |
+| **Security Architecture** | [`docs/SECURITY_ARCHITECTURE.md`](docs/SECURITY_ARCHITECTURE.md) | Security safeguards, RBAC, Helmet, & auditing |
+| **AI Integration** | [`docs/AI.md`](docs/AI.md) | Gemini/Grok multi-provider AI engine & tools |
+| **Realtime Engine** | [`docs/REALTIME.md`](docs/REALTIME.md) / [`docs/SOCKETS.md`](docs/SOCKETS.md) | Socket.IO event dictionary & WebSocket gateways |
+| **Cache & Redis** | [`docs/REDIS.md`](docs/REDIS.md) | Redis key namespaces, caching policies, & Pub/Sub |
+| **Queue Workers** | [`docs/BULLMQ.md`](docs/BULLMQ.md) | BullMQ background jobs & notification processors |
+| **DevOps & Containers** | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) / [`docs/DEVOPS.md`](docs/DEVOPS.md) | Docker, Docker Compose, NGINX proxy, & K8s |
+| **Installation & Setup** | [`docs/INSTALLATION.md`](docs/INSTALLATION.md) / [`docs/SETUP.md`](docs/SETUP.md) | Environment setup, database seeding, & execution |
+| **Getting Started** | [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) | Onboarding guide for new developers |
+| **Environment Vars** | [`docs/ENVIRONMENT.md`](docs/ENVIRONMENT.md) | Complete environment variable specification |
+| **Testing & Quality** | [`docs/TESTING.md`](docs/TESTING.md) / [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md) | Unit tests, static analysis, & load testing specs |
+| **Operations Runbook** | [`docs/GO_LIVE_RUNBOOK.md`](docs/GO_LIVE_RUNBOOK.md) / [`docs/OPERATIONS.md`](docs/OPERATIONS.md) | Deployment runbook, monitoring, & on-call rules |
+| **Disaster Recovery** | [`docs/DISASTER_RECOVERY.md`](docs/DISASTER_RECOVERY.md) / [`docs/BACKUP_STRATEGY.md`](docs/BACKUP_STRATEGY.md) | Backup automation, recovery RTO/RPO SLAs |
+| **Troubleshooting & FAQ** | [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) / [`docs/FAQ.md`](docs/FAQ.md) | Common errors, solutions, & architectural FAQs |
+| **Features Deep-Dives** | [`docs/features/PRODUCTS.md`](docs/features/PRODUCTS.md) | Catalog, category taxonomy, search keywords |
+| **Inventory Feature** | [`docs/features/INVENTORY.md`](docs/features/INVENTORY.md) | Multi-store dark store stock allocation |
+| **Payments Feature** | [`docs/features/PAYMENTS.md`](docs/features/PAYMENTS.md) | Razorpay checkout, webhooks & wallet ledger |
+| **Notifications Feature** | [`docs/features/NOTIFICATIONS.md`](docs/features/NOTIFICATIONS.md) | FCM push, SMS OTP, and email notification feeds |
 
 ---
 
 ## 🗺️ Roadmap
 
-- [x] **v1.0** — Core platform: Flutter app (35 screens), Web portal (31 pages), Admin, Delivery PWA, NestJS API, Prisma schema, Docker, CI/CD
-- [ ] **v1.1** — Firebase Cloud Messaging (FCM) push notifications
-- [ ] **v1.2** — Multi-language support (Kannada, Hindi, English)
-- [ ] **v2.0** — Multi-store dark store hub dispatch engine
-- [ ] **v2.1** — AI-powered demand forecasting & auto-reorder
-
----
-
-## 📚 Documentation
-
-| Document | Path |
-|----------|------|
-| 📘 Product Requirements (PRD) | [`docs/PRD/`](docs/PRD/) |
-| 📐 Technical Requirements (TRD) | [`docs/TRD/`](docs/TRD/) |
-| 🏗️ Enterprise Architecture | [`docs/Architecture/`](docs/Architecture/) |
-| 🗄️ Database Schema & ERD | [`docs/Database/`](docs/Database/) |
-| 🔌 API Documentation | [`docs/API/`](docs/API/) |
-| 🎨 Coding Standards | [`docs/Naming-Convention/`](docs/Naming-Convention/) |
+- [x] **v1.0.0 (Current Release)**
+  - Flutter Mobile App (35+ screens, Material 3, Clean Architecture)
+  - Next.js Customer Web Portal (31 pages, TailwindCSS, Dark mode)
+  - Next.js Admin Dashboard (Real-time dispatch queue, KPIs)
+  - Next.js Delivery Partner PWA (GPS tracking, Doorstep OTP)
+  - NestJS Backend Gateway & Prisma PostgreSQL ORM
+  - Redis 7 Caching, BullMQ queues, Socket.IO WebSockets
+  - Multi-Provider AI Fallback Engine (Gemini, Grok, OpenRouter, Local)
+  - Razorpay Payment Gateway integration with HMAC SHA-256 verification
+- [ ] **v1.1.0 (Upcoming)**
+  - FCM Push Notification service integration
+  - Multi-language localization (Kannada, Hindi, English)
+- [ ] **v2.0.0 (Planned)**
+  - Multi-dark store automated dispatcher hub
+  - Predictive AI inventory demand forecasting
 
 ---
 
@@ -364,7 +447,7 @@ Distributed under the **MIT License** — see [`LICENSE`](LICENSE) for details.
 <br/>
 
 <p align="center">
-  Built with ❤️ and ☕ by <strong>Sachin</strong> &nbsp;|&nbsp;
+  Built with ❤️ by <strong>Sachin</strong> &nbsp;|&nbsp;
   <a href="https://github.com/Sachinxcode-01">@Sachinxcode-01</a>
 </p>
 

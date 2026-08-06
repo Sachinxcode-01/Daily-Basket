@@ -1,35 +1,46 @@
-# Security Policy
+# Security Policy & Vulnerability Disclosure — Daily Basket
 
-## Supported Versions
-
-We actively issue security updates for the following releases:
-
-| Version | Supported |
-|---|---|
-| **1.0.x** | ✅ Yes |
-| < 1.0 | ❌ No |
+At **Daily Basket**, security and data privacy are top engineering priorities. We adhere to industry best practices, safe authentication protocols, and rigorous data protection standards across our API microservices, mobile apps, and web portals.
 
 ---
 
-## 🔒 Reporting a Vulnerability
+## 🛡️ Security Architecture Highlights
 
-The Daily Basket team takes security seriously. If you discover a security vulnerability within the platform, please do **NOT** open a public GitHub issue.
-
-Instead, please send an email to our Security Response Team at:
-**`security@dailybasket.com`**
-
-### Please Include:
-1. Description of the vulnerability and potential impact.
-2. Steps to reproduce the vulnerability (proof of concept script or API payload).
-3. Any suggested remediation steps.
-
-We will acknowledge receipt of your vulnerability report within 24 hours and strive to release a fix within 72 hours.
+| Layer | Safeguard / Implementation |
+| :--- | :--- |
+| **Authentication** | Short-lived JWT Access Tokens (15m) + Secure HTTP-only Refresh Tokens (7d), Phone OTP PINs, Google OAuth 2.0 |
+| **Multi-Factor Auth** | TOTP authenticator app support, email verification tokens, account lockout after 5 failed login attempts |
+| **Authorization** | Strict Role-Based Access Control (`CUSTOMER`, `STORE_MANAGER`, `INVENTORY_MANAGER`, `DELIVERY_PARTNER`, `ADMIN`) |
+| **Payment Gateway** | Razorpay SDK integration with mandatory HMAC SHA-256 webhook signature verification |
+| **API Protection** | NestJS Throttler rate limiting (100 req/min), Helmet security headers, CORS origin validation |
+| **Data Protection** | Parameterized SQL queries via Prisma ORM 5, bcrypt password hashing, encrypted secrets management |
+| **Session Control** | Security audit logging, active device session tracking, instant remote session revocation |
 
 ---
 
-## 🛡️ Implemented Security Measures
+## 🚨 Reporting a Vulnerability
 
-- **Payment Verification**: Razorpay HMAC SHA-256 webhook signature verification.
-- **Authentication**: JWT access tokens + refresh token rotation with bcrypt password hashing.
-- **Database Safety**: Parameterized Prisma ORM database queries.
-- **Rate Limiting**: NestJS `@nestjs/throttler` (100 req/min).
+If you discover a security vulnerability within Daily Basket, please **do not open a public issue**. Instead, report it directly to our security team.
+
+### Reporting Process
+1. Email your findings to `security@dailybasket.com`.
+2. Include a detailed description of the vulnerability, steps to reproduce, proof of concept (PoC), and potential impact.
+3. Our security team will acknowledge receipt of your report within **24 hours**.
+
+---
+
+## ⏳ Disclosure Policy & Timeline
+
+- **Acknowledgement**: Within 24 hours.
+- **Assessment & Triage**: Within 48 hours.
+- **Patch Resolution**: Within 7 to 14 business days depending on severity.
+- **Public Disclosure**: Coordinated after the fix has been deployed to production.
+
+---
+
+## 🚫 Out of Scope
+
+The following issues are considered out of scope:
+- Social engineering or phishing attempts against Daily Basket employees.
+- Denial of Service (DoS / DDoS) attacks testing infrastructure limits.
+- Issues in third-party services (Razorpay, Google Firebase) not directly controllable by Daily Basket codebase.

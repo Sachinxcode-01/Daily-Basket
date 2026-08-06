@@ -67,12 +67,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     CartProvider? cartProvider;
-    try { cartProvider = context.watch<CartProvider>(); } catch (_) {}
+    try {
+      cartProvider = context.watch<CartProvider>();
+    } catch (_) {}
 
     final numericPrice = double.tryParse(widget.price.replaceAll('₹', '')) ?? 120.0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FC),
+      backgroundColor: const Color(0xFF0F172A),
       body: Stack(
         children: [
           // ─── Scrollable Page Content ──────────────────────────────────────
@@ -88,7 +90,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       height: 340,
                       width: double.infinity,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFEEEFEF),
+                        color: Color(0xFF1E293B),
                         borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
                       ),
                       child: ClipRRect(
@@ -97,9 +99,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           widget.imageUrl,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) => Container(
-                            color: const Color(0xFFE8F5E9),
+                            color: const Color(0xFF1E293B),
                             child: const Center(
-                              child: Icon(Icons.eco_rounded, size: 80, color: Color(0xFF006B23)),
+                              child: Icon(Icons.eco_rounded, size: 80, color: Color(0xFF2DD4BF)),
                             ),
                           ),
                         ),
@@ -119,16 +121,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 width: 42,
                                 height: 42,
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.90),
+                                  color: const Color(0xFF1E293B).withValues(alpha: 0.90),
                                   shape: BoxShape.circle,
-                                  boxShadow: [
+                                  border: Border.all(color: const Color(0xFF334155)),
+                                  boxShadow: const [
                                     BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.08),
+                                      color: Color(0x40000000),
                                       blurRadius: 8,
                                     ),
                                   ],
                                 ),
-                                child: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E), size: 22),
+                                child: const Icon(Icons.arrow_back_rounded, color: Color(0xFF2DD4BF), size: 22),
                               ),
                             ),
                             Row(
@@ -137,11 +140,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   width: 42,
                                   height: 42,
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withValues(alpha: 0.90),
+                                    color: const Color(0xFF1E293B).withValues(alpha: 0.90),
                                     shape: BoxShape.circle,
-                                    boxShadow: [
+                                    border: Border.all(color: const Color(0xFF334155)),
+                                    boxShadow: const [
                                       BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.08),
+                                        color: Color(0x40000000),
                                         blurRadius: 8,
                                       ),
                                     ],
@@ -170,6 +174,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                         content: Text('Product link copied to clipboard! Share with friends.'),
+                                        backgroundColor: Color(0xFF0F766E),
                                         behavior: SnackBarBehavior.floating,
                                       ),
                                     );
@@ -178,16 +183,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     width: 42,
                                     height: 42,
                                     decoration: BoxDecoration(
-                                      color: Colors.white.withValues(alpha: 0.90),
+                                      color: const Color(0xFF1E293B).withValues(alpha: 0.90),
                                       shape: BoxShape.circle,
-                                      boxShadow: [
+                                      border: Border.all(color: const Color(0xFF334155)),
+                                      boxShadow: const [
                                         BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.08),
+                                          color: Color(0x40000000),
                                           blurRadius: 8,
                                         ),
                                       ],
                                     ),
-                                    child: const Icon(Icons.share_outlined, color: Color(0xFF1A1C1E), size: 22),
+                                    child: const Icon(Icons.share_outlined, color: Color(0xFF2DD4BF), size: 22),
                                   ),
                                 ),
                               ],
@@ -211,14 +217,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF1E293B),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
-                          boxShadow: [
+                          border: Border.all(color: const Color(0xFF334155)),
+                          boxShadow: const [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
+                              color: Color(0x20000000),
                               blurRadius: 8,
-                              offset: const Offset(0, 2),
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
@@ -231,7 +237,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 fontSize: 12,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 0.5,
-                                color: const Color(0xFF006B23),
+                                color: const Color(0xFF2DD4BF),
                               ),
                             ),
                             const SizedBox(height: 6),
@@ -239,8 +245,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               widget.productName,
                               style: GoogleFonts.outfit(
                                 fontSize: 24,
-                                fontWeight: FontWeight.w700,
-                                color: const Color(0xFF1A1C1E),
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
                             const SizedBox(height: 10),
@@ -251,7 +257,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   style: GoogleFonts.outfit(
                                     fontSize: 26,
                                     fontWeight: FontWeight.w800,
-                                    color: const Color(0xFF1A1C1E),
+                                    color: const Color(0xFF2DD4BF),
                                   ),
                                 ),
                                 const SizedBox(width: 8),
@@ -259,28 +265,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   widget.mrp,
                                   style: GoogleFonts.inter(
                                     fontSize: 14,
-                                    color: const Color(0xFF6E7A6C),
+                                    color: const Color(0xFF94A3B8),
                                     decoration: TextDecoration.lineThrough,
+                                    decorationColor: const Color(0xFF94A3B8),
                                   ),
                                 ),
                                 const Spacer(),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFFFFDAD6),
+                                    gradient: const LinearGradient(
+                                      colors: [Color(0xFF0F766E), Color(0xFF14B8A6)],
+                                    ),
                                     borderRadius: BorderRadius.circular(9999),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      const Icon(Icons.local_fire_department_rounded, color: Color(0xFFBA1A1A), size: 14),
+                                      const Icon(Icons.local_fire_department_rounded, color: Colors.white, size: 14),
                                       const SizedBox(width: 2),
                                       Text(
                                         widget.discountPercentage,
                                         style: GoogleFonts.inter(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w700,
-                                          color: const Color(0xFFBA1A1A),
+                                          color: Colors.white,
                                         ),
                                       ),
                                     ],
@@ -293,7 +302,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               widget.unitDetails,
                               style: GoogleFonts.inter(
                                 fontSize: 13,
-                                color: const Color(0xFF6E7A6C),
+                                color: const Color(0xFF94A3B8),
                               ),
                             ),
 
@@ -304,22 +313,26 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    const Icon(Icons.notifications_active_outlined, size: 18, color: Color(0xFF006B23)),
+                                    const Icon(Icons.notifications_active_outlined, size: 18, color: Color(0xFF2DD4BF)),
                                     const SizedBox(width: 8),
                                     Text(
                                       'Notify on Price Drop',
-                                      style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)),
+                                      style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
                                     ),
                                   ],
                                 ),
                                 Switch(
                                   value: _priceDropAlert,
-                                  activeThumbColor: const Color(0xFF006B23),
+                                  activeThumbColor: const Color(0xFF2DD4BF),
+                                  activeTrackColor: const Color(0xFF0F766E),
+                                  inactiveThumbColor: const Color(0xFF64748B),
+                                  inactiveTrackColor: const Color(0xFF334155),
                                   onChanged: (val) {
                                     setState(() => _priceDropAlert = val);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(val ? 'Price drop alert set!' : 'Price drop alert removed.'),
+                                        backgroundColor: const Color(0xFF0F766E),
                                         duration: const Duration(seconds: 2),
                                         behavior: SnackBarBehavior.floating,
                                       ),
@@ -338,9 +351,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFF3F3F6),
+                          color: const Color(0xFF1E293B),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+                          border: Border.all(color: const Color(0xFF334155)),
                         ),
                         child: Row(
                           children: [
@@ -348,7 +361,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               width: 44,
                               height: 44,
                               decoration: const BoxDecoration(
-                                color: Color(0xFF006B23),
+                                color: Color(0xFF0F766E),
                                 shape: BoxShape.circle,
                               ),
                               child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 24),
@@ -362,19 +375,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     'Lightning Fast Delivery',
                                     style: GoogleFonts.outfit(
                                       fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: const Color(0xFF1A1C1E),
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
                                   RichText(
                                     text: TextSpan(
-                                      style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF3F4A3D)),
+                                      style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF94A3B8)),
                                       children: [
                                         const TextSpan(text: 'Arriving in '),
                                         TextSpan(
                                           text: widget.deliveryTime,
-                                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF006B23)),
+                                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF2DD4BF)),
                                         ),
                                         const TextSpan(text: ' to your location.'),
                                       ],
@@ -394,8 +407,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         'Description',
                         style: GoogleFonts.outfit(
                           fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF1A1C1E),
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -404,7 +417,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         style: GoogleFonts.inter(
                           fontSize: 14,
                           height: 22 / 14,
-                          color: const Color(0xFF3F4A3D),
+                          color: const Color(0xFF94A3B8),
                         ),
                       ),
 
@@ -414,24 +427,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       Container(
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF1E293B),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+                          border: Border.all(color: const Color(0xFF334155)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               'Product Information',
-                              style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
+                              style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                             const SizedBox(height: 12),
                             _buildInfoRow('Shelf Life', '3 to 5 days'),
-                            const Divider(color: Color(0xFFEEEFEF), height: 16),
+                            const Divider(color: Color(0xFF334155), height: 16),
                             _buildInfoRow('Country of Origin', 'India'),
-                            const Divider(color: Color(0xFFEEEFEF), height: 16),
+                            const Divider(color: Color(0xFF334155), height: 16),
                             _buildInfoRow('Storage Instructions', 'Store at room temperature until ripe'),
-                            const Divider(color: Color(0xFFEEEFEF), height: 16),
+                            const Divider(color: Color(0xFF334155), height: 16),
                             _buildInfoRow('Return Policy', 'Eligible for 24-hr replacement'),
                           ],
                         ),
@@ -443,14 +456,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       Container(
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF1E293B),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
-                          boxShadow: [
+                          border: Border.all(color: const Color(0xFF334155)),
+                          boxShadow: const [
                             BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.03),
+                              color: Color(0x20000000),
                               blurRadius: 8,
-                              offset: const Offset(0, 2),
+                              offset: Offset(0, 2),
                             ),
                           ],
                         ),
@@ -459,25 +472,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.eco_outlined, color: Color(0xFF006B23), size: 20),
+                                const Icon(Icons.eco_outlined, color: Color(0xFF2DD4BF), size: 20),
                                 const SizedBox(width: 8),
                                 Text(
                                   'Nutritional Value (Per 100g)',
                                   style: GoogleFonts.outfit(
                                     fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: const Color(0xFF1A1C1E),
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 12),
                             _buildNutritionRow('Calories', '160 kcal'),
-                            const Divider(color: Color(0xFFEEEFEF), height: 16),
+                            const Divider(color: Color(0xFF334155), height: 16),
                             _buildNutritionRow('Total Fat', '15g'),
-                            const Divider(color: Color(0xFFEEEFEF), height: 16),
+                            const Divider(color: Color(0xFF334155), height: 16),
                             _buildNutritionRow('Potassium', '485mg'),
-                            const Divider(color: Color(0xFFEEEFEF), height: 16),
+                            const Divider(color: Color(0xFF334155), height: 16),
                             _buildNutritionRow('Protein', '2g'),
                           ],
                         ),
@@ -489,9 +502,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       Container(
                         padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: const Color(0xFF1E293B),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+                          border: Border.all(color: const Color(0xFF334155)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,12 +514,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               children: [
                                 Text(
                                   'Ratings & Reviews',
-                                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
+                                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                                 ),
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: const Color(0xFF006B23),
+                                    color: const Color(0xFF0F766E),
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
@@ -515,7 +528,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       const SizedBox(width: 4),
                                       Text(
                                         '4.8',
-                                        style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 13),
+                                        style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                                       ),
                                     ],
                                   ),
@@ -523,16 +536,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ],
                             ),
                             const SizedBox(height: 12),
-                            Text('128 verified ratings', style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF6E7A6C))),
-                            const Divider(color: Color(0xFFEEEFEF), height: 20),
+                            Text('128 verified ratings', style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF94A3B8))),
+                            const Divider(color: Color(0xFF334155), height: 20),
 
                             // Sample Review Card
                             Row(
                               children: [
                                 const CircleAvatar(
                                   radius: 16,
-                                  backgroundColor: Color(0xFFE8F5E9),
-                                  child: Icon(Icons.person, size: 18, color: Color(0xFF006B23)),
+                                  backgroundColor: Color(0xFF0F766E),
+                                  child: Icon(Icons.person, size: 18, color: Colors.white),
                                 ),
                                 const SizedBox(width: 10),
                                 Column(
@@ -540,19 +553,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   children: [
                                     Row(
                                       children: [
-                                        Text('Priya S.', style: GoogleFonts.outfit(fontWeight: FontWeight.w700, fontSize: 14)),
+                                        Text('Priya S.', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
                                         const SizedBox(width: 6),
                                         Container(
                                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                           decoration: BoxDecoration(
-                                            color: const Color(0xFFE8F5E9),
+                                            color: const Color(0xFF0F766E).withValues(alpha: 0.3),
                                             borderRadius: BorderRadius.circular(4),
+                                            border: Border.all(color: const Color(0xFF14B8A6).withValues(alpha: 0.4)),
                                           ),
-                                          child: Text('Verified Buyer', style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF006B23), fontWeight: FontWeight.w600)),
+                                          child: Text('Verified Buyer', style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF2DD4BF), fontWeight: FontWeight.w600)),
                                         ),
                                       ],
                                     ),
-                                    Text('2 days ago', style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF6E7A6C))),
+                                    Text('2 days ago', style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF94A3B8))),
                                   ],
                                 ),
                               ],
@@ -560,7 +574,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             const SizedBox(height: 8),
                             Text(
                               'Super fresh avocados! They were perfectly ripe in two days just like promised.',
-                              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF3F4A3D)),
+                              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF94A3B8)),
                             ),
                             const SizedBox(height: 10),
                             GestureDetector(
@@ -572,11 +586,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               },
                               child: Row(
                                 children: [
-                                  Icon(_votedHelpful ? Icons.thumb_up : Icons.thumb_up_outlined, size: 14, color: const Color(0xFF006B23)),
+                                  Icon(_votedHelpful ? Icons.thumb_up : Icons.thumb_up_outlined, size: 14, color: const Color(0xFF2DD4BF)),
                                   const SizedBox(width: 6),
                                   Text(
                                     'Helpful ($_helpfulVotes)',
-                                    style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF006B23)),
+                                    style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF2DD4BF)),
                                   ),
                                 ],
                               ),
@@ -600,13 +614,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             bottom: 0,
             child: Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
+              decoration: const BoxDecoration(
+                color: Color(0xFF1E293B),
+                border: Border(
+                  top: BorderSide(color: Color(0xFF334155), width: 1),
+                ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
+                    color: Color(0x40000000),
                     blurRadius: 16,
-                    offset: const Offset(0, -4),
+                    offset: Offset(0, -4),
                   ),
                 ],
               ),
@@ -619,14 +636,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       height: 52,
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFF3F3F6),
+                        color: const Color(0xFF0F172A),
                         borderRadius: BorderRadius.circular(9999),
+                        border: Border.all(color: const Color(0xFF334155)),
                       ),
                       child: Row(
                         children: [
                           IconButton(
                             onPressed: () => _updateQuantity(-1),
-                            icon: const Icon(Icons.remove, color: Color(0xFF1A1C1E), size: 18),
+                            icon: const Icon(Icons.remove, color: Colors.white, size: 18),
                             constraints: const BoxConstraints(minWidth: 32),
                             padding: EdgeInsets.zero,
                           ),
@@ -634,13 +652,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             '$_quantity',
                             style: GoogleFonts.inter(
                               fontSize: 16,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF1A1C1E),
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
                           IconButton(
                             onPressed: () => _updateQuantity(1),
-                            icon: const Icon(Icons.add, color: Color(0xFF006B23), size: 18),
+                            icon: const Icon(Icons.add, color: Color(0xFF2DD4BF), size: 18),
                             constraints: const BoxConstraints(minWidth: 32),
                             padding: EdgeInsets.zero,
                           ),
@@ -653,39 +671,55 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     Expanded(
                       child: SizedBox(
                         height: 52,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (cartProvider != null) {
-                              cartProvider.updateQuantityById(
-                                id: widget.productId,
-                                name: widget.productName,
-                                subtitle: widget.unitDetails,
-                                price: numericPrice,
-                                image: widget.imageUrl,
-                                delta: _quantity,
-                              );
-                            }
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Added $_quantity x ${widget.productName} to cart!'),
-                                backgroundColor: const Color(0xFF006B23),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF006B23),
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF0F766E), Color(0xFF14B8A6)],
                             ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x4014B8A6),
+                                blurRadius: 12,
+                                offset: Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          child: Text(
-                            'Add to Cart • ₹${(numericPrice * _quantity).round()}',
-                            style: GoogleFonts.outfit(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w700,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (cartProvider != null) {
+                                cartProvider.updateQuantityById(
+                                  id: widget.productId,
+                                  name: widget.productName,
+                                  subtitle: widget.unitDetails,
+                                  price: numericPrice,
+                                  image: widget.imageUrl,
+                                  delta: _quantity,
+                                );
+                              }
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Added $_quantity x ${widget.productName} to cart!'),
+                                  backgroundColor: const Color(0xFF0F766E),
+                                  behavior: SnackBarBehavior.floating,
+                                ),
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                            ),
+                            child: Text(
+                              'Add to Cart • ₹${(numericPrice * _quantity).round()}',
+                              style: GoogleFonts.outfit(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -705,8 +739,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF6E7A6C))),
-        Text(value, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E))),
+        Text(label, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8))),
+        Text(value, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
       ],
     );
   }
@@ -715,12 +749,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF6E7A6C))),
+        Text(label, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8))),
         Flexible(
           child: Text(
             value,
             textAlign: TextAlign.end,
-            style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)),
+            style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
           ),
         ),
       ],

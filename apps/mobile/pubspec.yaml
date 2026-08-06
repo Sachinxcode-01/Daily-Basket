@@ -17,7 +17,7 @@ dependencies:
   google_maps_flutter_android: ^2.6.0
   flutter_staggered_animations: ^1.1.1
   # Enterprise AI Chat — Voice & Image
-  speech_to_text: ^6.6.2
+  speech_to_text: ^7.0.0
   image_picker: ^1.0.7
 
 dev_dependencies:
