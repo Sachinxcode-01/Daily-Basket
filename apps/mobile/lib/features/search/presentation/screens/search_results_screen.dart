@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import '../../../../core/widgets/staggered_animation_wrappers.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_network_image.dart';
@@ -498,58 +498,69 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
 
                   const SizedBox(height: 20),
 
-                  // ── Sort By Section ───────────────────────────────────────
+                  const SizedBox(height: 16),
+
+                  // ── Organic Only Switch ─────────────────────────────────────
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8FAFC),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.eco_rounded, color: AppColors.primary, size: 20),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Organic Only',
+                              style: GoogleFonts.outfit(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.onSurface,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Switch(
+                          value: tempFilter == 'Organic',
+                          activeThumbColor: AppColors.primary,
+                          onChanged: (val) {
+                            setModalState(() {
+                              tempFilter = val ? 'Organic' : 'All';
+                            });
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // ── Price Range Filter ────────────────────────────────────
                   Text(
-                    'Sort By',
+                    'Price Range (\$2.00 - \$15.00)',
                     style: GoogleFonts.outfit(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: AppColors.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: 8),
-
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: _sortOptions.map((option) {
-                        final isSelected = tempSort == option;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8.0),
-                          child: ChoiceChip(
-                            selected: isSelected,
-                            label: Text(option),
-                            labelStyle: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: isSelected
-                                  ? AppColors.primary
-                                  : AppColors.onSurfaceVariant,
-                            ),
-                            backgroundColor: const Color(0xFFF3F3F6),
-                            selectedColor:
-                                AppColors.primary.withValues(alpha: 0.15),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: BorderSide(
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : Colors.transparent,
-                                width: 1.5,
-                              ),
-                            ),
-                            onSelected: (bool selected) {
-                              setModalState(() {
-                                tempSort = option;
-                              });
-                            },
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                  const SizedBox(height: 6),
+                  RangeSlider(
+                    values: const RangeValues(2.0, 15.0),
+                    min: 1.0,
+                    max: 20.0,
+                    divisions: 19,
+                    activeColor: AppColors.primary,
+                    labels: const RangeLabels('\$2.00', '\$15.00'),
+                    onChanged: (values) {},
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
 
                   // ── PROMINENT CALL TO ACTION (CTA) BUTTON ─────────────────
                   SizedBox(

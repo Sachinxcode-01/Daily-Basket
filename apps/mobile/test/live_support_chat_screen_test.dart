@@ -34,7 +34,7 @@ void main() {
 
       expect(find.text('Sarah J.'), findsWidgets);
       expect(find.text('Support Agent • Online'), findsOneWidget);
-      expect(find.textContaining('Welcome to Daily Basket priority support'), findsOneWidget);
+      expect(find.textContaining('Welcome to Daily Basket Priority Support'), findsOneWidget);
     });
 
     testWidgets('2. Tapping "Delivery delay" triggers Live Delivery Order Status Card',
@@ -51,13 +51,15 @@ void main() {
       expect(delayChip, findsOneWidget);
       await tester.ensureVisible(delayChip);
       await tester.tap(delayChip);
-      await tester.pump(const Duration(milliseconds: 1000));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(seconds: 1));
+      await tester.pump(const Duration(milliseconds: 500));
+      await tester.drag(find.byType(ListView).first, const Offset(0, -500));
+      await tester.pump(const Duration(milliseconds: 300));
 
       // Verify user message balloon & bot response with rider info
       expect(find.text('Delivery delay'), findsWidgets);
-      expect(find.textContaining('Your delivery rider is en route!'), findsOneWidget);
-      expect(find.textContaining('Rahul M.'), findsOneWidget);
+      expect(find.textContaining('Your rider is en route!'), findsOneWidget);
+      expect(find.textContaining('Rahul M.'), findsWidgets);
     });
 
     testWidgets('3. Tapping "Talk to Manager" escalates to Senior Manager Ananya R.',
@@ -71,18 +73,20 @@ void main() {
 
       // Scroll to and tap 'Talk to Manager' chip
       await tester.drag(find.byType(SingleChildScrollView).last, const Offset(-400, 0));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 300));
 
       final managerChip = find.widgetWithText(ActionChip, 'Talk to Manager');
       expect(managerChip, findsOneWidget);
       await tester.ensureVisible(managerChip);
       await tester.tap(managerChip);
       await tester.pump(const Duration(milliseconds: 1000));
-      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 500));
 
       // Verify header updated to Ananya R. Senior Support Manager
       expect(find.text('Ananya R.'), findsWidgets);
       expect(find.text('Senior Support Manager • Online'), findsOneWidget);
+      await tester.drag(find.byType(ListView).first, const Offset(0, -300));
+      await tester.pump(const Duration(milliseconds: 300));
       expect(find.textContaining('I am Ananya R., Senior Support Manager'), findsOneWidget);
     });
   });

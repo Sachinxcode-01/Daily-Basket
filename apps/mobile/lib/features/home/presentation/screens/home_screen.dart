@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import '../../../../core/widgets/staggered_animation_wrappers.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/providers/language_provider.dart';
@@ -189,6 +189,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 _buildHeader(), const SizedBox(height: 12),
+                _buildGreetingHeader(),
+                _buildDeliveryEtaWidget(),
                 _buildAddressBar(), const SizedBox(height: 12),
                 _buildSearchBar(), const SizedBox(height: 16),
               ]),
@@ -300,6 +302,129 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             )),
           ]),
         ],
+      );
+
+  Widget _buildGreetingHeader() {
+    final hour = DateTime.now().hour;
+    String greeting = 'Good Morning';
+    IconData timeIcon = Icons.wb_sunny_rounded;
+    if (hour >= 12 && hour < 17) {
+      greeting = 'Good Afternoon';
+      timeIcon = Icons.wb_sunny_outlined;
+    } else if (hour >= 17) {
+      greeting = 'Good Evening';
+      timeIcon = Icons.nights_stay_rounded;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(timeIcon, color: const Color(0xFFEAB308), size: 20),
+              const SizedBox(width: 8),
+              Text(
+                '$greeting, Sachinxcode! 👋',
+                style: GoogleFonts.outfit(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1A1C1E),
+                ),
+              ),
+            ],
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFE8F5E9),
+              borderRadius: BorderRadius.circular(9999),
+              border: Border.all(color: const Color(0xFF006B23).withValues(alpha: 0.2)),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF006B23),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'STORE OPEN',
+                  style: GoogleFonts.inter(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF006B23),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDeliveryEtaWidget() => Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [Color(0xFF006B23), Color(0xFF078730)],
+          ),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF006B23).withValues(alpha: 0.25),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.bolt_rounded, color: Color(0xFF006B23), size: 20),
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '⚡ 10 MINS DELIVERY GUARANTEE',
+                      style: GoogleFonts.outfit(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    Text(
+                      'Delivering to 123 Main St, New York',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
+          ],
+        ),
       );
 
   Widget _buildAddressBar() => GestureDetector(

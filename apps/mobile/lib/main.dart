@@ -86,6 +86,7 @@ import 'features/search/presentation/screens/visual_search_results_screen.dart';
 import 'features/onboarding/presentation/screens/location_permission_onboarding_screen.dart';
 import 'features/onboarding/presentation/screens/notification_permission_onboarding_screen.dart';
 import 'features/settings/presentation/screens/app_permissions_settings_screen.dart';
+import 'core/providers/checkout_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -93,6 +94,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => CouponProvider()),
         ChangeNotifierProvider(create: (_) => UserProvider()),
         ChangeNotifierProvider(create: (_) => AppThemeProvider()),

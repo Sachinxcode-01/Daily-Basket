@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/widgets/staggered_animation_wrappers.dart';
 import '../../../../core/navigation/app_navigation_drawer.dart';
 import '../../../../core/providers/user_provider.dart';
 import '../../../../core/providers/app_theme_provider.dart';
@@ -173,7 +174,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     const SizedBox(height: 16),
 
                     // ─── 2. Profile Overview Header ───────────────────────────
-                    Center(
+                    AnimatedSectionWrapper(
+                      child: Center(
                       child: Column(
                         children: [
                           GestureDetector(
@@ -241,6 +243,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
+                    ),
                     ),
 
                     const SizedBox(height: 24),

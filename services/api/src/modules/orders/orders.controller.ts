@@ -1,15 +1,25 @@
 import { Controller, Post, Get, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
+import { OrderPricingService, CalculatePricingDto } from './order-pricing.service';
 
 @ApiTags('Orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(
+    private readonly ordersService: OrdersService,
+    private readonly orderPricingService: OrderPricingService,
+  ) {}
+
+  @Post('calculate')
+  @ApiOperation({ summary: 'Calculate dynamic order pricing, delivery fees, taxes, discounts & payment methods' })
+  async calculatePricing(@Body() body: CalculatePricingDto) {
+    return this.orderPricingService.calculatePricing(body);
+  }
 
   @Post()
   @ApiOperation({ summary: 'Create new 10-minute quick-commerce order' })
-  async createOrder(@Body() body: { userId: string; addressId: string; paymentMethod: any; items: any[] }) {
+  async createOrder(@Body() body: { userId: string; addressId: string; paymentMethod: any; items: any[]; couponCode?: string; useWallet?: boolean }) {
     return this.ordersService.createOrder(body.userId || 'demo_user_01', body);
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/widgets/staggered_animation_wrappers.dart';
 import 'order_details_screen.dart';
 import '../../../tracking/presentation/screens/tracking_screen.dart';
 
@@ -178,19 +179,22 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
           // ─── 2. Orders List ───────────────────────────────────────────────
           Expanded(
-            child: ListView.separated(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: _filteredOrders.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final order = _filteredOrders[index];
-                final isOngoing = order['isOngoing'] as bool;
-                final isCancelled = order['isCancelled'] as bool;
-                final thumbnails = order['thumbnails'] as List<String>;
-                final extraCount = order['extraCount'] as int;
+            child: AnimatedListWrapper(
+              child: ListView.separated(
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: _filteredOrders.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 16),
+                itemBuilder: (context, index) {
+                  final order = _filteredOrders[index];
+                  final isOngoing = order['isOngoing'] as bool;
+                  final isCancelled = order['isCancelled'] as bool;
+                  final thumbnails = order['thumbnails'] as List<String>;
+                  final extraCount = order['extraCount'] as int;
 
-                return Container(
+                  return AnimatedCardWrapper(
+                    position: index,
+                    child: Container(
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -446,18 +450,20 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                     ),
                                   ],
                                 ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                             ],
+                           ),
+                         ),
+                       ],
+                     ),
+                   ),
+                 ),
                 );
               },
             ),
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+ }
 }

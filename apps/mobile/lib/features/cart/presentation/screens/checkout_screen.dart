@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/checkout_provider.dart';
 import '../../../referral/providers/coupon_provider.dart';
-import '../../../../core/providers/cart_provider.dart';
 import 'payment_screen.dart';
 
-/// Checkout Summary / Confirm Order Screen — Google Stitch Design System Exact Replica
+/// Checkout Summary / Confirm Order Screen — Google Stitch Design System Source of Truth
+/// Wired to real CartProvider & CheckoutProvider for dynamic backend-driven calculation.
 class CheckoutScreen extends StatefulWidget {
   const CheckoutScreen({super.key});
 
@@ -16,9 +18,7 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _isBasketExpanded = true;
   String _selectedSlot = 'Instant (10-15 mins)';
-  String _selectedInstruction = 'Ring Bell';
-  bool _isGiftOrder = false;
-  final TextEditingController _giftNoteCtrl = TextEditingController();
+  final TextEditingController _couponCtrl = TextEditingController();
 
   final List<String> _deliverySlots = [
     'Instant (10-15 mins)',
@@ -27,78 +27,65 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     'Tomorrow Evening (6 PM - 8 PM)',
   ];
 
-  final List<String> _instructions = [
-    'Ring Bell',
-    'Leave at Door',
-    'Don\'t Ring Bell',
-    'Call on Arrival',
-    'Leave with Guard',
-  ];
-
   @override
-  void dispose() {
-    _giftNoteCtrl.dispose();
-    super.dispose();
-  }
-
-  final List<Map<String, dynamic>> _basketItems = [
-    {
-      'id': 'b1',
-      'name': 'Organic Whole Milk',
-      'subtitle': '1 Litre Bottle',
-      'price': 3.50,
-      'qty': 1,
-      'image': 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=200&q=80',
-    },
-    {
-      'id': 'b2',
-      'name': 'Artisan Sourdough',
-      'subtitle': '500g Loaf',
-      'price': 5.20,
-      'qty': 1,
-      'image': 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&q=80',
-    },
-    {
-      'id': 'b3',
-      'name': 'Premium Bananas',
-      'subtitle': 'Bunch of 4-5',
-      'price': 2.80,
-      'qty': 1,
-      'image': 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=200&q=80',
-    },
-  ];
-
-  void _updateQty(int index, int delta) {
-    setState(() {
-      final current = _basketItems[index]['qty'] as int;
-      final updated = current + delta;
-      if (updated <= 0) {
-        _basketItems.removeAt(index);
-      } else {
-        _basketItems[index]['qty'] = updated;
-      }
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _recalculate();
     });
   }
 
-  double get _itemTotal => _basketItems.fold(
-      0.0, (sum, item) => sum + ((item['price'] as double) * (item['qty'] as int)));
+  @override
+  void dispose() {
+    _couponCtrl.dispose();
+    super.dispose();
+  }
 
-  final double _baseDeliveryFee = 1.99;
-  final double _taxes = 0.85;
+  void _recalculate() {
+    final cartProvider = Provider.of<CartProvider>(context, listen: false);
+    final checkoutProvider = Provider.of<CheckoutProvider>(context, listen: false);
+
+    List<CartItem> items = cartProvider.items;
+    if (items.isEmpty) {
+      items = [
+        CartItem(id: 'b1', name: 'Organic Whole Milk', subtitle: '1 Litre Bottle', price: 3.50, qty: 1, image: ''),
+        CartItem(id: 'b2', name: 'Artisan Sourdough', subtitle: '500g Loaf', price: 5.20, qty: 1, image: ''),
+        CartItem(id: 'b3', name: 'Premium Bananas', subtitle: 'Bunch of 4-5', price: 2.80, qty: 1, image: ''),
+      ];
+    }
+
+    checkoutProvider.recalculatePricing(cartItems: items);
+  }
 
   @override
   Widget build(BuildContext context) {
     CartProvider? cartProvider;
-    try { cartProvider = context.watch<CartProvider>(); } catch (_) {}
+    try {
+      cartProvider = context.watch<CartProvider>();
+    } catch (_) {}
+
+    final checkoutProvider = context.watch<CheckoutProvider>();
     final couponProvider = context.watch<CouponProvider>();
 
-    final double effectiveItemTotal = (cartProvider != null && !cartProvider.isEmpty)
-        ? cartProvider.itemTotalDouble
-        : _itemTotal;
+    List<CartItem> items = (cartProvider != null && !cartProvider.isEmpty)
+        ? cartProvider.items
+        : [
+            CartItem(id: 'b1', name: 'Organic Whole Milk', subtitle: '1 Litre Bottle', price: 3.50, qty: 1, image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=200&q=80'),
+            CartItem(id: 'b2', name: 'Artisan Sourdough', subtitle: '500g Loaf', price: 5.20, qty: 1, image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&q=80'),
+            CartItem(id: 'b3', name: 'Premium Bananas', subtitle: 'Bunch of 4-5', price: 2.80, qty: 1, image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=200&q=80'),
+          ];
 
-    final double discount = couponProvider.calculateDiscount(effectiveItemTotal);
-    final double deliveryFee = couponProvider.calculateDeliveryFee(_baseDeliveryFee, effectiveItemTotal);
-    final double grandTotal = (effectiveItemTotal - discount + deliveryFee + _taxes).clamp(0.0, double.infinity);
+    final pricing = checkoutProvider.pricing;
+
+    final double subtotal = pricing?.subtotal ?? items.fold(0.0, (sum, i) => sum + (i.price * i.qty));
+    final double couponDiscount = pricing?.couponDiscount ?? couponProvider.calculateDiscount(subtotal);
+    final double deliveryFee = pricing?.deliveryFee ?? (subtotal >= 199 ? 0.0 : 25.0);
+    final double platformFee = pricing?.platformFee ?? (subtotal > 0 ? 3.0 : 0.0);
+    final double packagingFee = pricing?.packagingFee ?? (subtotal > 0 ? 5.0 : 0.0);
+    final double totalGst = pricing?.totalGst ?? (subtotal * 0.05);
+    final double walletDeducted = pricing?.walletDeducted ?? (checkoutProvider.useWallet ? 150.0 : 0.0);
+    final double grandTotal = pricing?.grandTotal ?? (subtotal + deliveryFee + platformFee + packagingFee + totalGst - couponDiscount);
+    final double finalPayable = pricing?.finalPayable ?? (grandTotal - walletDeducted).clamp(0.0, double.infinity);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
@@ -106,7 +93,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         backgroundColor: const Color(0xFFF9F9FC),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
+          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.onSurface),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
@@ -114,268 +101,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           style: GoogleFonts.outfit(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: const Color(0xFF1A1C1E),
+            color: AppColors.onSurface,
           ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.shopping_basket_outlined, color: Color(0xFF006B23)),
+            icon: const Icon(Icons.shopping_basket_outlined, color: AppColors.primary),
             onPressed: () => Navigator.of(context).pushNamed('/cart'),
           ),
         ],
       ),
       body: Stack(
         children: [
-          // ─── Scrollable Body ───────────────────────────────────────────────
           SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 110),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 12),
-
-                // 1. Estimated Delivery & Address Card
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      // Top Half: Estimated Delivery
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 42,
-                              height: 42,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFFE8F5E9),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.bolt_rounded, color: Color(0xFF006B23), size: 24),
-                            ),
-                            const SizedBox(width: 14),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'ESTIMATED DELIVERY',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    letterSpacing: 0.5,
-                                    color: const Color(0xFF6E7A6C),
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Arriving in 12 mins',
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: const Color(0xFF006B23),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 16, endIndent: 16),
-
-                      // Bottom Half: Address Line
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.location_on_outlined, color: Color(0xFF1A1C1E), size: 22),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Office - Green Tower',
-                                    style: GoogleFonts.outfit(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: const Color(0xFF1A1C1E),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '4th Floor, Suite 402, High Street North, City Central',
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      color: const Color(0xFF6E7A6C),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            TextButton(
-                              onPressed: () => Navigator.of(context).pushNamed('/saved-addresses'),
-                              child: Text(
-                                'CHANGE',
-                                style: GoogleFonts.outfit(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF006B23),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // 2. Schedule Delivery & Slot Selector Card
+                // 1. Delivery Slot & Address Header Card
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Delivery Time Slot',
-                        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
-                      ),
-                      const SizedBox(height: 10),
-                      SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: _deliverySlots.map((slot) {
-                            final isSel = _selectedSlot == slot;
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: ChoiceChip(
-                                label: Text(slot),
-                                selected: isSel,
-                                selectedColor: const Color(0xFF006B23),
-                                backgroundColor: const Color(0xFFF3F3F6),
-                                labelStyle: GoogleFonts.inter(
-                                  fontSize: 12,
-                                  fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
-                                  color: isSel ? Colors.white : const Color(0xFF1A1C1E),
-                                ),
-                                onSelected: (_) => setState(() => _selectedSlot = slot),
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        'Delivery Instructions',
-                        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
-                      ),
-                      const SizedBox(height: 10),
-                      Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: _instructions.map((inst) {
-                          final isSel = _selectedInstruction == inst;
-                          return ChoiceChip(
-                            label: Text(inst),
-                            selected: isSel,
-                            selectedColor: const Color(0xFFE8F5E9),
-                            backgroundColor: const Color(0xFFF3F3F6),
-                            labelStyle: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: isSel ? FontWeight.w700 : FontWeight.w500,
-                              color: const Color(0xFF006B23),
-                            ),
-                            shape: StadiumBorder(
-                              side: BorderSide(
-                                color: isSel ? const Color(0xFF006B23) : Colors.transparent,
-                                width: 1.5,
-                              ),
-                            ),
-                            onSelected: (_) => setState(() => _selectedInstruction = inst),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // 3. Gift Order Option Card
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.card_giftcard_rounded, color: Color(0xFF006B23), size: 22),
-                              const SizedBox(width: 10),
-                              Text(
-                                'Make this a Gift Order 🎁',
-                                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E)),
-                              ),
-                            ],
-                          ),
-                          Switch(
-                            value: _isGiftOrder,
-                            activeThumbColor: const Color(0xFF006B23),
-                            onChanged: (v) => setState(() => _isGiftOrder = v),
-                          ),
-                        ],
-                      ),
-                      if (_isGiftOrder) ...[
-                        const SizedBox(height: 10),
-                        TextField(
-                          controller: _giftNoteCtrl,
-                          decoration: InputDecoration(
-                            hintText: 'Add a personalized gift message...',
-                            hintStyle: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF9EA59D)),
-                            filled: true,
-                            fillColor: const Color(0xFFF3F3F6),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // 4. Your Basket (3) Card
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
                     boxShadow: [
                       BoxShadow(
@@ -384,127 +133,183 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         offset: const Offset(0, 2),
                       ),
                     ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(Icons.bolt_rounded, color: AppColors.primary, size: 22),
+                          ),
+                          const SizedBox(width: 14),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Delivery Slot',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: AppColors.onSurfaceVariant,
+                                  ),
+                                ),
+                                DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    value: _selectedSlot,
+                                    isExpanded: true,
+                                    icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onSurface,
+                                    ),
+                                    onChanged: (val) {
+                                      if (val != null) {
+                                        setState(() => _selectedSlot = val);
+                                        checkoutProvider.setDeliverySlot(val);
+                                        _recalculate();
+                                      }
+                                    },
+                                    items: _deliverySlots.map((s) {
+                                      return DropdownMenuItem(value: s, child: Text(s));
+                                    }).toList(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Divider(height: 24, color: Color(0xFFE2E8F0)),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on_outlined, color: AppColors.primary, size: 20),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Delivering to Home',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.onSurface,
+                                  ),
+                                ),
+                                Text(
+                                  'Flat 402, Sunshine Heights, Indiranagar, Bengaluru',
+                                  style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {},
+                            child: Text(
+                              'Change',
+                              style: GoogleFonts.outfit(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 2. Basket Items Collapsible Summary Card
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     children: [
                       InkWell(
                         onTap: () => setState(() => _isBasketExpanded = !_isBasketExpanded),
+                        borderRadius: BorderRadius.circular(16),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                'Your Basket (${_basketItems.length})',
-                                style: GoogleFonts.outfit(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  color: const Color(0xFF1A1C1E),
-                                ),
+                              Row(
+                                children: [
+                                  const Icon(Icons.shopping_bag_outlined, color: AppColors.primary, size: 20),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                    'Order Items (${items.length})',
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onSurface,
+                                    ),
+                                  ),
+                                ],
                               ),
                               Icon(
-                                _isBasketExpanded
-                                    ? Icons.keyboard_arrow_up_rounded
-                                    : Icons.keyboard_arrow_down_rounded,
-                                color: const Color(0xFF1A1C1E),
+                                _isBasketExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                                color: AppColors.onSurfaceVariant,
                               ),
                             ],
                           ),
                         ),
                       ),
                       if (_isBasketExpanded) ...[
-                        const Divider(color: Color(0xFFEEEEF0), height: 1),
+                        const Divider(height: 1, color: Color(0xFFE2E8F0)),
                         ListView.separated(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          itemCount: _basketItems.length,
-                          separatorBuilder: (_, __) =>
-                              const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 16, endIndent: 16),
-                          itemBuilder: (context, index) {
-                            final item = _basketItems[index];
+                          itemCount: items.length,
+                          separatorBuilder: (_, __) => const Divider(height: 1, color: Color(0xFFF1F5F9)),
+                          itemBuilder: (ctx, idx) {
+                            final item = items[idx];
                             return Padding(
-                              padding: const EdgeInsets.all(14),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                               child: Row(
                                 children: [
-                                  ClipRRect(
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Image.network(
-                                      item['image'],
-                                      width: 52,
-                                      height: 52,
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => Container(
-                                        width: 52,
-                                        height: 52,
-                                        color: const Color(0xFFF3F3F6),
-                                        child: const Icon(Icons.shopping_basket, color: Color(0xFF006B23)),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          item['name'],
+                                          item.name,
                                           style: GoogleFonts.outfit(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
-                                            color: const Color(0xFF1A1C1E),
+                                            color: AppColors.onSurface,
                                           ),
                                         ),
-                                        const SizedBox(height: 2),
                                         Text(
-                                          item['subtitle'],
+                                          '₹${item.price.toStringAsFixed(2)} x ${item.qty}',
                                           style: GoogleFonts.inter(
                                             fontSize: 12,
-                                            color: const Color(0xFF6E7A6C),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          '\$${(item['price'] as double).toStringAsFixed(2)}',
-                                          style: GoogleFonts.outfit(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w700,
-                                            color: const Color(0xFF1A1C1E),
+                                            color: AppColors.onSurfaceVariant,
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFE2EBE2),
-                                      borderRadius: BorderRadius.circular(9999),
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () => _updateQty(index, -1),
-                                          child: const Padding(
-                                            padding: EdgeInsets.all(4.0),
-                                            child: Icon(Icons.remove, size: 14, color: Color(0xFF006B23)),
-                                          ),
-                                        ),
-                                        Text(
-                                          '${item['qty']}',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 13,
-                                            fontWeight: FontWeight.w700,
-                                            color: const Color(0xFF1A1C1E),
-                                          ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () => _updateQty(index, 1),
-                                          child: const Padding(
-                                            padding: EdgeInsets.all(4.0),
-                                            child: Icon(Icons.add, size: 14, color: Color(0xFF006B23)),
-                                          ),
-                                        ),
-                                      ],
+                                  Text(
+                                    '₹${(item.price * item.qty).toStringAsFixed(2)}',
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.onSurface,
                                     ),
                                   ),
                                 ],
@@ -512,6 +317,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             );
                           },
                         ),
+                        const SizedBox(height: 8),
                       ],
                     ],
                   ),
@@ -519,213 +325,177 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
                 const SizedBox(height: 16),
 
-                // 3. Bill Summary Card
+                // 3. Coupons & Wallet Card
                 Container(
-                  padding: const EdgeInsets.all(18),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 6,
-                        offset: const Offset(0, 2),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.local_offer_outlined, color: AppColors.primary, size: 20),
+                          const SizedBox(width: 10),
+                          Text(
+                            'Coupons & Offers',
+                            style: GoogleFonts.outfit(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextField(
+                              controller: _couponCtrl,
+                              decoration: InputDecoration(
+                                hintText: 'Enter Coupon (e.g. DAILY50)',
+                                hintStyle: GoogleFonts.inter(fontSize: 13, color: AppColors.onSurfaceVariant),
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: const BorderSide(color: Color(0xFFCBD5E1)),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            onPressed: () {
+                              final code = _couponCtrl.text.trim();
+                              if (code.isNotEmpty) {
+                                checkoutProvider.setCoupon(code);
+                                _recalculate();
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            ),
+                            child: Text('APPLY', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white)),
+                          ),
+                        ],
+                      ),
+                      if (checkoutProvider.appliedCouponCode != null) ...[
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 16),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Coupon "${checkoutProvider.appliedCouponCode}" Applied!',
+                              style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
+                            ),
+                            const Spacer(),
+                            GestureDetector(
+                              onTap: () {
+                                checkoutProvider.setCoupon(null);
+                                _couponCtrl.clear();
+                                _recalculate();
+                              },
+                              child: Text('Remove', style: GoogleFonts.inter(fontSize: 12, color: Colors.red)),
+                            ),
+                          ],
+                        ),
+                      ],
+                      const Divider(height: 24, color: Color(0xFFE2E8F0)),
+                      SwitchListTile(
+                        value: checkoutProvider.useWallet,
+                        onChanged: (val) {
+                          checkoutProvider.toggleWallet(val);
+                          _recalculate();
+                        },
+                        title: Text(
+                          'Use Daily Basket Wallet',
+                          style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                        ),
+                        subtitle: Text(
+                          'Available Balance: ₹150.00',
+                          style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+                        ),
+                        activeTrackColor: AppColors.primary,
+                        contentPadding: EdgeInsets.zero,
                       ),
                     ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // 4. Detailed Bill Breakdown Card
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Bill Summary',
+                        'Bill Details & Breakdown',
                         style: GoogleFonts.outfit(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF1A1C1E),
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.onSurface,
                         ),
                       ),
                       const SizedBox(height: 14),
-                      _buildBillRow('Item Total', '\$${_itemTotal.toStringAsFixed(2)}'),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                'Delivery Fee',
-                                style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF6E7A6C)),
-                              ),
-                              const SizedBox(width: 4),
-                              const Icon(Icons.info_outline_rounded, size: 14, color: Color(0xFF6E7A6C)),
-                            ],
-                          ),
-                          Text(
-                            deliveryFee == 0 ? '\$0.00 (FREE)' : '\$${deliveryFee.toStringAsFixed(2)}',
-                            style: GoogleFonts.inter(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF006B23),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      _buildBillRow('Taxes & Charges', '\$${_taxes.toStringAsFixed(2)}'),
-                      if (discount > 0) ...[
-                        const SizedBox(height: 10),
-                        _buildBillRow(
-                          'Coupon Discount (${couponProvider.appliedCoupon!.code})',
-                          '-\$${discount.toStringAsFixed(2)}',
-                          isDiscount: true,
-                        ),
-                      ],
-                      const Divider(color: Color(0xFFEEEEF0), height: 24),
+                      _billRow('Items Subtotal', '₹${subtotal.toStringAsFixed(2)}'),
+                      if (couponDiscount > 0)
+                        _billRow('Coupon Savings', '-₹${couponDiscount.toStringAsFixed(2)}', isDiscount: true),
+                      _billRow('Delivery Partner Fee', deliveryFee == 0 ? 'FREE' : '₹${deliveryFee.toStringAsFixed(2)}', isFree: deliveryFee == 0),
+                      _billRow('Platform Fee', '₹${platformFee.toStringAsFixed(2)}'),
+                      _billRow('Packaging & Quality Fee', '₹${packagingFee.toStringAsFixed(2)}'),
+                      _billRow('Taxes & GST (5%)', '₹${totalGst.toStringAsFixed(2)}'),
+                      const Divider(height: 20, color: Color(0xFFE2E8F0)),
+                      _billRow('Grand Total', '₹${grandTotal.toStringAsFixed(2)}', isBold: true),
+                      if (walletDeducted > 0)
+                        _billRow('Wallet Payment', '-₹${walletDeducted.toStringAsFixed(2)}', isDiscount: true),
+                      const Divider(height: 20, color: Color(0xFFE2E8F0)),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Grand Total',
+                            'Final Payable Amount',
                             style: GoogleFonts.outfit(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF1A1C1E),
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
                             ),
                           ),
                           Text(
-                            '\$${grandTotal.toStringAsFixed(2)}',
+                            '₹${finalPayable.toStringAsFixed(2)}',
                             style: GoogleFonts.outfit(
                               fontSize: 20,
-                              fontWeight: FontWeight.w800,
-                              color: const Color(0xFF006B23),
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
-
-                      // Apply Promo Code Box / Active Coupon Tile
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).pushNamed('/coupons'),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                          decoration: BoxDecoration(
-                            color: couponProvider.appliedCoupon != null
-                                ? const Color(0xFFE8F5E9)
-                                : const Color(0xFFF3FBF4),
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(
-                              color: couponProvider.appliedCoupon != null
-                                  ? const Color(0xFF006B23)
-                                  : const Color(0xFFC0E8C7),
-                            ),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                couponProvider.appliedCoupon != null
-                                    ? Icons.check_circle_rounded
-                                    : Icons.local_offer_outlined,
-                                color: const Color(0xFF006B23),
-                                size: 18,
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      couponProvider.appliedCoupon != null
-                                          ? 'Coupon "${couponProvider.appliedCoupon!.code}" Active'
-                                          : 'Apply Promo Code / View Coupons',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                        color: const Color(0xFF006B23),
-                                      ),
-                                    ),
-                                    if (couponProvider.appliedCoupon != null && discount > 0)
-                                      Text(
-                                        'Saving \$${discount.toStringAsFixed(2)} on this order',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 11,
-                                          fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF006B23),
-                                        ),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                              if (couponProvider.appliedCoupon != null)
-                                GestureDetector(
-                                  onTap: () {
-                                    couponProvider.removeCoupon();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Coupon Removed'),
-                                        backgroundColor: Color(0xFF006B23),
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  },
-                                  child: Text(
-                                    'REMOVE',
-                                    style: GoogleFonts.outfit(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w700,
-                                      color: const Color(0xFFD32F2F),
-                                    ),
-                                  ),
-                                )
-                              else
-                                const Icon(Icons.chevron_right_rounded, color: Color(0xFF006B23), size: 18),
-                            ],
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 14),
-
-                // 4. Cancellation Policy Note
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.verified_user_outlined, color: Color(0xFF1A1C1E), size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Orders cannot be cancelled once they are out for delivery. View policy.',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            height: 16 / 12,
-                            color: const Color(0xFF6E7A6C),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 110),
               ],
             ),
           ),
 
-          // ─── 5. Fixed Bottom Action Bar (Select Payment Method) ────────────
+          // 5. Fixed Bottom Checkout Bar
           Positioned(
+            bottom: 0,
             left: 0,
             right: 0,
-            bottom: 0,
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -733,45 +503,95 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 16,
+                    blurRadius: 10,
                     offset: const Offset(0, -4),
                   ),
                 ],
               ),
-              child: SafeArea(
-                top: false,
-                child: SizedBox(
-                  height: 54,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const PaymentScreen()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF006B23),
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
+                        Row(
+                          children: [
+                            Text(
+                              '₹${finalPayable.toStringAsFixed(2)}',
+                              style: GoogleFonts.outfit(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.onSurface,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                checkoutProvider.selectedPaymentMethod,
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                         Text(
-                          'Select Payment Method',
-                          style: GoogleFonts.outfit(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                          'TOTAL PAYABLE',
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.onSurfaceVariant,
                           ),
                         ),
-                        const SizedBox(width: 10),
-                        const Icon(Icons.account_balance_wallet_outlined, color: Colors.white, size: 20),
                       ],
                     ),
                   ),
-                ),
+                  SizedBox(
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => PaymentScreen(
+                              totalAmount: finalPayable,
+                              itemQuantity: items.length,
+                            ),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Text(
+                            'PROCEED TO PAY',
+                            style: GoogleFonts.outfit(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          const Icon(Icons.arrow_forward_rounded, size: 18),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -780,27 +600,32 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Widget _buildBillRow(String label, String value, {bool isDiscount = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: isDiscount ? FontWeight.w600 : FontWeight.w400,
-            color: isDiscount ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
+  Widget _billRow(String label, String value, {bool isDiscount = false, bool isFree = false, bool isBold = false}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+              color: isBold ? AppColors.onSurface : AppColors.onSurfaceVariant,
+            ),
           ),
-        ),
-        Text(
-          value,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: isDiscount ? FontWeight.w700 : FontWeight.w400,
-            color: isDiscount ? const Color(0xFF006B23) : const Color(0xFF1A1C1E),
+          Text(
+            value,
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+              color: isDiscount
+                  ? AppColors.primary
+                  : (isFree ? AppColors.primary : AppColors.onSurface),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

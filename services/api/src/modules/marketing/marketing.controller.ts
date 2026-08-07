@@ -30,4 +30,16 @@ export class MarketingController {
   async triggerPushBroadcast(@Body() body: { title: string; body: string; segment?: string }) {
     return this.marketingService.triggerPushBroadcast(body.title, body.body, body.segment);
   }
+
+  @Get('flash-sales')
+  @ApiOperation({ summary: 'Get active flash sale campaign & discounted inventory items' })
+  async getFlashSales() {
+    return this.marketingService.getFlashSales();
+  }
+
+  @Post('delivery-fee')
+  @ApiOperation({ summary: 'Calculate dynamic delivery fee & free delivery threshold status' })
+  async calculateDeliveryFee(@Body() body: { cartTotal: number }) {
+    return this.marketingService.calculateDeliveryFee(body.cartTotal ?? 0);
+  }
 }

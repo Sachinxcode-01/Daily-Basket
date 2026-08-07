@@ -5,6 +5,8 @@ import { EventsGateway } from '../events/events.gateway';
 import { QueueProcessor } from '../queue/queue.processor';
 import { OrderStatus } from '@prisma/client';
 
+import { OrderPricingService } from './order-pricing.service';
+
 @Injectable()
 export class OrdersService {
   private readonly logger = new Logger(OrdersService.name);
@@ -14,17 +16,41 @@ export class OrdersService {
     private redisService: RedisService,
     private eventsGateway: EventsGateway,
     private queueProcessor: QueueProcessor,
+    private orderPricingService: OrderPricingService,
   ) {}
 
-  async createOrder(userId: string, data: { addressId: string; paymentMethod: any; items: any[] }) {
+  async createOrder(
+    userId: string,
+    data: {
+      addressId: string;
+      paymentMethod: any;
+      items: any[];
+      couponCode?: string;
+      useWallet?: boolean;
+    },
+  ) {
     const lockResource = `inventory_user_${userId}`;
     const lockToken = await this.redisService.acquireLock(lockResource, 5);
 
     try {
       const orderNumber = `DB-${Date.now().toString().slice(-6)}`;
-      const subtotal = data.items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-      const deliveryFee = subtotal >= 199 ? 0 : 25;
-      const totalAmount = subtotal + deliveryFee;
+      const pricing = this.orderPricingService.calculatePricing({
+        items: data.items.map((i) => ({
+          id: i.variantId || i.id || 'prod_01',
+          productName: i.productName || i.name || 'Item',
+          price: i.price,
+          quantity: i.quantity || i.qty || 1,
+        })),
+        couponCode: data.couponCode,
+        useWallet: data.useWallet,
+        paymentMethod: typeof data.paymentMethod === 'string' ? data.paymentMethod : data.paymentMethod?.id,
+      });
+
+      const subtotal = pricing.subtotal;
+      const deliveryFee = pricing.deliveryFee;
+      const discount = pricing.couponDiscount + pricing.itemDiscounts;
+      const totalAmount = pricing.finalPayable;
+      const paymentMethod = pricing.selectedPaymentMethod;
       const deliveryOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
       const order = await this.prisma.order.create({

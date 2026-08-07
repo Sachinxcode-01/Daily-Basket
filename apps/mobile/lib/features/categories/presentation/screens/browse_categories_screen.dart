@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import '../../../../core/widgets/staggered_animation_wrappers.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/categories_provider.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import 'category_products_screen.dart';
 
-/// Browse Categories Screen — Exact Google Stitch Specification
-/// 18 Primary Indian Quick-Commerce Categories
-class BrowseCategoriesScreen extends StatelessWidget {
+/// Browse Categories Screen — Google Stitch Source of Truth Specification
+/// Features top horizontal category chips, "FEATURED Farm Fresh Organic" hero banner, and category grid cards.
+class BrowseCategoriesScreen extends StatefulWidget {
   const BrowseCategoriesScreen({super.key});
+
+  @override
+  State<BrowseCategoriesScreen> createState() => _BrowseCategoriesScreenState();
+}
+
+class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
+  String _selectedFilter = 'All';
+
+  final List<String> _categoryFilters = [
+    'All',
+    'Fresh Produce',
+    'Bakery & Bread',
+    'Beverages',
+    'Dairy & Eggs',
+    'Meat & Seafood',
+    'Snacks & Sweets',
+  ];
 
   IconData _getCategoryIcon(String iconName) {
     switch (iconName) {
@@ -40,209 +58,112 @@ class BrowseCategoriesScreen extends StatelessWidget {
     final categoriesProvider = context.watch<CategoriesProvider>();
     final categories = categoriesProvider.categories;
 
+    final filteredCategories = _selectedFilter == 'All'
+        ? categories
+        : categories.where((c) => c.name.toLowerCase().contains(_selectedFilter.toLowerCase()) || _selectedFilter.toLowerCase().contains(c.name.toLowerCase())).toList();
+
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFFF9F9FC),
       appBar: AppBar(
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: Colors.white,
         elevation: 0.5,
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_rounded,
-            color: Color(0xFF2DD4BF),
+            color: AppColors.onSurface,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'All Categories (${categories.length})',
+          'Browse Categories',
           style: GoogleFonts.outfit(
-            fontSize: 20,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppColors.onSurface,
           ),
         ),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search_rounded, color: AppColors.onSurface),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Promo Banner Strip
+              // Top Location & Quick Search Banner
               Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF0F766E), Color(0xFF14B8A6)],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: const [
-                    BoxShadow(color: Color(0x4014B8A6), blurRadius: 12, offset: Offset(0, 4)),
-                  ],
-                ),
+                color: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: const BoxDecoration(
-                        color: Colors.white24,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 28),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Daily Basket Quick-Commerce Taxonomy',
-                            style: GoogleFonts.outfit(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                            ),
+                    const Icon(Icons.location_on_rounded, color: AppColors.primary, size: 20),
+                    const SizedBox(width: 6),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Delivering to Indiranagar, Bengaluru',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.onSurface,
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            '10-Minute Express Delivery across 18 specialized departments',
-                            style: GoogleFonts.inter(
-                              color: Colors.white.withValues(alpha: 0.9),
-                              fontSize: 12,
-                            ),
+                        ),
+                        Text(
+                          '⚡ 10-Minute Express Delivery',
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 8),
 
-              // Categories Grid
-              AnimationLimiter(
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: categories.length,
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    childAspectRatio: 0.82,
-                  ),
+              // Horizontal Category Chips Bar (Stitch Specification)
+              SizedBox(
+                height: 44,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: _categoryFilters.length,
                   itemBuilder: (context, index) {
-                    final cat = categories[index];
-                    final icon = _getCategoryIcon(cat.iconName);
+                    final filter = _categoryFilters[index];
+                    final isSelected = filter == _selectedFilter;
 
-                    return AnimationConfiguration.staggeredGrid(
-                      position: index,
-                      duration: const Duration(milliseconds: 375),
-                      columnCount: 2,
-                      child: ScaleAnimation(
-                        child: FadeInAnimation(
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => CategoryProductsScreen(categorySlug: cat.slug),
-                                ),
-                              );
-                            },
-                            borderRadius: BorderRadius.circular(16),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF1E293B),
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: cat.isFeatured
-                                      ? const Color(0xFF2DD4BF).withValues(alpha: 0.6)
-                                      : const Color(0xFF334155),
-                                  width: cat.isFeatured ? 1.5 : 1,
-                                ),
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Banner Image with Badge
-                                  Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                                        child: AppNetworkImage(
-                                          imageUrl: cat.imageUrl,
-                                          height: 110,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      Positioned(
-                                        top: 8,
-                                        left: 8,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(6),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFF0F172A).withValues(alpha: 0.8),
-                                            shape: BoxShape.circle,
-                                            border: Border.all(color: const Color(0xFF2DD4BF)),
-                                          ),
-                                          child: Icon(icon, color: const Color(0xFF2DD4BF), size: 16),
-                                        ),
-                                      ),
-                                      if (cat.isFeatured)
-                                        Positioned(
-                                          top: 8,
-                                          right: 8,
-                                          child: Container(
-                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                            decoration: BoxDecoration(
-                                              color: const Color(0xFFEC4899),
-                                              borderRadius: BorderRadius.circular(6),
-                                            ),
-                                            child: Text(
-                                              'POPULAR',
-                                              style: GoogleFonts.outfit(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 9,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(10.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          cat.name,
-                                          style: GoogleFonts.outfit(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 2),
-                                        Text(
-                                          '${cat.subcategories.length} subcategories',
-                                          style: GoogleFonts.inter(
-                                            fontSize: 11,
-                                            color: const Color(0xFF94A3B8),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(filter),
+                        selected: isSelected,
+                        onSelected: (selected) {
+                          if (selected) {
+                            setState(() {
+                              _selectedFilter = filter;
+                            });
+                          }
+                        },
+                        selectedColor: AppColors.primary,
+                        backgroundColor: Colors.white,
+                        labelStyle: GoogleFonts.inter(
+                          fontSize: 12,
+                          fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                          color: isSelected ? Colors.white : AppColors.onSurface,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: BorderSide(
+                            color: isSelected ? AppColors.primary : const Color(0xFFE2E8F0),
                           ),
                         ),
                       ),
@@ -250,6 +171,272 @@ class BrowseCategoriesScreen extends StatelessWidget {
                   },
                 ),
               ),
+
+              const SizedBox(height: 16),
+
+              // FEATURED Farm Fresh Organic Hero Banner (Stitch Specification)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF006B23), Color(0xFF10B981)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.2),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: Colors.white24,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                'FEATURED',
+                                style: GoogleFonts.outfit(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                  letterSpacing: 1,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Farm Fresh Organic',
+                              style: GoogleFonts.outfit(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Direct from local farms to your table within 24 hours.',
+                              style: GoogleFonts.inter(
+                                color: Colors.white.withValues(alpha: 0.9),
+                                fontSize: 12,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            ElevatedButton(
+                              onPressed: () {},
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white,
+                                foregroundColor: AppColors.primary,
+                                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                elevation: 0,
+                              ),
+                              child: Text(
+                                'Browse by Type',
+                                style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Container(
+                        width: 80,
+                        height: 80,
+                        decoration: const BoxDecoration(
+                          color: Colors.white24,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.local_florist_rounded,
+                          color: Colors.white,
+                          size: 44,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'Explore Categories',
+                  style: GoogleFonts.outfit(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.onSurface,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // Categories Grid
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: AnimationLimiter(
+                  child: GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: filteredCategories.isNotEmpty ? filteredCategories.length : categories.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      childAspectRatio: 0.88,
+                    ),
+                    itemBuilder: (context, index) {
+                      final listToUse = filteredCategories.isNotEmpty ? filteredCategories : categories;
+                      final cat = listToUse[index];
+                      final icon = _getCategoryIcon(cat.iconName);
+
+                      return AnimationConfiguration.staggeredGrid(
+                        position: index,
+                        duration: const Duration(milliseconds: 300),
+                        columnCount: 2,
+                        child: ScaleAnimation(
+                          child: FadeInAnimation(
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => CategoryProductsScreen(categorySlug: cat.slug),
+                                  ),
+                                );
+                              },
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(16),
+                                  border: Border.all(
+                                    color: cat.isFeatured
+                                        ? AppColors.primary.withValues(alpha: 0.4)
+                                        : const Color(0xFFF1F5F9),
+                                    width: cat.isFeatured ? 1.5 : 1,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withValues(alpha: 0.03),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                                          child: AppNetworkImage(
+                                            imageUrl: cat.imageUrl,
+                                            height: 100,
+                                            width: double.infinity,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 8,
+                                          left: 8,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black.withValues(alpha: 0.1),
+                                                  blurRadius: 4,
+                                                ),
+                                              ],
+                                            ),
+                                            child: Icon(icon, color: AppColors.primary, size: 16),
+                                          ),
+                                        ),
+                                        if (cat.isFeatured)
+                                          Positioned(
+                                            top: 8,
+                                            right: 8,
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: AppColors.primary,
+                                                borderRadius: BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                'POPULAR',
+                                                style: GoogleFonts.outfit(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 9,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            cat.name,
+                                            style: GoogleFonts.outfit(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.onSurface,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 2),
+                                          Text(
+                                            '${cat.subcategories.length} items',
+                                            style: GoogleFonts.inter(
+                                              fontSize: 11,
+                                              color: AppColors.onSurfaceVariant,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),

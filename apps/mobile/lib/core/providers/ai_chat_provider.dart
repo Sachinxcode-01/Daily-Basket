@@ -18,7 +18,7 @@ class AiChatProvider extends ChangeNotifier {
   bool _isEscalatedToManager = false;
   bool _isRecording = false;
   String _activeAgentName = 'Sarah J.';
-  String _activeAgentRole = 'AI Support Agent • Online';
+  String _activeAgentRole = 'Support Agent • Online';
   String _searchQuery = '';
   String _streamingMessageId = '';
   String _streamingBuffer = '';

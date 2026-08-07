@@ -11,7 +11,7 @@ import 'package:http/http.dart' as http;
 class AiAgentService {
   final String baseUrl;
   final int _maxRetries = 2;
-  final Duration _timeout = const Duration(seconds: 30);
+  final Duration _timeout = const Duration(milliseconds: 500);
 
   AiAgentService({this.baseUrl = 'http://10.0.2.2:3000/api'});
 

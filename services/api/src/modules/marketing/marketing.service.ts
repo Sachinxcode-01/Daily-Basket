@@ -40,4 +40,33 @@ export class MarketingService {
       dispatchedAt: new Date().toISOString(),
     };
   }
+
+  async getFlashSales() {
+    return {
+      active: true,
+      title: '⚡ Midnight Kirana Flash Sale',
+      endsAt: new Date(Date.now() + 14400000).toISOString(), // 4 hours from now
+      discountFlatPercent: 25,
+      items: [
+        { productId: 'prod_avocado', title: 'Organic Hass Avocado', flashPrice: 90, normalPrice: 120, stockRemaining: 14 },
+        { productId: 'mlk1', title: 'Full Cream Milk 1L', flashPrice: 48, normalPrice: 64, stockRemaining: 8 },
+      ],
+    };
+  }
+
+  async calculateDeliveryFee(cartTotal: number) {
+    const freeDeliveryThreshold = 199;
+    const baseFee = 25;
+    const isFree = cartTotal >= freeDeliveryThreshold;
+    const fee = isFree ? 0 : baseFee;
+    const remainingForFree = Math.max(0, freeDeliveryThreshold - cartTotal);
+
+    return {
+      cartTotal,
+      freeDeliveryThreshold,
+      isFree,
+      deliveryFee: fee,
+      remainingForFreeDelivery: remainingForFree,
+    };
+  }
 }

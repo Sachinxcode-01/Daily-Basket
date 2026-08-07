@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/favorite_button.dart';
 import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/providers/recently_viewed_provider.dart';
+import 'reviews_recommendations_screen.dart';
 
-/// Product Details Screen — Google Stitch Design System Exact Replica + Rich Product Info
+/// Product Details Screen — Google Stitch Source of Truth Specification (ID: fed4975734304fada8e33c3c4c02a910)
+/// Features Multi-Image Gallery, FSSAI compliance, Nutrition Specs, Smart Stock Indicator, and Ask AI Chef.
 class ProductDetailsScreen extends StatefulWidget {
   final String productId;
   final String categoryTag;
@@ -25,8 +28,8 @@ class ProductDetailsScreen extends StatefulWidget {
     this.price = '₹120',
     this.mrp = '₹150',
     this.discountPercentage = '20% OFF',
-    this.unitDetails = '2 units (Approx. 400g)',
-    this.deliveryTime = '8 mins',
+    this.unitDetails = '500g ~3-4 pieces',
+    this.deliveryTime = '15-30 mins',
     this.imageUrl = 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=800&q=80',
   });
 
@@ -35,10 +38,46 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  int _quantity = 1;
-  bool _priceDropAlert = false;
-  int _helpfulVotes = 42;
-  bool _votedHelpful = false;
+  int _selectedImageIndex = 0;
+  String _selectedWeight = '500g ~3-4 pieces';
+
+  final List<String> _galleryImages = [
+    'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=800&q=80',
+    'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&q=80',
+    'https://images.unsplash.com/photo-1601039641847-7857b994d704?w=800&q=80',
+  ];
+
+  final List<String> _weightOptions = [
+    '500g ~3-4 pieces',
+    '1kg ~6-8 pieces',
+  ];
+
+  final List<Map<String, String>> _similarProducts = [
+    {
+      'id': 'sim_1',
+      'name': 'Organic Blueberries',
+      'weight': '125g Pack',
+      'price': '₹240',
+      'mrp': '₹280',
+      'image': 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=300&q=80',
+    },
+    {
+      'id': 'sim_2',
+      'name': 'Fresh Strawberries',
+      'weight': '200g Pack',
+      'price': '₹160',
+      'mrp': '₹190',
+      'image': 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=300&q=80',
+    },
+    {
+      'id': 'sim_3',
+      'name': 'Organic Hass Avocado Oil',
+      'weight': '250ml Bottle',
+      'price': '₹450',
+      'mrp': '₹520',
+      'image': 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&q=80',
+    },
+  ];
 
   @override
   void initState() {
@@ -48,8 +87,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         context.read<RecentlyViewedProvider>().addRecentlyViewed({
           'id': widget.productId,
           'name': widget.productName,
-          'brand': 'Organic Produce',
-          'unit': widget.unitDetails,
+          'brand': 'Fresh Farm Co.',
+          'unit': _selectedWeight,
           'price': widget.price,
           'mrp': widget.mrp,
           'imageUrl': widget.imageUrl,
@@ -58,10 +97,126 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     });
   }
 
-  void _updateQuantity(int delta) {
-    setState(() {
-      _quantity = (_quantity + delta).clamp(1, 99);
-    });
+  void _showAiChefModal(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.auto_awesome_rounded, color: AppColors.primary, size: 24),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Ask AI Chef',
+                          style: GoogleFonts.outfit(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.onSurface,
+                          ),
+                        ),
+                        Text(
+                          'Instant recipes & nutrition hacks for ${widget.productName}',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: AppColors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _aiSuggestionTile(
+                icon: Icons.restaurant_menu_rounded,
+                title: 'Classic Guacamole Recipe',
+                subtitle: 'Mash 2 avocados with lime juice, cilantro, red onion, & sea salt.',
+              ),
+              const SizedBox(height: 12),
+              _aiSuggestionTile(
+                icon: Icons.health_and_safety_rounded,
+                title: 'Ripening Hack',
+                subtitle: 'Store in a brown paper bag with a banana for 24 hours to accelerate ripening.',
+              ),
+              const SizedBox(height: 12),
+              _aiSuggestionTile(
+                icon: Icons.fitness_center_rounded,
+                title: 'Keto Nutritional Pairing',
+                subtitle: 'Pair with poached eggs & whole grain sourdough for high-protein breakfast.',
+              ),
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  child: Text('Close Assistant', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _aiSuggestionTile({required IconData icon, required String title, required String subtitle}) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8FAFC),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: AppColors.primary, size: 20),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant, height: 1.3),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -71,662 +226,607 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       cartProvider = context.watch<CartProvider>();
     } catch (_) {}
 
-    final numericPrice = double.tryParse(widget.price.replaceAll('₹', '')) ?? 120.0;
+    final currentQty = cartProvider?.getQuantity(widget.productId) ?? 0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFFF9F9FC),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.onSurface),
+          onPressed: () => Navigator.of(context).maybePop(),
+        ),
+        title: Text(
+          widget.productName,
+          style: GoogleFonts.outfit(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: AppColors.onSurface,
+          ),
+        ),
+        actions: [
+          FavoriteButton(
+            productId: widget.productId,
+            productDetails: {
+              'id': widget.productId,
+              'name': widget.productName,
+              'brand': 'Fresh Farm Co.',
+              'unit': _selectedWeight,
+              'price': widget.price,
+              'mrp': widget.mrp,
+              'imageUrl': widget.imageUrl,
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.share_outlined, color: AppColors.onSurface),
+            onPressed: () {},
+          ),
+        ],
+      ),
       body: Stack(
         children: [
-          // ─── Scrollable Page Content ──────────────────────────────────────
           SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 110),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. Hero Image Container
-                Stack(
-                  children: [
-                    Container(
-                      height: 340,
-                      width: double.infinity,
-                      decoration: const BoxDecoration(
-                        color: Color(0xFF1E293B),
-                        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+                // 1. HD Zoomable Gallery Carousel
+                Container(
+                  height: 260,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.04),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
                       ),
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+                    ],
+                  ),
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(20),
                         child: Image.network(
-                          widget.imageUrl,
+                          _galleryImages[_selectedImageIndex],
+                          width: double.infinity,
+                          height: double.infinity,
                           fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: const Color(0xFF1E293B),
-                            child: const Center(
-                              child: Icon(Icons.eco_rounded, size: 80, color: Color(0xFF2DD4BF)),
-                            ),
-                          ),
                         ),
                       ),
-                    ),
-
-                    // Top Action Floating Buttons (Back, Favorite, Share)
-                    SafeArea(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      Positioned(
+                        top: 12,
+                        left: 12,
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            GestureDetector(
-                              onTap: () => Navigator.of(context).maybePop(),
-                              child: Container(
-                                width: 42,
-                                height: 42,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF1E293B).withValues(alpha: 0.90),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: const Color(0xFF334155)),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                      color: Color(0x40000000),
-                                      blurRadius: 8,
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(Icons.arrow_back_rounded, color: Color(0xFF2DD4BF), size: 22),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'ORGANIC',
+                                style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
                               ),
                             ),
-                            Row(
-                              children: [
-                                Container(
-                                  width: 42,
-                                  height: 42,
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF1E293B).withValues(alpha: 0.90),
-                                    shape: BoxShape.circle,
-                                    border: Border.all(color: const Color(0xFF334155)),
-                                    boxShadow: const [
-                                      BoxShadow(
-                                        color: Color(0x40000000),
-                                        blurRadius: 8,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: FavoriteButton(
-                                      productId: widget.productId,
-                                      productDetails: {
-                                        'id': widget.productId,
-                                        'name': widget.productName,
-                                        'brand': 'Organic India',
-                                        'weight': widget.unitDetails,
-                                        'price': numericPrice,
-                                        'mrp': double.tryParse(widget.mrp.replaceAll('₹', '')) ?? 150.0,
-                                        'category': widget.categoryTag,
-                                        'imageUrl': widget.imageUrl,
-                                      },
-                                      padding: EdgeInsets.zero,
-                                      size: 22,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                GestureDetector(
-                                  onTap: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Product link copied to clipboard! Share with friends.'),
-                                        backgroundColor: Color(0xFF0F766E),
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    width: 42,
-                                    height: 42,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF1E293B).withValues(alpha: 0.90),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: const Color(0xFF334155)),
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Color(0x40000000),
-                                          blurRadius: 8,
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(Icons.share_outlined, color: Color(0xFF2DD4BF), size: 22),
-                                  ),
-                                ),
-                              ],
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFEF3C7),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                'BEST SELLER',
+                                style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFFD97706)),
+                              ),
                             ),
                           ],
                         ),
+                      ),
+                      Positioned(
+                        bottom: 12,
+                        left: 0,
+                        right: 0,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: _galleryImages.asMap().entries.map((entry) {
+                            final idx = entry.key;
+                            final isSel = idx == _selectedImageIndex;
+                            return GestureDetector(
+                              onTap: () => setState(() => _selectedImageIndex = idx),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                width: isSel ? 24 : 8,
+                                height: 8,
+                                decoration: BoxDecoration(
+                                  color: isSel ? AppColors.primary : Colors.white.withValues(alpha: 0.7),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 2. Product Name, Brand & ETA Row
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.verified_rounded, color: AppColors.primary, size: 16),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'Fresh Farm Co. • Certified Organic',
+                      style: GoogleFonts.inter(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFDCFCE7),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.bolt_rounded, color: AppColors.primary, size: 14),
+                          const SizedBox(width: 2),
+                          Text(
+                            widget.deliveryTime,
+                            style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                Text(
+                  widget.productName,
+                  style: GoogleFonts.outfit(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.onSurface,
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // 3. Pricing & Discount Row
+                Row(
+                  children: [
+                    Text(
+                      widget.price,
+                      style: GoogleFonts.outfit(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      widget.mrp,
+                      style: GoogleFonts.outfit(
+                        fontSize: 16,
+                        decoration: TextDecoration.lineThrough,
+                        color: AppColors.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFEE2E2),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        widget.discountPercentage,
+                        style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 14),
+
+                // Smart Stock Warning Indicator
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFFBEB),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFFDE68A)),
+                  ),
+                  child: Row(
                     children: [
-                      // 2. Product Info Card
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF334155)),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x20000000),
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.categoryTag,
-                              style: GoogleFonts.inter(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 0.5,
-                                color: const Color(0xFF2DD4BF),
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              widget.productName,
-                              style: GoogleFonts.outfit(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                Text(
-                                  widget.price,
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 26,
-                                    fontWeight: FontWeight.w800,
-                                    color: const Color(0xFF2DD4BF),
-                                  ),
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  widget.mrp,
-                                  style: GoogleFonts.inter(
-                                    fontSize: 14,
-                                    color: const Color(0xFF94A3B8),
-                                    decoration: TextDecoration.lineThrough,
-                                    decorationColor: const Color(0xFF94A3B8),
-                                  ),
-                                ),
-                                const Spacer(),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      colors: [Color(0xFF0F766E), Color(0xFF14B8A6)],
-                                    ),
-                                    borderRadius: BorderRadius.circular(9999),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      const Icon(Icons.local_fire_department_rounded, color: Colors.white, size: 14),
-                                      const SizedBox(width: 2),
-                                      Text(
-                                        widget.discountPercentage,
-                                        style: GoogleFonts.inter(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              widget.unitDetails,
-                              style: GoogleFonts.inter(
-                                fontSize: 13,
-                                color: const Color(0xFF94A3B8),
-                              ),
-                            ),
-
-                            const SizedBox(height: 14),
-                            // Price Drop Alert Toggle
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.notifications_active_outlined, size: 18, color: Color(0xFF2DD4BF)),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      'Notify on Price Drop',
-                                      style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                                Switch(
-                                  value: _priceDropAlert,
-                                  activeThumbColor: const Color(0xFF2DD4BF),
-                                  activeTrackColor: const Color(0xFF0F766E),
-                                  inactiveThumbColor: const Color(0xFF64748B),
-                                  inactiveTrackColor: const Color(0xFF334155),
-                                  onChanged: (val) {
-                                    setState(() => _priceDropAlert = val);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(val ? 'Price drop alert set!' : 'Price drop alert removed.'),
-                                        backgroundColor: const Color(0xFF0F766E),
-                                        duration: const Duration(seconds: 2),
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      // 3. Lightning Fast Delivery Guarantee Banner Card
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: const Color(0xFF334155)),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 44,
-                              height: 44,
-                              decoration: const BoxDecoration(
-                                color: Color(0xFF0F766E),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 24),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Lightning Fast Delivery',
-                                    style: GoogleFonts.outfit(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  RichText(
-                                    text: TextSpan(
-                                      style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF94A3B8)),
-                                      children: [
-                                        const TextSpan(text: 'Arriving in '),
-                                        TextSpan(
-                                          text: widget.deliveryTime,
-                                          style: const TextStyle(fontWeight: FontWeight.w700, color: Color(0xFF2DD4BF)),
-                                        ),
-                                        const TextSpan(text: ' to your location.'),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // 4. Description Section
+                      const Icon(Icons.warning_amber_rounded, color: Color(0xFFD97706), size: 18),
+                      const SizedBox(width: 8),
                       Text(
-                        'Description',
-                        style: GoogleFonts.outfit(
-                          fontSize: 18,
+                        'Smart Stock: Only 4 items left in Indiranagar Darkstore!',
+                        style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0xFFB45309)),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 4. Weight Option Selector
+                Text(
+                  'Select Pack Size',
+                  style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: _weightOptions.map((opt) {
+                    final isSel = opt == _selectedWeight;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 12),
+                      child: ChoiceChip(
+                        label: Text(opt),
+                        selected: isSel,
+                        onSelected: (val) {
+                          if (val) setState(() => _selectedWeight = opt);
+                        },
+                        selectedColor: AppColors.primary,
+                        labelStyle: GoogleFonts.outfit(
+                          fontSize: 13,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: isSel ? Colors.white : AppColors.onSurface,
+                        ),
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: isSel ? AppColors.primary : const Color(0xFFCBD5E1)),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Creamy, rich, and perfectly ripened. These organic Hass avocados are hand-picked from sustainable farms. Known for their bumpy skin and buttery texture, they are ideal for guacamole, toast, or slicing over a fresh salad. Rich in healthy fats and vitamins.',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          height: 22 / 14,
-                          color: const Color(0xFF94A3B8),
-                        ),
+                    );
+                  }).toList(),
+                ),
+
+                const SizedBox(height: 20),
+
+                // 5. Ask AI Chef CTA Card
+                InkWell(
+                  onTap: () => _showAiChefModal(context),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          AppColors.primary.withValues(alpha: 0.12),
+                          AppColors.primary.withValues(alpha: 0.04),
+                        ],
                       ),
-
-                      const SizedBox(height: 20),
-
-                      // 5. Product Information & Attributes Grid
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF334155)),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: const BoxDecoration(
+                            color: AppColors.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 20),
                         ),
-                        child: Column(
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Ask AI Chef Assistant',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.onSurface,
+                                ),
+                              ),
+                              Text(
+                                'Get instant guacamole recipes, ripening tips, & nutrition pairing.',
+                                style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right_rounded, color: AppColors.primary),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 6. Comprehensive Product Specifications & Compliance
+                Text(
+                  'Product Specifications & Compliance',
+                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Column(
+                    children: [
+                      _specRow('Brand', 'Fresh Farm Co. Organic'),
+                      _specRow('Country of Origin', 'India 🇮🇳'),
+                      _specRow('FSSAI Lic. No.', '11223344556677'),
+                      _specRow('Ingredients', '100% Raw Certified Organic Hass Avocados'),
+                      _specRow('Storage Instructions', 'Store at room temp until ripe, then refrigerate'),
+                      _specRow('Shelf Life', 'Best consumed within 5 days of delivery'),
+                      _specRow('Return Policy', '100% Doorstep Return eligible within 24 hours'),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 7. Nutrition Facts Table
+                Text(
+                  'Nutrition Facts (Per 100g)',
+                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                ),
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      _nutritionPill('160 kcal', 'ENERGY'),
+                      _nutritionPill('2.0 g', 'PROTEIN'),
+                      _nutritionPill('14.7 g', 'FAT'),
+                      _nutritionPill('8.5 g', 'CARBS'),
+                      _nutritionPill('6.7 g', 'FIBER'),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // 8. Reviews & Recommendations Teaser Card
+                InkWell(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const ReviewsRecommendationsScreen()),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.star_rounded, color: Colors.amber, size: 24),
+                        const SizedBox(width: 10),
+                        Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Product Information',
-                              style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                              '4.8 Star Rating (1,248 Verified Reviews)',
+                              style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.onSurface),
                             ),
-                            const SizedBox(height: 12),
-                            _buildInfoRow('Shelf Life', '3 to 5 days'),
-                            const Divider(color: Color(0xFF334155), height: 16),
-                            _buildInfoRow('Country of Origin', 'India'),
-                            const Divider(color: Color(0xFF334155), height: 16),
-                            _buildInfoRow('Storage Instructions', 'Store at room temperature until ripe'),
-                            const Divider(color: Color(0xFF334155), height: 16),
-                            _buildInfoRow('Return Policy', 'Eligible for 24-hr replacement'),
+                            Text(
+                              'Tap to view customer photo gallery & buyer feedback',
+                              style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+                            ),
                           ],
                         ),
-                      ),
+                        const Spacer(),
+                        const Icon(Icons.chevron_right_rounded, color: AppColors.onSurfaceVariant),
+                      ],
+                    ),
+                  ),
+                ),
 
-                      const SizedBox(height: 20),
+                const SizedBox(height: 24),
 
-                      // 6. Nutritional Value Card
-                      Container(
-                        padding: const EdgeInsets.all(18),
+                // 9. Similar Products Carousel
+                Text(
+                  'Similar Fresh Recommendations',
+                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 190,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: _similarProducts.length,
+                    itemBuilder: (ctx, idx) {
+                      final item = _similarProducts[idx];
+                      return Container(
+                        width: 140,
+                        margin: const EdgeInsets.only(right: 12),
+                        padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF334155)),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x20000000),
-                              blurRadius: 8,
-                              offset: Offset(0, 2),
-                            ),
-                          ],
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(color: const Color(0xFFE2E8F0)),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.eco_outlined, color: Color(0xFF2DD4BF), size: 20),
-                                const SizedBox(width: 8),
-                                Text(
-                                  'Nutritional Value (Per 100g)',
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            _buildNutritionRow('Calories', '160 kcal'),
-                            const Divider(color: Color(0xFF334155), height: 16),
-                            _buildNutritionRow('Total Fat', '15g'),
-                            const Divider(color: Color(0xFF334155), height: 16),
-                            _buildNutritionRow('Potassium', '485mg'),
-                            const Divider(color: Color(0xFF334155), height: 16),
-                            _buildNutritionRow('Protein', '2g'),
-                          ],
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      // 7. Customer Ratings & Reviews
-                      Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
-                          borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF334155)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Ratings & Reviews',
-                                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFF0F766E),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.star, color: Colors.white, size: 14),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        '4.8',
-                                        style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            Text('128 verified ratings', style: GoogleFonts.inter(fontSize: 12, color: const Color(0xFF94A3B8))),
-                            const Divider(color: Color(0xFF334155), height: 20),
-
-                            // Sample Review Card
-                            Row(
-                              children: [
-                                const CircleAvatar(
-                                  radius: 16,
-                                  backgroundColor: Color(0xFF0F766E),
-                                  child: Icon(Icons.person, size: 18, color: Colors.white),
-                                ),
-                                const SizedBox(width: 10),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text('Priya S.', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
-                                        const SizedBox(width: 6),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: const Color(0xFF0F766E).withValues(alpha: 0.3),
-                                            borderRadius: BorderRadius.circular(4),
-                                            border: Border.all(color: const Color(0xFF14B8A6).withValues(alpha: 0.4)),
-                                          ),
-                                          child: Text('Verified Buyer', style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF2DD4BF), fontWeight: FontWeight.w600)),
-                                        ),
-                                      ],
-                                    ),
-                                    Text('2 days ago', style: GoogleFonts.inter(fontSize: 11, color: const Color(0xFF94A3B8))),
-                                  ],
-                                ),
-                              ],
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: Image.network(
+                                item['image']!,
+                                height: 90,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'Super fresh avocados! They were perfectly ripe in two days just like promised.',
-                              style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF94A3B8)),
+                              item['name']!,
+                              style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                            const SizedBox(height: 10),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _votedHelpful = !_votedHelpful;
-                                  _helpfulVotes += _votedHelpful ? 1 : -1;
-                                });
-                              },
-                              child: Row(
-                                children: [
-                                  Icon(_votedHelpful ? Icons.thumb_up : Icons.thumb_up_outlined, size: 14, color: const Color(0xFF2DD4BF)),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    'Helpful ($_helpfulVotes)',
-                                    style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF2DD4BF)),
-                                  ),
-                                ],
-                              ),
+                            Text(
+                              item['price']!,
+                              style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primary),
                             ),
                           ],
                         ),
-                      ),
-
-                      const SizedBox(height: 110),
-                    ],
+                      );
+                    },
                   ),
                 ),
               ],
             ),
           ),
 
-          // ─── 8. Fixed Bottom Action Bar ────────────────────────────────────
+          // 10. Sticky Bottom Add-to-Cart Action Bar
           Positioned(
+            bottom: 0,
             left: 0,
             right: 0,
-            bottom: 0,
             child: Container(
               padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: Color(0xFF1E293B),
-                border: Border(
-                  top: BorderSide(color: Color(0xFF334155), width: 1),
-                ),
+              decoration: BoxDecoration(
+                color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0x40000000),
-                    blurRadius: 16,
-                    offset: Offset(0, -4),
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 10,
+                    offset: const Offset(0, -4),
                   ),
                 ],
               ),
-              child: SafeArea(
-                top: false,
-                child: Row(
-                  children: [
-                    // Quantity Selector Pill
+              child: Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.price,
+                        style: GoogleFonts.outfit(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.onSurface,
+                        ),
+                      ),
+                      Text(
+                        _selectedWeight,
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          color: AppColors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  if (currentQty == 0)
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          cartProvider?.updateQuantityById(
+                            id: widget.productId,
+                            name: widget.productName,
+                            subtitle: _selectedWeight,
+                            price: 120.0,
+                            image: widget.imageUrl,
+                            delta: 1,
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        child: Text(
+                          'ADD TO BASKET',
+                          style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                        ),
+                      ),
+                    )
+                  else
                     Container(
-                      height: 52,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      height: 48,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF0F172A),
-                        borderRadius: BorderRadius.circular(9999),
-                        border: Border.all(color: const Color(0xFF334155)),
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         children: [
                           IconButton(
-                            onPressed: () => _updateQuantity(-1),
-                            icon: const Icon(Icons.remove, color: Colors.white, size: 18),
-                            constraints: const BoxConstraints(minWidth: 32),
-                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.remove_rounded, color: Colors.white),
+                            onPressed: () {
+                              cartProvider?.updateQuantityById(
+                                id: widget.productId,
+                                name: widget.productName,
+                                subtitle: _selectedWeight,
+                                price: 120.0,
+                                image: widget.imageUrl,
+                                delta: -1,
+                              );
+                            },
                           ),
-                          Text(
-                            '$_quantity',
-                            style: GoogleFonts.inter(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            child: Text(
+                              '$currentQty',
+                              style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                           ),
                           IconButton(
-                            onPressed: () => _updateQuantity(1),
-                            icon: const Icon(Icons.add, color: Color(0xFF2DD4BF), size: 18),
-                            constraints: const BoxConstraints(minWidth: 32),
-                            padding: EdgeInsets.zero,
+                            icon: const Icon(Icons.add_rounded, color: Colors.white),
+                            onPressed: () {
+                              cartProvider?.updateQuantityById(
+                                id: widget.productId,
+                                name: widget.productName,
+                                subtitle: _selectedWeight,
+                                price: 120.0,
+                                image: widget.imageUrl,
+                                delta: 1,
+                              );
+                            },
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 14),
-
-                    // Add to Cart Button
-                    Expanded(
-                      child: SizedBox(
-                        height: 52,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF0F766E), Color(0xFF14B8A6)],
-                            ),
-                            borderRadius: BorderRadius.circular(16),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x4014B8A6),
-                                blurRadius: 12,
-                                offset: Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (cartProvider != null) {
-                                cartProvider.updateQuantityById(
-                                  id: widget.productId,
-                                  name: widget.productName,
-                                  subtitle: widget.unitDetails,
-                                  price: numericPrice,
-                                  image: widget.imageUrl,
-                                  delta: _quantity,
-                                );
-                              }
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Added $_quantity x ${widget.productName} to cart!'),
-                                  backgroundColor: const Color(0xFF0F766E),
-                                  behavior: SnackBarBehavior.floating,
-                                ),
-                              );
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                            ),
-                            child: Text(
-                              'Add to Cart • ₹${(numericPrice * _quantity).round()}',
-                              style: GoogleFonts.outfit(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                ],
               ),
             ),
           ),
@@ -735,28 +835,36 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
-  Widget _buildNutritionRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(label, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8))),
-        Text(value, style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
-      ],
+  Widget _specRow(String label, String val) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 140,
+            child: Text(
+              label,
+              style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              val,
+              style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _nutritionPill(String val, String label) {
+    return Column(
       children: [
-        Text(label, style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF94A3B8))),
-        Flexible(
-          child: Text(
-            value,
-            textAlign: TextAlign.end,
-            style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.white),
-          ),
-        ),
+        Text(val, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
+        const SizedBox(height: 2),
+        Text(label, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.onSurfaceVariant)),
       ],
     );
   }
