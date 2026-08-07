@@ -40,6 +40,43 @@ export class SearchService {
 
   constructor(private prisma: PrismaService) {}
 
+  private static readonly SYNONYM_MAP: Record<string, string[]> = {
+    doodh: ['milk', 'dairy', 'taaza'],
+    milk: ['doodh', 'dairy', 'toned milk'],
+    atta: ['flour', 'wheat', 'chakki'],
+    flour: ['atta', 'wheat', 'maida'],
+    makkhan: ['butter', 'amul butter', 'spread'],
+    butter: ['makkhan', 'amul', 'spread'],
+    anda: ['egg', 'eggs', 'farm fresh'],
+    egg: ['anda', 'eggs', 'poultry'],
+    dahi: ['curd', 'yogurt', 'fresh curd'],
+    curd: ['dahi', 'yogurt', 'mishti doi'],
+    sabzi: ['vegetable', 'vegetables', 'veggie'],
+    veggie: ['vegetable', 'sabzi', 'fresh produce'],
+    paneer: ['cottage cheese', 'fresh paneer', 'dairy'],
+    ghee: ['clarified butter', 'cow ghee', 'pure ghee'],
+  };
+
+  private resolveSynonyms(query: string): string[] {
+    const clean = query.trim().toLowerCase();
+    const terms = new Set<string>([clean]);
+    
+    // Exact map check
+    if (SearchService.SYNONYM_MAP[clean]) {
+      SearchService.SYNONYM_MAP[clean].forEach((s) => terms.add(s));
+    }
+
+    // Word token check
+    const words = clean.split(/\s+/);
+    for (const w of words) {
+      if (SearchService.SYNONYM_MAP[w]) {
+        SearchService.SYNONYM_MAP[w].forEach((s) => terms.add(s));
+      }
+    }
+
+    return Array.from(terms);
+  }
+
   async searchProducts(query: string) {
     if (!query || query.trim() === '') {
       return {
@@ -55,18 +92,20 @@ export class SearchService {
       };
     }
 
-    const cleanQuery = query.trim().toLowerCase();
+    const searchTerms = this.resolveSynonyms(query);
+
+    const searchConditions = searchTerms.flatMap((term) => [
+      { name: { contains: term, mode: 'insensitive' as const } },
+      { description: { contains: term, mode: 'insensitive' as const } },
+      { brand: { contains: term, mode: 'insensitive' as const } },
+      { barcode: { equals: term } },
+      { tags: { hasSome: [term] } },
+      { searchKeywords: { hasSome: [term] } },
+    ]);
 
     const products = await this.prisma.product.findMany({
       where: {
-        OR: [
-          { name: { contains: cleanQuery, mode: 'insensitive' } },
-          { description: { contains: cleanQuery, mode: 'insensitive' } },
-          { brand: { contains: cleanQuery, mode: 'insensitive' } },
-          { barcode: { equals: cleanQuery } },
-          { tags: { hasSome: [cleanQuery] } },
-          { searchKeywords: { hasSome: [cleanQuery] } },
-        ],
+        OR: searchConditions,
       },
       include: { category: true, variants: true },
     });
@@ -82,6 +121,7 @@ export class SearchService {
       products,
       suggestions,
       totalCount: products.length,
+      resolvedTerms: searchTerms,
     };
   }
 
