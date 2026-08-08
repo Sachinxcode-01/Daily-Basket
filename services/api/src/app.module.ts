@@ -45,6 +45,9 @@ import { FavoritesModule } from './modules/favorites/favorites.module';
 import { VoiceModule } from './modules/voice/voice.module';
 import { ImageSearchModule } from './modules/image-search/image-search.module';
 import { PersonalizationModule } from './modules/personalization/personalization.module';
+import { StoreOperationsModule } from './modules/store-operations/store-operations.module';
+import { PurchaseManagementModule } from './modules/purchase/purchase-management.module';
+import { DocumentManagementModule } from './modules/documents/document-management.module';
 
 @Module({
   imports: [
@@ -64,6 +67,9 @@ import { PersonalizationModule } from './modules/personalization/personalization
     VoiceModule,
     ImageSearchModule,
     PersonalizationModule,
+    StoreOperationsModule,
+    PurchaseManagementModule,
+    DocumentManagementModule,
     AuthModule,
     UsersModule,
     ReferralsModule,

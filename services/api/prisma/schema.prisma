@@ -62,6 +62,7 @@ model Store {
   products     Product[]
   orders       Order[]
   inventories  Inventory[]
+  settings     StoreSettings?
 
   @@map("stores")
 }
@@ -828,6 +829,202 @@ model PersonalizationRule {
 
   @@map("personalization_rules")
 }
+
+model StoreSettings {
+  id                   String   @id @default(uuid())
+  storeId              String   @unique
+  store                Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  isOpen               Boolean  @default(true)
+  businessHours        Json     // { open: "07:00", close: "22:00" }
+  holidaySchedule      Json?    // Array of holiday objects
+  deliveryRadiusKm     Float    @default(5.0)
+  minOrderValue        Float    @default(149.0)
+  maxDeliveryDistanceKm Float   @default(10.0)
+  storeCapacityPerHour Int      @default(60)
+  orderCutoffTime      String   @default("21:30")
+  isMaintenanceMode    Boolean  @default(false)
+  maintenanceMessage   String?
+  updatedAt            DateTime @updatedAt
+
+  @@map("store_settings")
+}
+
+model BatchManagement {
+  id               String   @id @default(uuid())
+  storeId          String
+  variantId        String
+  batchNumber      String
+  shelfLocation    String   @default("A1-S2")
+  manufacturedAt   DateTime?
+  expiresAt        DateTime
+  quantity         Int      @default(100)
+  damagedQuantity  Int      @default(0)
+  reorderLevel     Int      @default(20)
+  costPrice        Float    @default(40.0)
+  sellingPrice     Float    @default(56.0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@index([storeId])
+  @@index([variantId])
+  @@index([expiresAt])
+  @@map("batch_managements")
+}
+
+model InventoryAudit {
+  id          String   @id @default(uuid())
+  storeId     String
+  auditedBy   String
+  auditDate   DateTime @default(now())
+  findings    Json     // Array of discrepancies found
+  status      String   @default("COMPLETED") // PENDING, COMPLETED, DISCREPANCY
+  notes       String?
+
+  @@index([storeId])
+  @@map("inventory_audits")
+}
+
+model Supplier {
+  id            String          @id @default(uuid())
+  name          String
+  code          String          @unique
+  contactPerson String
+  phone         String
+  email         String?
+  address       String
+  gstin         String?
+  paymentTerms  String          @default("NET_30")
+  rating        Float           @default(4.8)
+  isActive      Boolean         @default(true)
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  purchaseOrders PurchaseOrder[]
+
+  @@map("suppliers")
+}
+
+model PurchaseOrder {
+  id                 String             @id @default(uuid())
+  poNumber           String             @unique
+  supplierId         String
+  supplier           Supplier           @relation(fields: [supplierId], references: [id])
+  status             String             @default("APPROVED") // DRAFT, SUBMITTED, APPROVED, RECEIVED, CANCELLED
+  totalAmount        Float
+  items              Json               // Array of PO item objects
+  expectedDeliveryAt DateTime
+  receivedAt         DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  goodsReceiptNotes  GoodsReceiptNote[]
+
+  @@index([supplierId])
+  @@map("purchase_orders")
+}
+
+model GoodsReceiptNote {
+  id              String        @id @default(uuid())
+  grnNumber       String        @unique
+  purchaseOrderId String
+  purchaseOrder   PurchaseOrder @relation(fields: [purchaseOrderId], references: [id])
+  receivedBy      String
+  items           Json          // Verified items received
+  invoiceNumber   String?
+  invoiceUrl      String?
+  receivedAt      DateTime      @default(now())
+
+  @@map("goods_receipt_notes")
+}
+
+model VendorPayment {
+  id              String   @id @default(uuid())
+  supplierId      String
+  amount          Float
+  paymentMethod   String   @default("BANK_TRANSFER") // BANK_TRANSFER, CHEQUE, UPI
+  referenceNumber String   @unique
+  paidAt          DateTime @default(now())
+  status          String   @default("PAID") // PENDING, PAID, FAILED
+
+  @@index([supplierId])
+  @@map("vendor_payments")
+}
+
+model FinancialLedger {
+  id          String   @id @default(uuid())
+  storeId     String
+  type        String   // REVENUE, EXPENSE, CASH_REGISTER, WALLET, REFUND, VENDOR_PAYMENT, DELIVERY_PAYMENT
+  amount      Float
+  category    String   // SALES, INVENTORY, SALARY, RENT, UTILITIES, MARKETING
+  referenceId String?
+  notes       String?
+  entryDate   DateTime @default(now())
+
+  @@index([storeId])
+  @@index([type])
+  @@map("financial_ledgers")
+}
+
+model DailyClosing {
+  id           String   @id @default(uuid())
+  storeId      String
+  closingDate  DateTime @default(now())
+  totalSales   Float
+  cashCollected Float
+  onlineSales  Float
+  expenses     Float
+  netProfit    Float
+  closedBy     String
+
+  @@index([storeId])
+  @@map("daily_closings")
+}
+
+model CustomerManagementNote {
+  id        String   @id @default(uuid())
+  userId    String
+  adminId   String
+  note      String
+  tags      String[] @default(["LOYAL"]) // VIP, BLOCKED, LOYAL, HIGH_RETURNS
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@map("customer_management_notes")
+}
+
+model DeliveryPartnerProfile {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  isOnline       Boolean  @default(true)
+  zone           String   @default("CENTRAL_ZONE")
+  totalDeliveries Int     @default(142)
+  rating         Float    @default(4.9)
+  weeklyEarnings Float    @default(4850.0)
+  onLeave        Boolean  @default(false)
+  updatedAt      DateTime @updatedAt
+
+  @@map("delivery_partner_profiles")
+}
+
+model BusinessDocument {
+  id         String   @id @default(uuid())
+  title      String
+  type       String   // INVOICE, PURCHASE_BILL, GST_DOC, VENDOR_DOC, DELIVERY_PROOF, REFUND_RECEIPT
+  fileUrl    String
+  fileSize   String   @default("250 KB")
+  uploadedBy String   @default("STORE_OWNER")
+  createdAt  DateTime @default(now())
+
+  @@map("business_documents")
+}
+
+model BusinessInsightLog {
+  id        String   @id @default(uuid())
+  type      String   // LOW_STOCK_ALERT, BEST_SELLER, INVENTORY_FORECAST, PROFIT_SUGGESTION
+  content   Json
+  createdAt DateTime @default(now())
+
+  @@map("business_insight_logs")
+}
+
 
 
 

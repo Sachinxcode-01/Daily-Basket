@@ -61,4 +61,22 @@ export class FinanceService {
       closingStatus: 'BALANCED_AND_LOCKED',
     };
   }
+
+  async getProfitAndLossStatement() {
+    return {
+      period: 'JULY_2026',
+      totalRevenue: 482900.0,
+      costOfGoodsSold: 312000.0,
+      grossProfit: 170900.0,
+      operatingExpenses: {
+        rentAndUtilities: 35000.0,
+        staffSalaries: 42000.0,
+        deliveryPartnerPayouts: 38400.0,
+        marketingAndDiscounts: 24100.0,
+      },
+      totalExpenses: 139500.0,
+      netOperatingProfit: 31400.0,
+      profitMarginPercent: 6.5,
+    };
+  }
 }

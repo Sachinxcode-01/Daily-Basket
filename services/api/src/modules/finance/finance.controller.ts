@@ -36,4 +36,10 @@ export class FinanceController {
   async processDailyClosing() {
     return this.financeService.processDailyClosing();
   }
+
+  @Get('pnl')
+  @ApiOperation({ summary: 'Get Profit & Loss (P&L) financial statement' })
+  async getProfitAndLossStatement() {
+    return this.financeService.getProfitAndLossStatement();
+  }
 }
