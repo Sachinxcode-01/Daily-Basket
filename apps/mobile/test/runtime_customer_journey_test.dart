@@ -59,8 +59,23 @@ void main() {
 
   group('Runtime Customer Journey Verification Suite', () {
     testWidgets('1. App Launch & Splash Screen Test', (WidgetTester tester) async {
-      await tester.pumpWidget(const MaterialApp(home: SplashScreen()));
-      await tester.pump(const Duration(seconds: 3));
+      // Wrap with providers so SplashScreen → WelcomeScreen navigation succeeds
+      await tester.pumpWidget(wrapWithProviders(const SplashScreen()));
+      // Let splash animations play (1.5s)
+      await tester.pump(const Duration(milliseconds: 1500));
+      expect(find.byType(SplashScreen), findsOneWidget);
+      // Advance past the 3s navigation timer
+      await tester.pump(const Duration(milliseconds: 1600));
+      // Let the navigator push complete
+      await tester.pump(const Duration(milliseconds: 400));
+      // Drain WelcomeScreen sequence timers (900ms subtitle delay)
+      await tester.pump(const Duration(milliseconds: 900));
+      // Drain TypewriterText character timers (23 chars × 55ms = ~1265ms)
+      await tester.pump(const Duration(milliseconds: 1300));
+      // Drain buttons delay + cursor blink timer
+      await tester.pump(const Duration(milliseconds: 1000));
+      // Final settle — let all animations complete
+      await tester.pumpAndSettle(const Duration(seconds: 2));
     });
 
     testWidgets('2. Customer Home Screen Test', (WidgetTester tester) async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_motion.dart';
 import 'notification_permission_screen.dart';
 
 /// Location Permission Screen — Google Stitch Design System
@@ -66,12 +67,7 @@ class _LocationPermissionScreenState extends State<LocationPermissionScreen>
 
   void _navigateNext() {
     Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const NotificationPermissionScreen(),
-        transitionsBuilder: (_, anim, __, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+      AppPageTransitions.sharedAxisX(const NotificationPermissionScreen()),
     );
   }
 

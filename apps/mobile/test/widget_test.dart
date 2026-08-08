@@ -34,6 +34,14 @@ void main() {
       ),
     );
     expect(find.byType(DailyBasketApp), findsOneWidget);
-    await tester.pump(const Duration(seconds: 3));
+    // Pump splash animations (1.5s), then navigation (1.6s), then WelcomeScreen
+    // sequence timers (900ms + 1300ms typewriter + 1000ms buttons + settle)
+    await tester.pump(const Duration(milliseconds: 1500));
+    await tester.pump(const Duration(milliseconds: 1600));
+    await tester.pump(const Duration(milliseconds: 400));
+    await tester.pump(const Duration(milliseconds: 900));
+    await tester.pump(const Duration(milliseconds: 1300));
+    await tester.pump(const Duration(milliseconds: 1000));
+    await tester.pumpAndSettle(const Duration(seconds: 2));
   });
 }

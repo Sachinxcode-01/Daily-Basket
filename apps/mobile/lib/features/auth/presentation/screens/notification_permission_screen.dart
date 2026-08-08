@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_motion.dart';
 import 'ready_to_shop_screen.dart';
 
 /// Notification Permission Screen — Google Stitch Design System
@@ -68,12 +69,7 @@ class _NotificationPermissionScreenState
 
   void _navigate() {
     Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const ReadyToShopScreen(),
-        transitionsBuilder: (_, anim, __, child) =>
-            FadeTransition(opacity: anim, child: child),
-        transitionDuration: const Duration(milliseconds: 300),
-      ),
+      AppPageTransitions.sharedAxisX(const ReadyToShopScreen()),
     );
   }
 

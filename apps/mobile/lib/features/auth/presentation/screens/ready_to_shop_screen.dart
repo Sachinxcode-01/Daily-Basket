@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_motion.dart';
 import '../../../home/presentation/screens/home_screen.dart' show CustomerHomeScreen;
 
 /// Ready to Shop Screen — Google Stitch Design System
@@ -98,9 +99,7 @@ class _ReadyToShopScreenState extends State<ReadyToShopScreen>
 
   void _startShopping() {
     Navigator.of(context).pushReplacement(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => const CustomerHomeScreen(),
-      ),
+      AppPageTransitions.fadeThrough(const CustomerHomeScreen()),
     );
   }
 
