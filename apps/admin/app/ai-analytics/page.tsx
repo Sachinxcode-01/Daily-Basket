@@ -22,7 +22,7 @@ interface PromptTemplate {
 }
 
 export default function AiAnalyticsPage() {
-  const [activeTab, setActiveTab] = useState<'telemetry' | 'prompts' | 'trending' | 'security'>('telemetry');
+  const [activeTab, setActiveTab] = useState<'telemetry' | 'prompts' | 'trending' | 'security' | 'voice'>('telemetry');
 
   const [metrics, setMetrics] = useState<AiMetrics>({
     totalRequests: 1420,
@@ -123,10 +123,10 @@ export default function AiAnalyticsPage() {
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">
-          Enterprise AI Control Center & Shopping Intelligence
+          Enterprise AI Control Center & Conversational Voice Shopping
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Manage Gemini 2.5 & OpenRouter models, prompt templates, search analytics, and security moderation rules.
+          Manage Gemini 2.5 & OpenRouter models, prompt templates, Voice AI telemetry, STT/TTS latency, and security moderation rules.
         </p>
       </div>
 
@@ -141,6 +141,16 @@ export default function AiAnalyticsPage() {
           }`}
         >
           LLM Telemetry & Failover
+        </button>
+        <button
+          onClick={() => setActiveTab('voice')}
+          className={`pb-4 text-sm font-semibold border-b-2 transition-colors ${
+            activeTab === 'voice'
+              ? 'border-emerald-600 text-emerald-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          🎙️ Voice AI Analytics
         </button>
         <button
           onClick={() => setActiveTab('prompts')}
@@ -177,7 +187,6 @@ export default function AiAnalyticsPage() {
       {/* Tab 1: Telemetry & Failover */}
       {activeTab === 'telemetry' && (
         <div className="space-y-8">
-          {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -219,39 +228,71 @@ export default function AiAnalyticsPage() {
               <span className="text-xs text-gray-500">Gemini & OpenRouter tokens</span>
             </div>
           </div>
+        </div>
+      )}
 
-          {/* Provider Health */}
+      {/* Tab 2: Voice AI Analytics */}
+      {activeTab === 'voice' && (
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Voice Searches
+              </span>
+              <div className="text-3xl font-extrabold text-gray-900 mt-2">342</div>
+              <span className="text-xs text-emerald-600 font-medium">+28% voice adoption</span>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                STT Recognition Latency
+              </span>
+              <div className="text-3xl font-extrabold text-emerald-600 mt-2">180 ms</div>
+              <span className="text-xs text-gray-500">&lt; 1s target achieved</span>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                TTS Playback Start
+              </span>
+              <div className="text-3xl font-extrabold text-emerald-600 mt-2">45 ms</div>
+              <span className="text-xs text-gray-500">Redis cached audio</span>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Recognition Accuracy
+              </span>
+              <div className="text-3xl font-extrabold text-emerald-600 mt-2">98.4%</div>
+              <span className="text-xs text-gray-500">Multi-language accuracy</span>
+            </div>
+          </div>
+
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-            <h2 className="text-lg font-bold text-gray-900">
-              AI Provider Health & Automatic Failover Stack
-            </h2>
+            <h2 className="text-lg font-bold text-gray-900">Spoken Language Distribution</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {Object.entries(metrics.providerHealth).map(([provider, healthy]) => (
-                <div
-                  key={provider}
-                  className="flex items-center justify-between p-4 rounded-lg bg-gray-50 border border-gray-200"
-                >
-                  <div>
-                    <div className="font-bold text-sm text-gray-800">{provider}</div>
-                    <div className="text-xs text-gray-500">
-                      {provider === 'GEMINI' ? 'Priority #1 (Primary)' : 'Priority #2 (Failover)'}
-                    </div>
-                  </div>
-                  <span
-                    className={`px-2.5 py-1 text-xs font-bold rounded-full ${
-                      healthy ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
-                    }`}
-                  >
-                    {healthy ? 'HEALTHY' : 'DEGRADED'}
-                  </span>
-                </div>
-              ))}
+              <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                <div className="font-bold text-sm text-gray-800">English (India)</div>
+                <div className="text-2xl font-extrabold text-emerald-600 mt-1">42%</div>
+              </div>
+              <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                <div className="font-bold text-sm text-gray-800">Hindi (हिंदी)</div>
+                <div className="text-2xl font-extrabold text-emerald-600 mt-1">31%</div>
+              </div>
+              <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                <div className="font-bold text-sm text-gray-800">Kannada (ಕನ್ನಡ)</div>
+                <div className="text-2xl font-extrabold text-emerald-600 mt-1">15%</div>
+              </div>
+              <div className="p-4 rounded-lg bg-gray-50 border border-gray-200">
+                <div className="font-bold text-sm text-gray-800">Tamil & Others</div>
+                <div className="text-2xl font-extrabold text-emerald-600 mt-1">12%</div>
+              </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Tab 2: Prompt Manager */}
+      {/* Tab 3: Prompt Manager */}
       {activeTab === 'prompts' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3">
@@ -304,7 +345,7 @@ export default function AiAnalyticsPage() {
         </div>
       )}
 
-      {/* Tab 3: Trending Searches */}
+      {/* Tab 4: Trending Searches */}
       {activeTab === 'trending' && (
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
           <h2 className="text-lg font-bold text-gray-900">Featured Trending Search Keywords</h2>
@@ -334,7 +375,7 @@ export default function AiAnalyticsPage() {
         </div>
       )}
 
-      {/* Tab 4: Security Moderation */}
+      {/* Tab 5: Security Moderation */}
       {activeTab === 'security' && (
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
           <h2 className="text-lg font-bold text-gray-900">Prompt Injection & Content Moderation Shield</h2>

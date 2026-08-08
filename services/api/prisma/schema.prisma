@@ -111,6 +111,9 @@ model User {
   securityAuditLogs       SecurityAuditLog[]
   passwordHistories       PasswordHistory[]
   preferenceProfile       UserPreferenceProfile?
+  voiceSessions           VoiceSession[]
+  voiceLogs               VoiceCommandLog[]
+  voiceSettings           VoiceSettings?
 
   @@map("users")
 }
@@ -650,6 +653,73 @@ model UserPreferenceProfile {
 
   @@map("user_preference_profiles")
 }
+
+model VoiceSession {
+  id           String            @id @default(uuid())
+  userId       String
+  user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  locale       String            @default("en_IN") // en_IN, hi_IN, kn_IN, ta_IN, te_IN, ml_IN, mr_IN
+  currentRoute String            @default("/home")
+  status       String            @default("ACTIVE") // ACTIVE, COMPLETED, EXPIRED
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  logs         VoiceCommandLog[]
+
+  @@map("voice_sessions")
+}
+
+model VoiceCommandLog {
+  id               String        @id @default(uuid())
+  sessionId        String
+  session          VoiceSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  userId           String
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transcription    String
+  detectedLanguage String        @default("en_IN")
+  intent           String?       // SEARCH, ADD_TO_CART, NAVIGATE, TRACK_ORDER, SUPPORT, RECIPE
+  actionTaken      String?
+  audioUrl         String?
+  latencyMs        Int           @default(0)
+  isSuccess        Boolean       @default(true)
+  createdAt        DateTime      @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("voice_command_logs")
+}
+
+model VoiceSettings {
+  id                   String   @id @default(uuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  voiceEnabled         Boolean  @default(true)
+  preferredLanguage    String   @default("en_IN")
+  preferredVoiceGender String   @default("FEMALE") // FEMALE, MALE
+  speechSpeed          Float    @default(1.0) // 0.75 to 1.5
+  autoSpeak            Boolean  @default(true)
+  privacyMode          Boolean  @default(false)
+  updatedAt            DateTime @updatedAt
+
+  @@map("voice_settings")
+}
+
+model VoiceAnalyticsMetric {
+  id               String   @id @default(uuid())
+  language         String   @default("en_IN")
+  intent           String?
+  sttLatencyMs     Int      @default(0)
+  aiLatencyMs      Int      @default(0)
+  ttsLatencyMs     Int      @default(0)
+  isSuccess        Boolean  @default(true)
+  failureReason    String?
+  rating           Int?     // 1-5
+  createdAt        DateTime @default(now())
+
+  @@index([language])
+  @@index([createdAt])
+  @@map("voice_analytics_metrics")
+}
+
 
 
 

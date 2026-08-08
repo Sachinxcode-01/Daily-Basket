@@ -42,6 +42,7 @@ import { MarketingModule } from './modules/marketing/marketing.module';
 import { EventsModule } from './modules/events/events.module';
 import { QueueModule } from './modules/queue/queue.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
+import { VoiceModule } from './modules/voice/voice.module';
 
 @Module({
   imports: [
@@ -58,6 +59,7 @@ import { FavoritesModule } from './modules/favorites/favorites.module';
     EventsModule,
     QueueModule,
     FavoritesModule,
+    VoiceModule,
     AuthModule,
     UsersModule,
     ReferralsModule,
