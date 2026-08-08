@@ -227,121 +227,125 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 const SizedBox(height: 12),
 
                 // 2. Interactive Payment Method Options List
-                ..._methods.map((m) {
-                  final methodId = m['id'] as String;
-                  final isSelected = selectedMethod == methodId;
+                RadioGroup<String>(
+                  groupValue: selectedMethod,
+                  onChanged: (val) {
+                    if (val != null) {
+                      checkoutProvider.setPaymentMethod(val);
+                    }
+                  },
+                  child: Column(
+                    children: _methods.map((m) {
+                      final methodId = m['id'] as String;
+                      final isSelected = selectedMethod == methodId;
 
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: InkWell(
-                      onTap: () {
-                        checkoutProvider.setPaymentMethod(methodId);
-                      },
-                      borderRadius: BorderRadius.circular(16),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.05)
-                              : Colors.white,
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: InkWell(
+                          onTap: () {
+                            checkoutProvider.setPaymentMethod(methodId);
+                          },
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: isSelected ? AppColors.primary : const Color(0xFFE2E8F0),
-                            width: isSelected ? 2.0 : 1.0,
-                          ),
-                          boxShadow: [
-                            BoxShadow(
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
                               color: isSelected
-                                  ? AppColors.primary.withValues(alpha: 0.08)
-                                  : Colors.black.withValues(alpha: 0.02),
-                              blurRadius: isSelected ? 8 : 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? AppColors.primary
-                                    : const Color(0xFFF1F5F9),
-                                borderRadius: BorderRadius.circular(12),
+                                  ? AppColors.primary.withValues(alpha: 0.05)
+                                  : Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isSelected ? AppColors.primary : const Color(0xFFE2E8F0),
+                                width: isSelected ? 2.0 : 1.0,
                               ),
-                              child: Icon(
-                                m['icon'] as IconData,
-                                color: isSelected ? Colors.white : AppColors.onSurfaceVariant,
-                                size: 22,
-                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: isSelected
+                                      ? AppColors.primary.withValues(alpha: 0.08)
+                                      : Colors.black.withValues(alpha: 0.02),
+                                  blurRadius: isSelected ? 8 : 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color: isSelected
+                                        ? AppColors.primary
+                                        : const Color(0xFFF1F5F9),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Icon(
+                                    m['icon'] as IconData,
+                                    color: isSelected ? Colors.white : AppColors.onSurfaceVariant,
+                                    size: 22,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        m['title'] as String,
-                                        style: GoogleFonts.outfit(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.bold,
-                                          color: isSelected
-                                              ? AppColors.primary
-                                              : AppColors.onSurface,
-                                        ),
-                                      ),
-                                      if (m['badge'] != null) ...[
-                                        const SizedBox(width: 8),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                          decoration: BoxDecoration(
-                                            color: isSelected
-                                                ? AppColors.primary
-                                                : const Color(0xFFDCFCE7),
-                                            borderRadius: BorderRadius.circular(6),
-                                          ),
-                                          child: Text(
-                                            m['badge'] as String,
-                                            style: GoogleFonts.inter(
-                                              fontSize: 9,
+                                      Row(
+                                        children: [
+                                          Text(
+                                            m['title'] as String,
+                                            style: GoogleFonts.outfit(
+                                              fontSize: 15,
                                               fontWeight: FontWeight.bold,
-                                              color: isSelected ? Colors.white : AppColors.primary,
+                                              color: isSelected
+                                                  ? AppColors.primary
+                                                  : AppColors.onSurface,
                                             ),
                                           ),
+                                          if (m['badge'] != null) ...[
+                                            const SizedBox(width: 8),
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: isSelected
+                                                    ? AppColors.primary
+                                                    : const Color(0xFFDCFCE7),
+                                                borderRadius: BorderRadius.circular(6),
+                                              ),
+                                              child: Text(
+                                                m['badge'] as String,
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 9,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: isSelected ? Colors.white : AppColors.primary,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        m['subtitle'] as String,
+                                        style: GoogleFonts.inter(
+                                          fontSize: 12,
+                                          color: AppColors.onSurfaceVariant,
                                         ),
-                                      ],
+                                      ),
                                     ],
                                   ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    m['subtitle'] as String,
-                                    style: GoogleFonts.inter(
-                                      fontSize: 12,
-                                      color: AppColors.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                                ),
+                                Radio<String>(
+                                  value: methodId,
+                                  activeColor: AppColors.primary,
+                                ),
+                              ],
                             ),
-                            Radio<String>(
-                              value: methodId,
-                              groupValue: selectedMethod,
-                              activeColor: AppColors.primary,
-                              onChanged: (val) {
-                                if (val != null) {
-                                  checkoutProvider.setPaymentMethod(val);
-                                }
-                              },
-                            ),
-                          ],
+                          ),
                         ),
-                      ),
-                    ),
-                  );
-                }),
+                      );
+                    }).toList(),
+                  ),
+                ),
 
                 const SizedBox(height: 16),
               ],

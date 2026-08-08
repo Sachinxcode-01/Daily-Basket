@@ -8,7 +8,6 @@ import 'package:daily_basket_mobile/core/providers/user_provider.dart';
 import 'package:daily_basket_mobile/core/providers/app_theme_provider.dart';
 import 'package:daily_basket_mobile/core/providers/language_provider.dart';
 import 'package:daily_basket_mobile/core/providers/notification_provider.dart';
-import 'package:daily_basket_mobile/core/providers/cart_provider.dart';
 import 'package:daily_basket_mobile/features/profile/providers/address_provider.dart';
 import 'package:daily_basket_mobile/features/auth/presentation/screens/splash_screen.dart';
 import 'package:daily_basket_mobile/features/home/presentation/screens/home_screen.dart';

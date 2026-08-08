@@ -57,10 +57,10 @@ class _VoiceSettingsScreenState extends State<VoiceSettingsScreen> {
                   child: const Icon(Icons.record_voice_over, color: Color(0xFF059669), size: 24),
                 ),
                 const SizedBox(width: 14),
-                Expanded(
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text('Enable Voice Assistant', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                       Text('Search, shop, and navigate via speech', style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
                     ],
@@ -68,7 +68,7 @@ class _VoiceSettingsScreenState extends State<VoiceSettingsScreen> {
                 ),
                 Switch(
                   value: _voiceEnabled,
-                  activeColor: const Color(0xFF059669),
+                  activeTrackColor: const Color(0xFF059669),
                   onChanged: (val) => setState(() => _voiceEnabled = val),
                 ),
               ],
@@ -144,7 +144,7 @@ class _VoiceSettingsScreenState extends State<VoiceSettingsScreen> {
                   title: const Text('Auto-Speak Spoken Responses', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                   subtitle: const Text('Read AI responses out loud automatically', style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
                   value: _autoSpeak,
-                  activeColor: const Color(0xFF059669),
+                  activeTrackColor: const Color(0xFF059669),
                   onChanged: (val) => setState(() => _autoSpeak = val),
                 ),
               ],
@@ -168,7 +168,7 @@ class _VoiceSettingsScreenState extends State<VoiceSettingsScreen> {
                   title: const Text('Privacy Mode', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                   subtitle: const Text('Do not store voice audio command logs', style: TextStyle(fontSize: 12, color: Color(0xFF64748B))),
                   value: _privacyMode,
-                  activeColor: const Color(0xFF059669),
+                  activeTrackColor: const Color(0xFF059669),
                   onChanged: (val) => setState(() => _privacyMode = val),
                 ),
                 const Divider(height: 1, indent: 16, endIndent: 16),

@@ -5,7 +5,6 @@ import 'core/providers/user_provider.dart';
 import 'core/providers/app_theme_provider.dart';
 import 'core/providers/language_provider.dart';
 import 'core/providers/notification_provider.dart';
-import 'core/providers/cart_provider.dart';
 import 'features/referral/providers/coupon_provider.dart';
 
 // Authentication Screens

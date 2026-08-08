@@ -107,11 +107,11 @@ class ShoppingInsightsScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
+                  child: const LinearProgressIndicator(
                     value: 3450 / 5000,
                     minHeight: 10,
-                    backgroundColor: const Color(0xFFE2E8F0),
-                    color: const Color(0xFF059669),
+                    backgroundColor: Color(0xFFE2E8F0),
+                    color: Color(0xFF059669),
                   ),
                 ),
                 const SizedBox(height: 8),
