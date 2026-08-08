@@ -56,13 +56,6 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     'Under ₹50',
   ];
 
-  final List<String> _sortOptions = [
-    'Relevance',
-    'Price: Low to High',
-    'Price: High to Low',
-    'Best Discount',
-  ];
-
   final List<Map<String, dynamic>> _allProducts = [
     {
       'id': 's1',

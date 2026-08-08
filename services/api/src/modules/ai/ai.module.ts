@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AiController } from './ai.controller';
+import { AiAdminController } from './ai-admin.controller';
 import { AiService } from './ai.service';
 import { PrismaService } from '../../database/prisma.service';
 
@@ -14,6 +15,12 @@ import { LocalProvider } from './providers/local.provider';
 import { ProviderManager } from './managers/provider.manager';
 import { FallbackManager } from './managers/fallback.manager';
 import { HealthChecker } from './managers/health.checker';
+import { PromptManager } from './managers/prompt.manager';
+
+// Services
+import { RecommendationService } from './services/recommendation.service';
+import { ImageAnalysisService } from './services/image-analysis.service';
+import { ConversationService } from './services/conversation.service';
 
 // Tools & Security
 import { AiToolsRegistry } from './tools/ai-tools.registry';
@@ -21,7 +28,7 @@ import { AiSecurityService } from './security/ai-security.service';
 
 @Module({
   imports: [ConfigModule],
-  controllers: [AiController],
+  controllers: [AiController, AiAdminController],
   providers: [
     AiService,
     PrismaService,
@@ -32,6 +39,10 @@ import { AiSecurityService } from './security/ai-security.service';
     ProviderManager,
     FallbackManager,
     HealthChecker,
+    PromptManager,
+    RecommendationService,
+    ImageAnalysisService,
+    ConversationService,
     AiToolsRegistry,
     AiSecurityService,
   ],
@@ -40,6 +51,10 @@ import { AiSecurityService } from './security/ai-security.service';
     ProviderManager,
     FallbackManager,
     HealthChecker,
+    PromptManager,
+    RecommendationService,
+    ImageAnalysisService,
+    ConversationService,
     AiToolsRegistry,
     AiSecurityService,
   ],

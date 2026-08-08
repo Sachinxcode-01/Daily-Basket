@@ -110,6 +110,7 @@ model User {
   otpVerifications        OtpVerification[]
   securityAuditLogs       SecurityAuditLog[]
   passwordHistories       PasswordHistory[]
+  preferenceProfile       UserPreferenceProfile?
 
   @@map("users")
 }
@@ -175,6 +176,7 @@ model Product {
   variants        ProductVariant[]
   reviews         Review[]
   favorites       Favorite[]
+  aiInsight       ProductAiInsight?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -561,6 +563,94 @@ model Favorite {
   @@index([productId])
   @@map("favorites")
 }
+
+model PromptTemplate {
+  id          String   @id @default(uuid())
+  key         String   @unique // SEARCH_INTENT, SHOPPING_ASSISTANT, RECOMMENDATIONS, IMAGE_ANALYSIS, RECIPE_GENERATION, PRODUCT_COMPARISON
+  name        String
+  template    String
+  description String?
+  version     Int      @default(1)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("prompt_templates")
+}
+
+model SearchAnalytics {
+  id               String   @id @default(uuid())
+  query            String
+  intent           String?
+  resultsCount     Int      @default(0)
+  userId           String?
+  clickedProductId String?
+  latencyMs        Int      @default(0)
+  isSuccess        Boolean  @default(true)
+  createdAt        DateTime @default(now())
+
+  @@index([query])
+  @@index([createdAt])
+  @@map("search_analytics")
+}
+
+model TrendingSearch {
+  id          String   @id @default(uuid())
+  keyword     String   @unique
+  category    String?
+  searchCount Int      @default(1)
+  isFeatured  Boolean  @default(false)
+  sortOrder   Int      @default(0)
+  isActive    Boolean  @default(true)
+  updatedAt   DateTime @updatedAt
+
+  @@map("trending_searches")
+}
+
+model BlockedQuery {
+  id        String   @id @default(uuid())
+  pattern   String   @unique
+  reason    String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("blocked_queries")
+}
+
+model ProductAiInsight {
+  id                 String   @id @default(uuid())
+  productId          String   @unique
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  benefits           String[] @default([])
+  usage              String?
+  storage            String?
+  healthyChoice      Boolean  @default(false)
+  healthScore        Float    @default(8.5)
+  bestFor            String[] @default([])
+  recipeSuggestions  Json?
+  servingSuggestions String?
+  suitableAge        String?  // e.g. "6+ months", "All ages", "Kids 2-12"
+  nutritionalSummary Json?
+  comparisonPoints   Json?
+  updatedAt          DateTime @updatedAt
+
+  @@map("product_ai_insights")
+}
+
+model UserPreferenceProfile {
+  id                 String   @id @default(uuid())
+  userId             String   @unique
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  favoriteCategories String[] @default([])
+  favoriteBrands     String[] @default([])
+  dietaryPreferences String[] @default([]) // Organic, High-Protein, Sugar-Free, Vegan, Gluten-Free
+  budgetTier         String   @default("BALANCED") // BUDGET, BALANCED, PREMIUM
+  shoppingFrequency  String   @default("WEEKLY") // DAILY, WEEKLY, BIWEEKLY
+  updatedAt          DateTime @updatedAt
+
+  @@map("user_preference_profiles")
+}
+
 
 
 

@@ -1,10 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SearchService } from './search.service';
 import { PrismaService } from '../../database/prisma.service';
+import { RedisService } from '../redis/redis.service';
+import { PromptManager } from '../ai/managers/prompt.manager';
+import { ProviderManager } from '../ai/managers/provider.manager';
 
 describe('SearchService', () => {
   let service: SearchService;
-  let prisma: PrismaService;
 
   const mockPrismaService = {
     product: {
@@ -30,6 +32,29 @@ describe('SearchService', () => {
     productVariant: {
       findFirst: jest.fn().mockResolvedValue(null),
     },
+    category: {
+      findMany: jest.fn().mockResolvedValue([]),
+    },
+    searchAnalytics: {
+      create: jest.fn().mockResolvedValue({ id: 'sa_1' }),
+      count: jest.fn().mockResolvedValue(100),
+      aggregate: jest.fn().mockResolvedValue({ _avg: { latencyMs: 18 } }),
+      groupBy: jest.fn().mockResolvedValue([]),
+    },
+  };
+
+  const mockRedisService = {
+    get: jest.fn().mockResolvedValue(null),
+    set: jest.fn().mockResolvedValue('OK'),
+  };
+
+  const mockPromptManager = {
+    getTemplate: jest.fn().mockResolvedValue('Search prompt'),
+    renderPrompt: jest.fn().mockReturnValue('Search prompt rendered'),
+  };
+
+  const mockProviderManager = {
+    generateResponse: jest.fn().mockResolvedValue({ content: '{}' }),
   };
 
   beforeEach(async () => {
@@ -37,11 +62,13 @@ describe('SearchService', () => {
       providers: [
         SearchService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: RedisService, useValue: mockRedisService },
+        { provide: PromptManager, useValue: mockPromptManager },
+        { provide: ProviderManager, useValue: mockProviderManager },
       ],
     }).compile();
 
     service = module.get<SearchService>(SearchService);
-    prisma = module.get<PrismaService>(PrismaService);
   });
 
   it('should be defined', () => {

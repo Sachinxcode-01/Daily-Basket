@@ -1159,32 +1159,6 @@ color: Color(0xFF6E7A6C),
     );
   }
 
-  Widget _missingEssentialPill(String name, String price, VoidCallback onAdd) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFBECAB9)),
-      ),
-      child: Row(
-        children: [
-          Text('$name ($price)', style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E))),
-          const SizedBox(width: 6),
-          GestureDetector(
-            onTap: onAdd,
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: const BoxDecoration(color: Color(0xFF006B23), shape: BoxShape.circle),
-              child: const Icon(Icons.add, size: 14, color: Colors.white),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildBillRow(String label, String value, {bool isDiscount = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
