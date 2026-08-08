@@ -44,6 +44,7 @@ import { QueueModule } from './modules/queue/queue.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { VoiceModule } from './modules/voice/voice.module';
 import { ImageSearchModule } from './modules/image-search/image-search.module';
+import { PersonalizationModule } from './modules/personalization/personalization.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { ImageSearchModule } from './modules/image-search/image-search.module';
     FavoritesModule,
     VoiceModule,
     ImageSearchModule,
+    PersonalizationModule,
     AuthModule,
     UsersModule,
     ReferralsModule,

@@ -22,7 +22,7 @@ interface PromptTemplate {
 }
 
 export default function AiAnalyticsPage() {
-  const [activeTab, setActiveTab] = useState<'telemetry' | 'prompts' | 'trending' | 'security' | 'voice' | 'visual'>('telemetry');
+  const [activeTab, setActiveTab] = useState<'telemetry' | 'personalization' | 'visual' | 'voice' | 'prompts' | 'trending' | 'security'>('telemetry');
 
   const [metrics, setMetrics] = useState<AiMetrics>({
     totalRequests: 1420,
@@ -61,6 +61,10 @@ export default function AiAnalyticsPage() {
   const [selectedPromptKey, setSelectedPromptKey] = useState<string>('SEARCH_INTENT');
   const [editPromptText, setEditPromptText] = useState<string>('');
   const [saveSuccessMsg, setSaveSuccessMsg] = useState<string>('');
+
+  const [collaborativeWeight, setCollaborativeWeight] = useState<number>(0.45);
+  const [contentWeight, setContentWeight] = useState<number>(0.35);
+  const [recencyWeight, setRecencyWeight] = useState<number>(0.2);
 
   const [trendingKeywords, setTrendingKeywords] = useState<string[]>([
     'Amul Milk 1L',
@@ -123,10 +127,10 @@ export default function AiAnalyticsPage() {
     <div className="p-8 max-w-7xl mx-auto space-y-8">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">
-          Enterprise AI Control Center & Visual AI Shopping Platform
+          Enterprise AI Control Center & Hyper-Personalization Engine
         </h1>
         <p className="text-sm text-gray-500 mt-1">
-          Manage Gemini Vision & OCR models, reference product images, voice telemetry, prompt templates, and security moderation rules.
+          Manage Personalization Weights, Gemini Vision & OCR models, voice telemetry, prompt templates, and security moderation rules.
         </p>
       </div>
 
@@ -141,6 +145,16 @@ export default function AiAnalyticsPage() {
           }`}
         >
           LLM Telemetry & Failover
+        </button>
+        <button
+          onClick={() => setActiveTab('personalization')}
+          className={`pb-4 text-sm font-semibold border-b-2 whitespace-nowrap transition-colors ${
+            activeTab === 'personalization'
+              ? 'border-emerald-600 text-emerald-600'
+              : 'border-transparent text-gray-500 hover:text-gray-700'
+          }`}
+        >
+          ⚡ Personalization Engine
         </button>
         <button
           onClick={() => setActiveTab('visual')}
@@ -181,16 +195,6 @@ export default function AiAnalyticsPage() {
           }`}
         >
           Trending Searches
-        </button>
-        <button
-          onClick={() => setActiveTab('security')}
-          className={`pb-4 text-sm font-semibold border-b-2 whitespace-nowrap transition-colors ${
-            activeTab === 'security'
-              ? 'border-emerald-600 text-emerald-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          Security Moderation
         </button>
       </div>
 
@@ -241,7 +245,101 @@ export default function AiAnalyticsPage() {
         </div>
       )}
 
-      {/* Tab 2: Visual AI & Training */}
+      {/* Tab 2: Personalization Engine */}
+      {activeTab === 'personalization' && (
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Recommendation CTR
+              </span>
+              <div className="text-3xl font-extrabold text-emerald-600 mt-2">14.8%</div>
+              <span className="text-xs text-emerald-600 font-medium">+4.2% engagement</span>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Rec. Conversion Rate
+              </span>
+              <div className="text-3xl font-extrabold text-emerald-600 mt-2">8.4%</div>
+              <span className="text-xs text-gray-500">Direct basket additions</span>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Repeat Purchase Rate
+              </span>
+              <div className="text-3xl font-extrabold text-gray-900 mt-2">68.2%</div>
+              <span className="text-xs text-gray-500">Predictive reorder adoption</span>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                Avg Basket Size
+              </span>
+              <div className="text-3xl font-extrabold text-gray-900 mt-2">₹620</div>
+              <span className="text-xs text-emerald-600 font-medium">+₹85 via recommendations</span>
+            </div>
+          </div>
+
+          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
+            <h2 className="text-lg font-bold text-gray-900">Recommendation Algorithm Weight Tuning</h2>
+            <p className="text-xs text-gray-500">Adjust mathematical model weights for personalizing customer recommendations.</p>
+
+            <div className="space-y-4 max-w-xl">
+              <div>
+                <div className="flex justify-between text-xs font-bold text-gray-700 mb-1">
+                  <span>Collaborative Filtering (Similar Shoppers)</span>
+                  <span>{(collaborativeWeight * 100).toFixed(0)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="0.8"
+                  step="0.05"
+                  value={collaborativeWeight}
+                  onChange={(e) => setCollaborativeWeight(parseFloat(e.target.value))}
+                  className="w-full accent-emerald-600"
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs font-bold text-gray-700 mb-1">
+                  <span>Content-Based Matching (User Preference Profile)</span>
+                  <span>{(contentWeight * 100).toFixed(0)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0.1"
+                  max="0.8"
+                  step="0.05"
+                  value={contentWeight}
+                  onChange={(e) => setContentWeight(parseFloat(e.target.value))}
+                  className="w-full accent-emerald-600"
+                />
+              </div>
+
+              <div>
+                <div className="flex justify-between text-xs font-bold text-gray-700 mb-1">
+                  <span>Order Recency & Depletion Interval</span>
+                  <span>{(recencyWeight * 100).toFixed(0)}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0.05"
+                  max="0.5"
+                  step="0.05"
+                  value={recencyWeight}
+                  onChange={(e) => setRecencyWeight(parseFloat(e.target.value))}
+                  className="w-full accent-emerald-600"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tab 3: Visual AI */}
       {activeTab === 'visual' && (
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -258,7 +356,6 @@ export default function AiAnalyticsPage() {
                 Gemini Vision Accuracy
               </span>
               <div className="text-3xl font-extrabold text-emerald-600 mt-2">98.2%</div>
-              <span className="text-xs text-gray-500">Multi-object precision</span>
             </div>
 
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
@@ -266,7 +363,6 @@ export default function AiAnalyticsPage() {
                 OCR Text Extraction
               </span>
               <div className="text-3xl font-extrabold text-emerald-600 mt-2">98.6%</div>
-              <span className="text-xs text-gray-500">MRP & ingredient accuracy</span>
             </div>
 
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
@@ -274,25 +370,12 @@ export default function AiAnalyticsPage() {
                 Recipe Inference
               </span>
               <div className="text-3xl font-extrabold text-emerald-600 mt-2">95.1%</div>
-              <span className="text-xs text-gray-500">Dish to shopping list</span>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-            <h2 className="text-lg font-bold text-gray-900">Dark Store Reference Image Upload</h2>
-            <p className="text-xs text-gray-500">Upload high-resolution package photos to improve Gemini Vision training dataset.</p>
-            <div className="flex gap-4">
-              <input type="text" placeholder="Product ID (e.g. prod_amul_milk_1l)" className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-xs" />
-              <input type="text" placeholder="Image URL (e.g. https://storage.dailybasket.com/ref/amul.jpg)" className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-xs" />
-              <button className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg">
-                Upload Reference Image
-              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Tab 3: Voice AI */}
+      {/* Tab 4: Voice AI */}
       {activeTab === 'voice' && (
         <div className="space-y-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -301,7 +384,6 @@ export default function AiAnalyticsPage() {
                 Voice Searches
               </span>
               <div className="text-3xl font-extrabold text-gray-900 mt-2">342</div>
-              <span className="text-xs text-emerald-600 font-medium">+28% voice adoption</span>
             </div>
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
               <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
@@ -325,7 +407,7 @@ export default function AiAnalyticsPage() {
         </div>
       )}
 
-      {/* Tab 4: Prompt Manager */}
+      {/* Tab 5: Prompt Manager */}
       {activeTab === 'prompts' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-3">
@@ -378,7 +460,7 @@ export default function AiAnalyticsPage() {
         </div>
       )}
 
-      {/* Tab 5: Trending Searches */}
+      {/* Tab 6: Trending Searches */}
       {activeTab === 'trending' && (
         <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
           <h2 className="text-lg font-bold text-gray-900">Featured Trending Search Keywords</h2>
@@ -404,22 +486,6 @@ export default function AiAnalyticsPage() {
                 🔥 {kw}
               </span>
             ))}
-          </div>
-        </div>
-      )}
-
-      {/* Tab 6: Security Moderation */}
-      {activeTab === 'security' && (
-        <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-          <h2 className="text-lg font-bold text-gray-900">Prompt Injection & Content Moderation Shield</h2>
-          <p className="text-sm text-gray-500">
-            Configured input sanitization regex patterns and PII masking filters.
-          </p>
-          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 font-mono text-xs text-gray-700 space-y-2">
-            <div>✓ Pattern 1: ignore previous instructions (BLOCKED)</div>
-            <div>✓ Pattern 2: system prompt reveal (BLOCKED)</div>
-            <div>✓ Pattern 3: roleplay jailbreak (BLOCKED)</div>
-            <div>✓ PII Protection: Phone numbers & Emails auto-masked before storing</div>
           </div>
         </div>
       )}

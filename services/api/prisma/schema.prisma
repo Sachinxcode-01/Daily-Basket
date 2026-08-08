@@ -115,6 +115,9 @@ model User {
   voiceLogs               VoiceCommandLog[]
   voiceSettings           VoiceSettings?
   imageSearchLogs         ImageSearchLog[]
+  groceryLists            GroceryList[]
+  predictiveItems         PredictiveReorderItem[]
+  personalizedOffers      PersonalizedOffer[]
 
   @@map("users")
 }
@@ -767,6 +770,65 @@ model VisualAiAnalyticsMetric {
   @@index([createdAt])
   @@map("visual_ai_analytics_metrics")
 }
+
+model GroceryList {
+  id                 String   @id @default(uuid())
+  userId             String
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name               String   // e.g. "Weekly Essentials", "Monthly Grocery", "Family BBQ"
+  type               String   @default("CUSTOM") // WEEKLY, MONTHLY, CUSTOM, AI_GENERATED
+  items              Json     // Array of list item objects
+  isRecurring        Boolean  @default(false)
+  reminderFrequency  String?  // WEEKLY, BIWEEKLY, MONTHLY
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([userId])
+  @@map("grocery_lists")
+}
+
+model PredictiveReorderItem {
+  id                    String    @id @default(uuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId             String
+  averageDaysInterval   Int       @default(7)
+  lastPurchasedAt       DateTime  @default(now())
+  nextPredictedPurchaseAt DateTime
+  runOutLikelihood      Float     @default(0.85) // 0.0 to 1.0
+
+  @@index([userId])
+  @@map("predictive_reorder_items")
+}
+
+model PersonalizedOffer {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code           String    @unique
+  title          String
+  discountPercent Float    @default(15.0)
+  maxDiscount    Float     @default(150.0)
+  targetReason   String    // FAVORITE_BRAND, HIGH_LOYALTY, RE-ENGAGEMENT, FESTIVAL
+  expiresAt      DateTime
+  isRedeemed     Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+
+  @@index([userId])
+  @@map("personalized_offers")
+}
+
+model PersonalizationRule {
+  id             String   @id @default(uuid())
+  name           String   // e.g. "Boost Organic for Premium Users"
+  targetSegment  String   @default("ALL") // ALL, BUDGET, PREMIUM, VEGAN, ORGANIC
+  weightScore    Float    @default(1.0)
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+
+  @@map("personalization_rules")
+}
+
 
 
 
