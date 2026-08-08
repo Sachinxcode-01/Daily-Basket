@@ -27,7 +27,6 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _dotsCtrl;
 
   late Animation<double> _logoOpacity;
-  late Animation<Offset> _logoSlide;
   late Animation<double> _titleOpacity;
   late Animation<Offset> _titleSlide;
   late Animation<double> _subtitleOpacity;
@@ -57,8 +56,6 @@ class _SplashScreenState extends State<SplashScreen>
 
     final curve = CurvedAnimation(parent: _logoCtrl, curve: Curves.easeOut);
     _logoOpacity = Tween<double>(begin: 0, end: 1).animate(curve);
-    _logoSlide   = Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero)
-        .animate(curve);
 
     final curveTitle = CurvedAnimation(parent: _titleCtrl, curve: Curves.easeOut);
     _titleOpacity = Tween<double>(begin: 0, end: 1).animate(curveTitle);
@@ -134,26 +131,29 @@ class _SplashScreenState extends State<SplashScreen>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo Container (glassmorphism, 128×128, rounded-3xl)
+                      // Logo Container (glassmorphism, scale 0.9->1.0 & glow)
                       FadeTransition(
                         opacity: _logoOpacity,
-                        child: SlideTransition(
-                          position: _logoSlide,
+                        child: ScaleTransition(
+                          scale: Tween<double>(begin: 0.9, end: 1.0).animate(
+                            CurvedAnimation(parent: _logoCtrl, curve: Curves.easeOutBack),
+                          ),
                           child: Container(
                             width: 128,
                             height: 128,
                             margin: const EdgeInsets.only(bottom: AppTheme.spacingLg),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.10),
-                              borderRadius: BorderRadius.circular(24), // rounded-3xl
+                              color: Colors.white.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(24),
                               border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.20),
-                                width: 1,
+                                color: Colors.white.withValues(alpha: 0.25),
+                                width: 1.5,
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.15),
-                                  blurRadius: 20,
+                                  color: const Color(0xFF34D399).withValues(alpha: 0.35),
+                                  blurRadius: 28,
+                                  spreadRadius: 2,
                                   offset: const Offset(0, 4),
                                 ),
                               ],
@@ -163,11 +163,9 @@ class _SplashScreenState extends State<SplashScreen>
                               child: Stack(
                                 alignment: Alignment.center,
                                 children: [
-                                  // Frosted glass blur layer
                                   Container(
                                     color: Colors.white.withValues(alpha: 0.05),
                                   ),
-                                  // Official Daily Basket Logo Asset
                                   Image.asset(
                                     'assets/images/daily_basket_logo.png',
                                     width: 104,
@@ -181,13 +179,13 @@ class _SplashScreenState extends State<SplashScreen>
                         ),
                       ),
 
-                      // Title: "Daily Basket" — Outfit 48px 700, white
+                      // Title: Typewriter "Daily Basket" + Blinking Cursor
                       FadeTransition(
                         opacity: _titleOpacity,
                         child: SlideTransition(
                           position: _titleSlide,
-                          child: Text(
-                            'Daily Basket',
+                          child: _TypewriterTextWidget(
+                            text: 'Daily Basket',
                             style: GoogleFonts.outfit(
                               fontSize: 48,
                               fontWeight: FontWeight.w700,
@@ -195,25 +193,24 @@ class _SplashScreenState extends State<SplashScreen>
                               letterSpacing: -0.02 * 48,
                               color: AppColors.onPrimary,
                             ),
-                            textAlign: TextAlign.center,
                           ),
                         ),
                       ),
 
                       const SizedBox(height: AppTheme.spacingSm),
 
-                      // Subtitle: "Fresh Groceries Delivered Fast" — Outfit 20px 500, white/80%
+                      // Subtitle: "Fresh Groceries Delivered in Minutes" — Outfit 20px 500
                       FadeTransition(
                         opacity: _subtitleOpacity,
                         child: SlideTransition(
                           position: _subtitleSlide,
                           child: Text(
-                            'Fresh Groceries Delivered Fast',
+                            'Fresh Groceries Delivered in Minutes',
                             style: GoogleFonts.outfit(
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
                               height: 28 / 20,
-                              color: AppColors.onPrimary.withValues(alpha: 0.80),
+                              color: AppColors.onPrimary.withValues(alpha: 0.85),
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -304,3 +301,61 @@ class _PulsingDotState extends State<_PulsingDot>
     );
   }
 }
+
+class _TypewriterTextWidget extends StatefulWidget {
+  final String text;
+  final TextStyle style;
+  const _TypewriterTextWidget({required this.text, required this.style});
+
+  @override
+  State<_TypewriterTextWidget> createState() => _TypewriterTextWidgetState();
+}
+
+class _TypewriterTextWidgetState extends State<_TypewriterTextWidget>
+    with SingleTickerProviderStateMixin {
+  String _displayedText = '';
+  late AnimationController _cursorCtrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _cursorCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    )..repeat(reverse: true);
+
+    _startTyping();
+  }
+
+  void _startTyping() async {
+    for (int i = 0; i <= widget.text.length; i++) {
+      if (!mounted) return;
+      setState(() {
+        _displayedText = widget.text.substring(0, i);
+      });
+      await Future.delayed(const Duration(milliseconds: 70));
+    }
+  }
+
+  @override
+  void dispose() {
+    _cursorCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(_displayedText, style: widget.style),
+        FadeTransition(
+          opacity: _cursorCtrl,
+          child: Text('|', style: widget.style.copyWith(color: const Color(0xFF34D399))),
+        ),
+      ],
+    );
+  }
+}
+
