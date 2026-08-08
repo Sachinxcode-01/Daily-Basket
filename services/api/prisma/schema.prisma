@@ -1157,6 +1157,72 @@ model SystemObservabilityMetric {
   @@map("system_observability_metrics")
 }
 
+model MasterDataConfig {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  category    String   @default("SYSTEM") // TAX, SYSTEM, PRICING, COMPLIANCE
+  value       Json
+  description String?
+  updatedBy   String   @default("ADMIN")
+  updatedAt   DateTime @updatedAt
+
+  @@map("master_data_configs")
+}
+
+model WorkflowRule {
+  id              String   @id @default(uuid())
+  name            String
+  triggerEvent    String   // STOCK_LOW, REFUND_APPROVED, EXPIRY_WARNING, INACTIVE_CUSTOMER
+  conditionJson   Json     // IF logic conditions
+  actionType      String   // CREATE_PO, REFUND_WALLET, CREATE_DISCOUNT_CAMPAIGN, WINBACK_PUSH
+  actionConfig    Json     // Action details
+  isActive        Boolean  @default(true)
+  timesTriggered  Int      @default(0)
+  lastTriggeredAt DateTime?
+  createdAt       DateTime @default(now())
+
+  @@map("workflow_rules")
+}
+
+model IntegrationConnection {
+  id           String   @id @default(uuid())
+  providerName String   @unique // RAZORPAY, GOOGLE_MAPS, FIREBASE, CLOUDINARY, WHATSAPP, POS_GATEWAY
+  category     String   @default("PAYMENT") // PAYMENT, MAPS, COMMUNICATIONS, STORAGE, POS
+  status       String   @default("CONNECTED") // CONNECTED, DISCONNECTED, ERROR
+  apiEndpoint  String?
+  apiKeyHash   String?
+  lastSyncAt   DateTime @default(now())
+
+  @@map("integration_connections")
+}
+
+model AiCopilotQueryLog {
+  id           String   @id @default(uuid())
+  userId       String
+  query        String
+  resolvedIntent String?
+  responseSummary String
+  latencyMs    Int      @default(0)
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("ai_copilot_query_logs")
+}
+
+model DisasterRecoveryBackup {
+  id          String   @id @default(uuid())
+  backupName  String   @unique
+  backupType  String   @default("FULL_SNAPSHOT") // FULL_SNAPSHOT, POINT_IN_TIME, LOG_REPLICATION
+  fileSize    String   @default("45.2 MB")
+  status      String   @default("COMPLETED") // COMPLETED, IN_PROGRESS, FAILED
+  checksum    String?
+  createdAt   DateTime @default(now())
+
+  @@map("disaster_recovery_backups")
+}
+
+
 
 
 

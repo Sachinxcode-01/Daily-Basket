@@ -53,6 +53,7 @@ import { WarehouseModule } from './modules/warehouse/warehouse.module';
 import { FleetModule } from './modules/fleet/fleet.module';
 import { FranchiseModule } from './modules/franchise/franchise.module';
 import { ObservabilityModule } from './modules/observability/observability.module';
+import { RetailOsModule } from './modules/retail-os/retail-os.module';
 
 @Module({
   imports: [
@@ -80,6 +81,7 @@ import { ObservabilityModule } from './modules/observability/observability.modul
     FleetModule,
     FranchiseModule,
     ObservabilityModule,
+    RetailOsModule,
     AuthModule,
     UsersModule,
     ReferralsModule,
