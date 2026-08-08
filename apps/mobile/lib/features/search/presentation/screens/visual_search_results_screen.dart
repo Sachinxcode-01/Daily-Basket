@@ -120,7 +120,7 @@ class VisualSearchResultsScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 6),
                           Text(
-                            metadata.detectedBrand ?? 'Recognized Grocery Item',
+                            metadata.brand.isNotEmpty ? metadata.brand : 'Recognized Grocery Item',
                             style: GoogleFonts.outfit(
                               color: Colors.white,
                               fontSize: 16,
@@ -128,7 +128,7 @@ class VisualSearchResultsScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'MRP ₹${metadata.mrp ?? 56} • Net Vol ${metadata.netWeight ?? '1L'}',
+                            'MRP ₹${metadata.mrp} • Net Vol ${metadata.weight}',
                             style: GoogleFonts.inter(
                               color: Colors.white70,
                               fontSize: 12,
@@ -147,13 +147,16 @@ class VisualSearchResultsScreen extends StatelessWidget {
               onAddSelectedToCart: (selected) {
                 HapticFeedback.mediumImpact();
                 for (var item in selected) {
-                  cartProvider.addItem({
-                    'id': 'p_${item['detectedName']}',
-                    'name': item['detectedName'],
-                    'price': (item['estimatedPrice'] as num).toDouble(),
-                    'imageUrl': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
-                    'unit': '1 unit',
-                  });
+                  cartProvider.addItem(
+                    CartItem(
+                      id: 'p_${item['detectedName']}',
+                      name: item['detectedName'],
+                      subtitle: item['category'] ?? '1 unit',
+                      price: (item['estimatedPrice'] as num).toDouble(),
+                      qty: 1,
+                      image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
+                    ),
+                  );
                 }
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text('Added ${selected.length} items to your basket!')),
@@ -197,27 +200,33 @@ class VisualSearchResultsScreen extends StatelessWidget {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       onPressed: () {
-                        cartProvider.addItem({
-                          'id': 'p_paneer',
-                          'name': 'Fresh Paneer 200g',
-                          'price': 110.0,
-                          'imageUrl': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
-                          'unit': '200g',
-                        });
-                        cartProvider.addItem({
-                          'id': 'p_butter',
-                          'name': 'Amul Butter 100g',
-                          'price': 56.0,
-                          'imageUrl': 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
-                          'unit': '100g',
-                        });
+                        cartProvider.addItem(
+                          CartItem(
+                            id: 'p_paneer',
+                            name: 'Fresh Paneer 200g',
+                            subtitle: '200g',
+                            price: 110.0,
+                            qty: 1,
+                            image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
+                          ),
+                        );
+                        cartProvider.addItem(
+                          CartItem(
+                            id: 'p_butter',
+                            name: 'Amul Butter 100g',
+                            subtitle: '100g',
+                            price: 56.0,
+                            qty: 1,
+                            image: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
+                          ),
+                        );
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text('Added recipe ingredients to your basket!')),
                         );
                       },
                       style: OutlinedButton.styleFrom(
                         foregroundColor: const Color(0xFF92400E),
-                        borderColor: const Color(0xFFF59E0B),
+                        side: const BorderSide(color: Color(0xFFF59E0B)),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       ),
                       icon: const Icon(Icons.add_shopping_cart_rounded, size: 16),
@@ -283,7 +292,7 @@ class VisualSearchResultsScreen extends StatelessWidget {
                               '₹${product.price} / ${product.unit}',
                               style: GoogleFonts.outfit(
                                 fontSize: 15,
-                                fontWeight: FontWeight.extrabold,
+                                fontWeight: FontWeight.w800,
                                 color: const Color(0xFF006B23),
                               ),
                             ),
@@ -293,13 +302,16 @@ class VisualSearchResultsScreen extends StatelessWidget {
                       FavoriteButton(productId: product.id),
                       ElevatedButton(
                         onPressed: () {
-                          cartProvider.addItem({
-                            'id': product.id,
-                            'name': product.name,
-                            'price': product.price,
-                            'imageUrl': product.imageUrl,
-                            'unit': product.unit,
-                          });
+                          cartProvider.addItem(
+                            CartItem(
+                              id: product.id,
+                              name: product.name,
+                              subtitle: product.unit,
+                              price: product.price,
+                              qty: 1,
+                              image: product.imageUrl,
+                            ),
+                          );
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text('Added ${product.name} to basket!')),
                           );
