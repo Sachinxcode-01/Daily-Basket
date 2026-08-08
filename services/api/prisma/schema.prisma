@@ -114,6 +114,7 @@ model User {
   voiceSessions           VoiceSession[]
   voiceLogs               VoiceCommandLog[]
   voiceSettings           VoiceSettings?
+  imageSearchLogs         ImageSearchLog[]
 
   @@map("users")
 }
@@ -180,6 +181,7 @@ model Product {
   reviews         Review[]
   favorites       Favorite[]
   aiInsight       ProductAiInsight?
+  referenceImages ProductReferenceImage[]
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
@@ -719,6 +721,53 @@ model VoiceAnalyticsMetric {
   @@index([createdAt])
   @@map("voice_analytics_metrics")
 }
+
+model ImageSearchLog {
+  id                String   @id @default(uuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  imageUrl          String
+  imageHash         String?
+  detectedProducts  Json?    // Array of detected product objects with bounding boxes
+  ocrText           String?  // Extracted raw OCR text from packaging
+  recipeName        String?  // Identified dish/recipe name if food item
+  confidenceScore   Float    @default(95.0)
+  latencyMs         Int      @default(0)
+  isSuccess         Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("image_search_logs")
+}
+
+model ProductReferenceImage {
+  id          String   @id @default(uuid())
+  productId   String
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  imageUrl    String
+  angle       String   @default("FRONT") // FRONT, BACK, LABEL, NUTRITION, INGREDIENTS
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  @@index([productId])
+  @@map("product_reference_images")
+}
+
+model VisualAiAnalyticsMetric {
+  id                   String   @id @default(uuid())
+  totalSearches        Int      @default(0)
+  successfulMatches    Int      @default(0)
+  failedMatches        Int      @default(0)
+  avgLatencyMs         Int      @default(0)
+  ocrSuccessRate       Float    @default(98.5)
+  recipeDetectionRate  Float    @default(94.2)
+  createdAt            DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("visual_ai_analytics_metrics")
+}
+
 
 
 

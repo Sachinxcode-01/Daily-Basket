@@ -43,6 +43,7 @@ import { EventsModule } from './modules/events/events.module';
 import { QueueModule } from './modules/queue/queue.module';
 import { FavoritesModule } from './modules/favorites/favorites.module';
 import { VoiceModule } from './modules/voice/voice.module';
+import { ImageSearchModule } from './modules/image-search/image-search.module';
 
 @Module({
   imports: [
@@ -60,6 +61,7 @@ import { VoiceModule } from './modules/voice/voice.module';
     QueueModule,
     FavoritesModule,
     VoiceModule,
+    ImageSearchModule,
     AuthModule,
     UsersModule,
     ReferralsModule,
