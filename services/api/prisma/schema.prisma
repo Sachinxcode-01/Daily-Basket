@@ -1025,6 +1025,139 @@ model BusinessInsightLog {
   @@map("business_insight_logs")
 }
 
+model Warehouse {
+  id              String               @id @default(uuid())
+  name            String
+  code            String               @unique
+  city            String
+  address         String
+  latitude        Float
+  longitude       Float
+  capacitySqFt    Int                  @default(25000)
+  storageZones    Json                 // Array of zones: RECEIVING, PACKING, DISPATCH, COLD_STORAGE, DAMAGED
+  shelfMap        Json                 // Shelf layout mapping
+  isActive        Boolean              @default(true)
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime             @updatedAt
+  inventories     WarehouseInventory[]
+
+  @@map("warehouses")
+}
+
+model WarehouseInventory {
+  id               String    @id @default(uuid())
+  warehouseId      String
+  warehouse        Warehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  variantId        String
+  quantity         Int       @default(1000)
+  reservedQuantity Int       @default(0)
+  batchNumber      String    @default("BATCH-2026-001")
+  shelfLocation    String    @default("ZONE-A-RACK-04")
+  expiresAt        DateTime?
+  updatedAt        DateTime  @updatedAt
+
+  @@unique([warehouseId, variantId, batchNumber])
+  @@map("warehouse_inventories")
+}
+
+model InterLocationTransfer {
+  id             String   @id @default(uuid())
+  transferNumber String   @unique
+  fromType       String   // WAREHOUSE, STORE
+  fromId         String
+  toType         String   // WAREHOUSE, STORE
+  toId           String
+  items          Json     // Array of transfer items
+  status         String   @default("APPROVED") // REQUESTED, APPROVED, IN_TRANSIT, RECEIVED, REJECTED
+  driverId       String?
+  trackingNumber String?
+  requestedBy    String   @default("CENTRAL_DISPATCH")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([fromId])
+  @@index([toId])
+  @@map("inter_location_transfers")
+}
+
+model DeliveryZone {
+  id              String   @id @default(uuid())
+  name            String
+  city            String
+  pincodes        String[]
+  minOrderValue   Float    @default(149.0)
+  baseDeliveryFee Float    @default(25.0)
+  distanceRules   Json     // Dynamic distance tier pricing rules
+  zoneManagerId   String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+
+  @@index([city])
+  @@map("delivery_zones")
+}
+
+model FleetVehicle {
+  id             String   @id @default(uuid())
+  driverId       String?
+  vehicleType    String   @default("EV_SCOOTER") // EV_SCOOTER, BIKE, VAN
+  registrationNo String   @unique
+  fuelType       String   @default("ELECTRIC")
+  batteryPercent Int      @default(92)
+  status         String   @default("ACTIVE") // ACTIVE, MAINTENANCE, INACTIVE
+  currentLat     Float?
+  currentLng     Float?
+  updatedAt      DateTime @updatedAt
+
+  @@map("fleet_vehicles")
+}
+
+model Franchise {
+  id                 String   @id @default(uuid())
+  name               String
+  companyName        String
+  gstin              String   @unique
+  franchiseOwnerId   String
+  city               String
+  commissionPercent  Float    @default(8.5)
+  revenueShareTerms  Json     // Settlement terms object
+  status             String   @default("ACTIVE") // PENDING, ACTIVE, SUSPENDED
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@map("franchises")
+}
+
+model EmployeeProfile {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  storeId     String?
+  warehouseId String?
+  department  String   // OPERATIONS, INVENTORY, LOGISTICS, SUPPORT, FINANCE
+  designation String
+  shiftHours  String   @default("08:00 - 17:00")
+  attendance  Json?    // Attendance record logs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("employee_profiles")
+}
+
+model SystemObservabilityMetric {
+  id               String   @id @default(uuid())
+  serviceName      String   @default("API_GATEWAY")
+  apiLatencyMs     Int      @default(24)
+  redisLatencyMs   Int      @default(2)
+  activeQueueJobs  Int      @default(0)
+  dbConnections    Int      @default(12)
+  cpuUsagePercent  Float    @default(14.5)
+  memoryUsageMb    Float    @default(256.0)
+  createdAt        DateTime @default(now())
+
+  @@index([createdAt])
+  @@map("system_observability_metrics")
+}
+
+
 
 
 

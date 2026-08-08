@@ -48,6 +48,11 @@ import { PersonalizationModule } from './modules/personalization/personalization
 import { StoreOperationsModule } from './modules/store-operations/store-operations.module';
 import { PurchaseManagementModule } from './modules/purchase/purchase-management.module';
 import { DocumentManagementModule } from './modules/documents/document-management.module';
+import { MultiStoreModule } from './modules/multi-store/multi-store.module';
+import { WarehouseModule } from './modules/warehouse/warehouse.module';
+import { FleetModule } from './modules/fleet/fleet.module';
+import { FranchiseModule } from './modules/franchise/franchise.module';
+import { ObservabilityModule } from './modules/observability/observability.module';
 
 @Module({
   imports: [
@@ -70,6 +75,11 @@ import { DocumentManagementModule } from './modules/documents/document-managemen
     StoreOperationsModule,
     PurchaseManagementModule,
     DocumentManagementModule,
+    MultiStoreModule,
+    WarehouseModule,
+    FleetModule,
+    FranchiseModule,
+    ObservabilityModule,
     AuthModule,
     UsersModule,
     ReferralsModule,
