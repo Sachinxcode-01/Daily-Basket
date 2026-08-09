@@ -35,7 +35,7 @@ class _AdminProductDetailsScreenState extends State<AdminProductDetailsScreen> {
   static const Color _orangeText = Color(0xFFC2410C);
 
   // Real Product Data State (integrated with NestJS backend)
-  Map<String, dynamic> _productData = {
+  final Map<String, dynamic> _productData = {
     'id': 'AV-ORG-001',
     'name': 'Organic Hass Avocados',
     'brand': 'Fresh Farms',
@@ -240,6 +240,27 @@ class _AdminProductDetailsScreenState extends State<AdminProductDetailsScreen> {
                   children: [
                     // Hero Image Banner Carousel
                     _buildImageHeroCarousel(),
+                    if (_errorMessage != null)
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFEE2E2),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.info_outline, color: Color(0xFFB91C1C), size: 16),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'Backend Status: Offline fallback active ($_errorMessage)',
+                                style: const TextStyle(color: Color(0xFFB91C1C), fontSize: 11.5),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 16),
 
                     // Header Info: Taxonomy, Title, Brand, Description
