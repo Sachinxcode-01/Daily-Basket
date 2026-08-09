@@ -52,6 +52,9 @@ import 'features/marketing/presentation/screens/admin_coupon_analytics_screen.da
 import 'features/marketing/presentation/screens/admin_campaigns_screen.dart';
 import 'features/marketing/presentation/screens/admin_coupon_details_screen.dart';
 import 'features/settings/presentation/screens/admin_integrations_screen.dart';
+import 'features/support/presentation/screens/admin_notifications_center_screen.dart';
+import 'features/reports/presentation/screens/admin_reports_screen.dart';
+import 'features/ai_copilot/presentation/screens/admin_ai_copilot_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -128,6 +131,9 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/marketing/coupons/details': (context) => const AdminCouponDetailsScreen(),
         '/admin/settings/integrations': (context) => const AdminIntegrationsScreen(),
         '/admin/integrations': (context) => const AdminIntegrationsScreen(),
+        '/admin/notifications': (context) => const AdminNotificationsCenterScreen(),
+        '/admin/reports': (context) => const AdminReportsScreen(),
+        '/admin/copilot': (context) => const AdminAiCopilotScreen(),
       },
     );
   }
