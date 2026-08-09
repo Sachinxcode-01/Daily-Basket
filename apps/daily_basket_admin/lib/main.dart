@@ -55,6 +55,9 @@ import 'features/settings/presentation/screens/admin_integrations_screen.dart';
 import 'features/support/presentation/screens/admin_notifications_center_screen.dart';
 import 'features/reports/presentation/screens/admin_reports_screen.dart';
 import 'features/ai_copilot/presentation/screens/admin_ai_copilot_screen.dart';
+import 'features/support/presentation/screens/admin_help_support_screen.dart';
+import 'features/settings/presentation/screens/admin_privacy_policy_screen.dart';
+import 'features/settings/presentation/screens/admin_launch_checklist_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -134,6 +137,10 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/notifications': (context) => const AdminNotificationsCenterScreen(),
         '/admin/reports': (context) => const AdminReportsScreen(),
         '/admin/copilot': (context) => const AdminAiCopilotScreen(),
+        '/admin/support/help': (context) => const AdminHelpSupportScreen(),
+        '/admin/settings/privacy': (context) => const AdminPrivacyPolicyScreen(),
+        '/admin/settings/checklist': (context) => const AdminLaunchChecklistScreen(),
+        '/admin/checklist': (context) => const AdminLaunchChecklistScreen(),
       },
     );
   }
