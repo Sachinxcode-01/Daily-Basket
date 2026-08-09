@@ -35,6 +35,7 @@ import 'features/products/presentation/screens/admin_product_details_screen.dart
 import 'features/customers/presentation/screens/admin_customers_screen.dart';
 import 'features/customers/presentation/screens/admin_customer_profile_360_screen.dart';
 import 'features/delivery/presentation/screens/admin_delivery_screen.dart';
+import 'features/delivery/presentation/screens/admin_rider_profile_screen.dart';
 import 'features/finance/presentation/screens/admin_finance_screen.dart';
 import 'features/marketing/presentation/screens/admin_marketing_screen.dart';
 import 'features/support/presentation/screens/admin_support_screen.dart';
@@ -96,6 +97,7 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/customers': (context) => const AdminCustomersScreen(),
         '/admin/customers/profile': (context) => const AdminCustomerProfile360Screen(),
         '/admin/delivery': (context) => const AdminDeliveryScreen(),
+        '/admin/delivery/rider': (context) => const AdminRiderProfileScreen(),
         '/admin/finance': (context) => const AdminFinanceScreen(),
         '/admin/marketing': (context) => const AdminMarketingScreen(),
         '/admin/support': (context) => const AdminSupportScreen(),
