@@ -32,7 +32,7 @@ class _AdminCustomerProfile360ScreenState extends State<AdminCustomerProfile360S
   static const Color _blueText = Color(0xFF2563EB);
 
   // Customer Data State (integrated with NestJS /profile endpoint)
-  Map<String, dynamic> _customer = {
+  final Map<String, dynamic> _customer = {
     'id': '#DB-CUS-782',
     'name': 'Rahul Sharma',
     'joined': 'Joined Mar 2022',
@@ -56,7 +56,7 @@ class _AdminCustomerProfile360ScreenState extends State<AdminCustomerProfile360S
         'time': 'Today, 10:42 AM',
         'amount': '₹1,240',
         'status': 'Out for Delivery',
-        'statusColor': Color(0xFF0284C7),
+        'statusColor': const Color(0xFF0284C7),
         'icon': Icons.local_shipping_outlined,
         'isActive': true,
       },
@@ -65,7 +65,7 @@ class _AdminCustomerProfile360ScreenState extends State<AdminCustomerProfile360S
         'time': '2 days ago',
         'amount': '₹850',
         'status': 'Delivered',
-        'statusColor': Color(0xFF15803D),
+        'statusColor': const Color(0xFF15803D),
         'icon': Icons.check_circle_outline_rounded,
         'isActive': false,
       },
