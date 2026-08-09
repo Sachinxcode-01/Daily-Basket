@@ -3,6 +3,7 @@ import 'admin_overview_screen.dart';
 import 'operational_insights_roi_screen.dart';
 import '../../../orders/presentation/screens/admin_orders_screen.dart';
 import '../../../inventory/presentation/screens/admin_inventory_screen.dart';
+import '../../../products/presentation/screens/admin_products_screen.dart';
 import '../../../delivery/presentation/screens/admin_delivery_screen.dart';
 import '../../../customers/presentation/screens/admin_customers_screen.dart';
 import '../../../finance/presentation/screens/admin_finance_screen.dart';
@@ -24,33 +25,35 @@ class AdminDashboardShell extends StatefulWidget {
 class _AdminDashboardShellState extends State<AdminDashboardShell> {
   int _currentIndex = 0;
 
-  // All module screens (indexed 0-10)
+  // All module screens (indexed 0-11)
   static const List<Widget> _screens = [
     AdminOverviewScreen(),             // 0 — Overview (default home)
     AdminOrdersScreen(),               // 1 — Orders Live Feed
     AdminInventoryScreen(),            // 2 — Stock & Expiry
-    AdminCategoryManagementScreen(),   // 3 — Categories Taxonomy
-    AdminDeliveryScreen(),             // 4 — Fleet
-    AdminCustomersScreen(),            // 5 — Customers
-    OperationalInsightsRoiScreen(),    // 6 — Insights & ROI
-    AdminFinanceScreen(),              // 7 — Finance & GST
-    AdminMarketingScreen(),            // 8 — Marketing
-    AdminSupportScreen(),              // 9 — Support AI
-    AdminSettingsScreen(),             // 10 — Settings & Security
+    AdminProductsScreen(),             // 3 — Product Management Dashboard (Stitch Screen 7f4ce4c9d581414bbd9ee1df7768f876)
+    AdminCategoryManagementScreen(),   // 4 — Categories Taxonomy
+    AdminDeliveryScreen(),             // 5 — Fleet
+    AdminCustomersScreen(),            // 6 — Customers
+    OperationalInsightsRoiScreen(),    // 7 — Insights & ROI
+    AdminFinanceScreen(),              // 8 — Finance & GST
+    AdminMarketingScreen(),            // 9 — Marketing
+    AdminSupportScreen(),              // 10 — Support AI
+    AdminSettingsScreen(),             // 11 — Settings & Security
   ];
 
   static const List<_DrawerItem> _drawerItems = [
     _DrawerItem(0, 'Overview', Icons.home_rounded),
     _DrawerItem(1, 'Orders & Dispatch', Icons.shopping_bag_outlined),
     _DrawerItem(2, 'Inventory & Stock', Icons.inventory_2_outlined),
-    _DrawerItem(3, 'Categories Taxonomy', Icons.category_rounded),
-    _DrawerItem(4, 'Delivery Fleet', Icons.two_wheeler_rounded),
-    _DrawerItem(5, 'Customers & VIPs', Icons.people_outline_rounded),
-    _DrawerItem(6, 'Operational Insights', Icons.insights_rounded),
-    _DrawerItem(7, 'Finance & GST', Icons.account_balance_wallet_outlined),
-    _DrawerItem(8, 'Marketing & Banners', Icons.campaign_outlined),
-    _DrawerItem(9, 'Support & AI', Icons.support_agent_rounded),
-    _DrawerItem(10, 'Settings & Security', Icons.settings_outlined),
+    _DrawerItem(3, 'Products Catalog', Icons.local_offer_rounded),
+    _DrawerItem(4, 'Categories Taxonomy', Icons.category_rounded),
+    _DrawerItem(5, 'Delivery Fleet', Icons.two_wheeler_rounded),
+    _DrawerItem(6, 'Customers & VIPs', Icons.people_outline_rounded),
+    _DrawerItem(7, 'Operational Insights', Icons.insights_rounded),
+    _DrawerItem(8, 'Finance & GST', Icons.account_balance_wallet_outlined),
+    _DrawerItem(9, 'Marketing & Banners', Icons.campaign_outlined),
+    _DrawerItem(10, 'Support & AI', Icons.support_agent_rounded),
+    _DrawerItem(11, 'Settings & Security', Icons.settings_outlined),
   ];
 
   @override

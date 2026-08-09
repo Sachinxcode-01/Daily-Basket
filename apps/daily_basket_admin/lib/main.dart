@@ -29,6 +29,8 @@ import 'features/dashboard/presentation/screens/operational_insights_roi_screen.
 import 'features/dashboard/presentation/screens/admin_dashboard_shell.dart';
 import 'features/orders/presentation/screens/admin_orders_screen.dart';
 import 'features/inventory/presentation/screens/admin_inventory_screen.dart';
+import 'features/products/presentation/screens/admin_products_screen.dart';
+import 'features/products/presentation/screens/admin_add_product_basic_info_screen.dart';
 import 'features/customers/presentation/screens/admin_customers_screen.dart';
 import 'features/delivery/presentation/screens/admin_delivery_screen.dart';
 import 'features/finance/presentation/screens/admin_finance_screen.dart';
@@ -86,6 +88,8 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/insights': (context) => const OperationalInsightsRoiScreen(),
         '/admin/orders': (context) => const AdminOrdersScreen(),
         '/admin/inventory': (context) => const AdminInventoryScreen(),
+        '/admin/products': (context) => const AdminProductsScreen(),
+        '/admin/products/new': (context) => const AdminAddProductBasicInfoScreen(),
         '/admin/customers': (context) => const AdminCustomersScreen(),
         '/admin/delivery': (context) => const AdminDeliveryScreen(),
         '/admin/finance': (context) => const AdminFinanceScreen(),

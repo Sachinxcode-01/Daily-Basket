@@ -876,37 +876,42 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
               const SizedBox(height: 10),
               Text('Sort By', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
               const SizedBox(height: 8),
-              ListTile(
-                title: const Text('Popularity'),
-                leading: Radio<String>(
-                  value: 'popular',
-                  groupValue: provider.sortOption,
-                  onChanged: (val) {
-                    if (val != null) provider.setSortOption(val);
+              RadioGroup<String>(
+                groupValue: provider.sortOption,
+                onChanged: (val) {
+                  if (val != null) {
+                    provider.setSortOption(val);
                     Navigator.pop(context);
-                  },
-                ),
-              ),
-              ListTile(
-                title: const Text('Price: Low to High'),
-                leading: Radio<String>(
-                  value: 'price_low_high',
-                  groupValue: provider.sortOption,
-                  onChanged: (val) {
-                    if (val != null) provider.setSortOption(val);
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
-              ListTile(
-                title: const Text('Price: High to Low'),
-                leading: Radio<String>(
-                  value: 'price_high_low',
-                  groupValue: provider.sortOption,
-                  onChanged: (val) {
-                    if (val != null) provider.setSortOption(val);
-                    Navigator.pop(context);
-                  },
+                  }
+                },
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: const Text('Popularity'),
+                      leading: const Radio<String>(value: 'popular'),
+                      onTap: () {
+                        provider.setSortOption('popular');
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Price: Low to High'),
+                      leading: const Radio<String>(value: 'price_low_high'),
+                      onTap: () {
+                        provider.setSortOption('price_low_high');
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      title: const Text('Price: High to Low'),
+                      leading: const Radio<String>(value: 'price_high_low'),
+                      onTap: () {
+                        provider.setSortOption('price_high_low');
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
                 ),
               ),
             ],
