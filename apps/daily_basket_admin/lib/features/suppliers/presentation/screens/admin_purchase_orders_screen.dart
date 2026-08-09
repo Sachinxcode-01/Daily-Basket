@@ -160,12 +160,12 @@ class _AdminPurchaseOrdersScreenState extends State<AdminPurchaseOrdersScreen> {
           fontSize: 18,
         ),
       ),
-      actions: [
+      actions: const [
         Padding(
-          padding: const EdgeInsets.only(right: 12),
+          padding: EdgeInsets.only(right: 12),
           child: CircleAvatar(
             radius: 16,
-            backgroundImage: const NetworkImage(
+            backgroundImage: NetworkImage(
               'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
             ),
           ),

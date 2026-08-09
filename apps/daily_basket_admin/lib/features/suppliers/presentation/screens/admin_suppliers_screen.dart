@@ -176,11 +176,11 @@ class _AdminSuppliersScreenState extends State<AdminSuppliersScreen> {
           icon: const Icon(Icons.notifications_none_rounded, color: _textDark),
           onPressed: () {},
         ),
-        Padding(
-          padding: const EdgeInsets.only(right: 12),
+        const Padding(
+          padding: EdgeInsets.only(right: 12),
           child: CircleAvatar(
             radius: 16,
-            backgroundImage: const NetworkImage(
+            backgroundImage: NetworkImage(
               'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=100',
             ),
           ),
