@@ -1,5 +1,6 @@
 {
   "extends": ["next/core-web-vitals"],
+  "ignorePatterns": ["tailwind.config.js", "next.config.js", "postcss.config.js"],
   "rules": {
     "@next/next/no-img-element": "warn",
     "@next/next/no-page-custom-font": "warn",

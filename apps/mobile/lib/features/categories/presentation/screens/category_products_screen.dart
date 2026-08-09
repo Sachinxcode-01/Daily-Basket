@@ -42,30 +42,6 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
     super.dispose();
   }
 
-  IconData _getCategoryIcon(String iconName) {
-    switch (iconName) {
-      case 'eco': return Icons.eco_rounded;
-      case 'egg_alt': return Icons.egg_alt_rounded;
-      case 'fastfood': return Icons.fastfood_rounded;
-      case 'shopping_bag': return Icons.shopping_bag_rounded;
-      case 'opacity': return Icons.opacity_rounded;
-      case 'temple_hindu': return Icons.temple_hindu_rounded;
-      case 'cleaning_services': return Icons.cleaning_services_rounded;
-      case 'home_work': return Icons.home_work_rounded;
-      case 'face': return Icons.face_rounded;
-      case 'child_care': return Icons.child_care_rounded;
-      case 'pets': return Icons.pets_rounded;
-      case 'local_drink': return Icons.local_drink_rounded;
-      case 'coffee': return Icons.coffee_rounded;
-      case 'bakery_dining': return Icons.bakery_dining_rounded;
-      case 'icecream': return Icons.icecream_rounded;
-      case 'spa': return Icons.spa_rounded;
-      case 'ac_unit': return Icons.ac_unit_rounded;
-      case 'restaurant': return Icons.restaurant_rounded;
-      default: return Icons.category_rounded;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<CategoriesProvider>();

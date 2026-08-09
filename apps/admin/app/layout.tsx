@@ -3,6 +3,7 @@ import Link from 'next/link';
 import './globals.css';
 import {
   LayoutDashboard,
+  TrendingUp,
   Package,
   ShoppingCart,
   Users,
@@ -50,6 +51,14 @@ export default function AdminLayout({
               >
                 <LayoutDashboard className="w-4 h-4 text-[#006b23]" />
                 <span>Overview</span>
+              </Link>
+
+              <Link
+                href="/executive-analytics"
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-primary-container/20 transition"
+              >
+                <TrendingUp className="w-4 h-4 text-primary" />
+                <span className="font-bold">Executive Analytics</span>
               </Link>
 
               <Link
