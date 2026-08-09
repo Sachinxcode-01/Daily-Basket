@@ -40,6 +40,8 @@ import 'features/finance/presentation/screens/admin_finance_screen.dart';
 import 'features/marketing/presentation/screens/admin_marketing_screen.dart';
 import 'features/support/presentation/screens/admin_support_screen.dart';
 import 'features/settings/presentation/screens/admin_settings_screen.dart';
+import 'features/suppliers/presentation/screens/admin_suppliers_screen.dart';
+import 'features/suppliers/presentation/screens/admin_purchase_orders_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,6 +104,8 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/marketing': (context) => const AdminMarketingScreen(),
         '/admin/support': (context) => const AdminSupportScreen(),
         '/admin/settings': (context) => const AdminSettingsScreen(),
+        '/admin/suppliers': (context) => const AdminSuppliersScreen(),
+        '/admin/purchase-orders': (context) => const AdminPurchaseOrdersScreen(),
       },
     );
   }
