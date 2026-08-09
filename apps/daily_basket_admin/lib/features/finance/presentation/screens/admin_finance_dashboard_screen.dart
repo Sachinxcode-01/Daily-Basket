@@ -733,7 +733,7 @@ class _DonutChartPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 - 10;
-    final strokeWidth = 24.0;
+    const strokeWidth = 24.0;
 
     final paintGreen = Paint()
       ..color = const Color(0xFF006837)
