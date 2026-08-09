@@ -46,6 +46,11 @@ import 'features/inventory/presentation/screens/admin_grn_screen.dart';
 import 'features/inventory/presentation/screens/admin_warehouse_stock_screen.dart';
 import 'features/finance/presentation/screens/admin_finance_dashboard_screen.dart';
 import 'features/settings/presentation/screens/admin_roles_permissions_screen.dart';
+import 'features/marketing/presentation/screens/admin_coupon_dashboard_screen.dart';
+import 'features/marketing/presentation/screens/admin_create_coupon_screen.dart';
+import 'features/marketing/presentation/screens/admin_coupon_analytics_screen.dart';
+import 'features/marketing/presentation/screens/admin_campaigns_screen.dart';
+import 'features/marketing/presentation/screens/admin_coupon_details_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -115,6 +120,11 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/finance/dashboard': (context) => const AdminFinanceDashboardScreen(),
         '/admin/settings/roles-permissions': (context) => const AdminRolesPermissionsScreen(),
         '/admin/roles': (context) => const AdminRolesPermissionsScreen(),
+        '/admin/marketing/coupons': (context) => const AdminCouponDashboardScreen(),
+        '/admin/marketing/coupons/create': (context) => const AdminCreateCouponScreen(),
+        '/admin/marketing/analytics': (context) => const AdminCouponAnalyticsScreen(),
+        '/admin/marketing/campaigns': (context) => const AdminCampaignsScreen(),
+        '/admin/marketing/coupons/details': (context) => const AdminCouponDetailsScreen(),
       },
     );
   }
