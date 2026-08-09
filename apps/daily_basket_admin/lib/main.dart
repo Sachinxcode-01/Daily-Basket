@@ -45,6 +45,7 @@ import 'features/suppliers/presentation/screens/admin_purchase_orders_screen.dar
 import 'features/inventory/presentation/screens/admin_grn_screen.dart';
 import 'features/inventory/presentation/screens/admin_warehouse_stock_screen.dart';
 import 'features/finance/presentation/screens/admin_finance_dashboard_screen.dart';
+import 'features/settings/presentation/screens/admin_roles_permissions_screen.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -112,6 +113,8 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/grn': (context) => const AdminGrnScreen(),
         '/admin/inventory/warehouse': (context) => const AdminWarehouseStockScreen(),
         '/admin/finance/dashboard': (context) => const AdminFinanceDashboardScreen(),
+        '/admin/settings/roles-permissions': (context) => const AdminRolesPermissionsScreen(),
+        '/admin/roles': (context) => const AdminRolesPermissionsScreen(),
       },
     );
   }
