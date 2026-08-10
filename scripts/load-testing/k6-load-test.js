@@ -3,11 +3,12 @@ import { check, sleep, group } from 'k6';
 
 export const options = {
   stages: [
-    { duration: '30s', target: 100 },   # Ramp to 100 users
-    { duration: '1m', target: 500 },    # Ramp to 500 users
-    { duration: '1m', target: 1000 },   # Peak 1,000 concurrent users
-    { duration: '30s', target: 5000 },   # Stress spike to 5,000 users
-    { duration: '30s', target: 0 },      # Cool down to 0
+    { duration: '30s', target: 100 },   // Ramp to 100 users
+    { duration: '1m', target: 500 },    // Ramp to 500 users
+    { duration: '1m', target: 1000 },   // Peak 1,000 concurrent users
+    { duration: '30s', target: 5000 },   // Stress spike to 5,000 users
+    { duration: '30s', target: 0 },      // Cool down to 0
+
   ],
   thresholds: {
     http_req_duration: ['p(95)<200', 'p(99)<500'], // 95% of requests under 200ms
