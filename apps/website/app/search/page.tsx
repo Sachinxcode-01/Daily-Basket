@@ -1,6 +1,11 @@
+// Google Stitch Screen ID: f7c78b705cb6471dae1b49027ca746b3
+// Title: Premium Product Catalog & Search
+// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
+
 'use client';
 
 import React, { useState } from 'react';
+
 import Link from 'next/link';
 import { Search, Camera, SlidersHorizontal, Plus, Check, ArrowLeft, Sparkles, Upload, X } from 'lucide-react';
 import { formatCurrency } from '@daily-basket/shared-utils';

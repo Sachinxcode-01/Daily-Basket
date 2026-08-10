@@ -1,6 +1,11 @@
+// Google Stitch Screen ID: 6b2f3bdb3dca4c43954638dd8af95506
+// Title: Secure Enterprise Checkout Flow - Checkout Experience
+// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
+
 'use client';
 
 import React, { useState } from 'react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, MapPin, CreditCard, ShieldCheck, CheckCircle2, Zap, Clock, Loader2 } from 'lucide-react';

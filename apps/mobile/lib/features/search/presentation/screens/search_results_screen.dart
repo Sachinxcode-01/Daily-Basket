@@ -1,3 +1,7 @@
+// Google Stitch Screen ID: f7c78b705cb6471dae1b49027ca746b3
+// Title: Premium Product Catalog & Search
+// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/widgets/staggered_animation_wrappers.dart';
@@ -8,6 +12,8 @@ import '../../../../core/providers/search_history_provider.dart';
 
 /// Search Results Screen — Exact Google Stitch Specification
 class SearchResultsScreen extends StatefulWidget {
+  static const String stitchId = 'f7c78b705cb6471dae1b49027ca746b3';
+
   const SearchResultsScreen({super.key});
 
   @override

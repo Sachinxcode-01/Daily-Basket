@@ -1,3 +1,7 @@
+// Google Stitch Screen ID: 6b2f3bdb3dca4c43954638dd8af95506
+// Title: Secure Enterprise Checkout Flow - Checkout Experience
+// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +13,8 @@ import 'payment_screen.dart';
 /// Checkout Summary / Confirm Order Screen — Google Stitch Design System Source of Truth
 /// Wired to real CartProvider & CheckoutProvider for dynamic backend-driven calculation.
 class CheckoutScreen extends StatefulWidget {
+  static const String stitchId = '6b2f3bdb3dca4c43954638dd8af95506';
+
   const CheckoutScreen({super.key});
 
   @override

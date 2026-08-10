@@ -1,6 +1,11 @@
+// Google Stitch Screen ID: dc03d5c76b814f639becc038ad8805bb
+// Title: Daily Basket - Premium Home Experience
+// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
+
 'use client';
 
 import React, { useState } from 'react';
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatCurrency } from '@daily-basket/shared-utils';

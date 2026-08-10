@@ -1,5 +1,10 @@
+// Google Stitch Screen ID: dc03d5c76b814f639becc038ad8805bb
+// Title: Daily Basket - Premium Home Experience
+// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../../../../core/widgets/staggered_animation_wrappers.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/cart_provider.dart';
