@@ -1,6 +1,11 @@
+// Google Stitch Screen ID: 2b83e1a79bb34387892c25c20f412941
+// Title: Your Shopping Cart - Daily Basket
+// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
+
 'use client';
 
 import React, { useState } from 'react';
+
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ShoppingBag, Plus, Minus, Tag, MapPin, ChevronRight, ShieldCheck, Zap } from 'lucide-react';
