@@ -5,13 +5,14 @@
 'use client';
 
 import React, { useState } from 'react';
-
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, ShoppingBag, Plus, Minus, Tag, MapPin, ChevronRight, ShieldCheck, Zap } from 'lucide-react';
 import { formatCurrency } from '@daily-basket/shared-utils';
 
 export default function CartPage() {
+
   const router = useRouter();
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>({
@@ -95,7 +96,8 @@ export default function CartPage() {
                 className="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl flex items-center justify-between"
               >
                 <div className="flex items-center gap-3">
-                  <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-xl bg-slate-900" />
+                  <Image src={item.image} alt={item.name} width={64} height={64} className="w-16 h-16 object-cover rounded-xl bg-slate-900" />
+
                   <div>
                     <h3 className="text-sm font-bold text-white">{item.name}</h3>
                     <p className="text-xs text-slate-400">{item.unit}</p>
