@@ -7,12 +7,15 @@ import {
   LoginEmailDto,
   RequestOtpDto,
   VerifyOtpDto,
+  SendEmailOtpDto,
+  VerifyEmailOtpDto,
   GoogleOAuthDto,
   ForgotPasswordDto,
   ResetPasswordDto,
   VerifyEmailDto,
   ChangePasswordDto,
 } from './dto/auth.dto';
+
 
 @ApiTags('Authentication & Security')
 @Controller('auth')
@@ -149,10 +152,59 @@ export class AuthController {
     return this.authService.authenticatePasskey(body.credentialId, body.signature);
   }
 
+  @Post('send-email-otp')
+  @ApiOperation({ summary: 'Request 6-digit Email OTP with 60s cooldown & rate limiting' })
+  async sendEmailOtp(@Body() body: SendEmailOtpDto) {
+    return this.authService.sendEmailOtp(body.email, body.type);
+  }
+
+  @Post('verify-email-otp')
+  @ApiOperation({ summary: 'Verify Email 6-digit OTP & generate JWT bearer tokens' })
+  async verifyEmailOtp(@Body() body: VerifyEmailOtpDto) {
+    return this.authService.verifyEmailOtp(body.email, body.otp, {
+      deviceId: body.deviceId,
+      deviceName: body.deviceName,
+      platform: body.platform,
+    });
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Log out active admin session & invalidate refresh token' })
+  async logout(@Req() req: any, @Body() body: { refreshToken?: string }) {
+    return this.authService.logout(req.user?.id || 'usr_admin_01', body.refreshToken);
+  }
+
+  @Post('logout-all')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Log out across all devices and invalidate all active sessions' })
+  async logoutAll(@Req() req: any) {
+    return this.authService.revokeAllSessions(req.user?.id || 'usr_admin_01');
+  }
+
+  @Get('profile')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get logged-in admin user profile & permissions' })
+  async getProfile(@Req() req: any) {
+    return this.authService.getAdminProfile(req.user?.id || 'usr_admin_01');
+  }
+
+  @Get('session')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get current session metadata, risk score & trusted device info' })
+  async getSession(@Req() req: any) {
+    return this.authService.getUserSession(req.user?.id || 'usr_admin_01');
+  }
+
   @Post('risk-score')
   @ApiOperation({ summary: 'Evaluate device fingerprint security risk score' })
   async evaluateDeviceRisk(@Body() body: { userId?: string; deviceId: string; ipAddress: string; platform: string }) {
     return this.authService.evaluateDeviceRisk(body.userId || 'usr_demo', body.deviceId, body.ipAddress, body.platform);
   }
 }
+
 

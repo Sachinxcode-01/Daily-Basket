@@ -14,6 +14,8 @@ class AdminAuthProvider extends ChangeNotifier {
   final double _riskScore = 0.04;
 
 
+  bool _isProfileComplete = true;
+
   bool get isLoggedIn => _isLoggedIn;
   String get adminRole => _adminRole;
   String get adminName => _adminName;
@@ -23,10 +25,17 @@ class AdminAuthProvider extends ChangeNotifier {
   bool get isDeviceTrusted => _isDeviceTrusted;
   String get deviceId => _deviceId;
   double get riskScore => _riskScore;
+  bool get isProfileComplete => _isProfileComplete;
 
   void login(String email, String role) {
     _adminEmail = email;
     _adminRole = role;
+    notifyListeners();
+  }
+
+  void completeProfile({required String name, required String phone, required String role}) {
+    _adminRole = role;
+    _isProfileComplete = true;
     notifyListeners();
   }
 
@@ -60,4 +69,5 @@ class AdminAuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 }
+
 

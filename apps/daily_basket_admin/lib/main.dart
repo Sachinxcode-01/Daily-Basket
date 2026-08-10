@@ -59,6 +59,10 @@ import 'features/support/presentation/screens/admin_help_support_screen.dart';
 import 'features/settings/presentation/screens/admin_privacy_policy_screen.dart';
 import 'features/settings/presentation/screens/admin_launch_checklist_screen.dart';
 
+import 'core/providers/ai_health_provider.dart';
+import 'features/authentication/presentation/screens/admin_profile_completion_screen.dart';
+import 'features/ai/presentation/screens/ai_health_dashboard_screen.dart';
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
@@ -66,6 +70,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => AdminAuthProvider()),
         ChangeNotifierProvider(create: (_) => AdminDashboardProvider()),
+        ChangeNotifierProvider(create: (_) => AiHealthProvider()),
       ],
       child: const DailyBasketAdminApp(),
     ),
@@ -93,8 +98,11 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/otp-verification': (context) => const AdminOtpVerificationScreen(),
         '/admin/biometric-login': (context) => const AdminBiometricLoginScreen(),
         '/admin/device-verification': (context) => const AdminDeviceVerificationScreen(),
+        '/admin/complete-profile': (context) => const AdminProfileCompletionScreen(),
+        '/admin/ai-health': (context) => const AiHealthDashboardScreen(),
         '/admin/forgot-password': (context) => const AdminForgotPasswordScreen(),
         '/admin/reset-password': (context) => const AdminResetPasswordScreen(),
+
         '/admin/auth-error': (context) => const AdminAuthErrorScreen(),
         '/admin/session-expired': (context) => const AdminSessionExpiredScreen(),
         '/admin/force-password-change': (context) => const AdminForcePasswordChangeScreen(),

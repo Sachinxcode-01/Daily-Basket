@@ -75,7 +75,47 @@ export class LoginEmailDto {
   platform?: string;
 }
 
+export class SendEmailOtpDto {
+  @ApiProperty({ example: 'admin@dailybasket.com' })
+  @IsEmail()
+  @IsNotEmpty()
+  email!: string;
+
+  @ApiPropertyOptional({ example: 'ADMIN_LOGIN' })
+  @IsOptional()
+  @IsString()
+  type?: string;
+}
+
+export class VerifyEmailOtpDto {
+  @ApiProperty({ example: 'admin@dailybasket.com' })
+  @IsEmail()
+  @IsNotEmpty()
+  email!: string;
+
+  @ApiProperty({ example: '482109' })
+  @IsString()
+  @IsNotEmpty()
+  otp!: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  deviceId?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  deviceName?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  platform?: string;
+}
+
 export class RequestOtpDto {
+
   @ApiProperty({ example: '9876543210' })
   @IsString()
   @IsNotEmpty()
