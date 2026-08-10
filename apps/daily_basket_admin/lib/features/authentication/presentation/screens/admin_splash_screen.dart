@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
 /// Stitch Screen: Admin Splash Screen
-/// ID: 48bdb69a979b4e8caccfa879454b2117
+/// ID: 969a152fe94a4132b0e5b277502a3470
 class AdminSplashScreen extends StatefulWidget {
   const AdminSplashScreen({super.key});
 
@@ -42,7 +42,7 @@ class _AdminSplashScreenState extends State<AdminSplashScreen> with SingleTicker
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFF1A1C1E),
       body: AnimationLimiter(
         child: Column(
           children: AnimationConfiguration.toStaggeredList(
@@ -64,14 +64,14 @@ class _AdminSplashScreenState extends State<AdminSplashScreen> with SingleTicker
                           padding: const EdgeInsets.all(24),
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color(0xFF0F766E), Color(0xFF0D9488), Color(0xFF14B8A6)],
+                              colors: [Color(0xFF006B23), Color(0xFF078730), Color(0xFF70DD7A)],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF14B8A6).withValues(alpha: 0.45),
+                                color: const Color(0xFF006B23).withValues(alpha: 0.45),
                                 blurRadius: 36,
                                 spreadRadius: 4,
                                 offset: const Offset(0, 8),
@@ -101,7 +101,7 @@ class _AdminSplashScreenState extends State<AdminSplashScreen> with SingleTicker
                       const Text(
                         'Enterprise Operations & Dark Store Suite',
                         style: TextStyle(
-                          color: Color(0xFF94A3B8),
+                          color: Color(0xFFBECAB9),
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -112,19 +112,19 @@ class _AdminSplashScreenState extends State<AdminSplashScreen> with SingleTicker
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF1E293B),
+                          color: const Color(0xFF2F3133),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF0F766E).withValues(alpha: 0.5)),
+                          border: Border.all(color: const Color(0xFF078730).withValues(alpha: 0.5)),
                         ),
                         child: const Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.shield_rounded, color: Color(0xFF2DD4BF), size: 14),
+                            Icon(Icons.shield_rounded, color: Color(0xFF8CFA93), size: 14),
                             SizedBox(width: 6),
                             Text(
                               'TLS 1.3 Encrypted • FIPS 140-2 Compliant',
                               style: TextStyle(
-                                color: Color(0xFF2DD4BF),
+                                color: Color(0xFF8CFA93),
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -142,14 +142,14 @@ class _AdminSplashScreenState extends State<AdminSplashScreen> with SingleTicker
                 width: 28,
                 height: 28,
                 child: CircularProgressIndicator(
-                  color: Color(0xFF2DD4BF),
+                  color: Color(0xFF8CFA93),
                   strokeWidth: 2.8,
                 ),
               ),
               const SizedBox(height: 16),
               const Text(
                 'v2.0.0 Enterprise Build 512',
-                style: TextStyle(color: Color(0xFF64748B), fontSize: 11),
+                style: TextStyle(color: Color(0xFF6E7A6C), fontSize: 11),
               ),
               const SizedBox(height: 48),
             ],
@@ -159,3 +159,4 @@ class _AdminSplashScreenState extends State<AdminSplashScreen> with SingleTicker
     );
   }
 }
+

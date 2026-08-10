@@ -1,143 +1,199 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Edit3, Save, Upload, Sparkles, ArrowLeft, Image as ImageIcon } from 'lucide-react';
+import Link from 'next/link';
 
-export default function ProductEditorPage() {
-  const [product, setProduct] = useState({
-    title: 'Organic Hass Avocados (2 units)',
-    category: 'Fresh Produce',
-    sku: 'FRU-AVO-2X',
-    mrp: '150',
-    sellingPrice: '120',
-    stockCount: '45',
-    unitDetails: '2 units (Approx. 400g)',
-    description: 'Farm-fresh organic Hass avocados rich in healthy fats, hand-picked for optimum ripeness.',
-    shelfLifeDays: '5',
-    isOrganic: true,
-  });
+export default function AdminProductEditorPage() {
+  const [name, setName] = useState('Organic Hass Avocados');
+  const [sku, setSku] = useState('PROD-AVO-001');
+  const [category, setCategory] = useState('Fresh Produce');
+  const [price, setPrice] = useState('180');
+  const [mrp, setMrp] = useState('220');
+  const [stock, setStock] = useState('145');
+  const [unit, setUnit] = useState('Pack of 4');
+  const [description, setDescription] = useState('Fresh, hand-picked organic Hass avocados imported directly from partner farms.');
+  const [imageUrl, setImageUrl] = useState('https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=800&q=80');
+  const [isSaved, setIsSaved] = useState(false);
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaved(true);
+    setTimeout(() => setIsSaved(false), 2000);
+  };
 
   return (
-    <div className="space-y-8 max-w-5xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#e2e2e5] pb-6">
+    <div className="p-6 max-w-5xl mx-auto flex flex-col gap-6">
+      {/* Header & Actions */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-extrabold text-[#1a1c1e] tracking-tight">Product Editor</h1>
-          <p className="text-sm text-[#3f4a3d]">Create or modify SKU catalog details, price margins, and dark store inventory specifications.</p>
+          <div className="flex items-center gap-2 text-xs text-on-surface-variant mb-1">
+            <Link href="/products" className="hover:text-primary">Products</Link>
+            <span>/</span>
+            <span className="text-on-surface font-medium">Edit Product</span>
+          </div>
+          <h1 className="font-headline text-2xl font-bold text-on-surface">Product Editor</h1>
         </div>
-
         <div className="flex items-center gap-3">
-          <button className="inline-flex items-center gap-2 px-6 py-2.5 bg-[#006b23] text-white rounded-xl text-xs font-bold hover:bg-[#078730] transition active:scale-95 shadow-sm">
-            <Save className="w-4 h-4" />
-            <span>Save SKU Changes</span>
+          <Link
+            href="/products"
+            className="px-4 py-2 border border-outline-variant rounded-xl text-on-surface font-label text-sm hover:bg-surface-container transition-colors"
+          >
+            Cancel
+          </Link>
+          <button
+            onClick={handleSave}
+            className="px-5 py-2 bg-primary text-on-primary rounded-xl font-label text-sm font-semibold hover:bg-primary-container transition-colors shadow-sm flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-sm">save</span>
+            {isSaved ? 'Saved!' : 'Save Product'}
           </button>
         </div>
       </div>
 
-      {/* Editor Form Bento */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Main Details (Span 8) */}
-        <div className="lg:col-span-8 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-[#e2e2e5] space-y-6">
-          <h2 className="text-lg font-bold text-[#1a1c1e]">General Catalog Information</h2>
+      <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left 2 Cols: Form Fields */}
+        <div className="lg:col-span-2 flex flex-col gap-6">
+          {/* General Information */}
+          <div className="bg-surface-container-lowest p-6 rounded-2xl border border-surface-variant/40 shadow-sm flex flex-col gap-4">
+            <h2 className="font-headline text-lg font-semibold text-on-surface">Basic Information</h2>
 
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider block mb-1.5">Product Title</label>
+            <div className="flex flex-col gap-1">
+              <label className="font-label text-xs font-semibold text-on-surface-variant">Product Name</label>
               <input
                 type="text"
-                value={product.title}
-                onChange={(e) => setProduct({ ...product, title: e.target.value })}
-                className="w-full px-4 py-2.5 bg-[#f3f3f6] border border-transparent rounded-xl text-sm font-semibold focus:outline-none focus:border-[#006b23] focus:bg-white transition"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-2.5 bg-surface rounded-xl border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                required
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider block mb-1.5">Category</label>
-                <select
-                  value={product.category}
-                  onChange={(e) => setProduct({ ...product, category: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-[#f3f3f6] border border-transparent rounded-xl text-sm font-semibold focus:outline-none focus:border-[#006b23] focus:bg-white transition"
-                >
-                  <option value="Fresh Produce">Fresh Produce</option>
-                  <option value="Dairy & Eggs">Dairy & Eggs</option>
-                  <option value="Bakery & Snacks">Bakery & Snacks</option>
-                  <option value="Beverages">Beverages</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider block mb-1.5">SKU Code</label>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="font-label text-xs font-semibold text-on-surface-variant">SKU Code</label>
                 <input
                   type="text"
-                  value={product.sku}
-                  onChange={(e) => setProduct({ ...product, sku: e.target.value })}
-                  className="w-full px-4 py-2.5 bg-[#f3f3f6] border border-transparent rounded-xl text-sm font-mono font-bold focus:outline-none focus:border-[#006b23] focus:bg-white transition"
+                  value={sku}
+                  onChange={(e) => setSku(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-surface rounded-xl border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="font-label text-xs font-semibold text-on-surface-variant">Category</label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-surface rounded-xl border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                >
+                  <option>Fresh Produce</option>
+                  <option>Dairy & Eggs</option>
+                  <option>Bakery & Snacks</option>
+                  <option>Beverages</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="font-label text-xs font-semibold text-on-surface-variant">Description</label>
+              <textarea
+                rows={4}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full px-4 py-2.5 bg-surface rounded-xl border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+            </div>
+          </div>
+
+          {/* Pricing & Stock */}
+          <div className="bg-surface-container-lowest p-6 rounded-2xl border border-surface-variant/40 shadow-sm flex flex-col gap-4">
+            <h2 className="font-headline text-lg font-semibold text-on-surface">Pricing & Inventory</h2>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="font-label text-xs font-semibold text-on-surface-variant">Selling Price (₹)</label>
+                <input
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-surface rounded-xl border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="font-label text-xs font-semibold text-on-surface-variant">MRP (₹)</label>
+                <input
+                  type="number"
+                  value={mrp}
+                  onChange={(e) => setMrp(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-surface rounded-xl border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="font-label text-xs font-semibold text-on-surface-variant">Stock Quantity</label>
+                <input
+                  type="number"
+                  value={stock}
+                  onChange={(e) => setStock(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-surface rounded-xl border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                  required
                 />
               </div>
             </div>
 
-            <div>
-              <label className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider block mb-1.5">Product Description</label>
-              <textarea
-                rows={4}
-                value={product.description}
-                onChange={(e) => setProduct({ ...product, description: e.target.value })}
-                className="w-full px-4 py-2.5 bg-[#f3f3f6] border border-transparent rounded-xl text-sm focus:outline-none focus:border-[#006b23] focus:bg-white transition"
+            <div className="flex flex-col gap-1">
+              <label className="font-label text-xs font-semibold text-on-surface-variant">Unit Specification</label>
+              <input
+                type="text"
+                value={unit}
+                onChange={(e) => setUnit(e.target.value)}
+                className="w-full px-4 py-2.5 bg-surface rounded-xl border border-outline-variant text-on-surface text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                required
               />
             </div>
           </div>
         </div>
 
-        {/* Pricing & Stock Details (Span 4) */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#e2e2e5] space-y-4">
-            <h3 className="text-base font-bold text-[#1a1c1e]">Pricing & Margins</h3>
+        {/* Right 1 Col: Image Dropzone & Status */}
+        <div className="flex flex-col gap-6">
+          <div className="bg-surface-container-lowest p-6 rounded-2xl border border-surface-variant/40 shadow-sm flex flex-col gap-4">
+            <h2 className="font-headline text-lg font-semibold text-on-surface">Product Image</h2>
 
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider block mb-1">MRP (₹)</label>
-                <input
-                  type="number"
-                  value={product.mrp}
-                  onChange={(e) => setProduct({ ...product, mrp: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#f3f3f6] border border-transparent rounded-xl text-sm font-bold"
-                />
+            <div className="w-full aspect-square rounded-2xl overflow-hidden bg-surface border-2 border-dashed border-outline-variant relative group flex items-center justify-center">
+              <img src={imageUrl} alt="Product Preview" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-white p-4 text-center">
+                <span className="material-symbols-outlined text-3xl mb-1">cloud_upload</span>
+                <span className="font-label text-xs">Click or drag image to replace</span>
               </div>
+            </div>
 
-              <div>
-                <label className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider block mb-1">Selling Price (₹)</label>
-                <input
-                  type="number"
-                  value={product.sellingPrice}
-                  onChange={(e) => setProduct({ ...product, sellingPrice: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#f3f3f6] border border-transparent rounded-xl text-sm font-bold text-[#006b23]"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-[#3f4a3d] uppercase tracking-wider block mb-1">Initial Dark Store Stock</label>
-                <input
-                  type="number"
-                  value={product.stockCount}
-                  onChange={(e) => setProduct({ ...product, stockCount: e.target.value })}
-                  className="w-full px-3 py-2 bg-[#f3f3f6] border border-transparent rounded-xl text-sm font-bold"
-                />
-              </div>
+            <div className="flex flex-col gap-1">
+              <label className="font-label text-xs font-semibold text-on-surface-variant">Image URL</label>
+              <input
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                className="w-full px-3 py-2 bg-surface rounded-xl border border-outline-variant text-xs text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+              />
             </div>
           </div>
 
-          {/* Media Upload Box */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-[#e2e2e5] text-center space-y-3">
-            <h3 className="text-sm font-bold text-[#1a1c1e]">Product Media</h3>
-            <div className="border-2 border-dashed border-[#e2e2e5] rounded-2xl p-6 flex flex-col items-center justify-center space-y-2 hover:border-[#006b23] transition cursor-pointer">
-              <ImageIcon className="w-8 h-8 text-[#3f4a3d]" />
-              <span className="text-xs font-bold text-[#006b23]">Drag & drop high-res images</span>
-              <span className="text-[10px] text-[#3f4a3d]">PNG, JPG up to 5MB</span>
+          <div className="bg-surface-container-lowest p-6 rounded-2xl border border-surface-variant/40 shadow-sm flex flex-col gap-4">
+            <h2 className="font-headline text-lg font-semibold text-on-surface">Publish Status</h2>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-body text-sm font-semibold text-on-surface block">Active Status</span>
+                <span className="font-body text-xs text-on-surface-variant">Visible in customer catalog</span>
+              </div>
+              <div className="w-10 h-5 rounded-full bg-primary relative flex items-center px-0.5">
+                <div className="w-4 h-4 rounded-full bg-white shadow-md transform translate-x-5" />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 }

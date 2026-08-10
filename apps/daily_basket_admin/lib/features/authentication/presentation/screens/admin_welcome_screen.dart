@@ -3,14 +3,14 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../../../../core/widgets/staggered_animated_card.dart';
 
 /// Stitch Screen: Admin Welcome Screen
-/// ID: 9696fa8e284f4eb092f842f851ab73a7
+/// ID: af30e42884994d39a7a3eedba5a23b8d
 class AdminWelcomeScreen extends StatelessWidget {
   const AdminWelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFF1A1C1E),
       body: SafeArea(
         child: AnimationLimiter(
           child: Padding(
@@ -27,18 +27,18 @@ class AdminWelcomeScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(28),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E293B),
+                        color: const Color(0xFF2F3133),
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF0F766E), width: 2),
+                        border: Border.all(color: const Color(0xFF006B23), width: 2),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF0F766E).withValues(alpha: 0.35),
+                            color: const Color(0xFF006B23).withValues(alpha: 0.35),
                             blurRadius: 28,
                             offset: const Offset(0, 6),
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.storefront_rounded, size: 76, color: Color(0xFF2DD4BF)),
+                      child: const Icon(Icons.storefront_rounded, size: 76, color: Color(0xFF8CFA93)),
                     ),
                   ),
                 ),
@@ -58,7 +58,7 @@ class AdminWelcomeScreen extends StatelessWidget {
                       const Text(
                         'Manage Dark Stores, Real-time Logistics, Inventory, GST Compliance, and AI Telemetry.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0xFF94A3B8), fontSize: 14, height: 1.5),
+                        style: TextStyle(color: Color(0xFFBECAB9), fontSize: 14, height: 1.5),
                       ),
                       const SizedBox(height: 20),
 
@@ -81,7 +81,7 @@ class AdminWelcomeScreen extends StatelessWidget {
                 // Action Buttons
                 StaggeredAnimatedButton(
                   index: 2,
-                  backgroundColor: const Color(0xFF0F766E),
+                  backgroundColor: const Color(0xFF006B23),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   onPressed: () => Navigator.pushNamed(context, '/admin/secure-login'),
                   child: const Row(
@@ -94,6 +94,7 @@ class AdminWelcomeScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
+
 
                 StaggeredAnimatedButton(
                   index: 3,

@@ -1,41 +1,70 @@
+export const googleStitchColors = {
+  primary: '#006b23',
+  primaryContainer: '#078730',
+  primaryFixed: '#8cfa93',
+  primaryFixedDim: '#70dd7a',
+  onPrimary: '#ffffff',
+  onPrimaryContainer: '#f7fff2',
+  secondary: '#58605a',
+  secondaryContainer: '#dce5dd',
+  onSecondary: '#ffffff',
+  onSecondaryContainer: '#5e6660',
+  tertiary: '#5a5c5c',
+  tertiaryContainer: '#737575',
+  surface: '#f9f9fc',
+  surfaceContainerLowest: '#ffffff',
+  surfaceContainerLow: '#f3f3f6',
+  surfaceContainer: '#eeeef0',
+  surfaceContainerHigh: '#e8e8ea',
+  surfaceContainerHighest: '#e2e2e5',
+  onSurface: '#1a1c1e',
+  onSurfaceVariant: '#3f4a3d',
+  outline: '#6e7a6c',
+  outlineVariant: '#becab9',
+  error: '#ba1a1a',
+  errorContainer: '#ffdad6',
+};
+
 export const m3Colors = {
   primary: {
-    light: '#059669', // Emerald 600
-    dark: '#10b981',  // Emerald 500
-    containerLight: '#d1fae5',
-    containerDark: '#064e3b',
+    light: '#006b23',
+    dark: '#70dd7a',
+    containerLight: '#078730',
+    containerDark: '#00531a',
   },
   secondary: {
-    light: '#84cc16', // Lime 500
-    dark: '#a3e635',  // Lime 400
-    containerLight: '#ecfccb',
-    containerDark: '#365314',
+    light: '#58605a',
+    dark: '#c0c9c1',
+    containerLight: '#dce5dd',
+    containerDark: '#404943',
   },
   accent: {
-    light: '#0f766e', // Deep Teal
-    dark: '#14b8a6',
+    light: '#006b23',
+    dark: '#8cfa93',
   },
   surface: {
-    light: '#f8fafc',
-    dark: '#0f172a',
+    light: '#f9f9fc',
+    dark: '#1a1c1e',
     cardLight: '#ffffff',
-    cardDark: '#1e293b',
+    cardDark: '#2f3133',
   },
   text: {
-    lightPrimary: '#0f172a',
-    lightSecondary: '#64748b',
-    darkPrimary: '#f8fafc',
-    darkSecondary: '#94a3b8',
+    lightPrimary: '#1a1c1e',
+    lightSecondary: '#3f4a3d',
+    darkPrimary: '#f9f9fc',
+    darkSecondary: '#becab9',
   },
   status: {
-    success: '#10b981',
+    success: '#006b23',
     warning: '#f59e0b',
-    error: '#ef4444',
+    error: '#ba1a1a',
     info: '#3b82f6',
   },
 };
 
 export const typography = {
+  displayFont: 'Outfit, sans-serif',
+  bodyFont: 'Inter, system-ui, -apple-system, sans-serif',
   fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
   sizes: {
     xs: '0.75rem',
@@ -47,3 +76,4 @@ export const typography = {
     '3xl': '1.875rem',
   },
 };
+

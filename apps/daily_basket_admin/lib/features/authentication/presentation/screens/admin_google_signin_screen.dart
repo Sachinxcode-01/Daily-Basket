@@ -5,7 +5,7 @@ import '../../../../core/providers/admin_auth_provider.dart';
 import '../../../../core/widgets/staggered_animated_card.dart';
 
 /// Stitch Screen: Admin Google Sign-In
-/// ID: a03e39cacde74e07a722413f8d0b6699
+/// ID: 8c2357db3366400da7093290db32f886
 class AdminGoogleSigninScreen extends StatefulWidget {
   const AdminGoogleSigninScreen({super.key});
 
@@ -30,10 +30,10 @@ class _AdminGoogleSigninScreenState extends State<AdminGoogleSigninScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: const Color(0xFF1A1C1E),
       appBar: AppBar(
         title: const Text('Google Workspace SSO', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-        backgroundColor: const Color(0xFF1E293B),
+        backgroundColor: const Color(0xFF2F3133),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SafeArea(
@@ -52,18 +52,18 @@ class _AdminGoogleSigninScreenState extends State<AdminGoogleSigninScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1E293B),
+                        color: const Color(0xFF2F3133),
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF2DD4BF).withValues(alpha: 0.4)),
+                        border: Border.all(color: const Color(0xFF8CFA93).withValues(alpha: 0.4)),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF2DD4BF).withValues(alpha: 0.25),
+                            color: const Color(0xFF006B23).withValues(alpha: 0.25),
                             blurRadius: 20,
                             offset: const Offset(0, 4),
                           ),
                         ],
                       ),
-                      child: const Icon(Icons.g_mobiledata_rounded, size: 72, color: Color(0xFF2DD4BF)),
+                      child: const Icon(Icons.g_mobiledata_rounded, size: 72, color: Color(0xFF8CFA93)),
                     ),
                   ),
                 ),
@@ -83,7 +83,7 @@ class _AdminGoogleSigninScreenState extends State<AdminGoogleSigninScreen> {
                       Text(
                         'Connecting to @dailybasket.com Google Workspace domain',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                        style: TextStyle(color: Color(0xFFBECAB9), fontSize: 13),
                       ),
                     ],
                   ),
@@ -96,15 +96,15 @@ class _AdminGoogleSigninScreenState extends State<AdminGoogleSigninScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
+                      color: const Color(0xFF2F3133),
                       borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF0F766E)),
+                      border: Border.all(color: const Color(0xFF006B23)),
                     ),
                     child: const Row(
                       children: [
                         CircleAvatar(
                           radius: 24,
-                          backgroundColor: Color(0xFF0F766E),
+                          backgroundColor: Color(0xFF006B23),
                           child: Text('A', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20)),
                         ),
                         SizedBox(width: 14),
@@ -113,17 +113,18 @@ class _AdminGoogleSigninScreenState extends State<AdminGoogleSigninScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Ananya Rao', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                              Text('ananya.rao@dailybasket.com', style: TextStyle(color: Color(0xFF2DD4BF), fontSize: 12)),
+                              Text('ananya.rao@dailybasket.com', style: TextStyle(color: Color(0xFF8CFA93), fontSize: 12)),
                               SizedBox(height: 4),
-                              Text('Super Admin • Dark Store Lead', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+                              Text('Super Admin • Dark Store Lead', style: TextStyle(color: Color(0xFFBECAB9), fontSize: 10)),
                             ],
                           ),
                         ),
-                        Icon(Icons.check_circle_rounded, color: Color(0xFF10B981), size: 22),
+                        Icon(Icons.check_circle_rounded, color: Color(0xFF8CFA93), size: 22),
                       ],
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 24),
 
                 // Security info banner
@@ -132,9 +133,9 @@ class _AdminGoogleSigninScreenState extends State<AdminGoogleSigninScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A),
+                      color: const Color(0xFF1A1C1E),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: const Color(0xFF334155)),
+                      border: Border.all(color: const Color(0xFF6E7A6C)),
                     ),
                     child: const Row(
                       children: [
@@ -143,7 +144,7 @@ class _AdminGoogleSigninScreenState extends State<AdminGoogleSigninScreen> {
                         Expanded(
                           child: Text(
                             'Requires 2-Step Verification key approval on your authorized mobile device.',
-                            style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+                            style: TextStyle(color: Color(0xFFBECAB9), fontSize: 11),
                           ),
                         ),
                       ],
@@ -155,7 +156,7 @@ class _AdminGoogleSigninScreenState extends State<AdminGoogleSigninScreen> {
                 // Authorize Button
                 StaggeredAnimatedButton(
                   index: 4,
-                  backgroundColor: const Color(0xFF0F766E),
+                  backgroundColor: const Color(0xFF006B23),
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   onPressed: _isAuthenticating ? () {} : () => _handleGoogleSignIn(context),
                   child: _isAuthenticating
@@ -182,10 +183,10 @@ class _AdminGoogleSigninScreenState extends State<AdminGoogleSigninScreen> {
                 StaggeredAnimatedButton(
                   index: 5,
                   backgroundColor: Colors.transparent,
-                  borderSide: const BorderSide(color: Color(0xFF334155)),
+                  borderSide: const BorderSide(color: Color(0xFF6E7A6C)),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Use a Different Google Account', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13)),
+                  child: const Text('Use a Different Google Account', style: TextStyle(color: Color(0xFFBECAB9), fontSize: 13)),
                 ),
               ],
             ),
@@ -195,3 +196,4 @@ class _AdminGoogleSigninScreenState extends State<AdminGoogleSigninScreen> {
     );
   }
 }
+
