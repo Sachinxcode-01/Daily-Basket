@@ -58,9 +58,25 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { status: 'sent' };
   }
 
-  // --- Real-time Event Broadcasters ---
+  // --- Real-time Canonical Event Broadcasters ---
+
+  broadcastProductCreated(product: any) {
+    this.server.emit('product.created', product);
+    this.server.emit('product_created', product);
+  }
+
+  broadcastProductUpdated(product: any) {
+    this.server.emit('product.updated', product);
+    this.server.emit('product_updated', product);
+  }
+
+  broadcastProductDeleted(productId: string) {
+    this.server.emit('product.deleted', { productId });
+    this.server.emit('product_deleted', { productId });
+  }
 
   broadcastOrderCreated(order: any) {
+    this.server.emit('order.created', order);
     this.server.to('admin').emit('order_created', order);
     if (order.storeId) {
       this.server.to(`store_${order.storeId}`).emit('order_created', order);
@@ -68,7 +84,15 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('dashboard_metrics_tick', { action: 'ORDER_CREATED', orderId: order.id });
   }
 
+  broadcastOrderUpdated(order: any) {
+    this.server.emit('order.updated', order);
+    this.server.to('admin').emit('order_updated', order);
+    this.server.to(`order_${order.id}`).emit('order_updated', order);
+    this.server.to(`customer_${order.userId}`).emit('order_status_update', order);
+  }
+
   broadcastOrderPacking(order: any) {
+    this.server.emit('order.updated', { ...order, status: 'PACKING' });
     this.server.to('admin').emit('order_packing', order);
     this.server.to(`order_${order.id}`).emit('order_packing', order);
     this.server.to(`customer_${order.userId}`).emit('order_status_update', {
@@ -79,6 +103,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   broadcastRiderAssigned(orderId: string, userId: string, riderId: string, riderDetails: any) {
+    const payload = { orderId, riderId, rider: riderDetails };
+    this.server.emit('delivery.assigned', payload);
     this.server.to(`rider_${riderId}`).emit('new_order_assigned', { orderId, details: riderDetails });
     this.server.to(`customer_${userId}`).emit('rider_assigned', { orderId, rider: riderDetails });
     this.server.to(`order_${orderId}`).emit('order_status_update', { orderId, status: 'ASSIGNED', rider: riderDetails });
@@ -87,6 +113,7 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   broadcastLiveLocation(orderId: string, riderId: string, lat: number, lng: number) {
     const payload = { orderId, riderId, lat, lng, timestamp: new Date().toISOString() };
+    this.server.emit('delivery.location', payload);
     this.server.to(`order_${orderId}`).emit('rider_location_update', payload);
     this.server.to('admin').emit('fleet_location_tick', payload);
   }
@@ -98,21 +125,48 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       deliveredAt: new Date().toISOString(),
       invoice,
     };
+    this.server.emit('order.updated', payload);
     this.server.to(`order_${orderId}`).emit('order_delivered', payload);
     this.server.to(`customer_${userId}`).emit('order_status_update', payload);
     this.server.to('admin').emit('order_delivered', payload);
   }
 
   broadcastInventoryUpdate(productId: string, newStock: number, isAvailable: boolean) {
-    this.server.emit('stock_updated', { productId, newStock, isAvailable, timestamp: new Date().toISOString() });
+    const payload = { productId, newStock, isAvailable, timestamp: new Date().toISOString() };
+    this.server.emit('inventory.updated', payload);
+    this.server.emit('stock_updated', payload);
   }
 
   broadcastProductStatus(productId: string, isAvailable: boolean) {
+    this.server.emit('product.updated', { productId, isAvailable });
     this.server.emit('product_status_changed', { productId, isAvailable, timestamp: new Date().toISOString() });
   }
 
   broadcastCouponCreated(coupon: any) {
+    this.server.emit('coupon.created', coupon);
     this.server.emit('coupon_created', coupon);
+  }
+
+  broadcastCouponUpdated(coupon: any) {
+    this.server.emit('coupon.updated', coupon);
+    this.server.emit('coupon_updated', coupon);
+  }
+
+  broadcastWalletUpdated(userId: string, balance: number, transaction: any) {
+    const payload = { userId, balance, transaction, timestamp: new Date().toISOString() };
+    this.server.emit('wallet.updated', payload);
+    this.server.to(`customer_${userId}`).emit('wallet_updated', payload);
+  }
+
+  broadcastNotificationSent(userId: string, notification: any) {
+    const payload = { userId, notification, timestamp: new Date().toISOString() };
+    this.server.emit('notification.sent', payload);
+    this.server.to(`customer_${userId}`).emit('notification_received', payload);
+  }
+
+  broadcastSupportCreated(ticket: any) {
+    this.server.emit('support.created', ticket);
+    this.server.to('admin').emit('support_ticket_created', ticket);
   }
 
   broadcastSupportMessage(ticketId: string, messagePayload: any) {
@@ -125,7 +179,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('favorite_analytics_tick', payload);
   }
 
+  broadcastAnalyticsUpdated(metrics: any) {
+    this.server.emit('analytics.updated', metrics);
+    this.server.to('admin').emit('dashboard_metrics_tick', metrics);
+  }
+
   broadcastDashboardTick(metrics: any) {
+    this.server.emit('analytics.updated', metrics);
     this.server.to('admin').emit('dashboard_metrics_tick', metrics);
   }
 }
+
