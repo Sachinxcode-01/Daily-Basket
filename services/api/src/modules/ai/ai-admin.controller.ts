@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Put, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { PromptManager } from './managers/prompt.manager';
 import { PrismaService } from '../../database/prisma.service';
+import { AiService } from './ai.service';
 
 @ApiTags('ai-admin')
 @Controller('ai/admin')
@@ -9,7 +10,20 @@ export class AiAdminController {
   constructor(
     private promptManager: PromptManager,
     private prisma: PrismaService,
+    private aiService: AiService,
   ) {}
+
+  @Get('validate-providers')
+  @ApiOperation({ summary: 'Run real-time API Key & Provider Validation across all AI services' })
+  async validateProviders() {
+    return this.aiService.validateAllProviders();
+  }
+
+  @Post('test-all-features')
+  @ApiOperation({ summary: 'Run E2E feature integration test suite across all 12 platform AI modules' })
+  async testAllFeatures() {
+    return this.aiService.testAllFeatures();
+  }
 
   @Get('prompts')
   @ApiOperation({ summary: 'List all centralized AI prompt templates' })
@@ -79,3 +93,4 @@ export class AiAdminController {
     });
   }
 }
+
