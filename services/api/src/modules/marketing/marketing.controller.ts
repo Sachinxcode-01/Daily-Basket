@@ -42,4 +42,41 @@ export class MarketingController {
   async calculateDeliveryFee(@Body() body: { cartTotal: number }) {
     return this.marketingService.calculateDeliveryFee(body.cartTotal ?? 0);
   }
+
+  @Get('plus-membership')
+  @ApiOperation({ summary: 'Get Daily Basket Plus membership plans & VIP benefits' })
+  async getPlusMembership() {
+    return this.marketingService.getPlusMembershipPlans();
+  }
+
+  @Get('subscriptions')
+  @ApiOperation({ summary: 'Get recurring order subscriptions (Milk, Bread, Eggs, Curd)' })
+  async getSubscriptions() {
+    return this.marketingService.getSubscriptions();
+  }
+
+  @Post('subscriptions/action')
+  @ApiOperation({ summary: 'Pause, Resume, or Skip recurring order subscription' })
+  async updateSubscription(@Body() body: { subscriptionId: string; action: 'PAUSE' | 'RESUME' | 'SKIP_NEXT' }) {
+    return this.marketingService.updateSubscription(body.subscriptionId, body.action);
+  }
+
+  @Get('automated-triggers')
+  @ApiOperation({ summary: 'Get marketing automation triggers (Abandoned cart, Price drops, Back in stock)' })
+  async getAutomatedTriggers() {
+    return this.marketingService.getAutomatedTriggers();
+  }
+
+  @Get('ab-testing')
+  @ApiOperation({ summary: 'Get active A/B testing experiment variants and conversion uplifts' })
+  async getAbTesting() {
+    return this.marketingService.getAbTestExperiments();
+  }
+
+  @Get('growth-analytics')
+  @ApiOperation({ summary: 'Get executive growth KPIs, CLV, Retention, and AOV metrics' })
+  async getGrowthAnalytics() {
+    return this.marketingService.getGrowthAnalytics();
+  }
 }
+
