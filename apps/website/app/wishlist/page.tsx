@@ -1,6 +1,11 @@
+// Google Stitch Screen ID: 538a08fbfe7b48218ebe496fdd5635e9
+// Title: My Wishlist - Daily Basket Elite Website Elite
+// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
+
 'use client';
 
 import React, { useState } from 'react';
+
 import Link from 'next/link';
 
 interface FavoriteProduct {
