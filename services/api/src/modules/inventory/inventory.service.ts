@@ -1,23 +1,121 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
+import { RedisService } from '../redis/redis.service';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class InventoryService {
-  constructor(private prisma: PrismaService) {}
+  private readonly logger = new Logger(InventoryService.name);
+
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly redisService: RedisService,
+    private readonly eventsGateway: EventsGateway,
+  ) {}
 
   async getStoreInventory(storeId: string) {
-    return this.prisma.inventory.findMany({
+    // Check Redis cache first
+    const cacheKey = `dailybasket:inventory:store:${storeId}`;
+    const cached = await this.redisService.get(cacheKey);
+    if (cached) return cached;
+
+    const inventory = await this.prisma.inventory.findMany({
       where: { storeId },
-      include: { variant: { include: { product: true } } },
+      include: {
+        variant: {
+          select: {
+            id: true,
+            unitName: true,
+            price: true,
+            mrp: true,
+            sku: true,
+            isAvailable: true,
+            product: {
+              select: {
+                id: true,
+                name: true,
+                slug: true,
+                images: true,
+                brand: true,
+              },
+            },
+          },
+        },
+      },
     });
+
+    await this.redisService.set(cacheKey, inventory, 60);
+    return inventory;
   }
 
   async updateStock(storeId: string, variantId: string, stockQuantity: number) {
-    return this.prisma.inventory.upsert({
+    const updated = await this.prisma.inventory.upsert({
       where: { storeId_variantId: { storeId, variantId } },
       update: { stockQuantity },
       create: { storeId, variantId, stockQuantity },
     });
+
+    // Invalidate store inventory cache
+    await this.redisService.del(`dailybasket:inventory:store:${storeId}`);
+
+    // Emit real-time stock update
+    const isAvailable = stockQuantity > 0;
+    this.eventsGateway.broadcastInventoryUpdate(variantId, stockQuantity, isAvailable);
+
+    return updated;
+  }
+
+  /**
+   * Atomic stock reservation with PostgreSQL row-level condition & Redlock
+   * Prevents race conditions and negative inventory under flash sales / heavy concurrency.
+   */
+  async reserveStockAtomic(storeId: string, variantId: string, quantity: number): Promise<boolean> {
+    const lockToken = await this.redisService.acquireLock(`inventory:${storeId}:${variantId}`, 5);
+    if (!lockToken) {
+      this.logger.warn(`Lock contention on inventory:${storeId}:${variantId}`);
+    }
+
+    try {
+      // Execute atomic UPDATE query: only updates if stockQuantity >= quantity
+      const rowsUpdated = await this.prisma.$executeRaw`
+        UPDATE inventories
+        SET "stockQuantity" = "stockQuantity" - ${quantity},
+            "reservedQuantity" = "reservedQuantity" + ${quantity},
+            "updatedAt" = NOW()
+        WHERE "storeId" = ${storeId}
+          AND "variantId" = ${variantId}
+          AND "stockQuantity" >= ${quantity}
+      `;
+
+      if (rowsUpdated > 0) {
+        await this.redisService.del(`dailybasket:inventory:store:${storeId}`);
+        return true;
+      }
+      return false;
+    } finally {
+      if (lockToken) {
+        await this.redisService.releaseLock(`inventory:${storeId}:${variantId}`, lockToken);
+      }
+    }
+  }
+
+  /**
+   * Release reserved stock on order cancellation or checkout timeout
+   */
+  async releaseStockAtomic(storeId: string, variantId: string, quantity: number): Promise<boolean> {
+    const rowsUpdated = await this.prisma.$executeRaw`
+      UPDATE inventories
+      SET "stockQuantity" = "stockQuantity" + ${quantity},
+          "reservedQuantity" = GREATEST(0, "reservedQuantity" - ${quantity}),
+          "updatedAt" = NOW()
+      WHERE "storeId" = ${storeId}
+        AND "variantId" = ${variantId}
+    `;
+    if (rowsUpdated > 0) {
+      await this.redisService.del(`dailybasket:inventory:store:${storeId}`);
+      return true;
+    }
+    return false;
   }
 
   async getVendors() {
@@ -93,4 +191,3 @@ export class InventoryService {
     };
   }
 }
-

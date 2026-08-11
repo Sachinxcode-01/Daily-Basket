@@ -1,0 +1,41 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "title": "Daily Basket — Incident Diagnostic Dashboard",
+  "tags": ["incidents", "daily-basket", "devops"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "5xx Error Rate",
+      "type": "stat",
+      "targets": [{ "expr": "rate(http_requests_total{status=~\"5..\"}[5m])" }],
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "red", "value": 1 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Slow Query Timeline (>100ms)",
+      "type": "timeseries",
+      "targets": [{ "expr": "db_slow_queries_total" }]
+    },
+    {
+      "id": 3,
+      "title": "Dead Letter Queue (DLQ) Failures",
+      "type": "stat",
+      "targets": [{ "expr": "bullmq_dlq_failed_jobs_total" }]
+    }
+  ],
+  "schemaVersion": 38,
+  "version": 1
+}

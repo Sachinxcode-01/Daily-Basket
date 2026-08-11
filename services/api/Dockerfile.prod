@@ -1,0 +1,60 @@
+# ==============================================================================
+# Multi-Stage Production Dockerfile for Daily Basket NestJS API Service
+# Minimal, secure, non-root Alpine container with layer caching
+# ==============================================================================
+
+# --- Stage 1: Build Dependencies ---
+FROM node:20-alpine AS builder
+WORKDIR /app
+
+# Install pnpm or package tools if needed
+RUN apk add --no-libc-compat --no-cache python3 make g++
+
+# Copy package files
+COPY package*.json ./
+COPY prisma ./prisma/
+
+# Install dependencies (including devDependencies for build)
+RUN npm ci
+
+# Copy source files
+COPY . .
+
+# Generate Prisma Client
+RUN npm run prisma:generate
+
+# Build NestJS application
+RUN npm run build
+
+# Prune devDependencies to keep container minimal
+RUN npm prune --production
+
+# --- Stage 2: Production Runtime Image ---
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV PORT=4000
+
+# Create non-root system user for security hardening
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001 -G nodejs
+
+# Copy production artifacts from builder stage
+COPY --chown=nestjs:nodejs --from=builder /app/package*.json ./
+COPY --chown=nestjs:nodejs --from=builder /app/node_modules ./node_modules
+COPY --chown=nestjs:nodejs --from=builder /app/dist ./dist
+COPY --chown=nestjs:nodejs --from=builder /app/prisma ./prisma
+
+# Switch to non-root user
+USER nestjs
+
+# Expose API Service Port
+EXPOSE 4000
+
+# Health check probe
+HEALTHCHECK --interval=15s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:4000/api/v1/observability/liveness || exit 1
+
+# Start Production Server
+CMD ["node", "dist/main"]

@@ -1,0 +1,39 @@
+# ==============================================================================
+# Argo Rollouts / Canary Traffic Split Deployment Strategy
+# Enables zero-downtime Blue-Green & Canary releases (10% -> 25% -> 50% -> 100%)
+# ==============================================================================
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: daily-basket-api-canary
+  namespace: daily-basket
+spec:
+  replicas: 5
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: daily-basket-api-canary
+  strategy:
+    canary:
+      canaryService: daily-basket-api-canary-svc
+      stableService: daily-basket-api-stable-svc
+      trafficRouting:
+        nginx:
+          stableIngress: daily-basket-ingress
+      steps:
+        - setWeight: 10
+        - pause: { duration: 5m }
+        - setWeight: 25
+        - pause: { duration: 10m }
+        - setWeight: 50
+        - pause: { duration: 15m }
+  template:
+    metadata:
+      labels:
+        app: daily-basket-api-canary
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/sachinxcode-01/daily-basket-api:v2.0.0
+          ports:
+            - containerPort: 4000

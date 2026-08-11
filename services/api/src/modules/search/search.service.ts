@@ -201,7 +201,7 @@ export class SearchService {
     const cacheKey = `search:v2:${query.trim().toLowerCase()}:${userId || 'anon'}`;
     const cached = await this.redisService.get(cacheKey);
     if (cached) {
-      const parsed = JSON.parse(cached as string);
+      const parsed = typeof cached === 'string' ? JSON.parse(cached) : cached;
       parsed.latencyMs = Date.now() - startTime;
       return parsed;
     }

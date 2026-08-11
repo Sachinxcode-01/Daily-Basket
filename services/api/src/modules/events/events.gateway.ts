@@ -13,6 +13,9 @@ import { Logger } from '@nestjs/common';
 @WebSocketGateway({
   cors: { origin: '*' },
   namespace: '/ws',
+  transports: ['websocket', 'polling'],
+  pingInterval: 25000,
+  pingTimeout: 10000,
 })
 export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
@@ -20,26 +23,52 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private readonly logger = new Logger(EventsGateway.name);
 
+  // In-memory presence tracking store
+  private readonly activeSockets = new Map<string, { userId?: string; connectedAt: number }>();
+  // Recent event deduplication cache (eventHash -> timestamp)
+  private readonly eventDeduplicationMap = new Map<string, number>();
+
   handleConnection(client: Socket) {
-    this.logger.log(`Client connected to WebSockets: ${client.id}`);
+    const userId = (client.handshake.query.userId as string) || undefined;
+    this.activeSockets.set(client.id, { userId, connectedAt: Date.now() });
+
+    if (userId) {
+      client.join(`user_${userId}`);
+      client.join(`customer_${userId}`);
+    }
+
+    this.logger.log(`⚡ Client connected to WebSockets: ${client.id} (User: ${userId || 'anonymous'})`);
   }
 
   handleDisconnect(client: Socket) {
+    this.activeSockets.delete(client.id);
     this.logger.log(`Client disconnected: ${client.id}`);
   }
 
   @SubscribeMessage('join_room')
   handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string) {
     client.join(room);
-    this.logger.log(`Client ${client.id} joined room: ${room}`);
+    this.logger.debug(`Client ${client.id} joined room: ${room}`);
     return { status: 'joined', room };
   }
 
   @SubscribeMessage('leave_room')
   handleLeaveRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string) {
     client.leave(room);
-    this.logger.log(`Client ${client.id} left room: ${room}`);
+    this.logger.debug(`Client ${client.id} left room: ${room}`);
     return { status: 'left', room };
+  }
+
+  @SubscribeMessage('typing_indicator')
+  handleTypingIndicator(
+    @ConnectedSocket() client: Socket,
+    @MessageBody() payload: { ticketId: string; isTyping: boolean },
+  ) {
+    client.to(`ticket_${payload.ticketId}`).emit('user_typing', {
+      clientId: client.id,
+      isTyping: payload.isTyping,
+    });
+    return { status: 'ok' };
   }
 
   @SubscribeMessage('rider_gps_tick')
@@ -58,7 +87,24 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { status: 'sent' };
   }
 
-  // --- Real-time Canonical Event Broadcasters ---
+  // --- Real-Time Deduplicated Event Broadcasters (<100ms latency) ---
+
+  private isDuplicateEvent(eventKey: string, ttlMs = 500): boolean {
+    const now = Date.now();
+    const lastEmitted = this.eventDeduplicationMap.get(eventKey);
+    if (lastEmitted && now - lastEmitted < ttlMs) {
+      return true;
+    }
+    this.eventDeduplicationMap.set(eventKey, now);
+
+    // Evict old hash entries periodically
+    if (this.eventDeduplicationMap.size > 2000) {
+      for (const [key, ts] of this.eventDeduplicationMap.entries()) {
+        if (now - ts > ttlMs * 2) this.eventDeduplicationMap.delete(key);
+      }
+    }
+    return false;
+  }
 
   broadcastProductCreated(product: any) {
     this.server.emit('product.created', product);
@@ -76,6 +122,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   broadcastOrderCreated(order: any) {
+    if (this.isDuplicateEvent(`order_created_${order.id}`)) return;
+
     this.server.emit('order.created', order);
     this.server.to('admin').emit('order_created', order);
     if (order.storeId) {
@@ -112,6 +160,9 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   broadcastLiveLocation(orderId: string, riderId: string, lat: number, lng: number) {
+    // Deduplicate rapid GPS jitter updates within 200ms
+    if (this.isDuplicateEvent(`gps_${orderId}_${riderId}`, 200)) return;
+
     const payload = { orderId, riderId, lat, lng, timestamp: new Date().toISOString() };
     this.server.emit('delivery.location', payload);
     this.server.to(`order_${orderId}`).emit('rider_location_update', payload);
@@ -188,5 +239,8 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.emit('analytics.updated', metrics);
     this.server.to('admin').emit('dashboard_metrics_tick', metrics);
   }
-}
 
+  public getActiveConnectionCount(): number {
+    return this.activeSockets.size;
+  }
+}

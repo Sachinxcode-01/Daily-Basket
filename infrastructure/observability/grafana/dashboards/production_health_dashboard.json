@@ -1,0 +1,52 @@
+{
+  "annotations": { "list": [] },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "title": "Daily Basket — Production Health & SLA Dashboard",
+  "tags": ["production", "daily-basket", "platform-engineering"],
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "title": "API p95 Latency Target (<300ms)",
+      "type": "stat",
+      "targets": [{ "expr": "http_requests_p95_latency_ms" }],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 200 },
+              { "color": "red", "value": 300 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Active WebSocket Connections",
+      "type": "stat",
+      "targets": [{ "expr": "websocket_active_connections" }],
+      "fieldConfig": { "defaults": { "color": { "mode": "thresholds" } } }
+    },
+    {
+      "id": 3,
+      "title": "BullMQ Queue Pending Jobs",
+      "type": "stat",
+      "targets": [{ "expr": "bullmq_pending_orders" }]
+    },
+    {
+      "id": 4,
+      "title": "Heap Memory Used",
+      "type": "timeseries",
+      "targets": [{ "expr": "process_heap_bytes" }]
+    }
+  ],
+  "schemaVersion": 38,
+  "version": 1
+}

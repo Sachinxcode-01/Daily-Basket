@@ -189,6 +189,9 @@ model Product {
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
 
+  @@index([storeId, categoryId])
+  @@index([brand])
+  @@index([createdAt])
   @@map("products")
 }
 
@@ -205,6 +208,8 @@ model ProductVariant {
   orderItems    OrderItem[]
   stockAlerts   StockAlert[]
 
+  @@index([productId, isAvailable])
+  @@index([price])
   @@map("product_variants")
 }
 
@@ -219,6 +224,9 @@ model Inventory {
   updatedAt        DateTime       @updatedAt
 
   @@unique([storeId, variantId])
+  @@index([storeId])
+  @@index([variantId])
+  @@index([stockQuantity])
   @@map("inventories")
 }
 
@@ -246,6 +254,10 @@ model Order {
   updatedAt            DateTime      @updatedAt
   payments             Payment[]
 
+  @@index([userId, status])
+  @@index([storeId, status])
+  @@index([createdAt])
+  @@index([status])
   @@map("orders")
 }
 
@@ -261,6 +273,8 @@ model OrderItem {
   quantity    Int
   totalPrice  Float
 
+  @@index([orderId])
+  @@index([variantId])
   @@map("order_items")
 }
 
@@ -275,6 +289,8 @@ model Payment {
   status          PaymentStatus @default(PENDING)
   createdAt       DateTime      @default(now())
 
+  @@index([orderId])
+  @@index([status])
   @@map("payments")
 }
 
@@ -324,6 +340,8 @@ model Review {
   comment   String?
   createdAt DateTime @default(now())
 
+  @@index([productId, rating])
+  @@index([userId])
   @@map("reviews")
 }
 
@@ -369,6 +387,8 @@ model SupportTicket {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
+  @@index([userId, status])
+  @@index([createdAt])
   @@map("support_tickets")
 }
 
@@ -533,6 +553,8 @@ model SecurityAuditLog {
   metadata  Json?
   createdAt DateTime @default(now())
 
+  @@index([userId, event])
+  @@index([createdAt])
   @@map("security_audit_logs")
 }
 

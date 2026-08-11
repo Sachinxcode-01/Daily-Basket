@@ -2,111 +2,68 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: daily-basket-api
-  namespace: production
+  namespace: daily-basket
   labels:
-    app: daily-basket-api
-    tier: backend
+    app.kubernetes.io/name: daily-basket-api
+    app.kubernetes.io/component: backend-api
+    app.kubernetes.io/part-of: daily-basket-platform
 spec:
   replicas: 3
-  selector:
-    matchLabels:
-      app: daily-basket-api
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: 1
+      maxSurge: 25%
       maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: daily-basket-api
   template:
     metadata:
       labels:
         app: daily-basket-api
+        tier: backend
     spec:
+      terminationGracePeriodSeconds: 30
       containers:
         - name: api
-          image: gcr.io/daily-basket-prod/api:v1.1.0
+          image: ghcr.io/sachinxcode-01/daily-basket-api:latest
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 4000
+            - name: http
+              containerPort: 4000
           envFrom:
             - configMapRef:
-                name: daily-basket-config
+                name: daily-basket-api-config
             - secretRef:
-                name: daily-basket-secrets
+                name: daily-basket-api-secrets
           resources:
             requests:
-              cpu: "250m"
-              memory: "512Mi"
+              cpu: 250m
+              memory: 512Mi
             limits:
-              cpu: "1000m"
-              memory: "1024Mi"
-          readinessProbe:
-            httpGet:
-              path: /health/readiness
-              port: 4000
-            initialDelaySeconds: 10
-            periodSeconds: 5
+              cpu: 1000m
+              memory: 1536Mi
           livenessProbe:
             httpGet:
-              path: /health
+              path: /api/v1/observability/liveness
               port: 4000
             initialDelaySeconds: 15
             periodSeconds: 10
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: daily-basket-api-service
-  namespace: production
-spec:
-  type: ClusterIP
-  selector:
-    app: daily-basket-api
-  ports:
-    - port: 4000
-      targetPort: 4000
----
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: daily-basket-api-hpa
-  namespace: production
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: daily-basket-api
-  minReplicas: 3
-  maxReplicas: 10
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 75
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: daily-basket-ingress
-  namespace: production
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
-    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
-spec:
-  tls:
-    - hosts:
-        - api.dailybasket.com
-      secretName: dailybasket-tls
-  rules:
-    - host: api.dailybasket.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: daily-basket-api-service
-                port:
-                  number: 4000
+            timeoutSeconds: 3
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/observability/readiness
+              port: 4000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 2
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1001
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL

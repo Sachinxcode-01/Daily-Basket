@@ -54,6 +54,8 @@ import { FleetModule } from './modules/fleet/fleet.module';
 import { FranchiseModule } from './modules/franchise/franchise.module';
 import { ObservabilityModule } from './modules/observability/observability.module';
 import { RetailOsModule } from './modules/retail-os/retail-os.module';
+import { FeatureFlagsModule } from './modules/feature-flags/feature-flags.module';
+import { BotDetectionMiddleware } from './common/middleware/bot-detection.middleware';
 
 @Module({
   imports: [
@@ -82,6 +84,7 @@ import { RetailOsModule } from './modules/retail-os/retail-os.module';
     FranchiseModule,
     ObservabilityModule,
     RetailOsModule,
+    FeatureFlagsModule,
     AuthModule,
     UsersModule,
     ReferralsModule,
@@ -117,6 +120,9 @@ import { RetailOsModule } from './modules/retail-os/retail-os.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(RequestContextMiddleware).forRoutes('*');
+    consumer
+      .apply(RequestContextMiddleware, BotDetectionMiddleware)
+      .forRoutes('*');
   }
 }
+
