@@ -119,6 +119,8 @@ model User {
   groceryLists            GroceryList[]
   predictiveItems         PredictiveReorderItem[]
   personalizedOffers      PersonalizedOffer[]
+  cart                    Cart?
+  couponRedemptions       CouponRedemption[]
 
   @@map("users")
 }
@@ -295,15 +297,27 @@ model Payment {
 }
 
 model Coupon {
-  id             String    @id @default(uuid())
-  code           String    @unique
-  discountType   String    // PERCENTAGE, FLAT
-  discountValue  Float
-  minOrderAmount Float     @default(0)
-  maxDiscount    Float?
-  expiresAt      DateTime
-  isActive       Boolean   @default(true)
+  id                String             @id @default(uuid())
+  code              String             @unique
+  title             String             @default("Promotional Offer")
+  description       String             @default("Special discount coupon")
+  discountType      String             // PERCENTAGE, FLAT, FREE_DELIVERY, CASHBACK
+  discountValue     Float
+  minOrderAmount    Float              @default(0)
+  maxDiscount       Float?
+  category          String?
+  startDate         DateTime           @default(now())
+  expiresAt         DateTime
+  isActive          Boolean            @default(true)
+  usageLimitPerUser Int                @default(1)
+  totalUsageLimit   Int                @default(10000)
+  usedCount         Int                @default(0)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @default(now()) @updatedAt
+  redemptions       CouponRedemption[]
 
+  @@index([code])
+  @@index([isActive])
   @@map("coupons")
 }
 
@@ -1243,6 +1257,51 @@ model DisasterRecoveryBackup {
 
   @@map("disaster_recovery_backups")
 }
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("carts")
+}
+
+model CartItem {
+  id              String   @id @default(uuid())
+  cartId          String
+  cart            Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  variantId       String
+  productName     String
+  unitName        String
+  price           Float
+  quantity        Int      @default(1)
+  isSavedForLater Boolean  @default(false)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([cartId])
+  @@index([variantId])
+  @@map("cart_items")
+}
+
+model CouponRedemption {
+  id          String   @id @default(uuid())
+  couponId    String
+  coupon      Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId     String?
+  savedAmount Float
+  redeemedAt  DateTime @default(now())
+
+  @@index([couponId])
+  @@index([userId])
+  @@map("coupon_redemptions")
+}
+
 
 
 

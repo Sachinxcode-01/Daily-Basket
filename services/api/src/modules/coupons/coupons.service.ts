@@ -1,129 +1,121 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
+import { EventsGateway } from '../events/events.gateway';
 
 export interface CouponDto {
   id?: string;
   code: string;
   title: string;
   description: string;
-  discountType: 'PERCENTAGE' | 'FLAT' | 'FREE_DELIVERY' | 'CASHBACK';
+  discountType: 'PERCENTAGE' | 'FLAT' | 'FREE_DELIVERY' | 'CASHBACK' | 'FIRST_ORDER' | 'CATEGORY' | 'BRAND' | 'PRODUCT';
   discountValue: number;
   minOrderAmount: number;
   maxDiscount?: number;
+  category?: string;
+  startDate?: string;
   expiresAt: string;
-  isActive: boolean;
+  isActive?: boolean;
   usageLimitPerUser?: number;
   totalUsageLimit?: number;
   usedCount?: number;
-  category?: string;
 }
 
 @Injectable()
 export class CouponsService {
-  private coupons: Map<string, CouponDto> = new Map();
-  private couponHistory: Map<string, any[]> = new Map();
+  private readonly logger = new Logger(CouponsService.name);
 
-  constructor() {
-    // Seed initial production coupons
-    const initialCoupons: CouponDto[] = [
+  constructor(
+    private prisma: PrismaService,
+    private eventsGateway: EventsGateway,
+  ) {}
+
+  async getAvailableCoupons() {
+    const coupons = await this.prisma.coupon.findMany({
+      where: {
+        isActive: true,
+        expiresAt: { gte: new Date() },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    // Seed default promotional coupons if database table is empty
+    if (coupons.length === 0) {
+      await this.seedDefaultCoupons();
+      return this.prisma.coupon.findMany({ where: { isActive: true } });
+    }
+
+    return { success: true, data: coupons };
+  }
+
+  private async seedDefaultCoupons() {
+    const defaults = [
       {
-        id: 'cpn_WELCOME100',
         code: 'WELCOME100',
         title: '₹100 Off First Order',
         description: 'Get flat ₹100 off on your first order above ₹299',
-        discountType: 'FLAT',
+        discountType: 'FIRST_ORDER',
         discountValue: 100,
         minOrderAmount: 299,
-        expiresAt: '2026-12-31T23:59:59Z',
+        expiresAt: new Date('2026-12-31T23:59:59Z'),
         isActive: true,
         usageLimitPerUser: 1,
-        usedCount: 1420,
-        category: 'WELCOME',
+        totalUsageLimit: 10000,
       },
       {
-        id: 'cpn_FRESH20',
         code: 'FRESH20',
-        title: '20% Off Fresh Vegetables',
+        title: '20% Off Fresh Farm Vegetables',
         description: 'Save 20% up to ₹80 on fresh fruits and vegetables',
         discountType: 'PERCENTAGE',
         discountValue: 20,
         minOrderAmount: 199,
         maxDiscount: 80,
-        expiresAt: '2026-10-15T23:59:59Z',
+        expiresAt: new Date('2026-10-15T23:59:59Z'),
         isActive: true,
         usageLimitPerUser: 5,
-        usedCount: 3890,
-        category: 'VEGETABLES',
+        totalUsageLimit: 5000,
       },
       {
-        id: 'cpn_FREEDEL',
         code: 'FREEDEL',
         title: 'Free Delivery',
         description: 'Free 10-minute delivery on all orders above ₹149',
         discountType: 'FREE_DELIVERY',
-        discountValue: 35,
+        discountValue: 25,
         minOrderAmount: 149,
-        expiresAt: '2026-11-30T23:59:59Z',
+        expiresAt: new Date('2026-11-30T23:59:59Z'),
         isActive: true,
         usageLimitPerUser: 10,
-        usedCount: 8900,
-        category: 'DELIVERY',
-      },
-      {
-        id: 'cpn_DAILY50',
-        code: 'DAILY50',
-        title: 'Flat ₹50 Super Saver',
-        description: 'Flat ₹50 discount on grocery essentials',
-        discountType: 'FLAT',
-        discountValue: 50,
-        minOrderAmount: 399,
-        expiresAt: '2026-09-30T23:59:59Z',
-        isActive: true,
-        usageLimitPerUser: 3,
-        usedCount: 2310,
-        category: 'GROCERY',
+        totalUsageLimit: 20000,
       },
     ];
 
-    initialCoupons.forEach((c) => this.coupons.set(c.code, c));
-
-    // Seed mock coupon history for default user
-    this.couponHistory.set('usr_default', [
-      {
-        code: 'WELCOME100',
-        appliedAt: '2026-08-01T14:30:00Z',
-        savedAmount: 100,
-        orderId: 'ORD-98214',
-      },
-      {
-        code: 'FREEDEL',
-        appliedAt: '2026-08-03T10:15:00Z',
-        savedAmount: 35,
-        orderId: 'ORD-98255',
-      },
-    ]);
-  }
-
-  async getAvailableCoupons() {
-    return {
-      success: true,
-      data: Array.from(this.coupons.values()).filter((c) => c.isActive),
-    };
+    for (const item of defaults) {
+      await this.prisma.coupon.upsert({
+        where: { code: item.code },
+        update: {},
+        create: item,
+      });
+    }
   }
 
   async getCouponById(id: string) {
-    const coupon = Array.from(this.coupons.values()).find((c) => c.id === id || c.code === id);
+    const coupon = await this.prisma.coupon.findFirst({
+      where: { OR: [{ id }, { code: id.toUpperCase() }] },
+    });
+
     if (!coupon) throw new NotFoundException('Coupon not found');
     return { success: true, data: coupon };
   }
 
   async validateCoupon(code: string, cartSubtotal: number, userId = 'usr_default') {
-    const coupon = this.coupons.get(code.toUpperCase());
+    const coupon = await this.prisma.coupon.findUnique({
+      where: { code: code.toUpperCase() },
+    });
 
     if (!coupon || !coupon.isActive) {
-      throw new BadRequestException('Invalid or expired coupon code.');
+      throw new BadRequestException('Invalid or inactive coupon code.');
     }
 
-    if (new Date() > new Date(coupon.expiresAt)) {
+    if (new Date() > coupon.expiresAt) {
       throw new BadRequestException('Coupon code has expired.');
     }
 
@@ -133,6 +125,25 @@ export class CouponsService {
       );
     }
 
+    // First order validation check
+    if (coupon.discountType === 'FIRST_ORDER') {
+      const userOrderCount = await this.prisma.order.count({
+        where: { userId, status: { not: 'CANCELLED' } },
+      });
+      if (userOrderCount > 0) {
+        throw new BadRequestException('Coupon WELCOME100 is valid on your first order only.');
+      }
+    }
+
+    // User redemption count validation
+    const userRedemptions = await this.prisma.couponRedemption.count({
+      where: { couponId: coupon.id, userId },
+    });
+
+    if (userRedemptions >= coupon.usageLimitPerUser) {
+      throw new BadRequestException(`Usage limit of ${coupon.usageLimitPerUser} times reached for this coupon.`);
+    }
+
     let discountAmount = 0;
     if (coupon.discountType === 'PERCENTAGE') {
       discountAmount = (cartSubtotal * coupon.discountValue) / 100;
@@ -140,7 +151,7 @@ export class CouponsService {
         discountAmount = coupon.maxDiscount;
       }
     } else if (coupon.discountType === 'FREE_DELIVERY') {
-      discountAmount = coupon.discountValue || 35;
+      discountAmount = coupon.discountValue || 25;
     } else {
       discountAmount = coupon.discountValue;
     }
@@ -151,8 +162,9 @@ export class CouponsService {
       success: true,
       valid: true,
       code: coupon.code,
+      discountType: coupon.discountType,
       discountAmount,
-      message: `Coupon ${coupon.code} applied! Saved ₹${discountAmount}.`,
+      message: `Coupon ${coupon.code} applied successfully! Saved ₹${discountAmount}.`,
     };
   }
 
@@ -164,37 +176,83 @@ export class CouponsService {
   }
 
   async getHistory(userId = 'usr_default') {
-    const history = this.couponHistory.get(userId) || [];
+    const history = await this.prisma.couponRedemption.findMany({
+      where: { userId },
+      include: { coupon: true },
+      orderBy: { redeemedAt: 'desc' },
+    });
     return { success: true, data: history };
   }
 
-  // ─── ADMIN CRUD ─────────────────────────────────────────────────────────────
+  // ─── ADMIN MANAGEMENT WITH INSTANT WEBSOCKET BROADCASTING ─────────────────
   async createCoupon(dto: CouponDto) {
-    const newCoupon = {
-      ...dto,
-      id: `cpn_${dto.code.toUpperCase()}`,
-      code: dto.code.toUpperCase(),
-      usedCount: 0,
-      isActive: true,
-    };
-    this.coupons.set(newCoupon.code, newCoupon);
-    return { success: true, data: newCoupon, message: 'Coupon created successfully' };
+    const code = dto.code.toUpperCase();
+    const existing = await this.prisma.coupon.findUnique({ where: { code } });
+
+    if (existing) {
+      throw new BadRequestException(`Coupon code ${code} already exists.`);
+    }
+
+    const coupon = await this.prisma.coupon.create({
+      data: {
+        code,
+        title: dto.title,
+        description: dto.description,
+        discountType: dto.discountType,
+        discountValue: dto.discountValue,
+        minOrderAmount: dto.minOrderAmount || 0,
+        maxDiscount: dto.maxDiscount,
+        category: dto.category,
+        expiresAt: new Date(dto.expiresAt),
+        isActive: dto.isActive !== undefined ? dto.isActive : true,
+        usageLimitPerUser: dto.usageLimitPerUser || 1,
+        totalUsageLimit: dto.totalUsageLimit || 10000,
+      },
+    });
+
+    // Real-time Socket.IO emission to Customer Apps & Web Checkouts
+    this.eventsGateway.broadcastCouponCreated(coupon);
+
+    return { success: true, data: coupon, message: 'Coupon created successfully' };
   }
 
   async updateCoupon(id: string, dto: Partial<CouponDto>) {
-    const existing = Array.from(this.coupons.values()).find((c) => c.id === id || c.code === id);
+    const existing = await this.prisma.coupon.findFirst({
+      where: { OR: [{ id }, { code: id.toUpperCase() }] },
+    });
+
     if (!existing) throw new NotFoundException('Coupon not found');
 
-    const updated = { ...existing, ...dto };
-    this.coupons.set(existing.code, updated);
+    const updated = await this.prisma.coupon.update({
+      where: { id: existing.id },
+      data: {
+        title: dto.title,
+        description: dto.description,
+        discountType: dto.discountType,
+        discountValue: dto.discountValue,
+        minOrderAmount: dto.minOrderAmount,
+        maxDiscount: dto.maxDiscount,
+        expiresAt: dto.expiresAt ? new Date(dto.expiresAt) : undefined,
+        isActive: dto.isActive,
+      },
+    });
+
+    // Real-time Socket.IO emission
+    this.eventsGateway.broadcastCouponUpdated(updated);
+
     return { success: true, data: updated, message: 'Coupon updated successfully' };
   }
 
   async deleteCoupon(id: string) {
-    const existing = Array.from(this.coupons.values()).find((c) => c.id === id || c.code === id);
+    const existing = await this.prisma.coupon.findFirst({
+      where: { OR: [{ id }, { code: id.toUpperCase() }] },
+    });
+
     if (!existing) throw new NotFoundException('Coupon not found');
 
-    this.coupons.delete(existing.code);
+    await this.prisma.coupon.delete({ where: { id: existing.id } });
+    this.eventsGateway.server?.emit('coupon.deleted', { id: existing.id, code: existing.code });
+
     return { success: true, message: 'Coupon deleted successfully' };
   }
 }

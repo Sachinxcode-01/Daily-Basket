@@ -55,10 +55,12 @@ import { FranchiseModule } from './modules/franchise/franchise.module';
 import { ObservabilityModule } from './modules/observability/observability.module';
 import { RetailOsModule } from './modules/retail-os/retail-os.module';
 import { FeatureFlagsModule } from './modules/feature-flags/feature-flags.module';
+import { CartModule } from './modules/cart/cart.module';
 import { BotDetectionMiddleware } from './common/middleware/bot-detection.middleware';
 
 @Module({
   imports: [
+    CartModule,
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
