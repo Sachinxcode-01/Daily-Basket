@@ -65,12 +65,14 @@ timeline
 
 ## 🔮 Upcoming Milestones
 
-### 🔔 v1.1.0 — Push Notifications & Multi-Language
-- [ ] Integration of Firebase Cloud Messaging (FCM) for instant push alerts.
-- [ ] Multi-language support (Kannada, Hindi, English) across Mobile and Web applications.
-- [ ] Geofenced dark store radius mapping and dynamic surge pricing calculator.
+### 🔔 v1.1.0 — Push Notifications, i18n & Geofencing (Completed)
+- [x] Integration of Firebase Cloud Messaging (FCM) & SMS Gateway for instant push & transactional alerts.
+- [x] Multi-language support (Kannada, Hindi, English) localization dictionary in `@daily-basket/constants`.
+- [x] Geofenced dark store radius mapping (Haversine distance) and dynamic surge pricing calculator.
+
 
 ### 🤖 v2.0.0 — Automated Dispatch & AI Inventory
 - [ ] Multi-store dark store dispatch load-balancing engine.
 - [ ] AI-driven predictive inventory demand forecasting and auto-reorder engine.
-- [ ] Offline-first sync for Delivery Partner PWA during poor network connectivity.
+- [x] Offline-first sync for Delivery Partner PWA during poor network connectivity.
+

@@ -41,3 +41,6 @@ export const ERROR_CODES = {
   STORE_CLOSED: 'ERR_STORE_CLOSED',
   INVALID_COUPON: 'ERR_INVALID_COUPON',
 };
+
+export * from './i18n';
+

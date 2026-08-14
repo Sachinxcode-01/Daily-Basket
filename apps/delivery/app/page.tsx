@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Bike,
   Navigation,
@@ -13,11 +13,18 @@ import {
   Power,
   ChevronRight,
   AlertCircle,
+  Wifi,
+  WifiOff,
+  RefreshCw,
 } from 'lucide-react';
 import { formatCurrency } from '@daily-basket/shared-utils';
+import { OfflineSyncEngine, QueuedOfflineAction } from './lib/offlineStore';
 
 export default function DeliveryRiderDashboardPage() {
   const [isOnline, setIsOnline] = useState(true);
+  const [isNetworkOnline, setIsNetworkOnline] = useState(true);
+  const [pendingQueueCount, setPendingQueueCount] = useState(0);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [orderStep, setOrderStep] = useState<'ASSIGNED' | 'PICKED_UP' | 'ARRIVED' | 'DELIVERED'>('ASSIGNED');
   const [otpInput, setOtpInput] = useState('');
   const [otpError, setOtpError] = useState(false);
@@ -35,9 +42,51 @@ export default function DeliveryRiderDashboardPage() {
     validOtp: '4821',
   };
 
+  useEffect(() => {
+    // Initial queue count check
+    setPendingQueueCount(OfflineSyncEngine.getQueue().length);
+    setIsNetworkOnline(typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+    const handleOnline = async () => {
+      setIsNetworkOnline(true);
+      await triggerQueueSync();
+    };
+
+    const handleOffline = () => {
+      setIsNetworkOnline(false);
+    };
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  const triggerQueueSync = async () => {
+    setIsSyncing(true);
+    const result = await OfflineSyncEngine.flushQueue();
+    setPendingQueueCount(OfflineSyncEngine.getQueue().length);
+    setIsSyncing(false);
+  };
+
+  const handleStepTransition = (nextStep: 'PICKED_UP' | 'ARRIVED' | 'DELIVERED', payload?: Record<string, any>) => {
+    setOrderStep(nextStep);
+
+    if (!isNetworkOnline) {
+      OfflineSyncEngine.enqueueAction('STATUS_UPDATE', activeOrder.id, {
+        step: nextStep,
+        ...payload,
+      });
+      setPendingQueueCount(OfflineSyncEngine.getQueue().length);
+    }
+  };
+
   const handleVerifyOtp = () => {
     if (otpInput === activeOrder.validOtp) {
-      setOrderStep('DELIVERED');
+      handleStepTransition('DELIVERED', { otpVerified: true });
       setShowOtpModal(false);
       setOtpError(false);
     } else {
@@ -47,6 +96,38 @@ export default function DeliveryRiderDashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 p-4 pb-20 max-w-md mx-auto">
+      {/* Network Connectivity Status Banner */}
+      {!isNetworkOnline && (
+        <div className="bg-amber-500/20 border border-amber-500/40 text-amber-300 p-3 rounded-2xl mb-4 text-xs flex items-center justify-between shadow-lg animate-pulse">
+          <div className="flex items-center gap-2 font-bold">
+            <WifiOff className="w-4 h-4 text-amber-400" />
+            <span>Offline Mode — Actions will queue locally</span>
+          </div>
+          {pendingQueueCount > 0 && (
+            <span className="bg-amber-500/30 px-2 py-0.5 rounded-full text-[10px] font-extrabold">
+              {pendingQueueCount} Queued
+            </span>
+          )}
+        </div>
+      )}
+
+      {isNetworkOnline && pendingQueueCount > 0 && (
+        <div className="bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 p-3 rounded-2xl mb-4 text-xs flex items-center justify-between shadow-lg">
+          <div className="flex items-center gap-2 font-bold">
+            <Wifi className="w-4 h-4 text-emerald-400" />
+            <span>Connection Restored ({pendingQueueCount} Pending)</span>
+          </div>
+          <button
+            onClick={triggerQueueSync}
+            disabled={isSyncing}
+            className="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1 rounded-xl text-[11px] font-bold flex items-center gap-1 transition"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span>{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
+          </button>
+        </div>
+      )}
+
       {/* Top Header & Duty Toggle */}
       <div className="flex items-center justify-between py-4 border-b border-slate-800 mb-6">
         <div className="flex items-center gap-3">
@@ -156,7 +237,7 @@ export default function DeliveryRiderDashboardPage() {
           {/* Main Delivery Step Action Button */}
           {orderStep === 'ASSIGNED' && (
             <button
-              onClick={() => setOrderStep('PICKED_UP')}
+              onClick={() => handleStepTransition('PICKED_UP')}
               className="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-emerald-900/40 transition"
             >
               Confirm Order Picked Up
@@ -165,7 +246,7 @@ export default function DeliveryRiderDashboardPage() {
 
           {orderStep === 'PICKED_UP' && (
             <button
-              onClick={() => setOrderStep('ARRIVED')}
+              onClick={() => handleStepTransition('ARRIVED')}
               className="w-full py-3.5 bg-amber-600 hover:bg-amber-500 text-slate-950 font-extrabold rounded-xl text-sm shadow-lg transition"
             >
               Arrived at Doorstep
@@ -228,3 +309,4 @@ export default function DeliveryRiderDashboardPage() {
     </div>
   );
 }
+
