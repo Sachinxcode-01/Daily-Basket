@@ -15,7 +15,17 @@ async function bootstrap() {
   // Enable Graceful Shutdown Hooks
   app.enableShutdownHooks();
 
+  // Static Assets Serving for Local Uploaded Product Images
+  const express = require('express');
+  const path = require('path');
+  const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
+  if (!require('fs').existsSync(uploadsDir)) {
+    require('fs').mkdirSync(uploadsDir, { recursive: true });
+  }
+  app.use('/uploads', express.static(uploadsDir));
+
   // Global Prefix & API Versioning
+
   app.setGlobalPrefix('api/v1');
   app.enableVersioning({
     type: VersioningType.URI,
