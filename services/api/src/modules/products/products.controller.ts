@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Param, Query, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { ProductsService } from './products.service';
+import { BlinkitMigrationService } from './blinkit-migration.service';
 import { EventsGateway } from '../events/events.gateway';
 
 @ApiTags('Products & Home Feed')
@@ -8,6 +9,7 @@ import { EventsGateway } from '../events/events.gateway';
 export class ProductsController {
   constructor(
     private readonly productsService: ProductsService,
+    private readonly blinkitMigrationService: BlinkitMigrationService,
     private readonly eventsGateway: EventsGateway,
   ) {}
 
@@ -15,6 +17,22 @@ export class ProductsController {
   @ApiOperation({ summary: 'Get complete aggregated Home Feed data (banners, flash deals, categories)' })
   async getHomeFeed() {
     return this.productsService.getHomeFeed();
+  }
+
+  @Post('delete-all')
+  @ApiOperation({ summary: 'Admin Clean Wipe: Delete all catalog products, variants, and stock inventories' })
+  async deleteAllProducts() {
+    const result = await this.blinkitMigrationService.deleteAllProducts();
+    this.eventsGateway.server?.emit('catalog_reset', { timestamp: new Date().toISOString() });
+    return result;
+  }
+
+  @Post('run-blinkit-migration')
+  @ApiOperation({ summary: 'Admin Trigger: Run Blinkit product migration and data enrichment pipeline' })
+  async runBlinkitMigration() {
+    const report = await this.blinkitMigrationService.runMigration();
+    this.eventsGateway.server?.emit('catalog_migrated', report);
+    return report;
   }
 
   @Get()
@@ -46,3 +64,4 @@ export class ProductsController {
     return { id, newStock: body.newStock, isAvailable, status: 'BROADCASTED' };
   }
 }
+
