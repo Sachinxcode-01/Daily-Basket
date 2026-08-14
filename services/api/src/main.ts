@@ -15,16 +15,21 @@ async function bootstrap() {
   // Enable Graceful Shutdown Hooks
   app.enableShutdownHooks();
 
-  // Static Assets Serving for Local Uploaded Product Images
+  // Static Assets Serving for Monorepo Local Product Assets & Uploads
   const express = require('express');
   const path = require('path');
   const uploadsDir = path.join(__dirname, '..', 'public', 'uploads');
+  const assetsDir = path.join(__dirname, '..', '..', '..', 'assets');
   if (!require('fs').existsSync(uploadsDir)) {
     require('fs').mkdirSync(uploadsDir, { recursive: true });
   }
   app.use('/uploads', express.static(uploadsDir));
+  if (require('fs').existsSync(assetsDir)) {
+    app.use('/assets', express.static(assetsDir));
+  }
 
   // Global Prefix & API Versioning
+
 
   app.setGlobalPrefix('api/v1');
   app.enableVersioning({

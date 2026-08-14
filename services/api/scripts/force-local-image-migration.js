@@ -6,9 +6,9 @@ const prisma = new PrismaClient();
 
 async function runForceLocalImageMigration() {
   const startTime = Date.now();
-  console.log('🖼️  Starting Fast Force Local Image Migration Pipeline...');
+  console.log('🖼️  Starting Monorepo Local Image Migration Pipeline (assets/products/)...');
 
-  const downloadsBase = 'C:\\Users\\kalin\\Downloads';
+  const monorepoAssetsBase = path.join(__dirname, '..', '..', '..', 'assets', 'products');
   const targetUploadsDir = path.join(__dirname, '..', 'public', 'uploads', 'products');
 
   if (!fs.existsSync(targetUploadsDir)) {
@@ -16,14 +16,14 @@ async function runForceLocalImageMigration() {
   }
 
   const sourceFolders = [
-    { dirName: 'Buy Paneer & Tofu Online Now', categoryKey: 'paneer-tofu', catName: 'Paneer & Tofu' },
-    { dirName: 'Buy Muesli & Granola Online Now', categoryKey: 'muesli-granola', catName: 'Muesli & Granola' },
-    { dirName: 'Buy Flakes & Kids Cereals Online Now', categoryKey: 'flakes-cereals', catName: 'Flakes & Kids Cereals' },
-    { dirName: 'Buy Bread & Pav Online Now', categoryKey: 'bread-pav', catName: 'Bread & Pav' },
-    { dirName: 'Buy Milk Online Now', categoryKey: 'milk', catName: 'Milk' },
-    { dirName: 'Buy Poha, Daliya & Other Grains Online Now', categoryKey: 'poha-grains', catName: 'Poha, Daliya & Grains' },
-    { dirName: 'Buy Vermicelli Online Now', categoryKey: 'vermicelli-pasta', catName: 'Vermicelli & Pasta' },
-    { dirName: 'Buy Curd & Yogurt Online Now', categoryKey: 'curd-yogurt', catName: 'Curd & Yogurt' },
+    { dirName: 'paneer-tofu', categoryKey: 'paneer-tofu', catName: 'Paneer & Tofu' },
+    { dirName: 'muesli-granola', categoryKey: 'muesli-granola', catName: 'Muesli & Granola' },
+    { dirName: 'flakes-kids-cereals', categoryKey: 'flakes-kids-cereals', catName: 'Flakes & Kids Cereals' },
+    { dirName: 'bread-pav', categoryKey: 'bread-pav', catName: 'Bread & Pav' },
+    { dirName: 'milk', categoryKey: 'milk', catName: 'Milk' },
+    { dirName: 'poha-daliya-grains', categoryKey: 'poha-daliya-grains', catName: 'Poha, Daliya & Grains' },
+    { dirName: 'vermicelli', categoryKey: 'vermicelli-pasta', catName: 'Vermicelli & Pasta' },
+    { dirName: 'curd-yogurt', categoryKey: 'curd-yogurt', catName: 'Curd & Yogurt' },
   ];
 
   let totalImagesFound = 0;
@@ -32,8 +32,11 @@ async function runForceLocalImageMigration() {
   const localImageMap = {};
 
   for (const folderInfo of sourceFolders) {
-    const folderPath = path.join(downloadsBase, folderInfo.dirName);
-    if (!fs.existsSync(folderPath)) continue;
+    const folderPath = path.join(monorepoAssetsBase, folderInfo.dirName);
+    if (!fs.existsSync(folderPath)) {
+      console.warn(`Directory missing: ${folderPath}`);
+      continue;
+    }
 
     const files = fs.readdirSync(folderPath);
     const directImages = files.filter((f) => /\.(png|jpg|jpeg|webp|svg)$/i.test(f));
@@ -51,31 +54,29 @@ async function runForceLocalImageMigration() {
         try {
           fs.copyFileSync(srcPath, destPath);
           totalImagesCopied++;
-          categoryCopiedImages.push(`http://localhost:4000/uploads/products/${destFilename}`);
+          categoryCopiedImages.push(`http://localhost:4000/assets/products/${folderInfo.dirName}/${imgFile}`);
         } catch {}
       });
     } else {
-      // Create local formatted product asset placeholder if zip is archive
       for (let i = 1; i <= 4; i++) {
         const destFilename = `${folderInfo.categoryKey}-${i}.png`;
         const destPath = path.join(targetUploadsDir, destFilename);
         if (!fs.existsSync(destPath)) {
-          // Generate local solid WebP/PNG byte buffer asset
-          const dummyPngBuffer = Buffer.from(
+          const dummyBuffer = Buffer.from(
             'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
             'base64',
           );
-          fs.writeFileSync(destPath, dummyPngBuffer);
+          fs.writeFileSync(destPath, dummyBuffer);
         }
         totalImagesCopied++;
-        categoryCopiedImages.push(`http://localhost:4000/uploads/products/${destFilename}`);
+        categoryCopiedImages.push(`http://localhost:4000/assets/products/${folderInfo.dirName}/${destFilename}`);
       }
     }
 
     localImageMap[folderInfo.catName] = categoryCopiedImages;
   }
 
-  // Update Products in Database with copied local image URLs
+  // Update Products in Database with monorepo local image URLs
   try {
     const products = await prisma.product.findMany();
     for (const prod of products) {
@@ -108,12 +109,12 @@ async function runForceLocalImageMigration() {
   const processingTimeMs = Date.now() - startTime;
 
   console.log('\n======================================================');
-  console.log('🖼️  FORCE LOCAL IMAGE MIGRATION SUMMARY');
+  console.log('🖼️  MONOREPO LOCAL ASSET MIGRATION SUMMARY (assets/products)');
   console.log('======================================================');
+  console.log(`Source Asset Root:            ${monorepoAssetsBase}`);
   console.log(`Total Local Images Processed: ${totalImagesFound}`);
   console.log(`Total Images Copied & Linked: ${totalImagesCopied}`);
   console.log(`Products Updated in DB:       ${productsUpdatedCount}`);
-  console.log(`Target Local Uploads Dir:     ${targetUploadsDir}`);
   console.log(`Processing Execution Time:    ${processingTimeMs} ms`);
   console.log('======================================================\n');
 
