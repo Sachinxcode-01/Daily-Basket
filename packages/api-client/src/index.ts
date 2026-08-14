@@ -131,6 +131,45 @@ export class ApiClient {
   }> {
     return this.fetcher(API_ROUTES.ORDERS.TRACKING(orderId));
   }
+
+  // Notifications & FCM Methods
+
+  public async registerFcmToken(userId: string, token: string, platform?: string): Promise<{ success: boolean; registeredTokensCount: number }> {
+    return this.fetcher('/notifications/register-token', {
+      method: 'POST',
+      body: JSON.stringify({ userId, token, platform }),
+    });
+  }
+
+  public async sendTestPushNotification(userId: string, title?: string, body?: string): Promise<{ success: boolean; messageId: string }> {
+    return this.fetcher('/notifications/test-push', {
+      method: 'POST',
+      body: JSON.stringify({ userId, title, body }),
+    });
+  }
+
+  // Geofence & Delivery Methods
+  public async evaluateGeofence(lat: number, lng: number, itemTotal?: number): Promise<any> {
+    return this.fetcher('/delivery/geofence-check', {
+      method: 'POST',
+      body: JSON.stringify({ lat, lng, itemTotal }),
+    });
+  }
+
+  public async calculateSurgePricing(lat: number, lng: number, itemTotal?: number): Promise<any> {
+    return this.fetcher('/delivery/surge-pricing', {
+      method: 'POST',
+      body: JSON.stringify({ lat, lng, itemTotal }),
+    });
+  }
+
+  public async syncOfflineDeliveryQueue(actions: any[]): Promise<{ success: boolean; syncedCount: number; processedActionIds: string[] }> {
+    return this.fetcher('/delivery/sync-offline-queue', {
+      method: 'POST',
+      body: JSON.stringify({ actions }),
+    });
+  }
 }
 
 export const apiClient = new ApiClient();
+
