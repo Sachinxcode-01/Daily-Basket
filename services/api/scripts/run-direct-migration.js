@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
+
 
 console.log('🚀 Running Blinkit Product Migration & Data Enrichment Engine...');
 

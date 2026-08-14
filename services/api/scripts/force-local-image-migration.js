@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const fs = require('fs');
 const path = require('path');
 const { PrismaClient } = require('@prisma/client');
+
 
 const prisma = new PrismaClient();
 

@@ -1,5 +1,4 @@
-const fs = require('fs');
-const path = require('path');
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
@@ -8,7 +7,7 @@ async function runBlinkitScraperAndEnrichment() {
   const startTime = Date.now();
   console.log('🌐 Executing Blinkit Product Detail Scraper & Data Enrichment Engine...');
 
-  const monorepoAssetsBase = path.join(__dirname, '..', '..', '..', 'assets', 'products');
+
 
   // Master Scraped Blinkit Catalog mapped to Local Assets
   const blinkitScrapedCatalog = [

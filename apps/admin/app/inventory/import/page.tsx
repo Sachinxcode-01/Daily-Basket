@@ -12,8 +12,9 @@ import {
   Layers,
   Database,
   RefreshCw,
-  FolderZip,
+  FolderArchive,
   Sparkles,
+
   ShieldAlert,
   Search,
   Filter,
@@ -225,9 +226,10 @@ export default function BulkProductImportPage() {
       <div className="bg-slate-900/80 border border-slate-800 p-5 rounded-3xl space-y-4">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
           <h2 className="text-sm font-extrabold text-white uppercase tracking-wider flex items-center gap-2">
-            <FolderZip className="w-4 h-4 text-emerald-400" />
+            <FolderArchive className="w-4 h-4 text-emerald-400" />
             <span>Monorepo Source Directories (`assets/products/`)</span>
           </h2>
+
 
           <div className="relative w-full sm:w-64">
             <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
