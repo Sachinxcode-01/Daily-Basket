@@ -374,14 +374,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: OutlinedButton(
                             onPressed: _isLoading ? null : () async {
                               setState(() => _isLoading = true);
+                              final navigator = Navigator.of(context);
                               await Future.delayed(const Duration(milliseconds: 600));
-                              if (mounted) {
-                                setState(() => _isLoading = false);
-                                Navigator.of(context).pushReplacementNamed('/customer/home');
-                              }
+                              if (!mounted) return;
+                              setState(() => _isLoading = false);
+                              navigator.pushReplacementNamed('/customer/home');
                             },
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: AppColors.outlineVariant),
+                              side: const BorderSide(color: AppColors.outlineVariant),
                               shape: const StadiumBorder(),
                             ),
                             child: Row(
@@ -417,7 +417,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               Navigator.of(context).pushNamed('/auth/otp');
                             },
                             style: OutlinedButton.styleFrom(
-                              side: BorderSide(color: AppColors.outlineVariant),
+                              side: const BorderSide(color: AppColors.outlineVariant),
                               shape: const StadiumBorder(),
                             ),
                             child: Row(
@@ -441,6 +441,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
+
 
                         const SizedBox(height: 28),
 
