@@ -344,6 +344,104 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
 
+                        const SizedBox(height: 20),
+
+                        // ─── Divider: OR ──────────────────────────────────
+                        Row(
+                          children: [
+                            Expanded(child: Divider(color: AppColors.outlineVariant.withValues(alpha: 0.6))),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'OR',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.onSurfaceVariant,
+                                ),
+                              ),
+                            ),
+                            Expanded(child: Divider(color: AppColors.outlineVariant.withValues(alpha: 0.6))),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // ─── Continue with Google ─────────────────────────
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: OutlinedButton(
+                            onPressed: _isLoading ? null : () async {
+                              setState(() => _isLoading = true);
+                              await Future.delayed(const Duration(milliseconds: 600));
+                              if (mounted) {
+                                setState(() => _isLoading = false);
+                                Navigator.of(context).pushReplacementNamed('/customer/home');
+                              }
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: AppColors.outlineVariant),
+                              shape: const StadiumBorder(),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.g_mobiledata_rounded,
+                                  size: 24,
+                                  color: Color(0xFF4285F4),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Continue with Google',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        // ─── Continue with Phone OTP ──────────────────────
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: OutlinedButton(
+                            onPressed: _isLoading ? null : () {
+                              Navigator.of(context).pushNamed('/auth/otp');
+                            },
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: AppColors.outlineVariant),
+                              shape: const StadiumBorder(),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.phone_iphone_rounded,
+                                  size: 20,
+                                  color: AppColors.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Continue with Phone OTP',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
                         const SizedBox(height: 28),
 
                         // ─── Footer: Don't have an account? Sign up ──────
@@ -388,3 +486,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+
