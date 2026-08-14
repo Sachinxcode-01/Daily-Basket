@@ -70,8 +70,9 @@ export class AuthService {
         expiresAt,
         lastActive: new Date(),
       },
-    });
+    }).catch(() => null);
   }
+
 
   /**
    * Helper to log security audit events.

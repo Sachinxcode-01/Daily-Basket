@@ -197,4 +197,36 @@ describe('AuthService Enterprise Security Tests', () => {
       });
     });
   });
+
+  describe('Email OTP & Device Risk Evaluation', () => {
+    it('should send email OTP with 60s cooldown metadata', async () => {
+      const result = await service.sendEmailOtp('admin@dailybasket.com');
+      expect(result.success).toBe(true);
+      expect(result.resendCooldownSeconds).toBe(60);
+    });
+
+    it('should verify email OTP code', async () => {
+      const result = await service.verifyEmailOtp('admin@dailybasket.com', '482109');
+      expect(result.success).toBe(true);
+      expect(result.tokens).toBeDefined();
+    });
+
+    it('should evaluate device security risk score', async () => {
+      const riskResult = await service.evaluateDeviceRisk(
+        'usr_1',
+        'dev_browser_01',
+        '127.0.0.1',
+        'web',
+      );
+      expect(riskResult.riskScore).toBeLessThan(0.1);
+      expect(riskResult.riskLevel).toBe('LOW');
+    });
+
+    it('should authenticate passkey biometric challenge', async () => {
+      const passkeyResult = await service.authenticatePasskey('cred_123', 'sig_abc');
+      expect(passkeyResult.success).toBe(true);
+      expect(passkeyResult.signatureVerified).toBe(true);
+    });
+  });
 });
+
