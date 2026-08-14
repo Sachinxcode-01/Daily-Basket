@@ -41,11 +41,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _selectedImageIndex = 0;
   String _selectedWeight = '500g ~3-4 pieces';
 
-  final List<String> _galleryImages = [
-    'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=800&q=80',
-    'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=800&q=80',
-    'https://images.unsplash.com/photo-1601039641847-7857b994d704?w=800&q=80',
-  ];
+  List<String> get _galleryImages {
+    final primary = widget.imageUrl.isNotEmpty
+        ? widget.imageUrl
+        : 'http://localhost:4000/assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png';
+    return [
+      primary,
+      'http://localhost:4000/assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',
+      'http://localhost:4000/assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',
+    ];
+  }
 
   final List<String> _weightOptions = [
     '500g ~3-4 pieces',
@@ -55,29 +60,30 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   final List<Map<String, String>> _similarProducts = [
     {
       'id': 'sim_1',
-      'name': 'Organic Blueberries',
-      'weight': '125g Pack',
-      'price': '₹240',
-      'mrp': '₹280',
-      'image': 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=300&q=80',
+      'name': 'Fresh Hybrid Tomatoes',
+      'weight': '500g Pack',
+      'price': '₹24',
+      'mrp': '₹28',
+      'image': 'http://localhost:4000/assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
     },
     {
       'id': 'sim_2',
-      'name': 'Fresh Strawberries',
-      'weight': '200g Pack',
-      'price': '₹160',
-      'mrp': '₹190',
-      'image': 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=300&q=80',
+      'name': 'New Crop Potatoes',
+      'weight': '1kg Pack',
+      'price': '₹32',
+      'mrp': '₹35',
+      'image': 'http://localhost:4000/assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',
     },
     {
       'id': 'sim_3',
-      'name': 'Organic Hass Avocado Oil',
-      'weight': '250ml Bottle',
-      'price': '₹450',
-      'mrp': '₹520',
-      'image': 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300&q=80',
+      'name': 'Fresh Nashik Red Onions',
+      'weight': '1kg Pack',
+      'price': '₹38',
+      'mrp': '₹42',
+      'image': 'http://localhost:4000/assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',
     },
   ];
+
 
   @override
   void initState() {
