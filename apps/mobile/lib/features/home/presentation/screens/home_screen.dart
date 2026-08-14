@@ -32,14 +32,15 @@ class _Product {
 }
 
 const _catalog = <_Product>[
-  _Product(id:'mlk1',name:'Full Cream Milk',brand:'Amul',unit:'1 L Pouch',price:r'₹64',mrp:r'₹68',rating:4.7,reviews:8420,imageUrl:'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400',category:'Dairy'),
-  _Product(id:'mlk2',name:'Toned Milk',brand:'Mother Dairy',unit:'500 ml Pouch',price:r'₹30',mrp:r'₹32',rating:4.6,reviews:6210,imageUrl:'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400',category:'Dairy'),
-  _Product(id:'mlk3',name:'Double Toned Milk',brand:'Nandini',unit:'1 L Pouch',price:r'₹54',mrp:r'₹58',rating:4.5,reviews:3120,imageUrl:'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400',category:'Dairy'),
-  _Product(id:'mlk4',name:'Organic Cow Milk',brand:'Akshayakalpa',unit:'500 ml',price:r'₹46',mrp:r'₹50',rating:4.8,reviews:2890,imageUrl:'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400',category:'Dairy'),
-  _Product(id:'crd1',name:'Set Curd',brand:'Amul',unit:'400 g Cup',price:r'₹42',mrp:r'₹45',rating:4.6,reviews:5340,imageUrl:'https://images.unsplash.com/photo-1571512599285-9b05c2b06e99?w=400',category:'Dairy'),
-  _Product(id:'crd2',name:'Mishti Doi',brand:'Mother Dairy',unit:'100 g Cup',price:r'₹20',mrp:r'₹22',rating:4.5,reviews:2100,imageUrl:'https://images.unsplash.com/photo-1571512599285-9b05c2b06e99?w=400',category:'Dairy'),
-  _Product(id:'lsi1',name:'Sweet Lassi',brand:'Amul',unit:'200 ml Bottle',price:r'₹25',mrp:r'₹28',rating:4.7,reviews:4120,imageUrl:'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400',category:'Dairy'),
-  _Product(id:'lsi2',name:'Mango Lassi',brand:'Havmor',unit:'200 ml Bottle',price:r'₹28',mrp:r'₹30',rating:4.6,reviews:3200,imageUrl:'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=400',category:'Dairy'),
+  _Product(id:'mlk1',name:'Full Cream Milk',brand:'Amul',unit:'1 L Pouch',price:r'₹64',mrp:r'₹68',rating:4.7,reviews:8420,imageUrl:'http://localhost:4000/assets/products/milk/imgi_10.png',category:'Dairy'),
+  _Product(id:'mlk2',name:'Toned Milk',brand:'Mother Dairy',unit:'500 ml Pouch',price:r'₹30',mrp:r'₹32',rating:4.6,reviews:6210,imageUrl:'http://localhost:4000/assets/products/milk/imgi_11.png',category:'Dairy'),
+  _Product(id:'mlk3',name:'Double Toned Milk',brand:'Nandini',unit:'1 L Pouch',price:r'₹54',mrp:r'₹58',rating:4.5,reviews:3120,imageUrl:'http://localhost:4000/assets/products/milk/imgi_12.png',category:'Dairy'),
+  _Product(id:'mlk4',name:'Organic Cow Milk',brand:'Akshayakalpa',unit:'500 ml',price:r'₹46',mrp:r'₹50',rating:4.8,reviews:2890,imageUrl:'http://localhost:4000/assets/products/milk/imgi_13.png',category:'Dairy'),
+  _Product(id:'crd1',name:'Set Curd',brand:'Amul',unit:'400 g Cup',price:r'₹42',mrp:r'₹45',rating:4.6,reviews:5340,imageUrl:'http://localhost:4000/assets/products/curd-yogurt/curd-1.png',category:'Dairy'),
+  _Product(id:'crd2',name:'Mishti Doi',brand:'Mother Dairy',unit:'100 g Cup',price:r'₹20',mrp:r'₹22',rating:4.5,reviews:2100,imageUrl:'http://localhost:4000/assets/products/curd-yogurt/curd-2.png',category:'Dairy'),
+  _Product(id:'lsi1',name:'Sweet Lassi',brand:'Amul',unit:'200 ml Bottle',price:r'₹25',mrp:r'₹28',rating:4.7,reviews:4120,imageUrl:'http://localhost:4000/assets/products/curd-yogurt/curd-3.png',category:'Dairy'),
+  _Product(id:'lsi2',name:'Fresh Paneer Block',brand:'Amul',unit:'200 g Pack',price:r'₹92',mrp:r'₹95',rating:4.8,reviews:7820,imageUrl:'http://localhost:4000/assets/products/paneer-tofu/1200_1657599895699.png',category:'Dairy'),
+
   _Product(id:'tea1',name:'Dust Tea',brand:'Red Label',unit:'500 g Pack',price:r'₹198',mrp:r'₹210',rating:4.8,reviews:12400,imageUrl:'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=400',category:'Beverages'),
   _Product(id:'tea2',name:'Natural Care Tea',brand:'Taj Mahal',unit:'250 g Pack',price:r'₹138',mrp:r'₹150',rating:4.7,reviews:9800,imageUrl:'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=400',category:'Beverages'),
   _Product(id:'tea3',name:'Masala Tea Powder',brand:'Wagh Bakri',unit:'250 g Pack',price:r'₹115',mrp:r'₹125',rating:4.6,reviews:7300,imageUrl:'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=400',category:'Beverages'),
