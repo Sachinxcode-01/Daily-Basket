@@ -41,6 +41,14 @@ const _catalog = <_Product>[
   _Product(id:'lsi1',name:'Sweet Lassi',brand:'Amul',unit:'200 ml Bottle',price:r'₹25',mrp:r'₹28',rating:4.7,reviews:4120,imageUrl:'http://localhost:4000/assets/products/curd-yogurt/curd-3.png',category:'Dairy'),
   _Product(id:'lsi2',name:'Fresh Paneer Block',brand:'Amul',unit:'200 g Pack',price:r'₹92',mrp:r'₹95',rating:4.8,reviews:7820,imageUrl:'http://localhost:4000/assets/products/paneer-tofu/1200_1657599895699.png',category:'Dairy'),
 
+  // --- Fresh Vegetables ---
+  _Product(id:'veg1',name:'Fresh Hybrid Tomatoes',brand:'Farm Fresh',unit:'500 g',price:r'₹24',mrp:r'₹28',rating:4.8,reviews:9850,imageUrl:'http://localhost:4000/assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',category:'Vegetables'),
+  _Product(id:'veg2',name:'New Crop Potatoes',brand:'Farm Fresh',unit:'1 kg',price:r'₹32',mrp:r'₹35',rating:4.7,reviews:14200,imageUrl:'http://localhost:4000/assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',category:'Vegetables'),
+  _Product(id:'veg3',name:'Fresh Nashik Red Onions',brand:'Farm Fresh',unit:'1 kg',price:r'₹38',mrp:r'₹42',rating:4.8,reviews:18900,imageUrl:'http://localhost:4000/assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',category:'Vegetables'),
+  _Product(id:'veg4',name:'Green Capsicum (Shimla Mirch)',brand:'Farm Fresh',unit:'250 g',price:r'₹36',mrp:r'₹40',rating:4.6,reviews:6400,imageUrl:'http://localhost:4000/assets/products/fresh-vegetables/079cdbf5-0e6e-4de4-ad0a-447e56ae8016.png',category:'Vegetables'),
+  _Product(id:'veg5',name:'Hydroponic Baby Spinach (Palak)',brand:'Farm Fresh',unit:'250 g',price:r'₹22',mrp:r'₹25',rating:4.9,reviews:5120,imageUrl:'http://localhost:4000/assets/products/fresh-vegetables/083c2cf1-36a0-4328-98a1-fbe6e0ec1d0a.png',category:'Vegetables'),
+
+
   _Product(id:'tea1',name:'Dust Tea',brand:'Red Label',unit:'500 g Pack',price:r'₹198',mrp:r'₹210',rating:4.8,reviews:12400,imageUrl:'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=400',category:'Beverages'),
   _Product(id:'tea2',name:'Natural Care Tea',brand:'Taj Mahal',unit:'250 g Pack',price:r'₹138',mrp:r'₹150',rating:4.7,reviews:9800,imageUrl:'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=400',category:'Beverages'),
   _Product(id:'tea3',name:'Masala Tea Powder',brand:'Wagh Bakri',unit:'250 g Pack',price:r'₹115',mrp:r'₹125',rating:4.6,reviews:7300,imageUrl:'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=400',category:'Beverages'),

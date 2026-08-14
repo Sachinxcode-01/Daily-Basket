@@ -49,9 +49,9 @@ export default function BulkProductImportPage() {
     updatedProducts: 0,
     duplicateProducts: 0,
     failedImports: 0,
-    totalImagesFound: 77,
-    imagesCopied: 77,
-    productsAssigned: 26,
+    totalImagesFound: 231,
+    imagesCopied: 231,
+    productsAssigned: 38,
     processingTimeMs: 5117,
     categoryBreakdown: {
       'Milk': 4,
@@ -62,11 +62,13 @@ export default function BulkProductImportPage() {
       'Bread & Pav': 3,
       'Poha, Daliya & Grains': 3,
       'Vermicelli & Pasta': 2,
+      'Fresh Vegetables': 12,
     },
   });
 
   const sourceFolders = [
-    { id: 'ALL', name: 'assets/products/ (8 Directories)', cat: 'Monorepo Root Total', count: 26, imagesCount: 77 },
+    { id: 'ALL', name: 'assets/products/ (9 Directories)', cat: 'Monorepo Root Total', count: 38, imagesCount: 231 },
+    { id: 'veg', name: 'assets/products/fresh-vegetables/', cat: 'Vegetables & Fruits', count: 12, imagesCount: 154 },
     { id: 'paneer', name: 'assets/products/paneer-tofu/', cat: 'Dairy, Bread & Eggs', count: 4, imagesCount: 8 },
     { id: 'muesli', name: 'assets/products/muesli-granola/', cat: 'Breakfast & Munchies', count: 3, imagesCount: 7 },
     { id: 'flakes', name: 'assets/products/flakes-kids-cereals/', cat: 'Breakfast & Munchies', count: 3, imagesCount: 6 },
@@ -78,6 +80,12 @@ export default function BulkProductImportPage() {
   ];
 
   const previewItems = [
+    { id: 'v1', name: 'Fresh Hybrid Tomatoes', brand: 'Farm Fresh', category: 'Vegetables & Fruits', unit: '500 g', price: 24, mrp: 28, barcode: '890126209001', status: 'LOCAL_ASSET_LINKED', localImage: 'http://localhost:4000/assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png' },
+    { id: 'v2', name: 'New Crop Potatoes', brand: 'Farm Fresh', category: 'Vegetables & Fruits', unit: '1 kg', price: 32, mrp: 35, barcode: '890126209002', status: 'LOCAL_ASSET_LINKED', localImage: 'http://localhost:4000/assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png' },
+    { id: 'v3', name: 'Fresh Nashik Red Onions', brand: 'Farm Fresh', category: 'Vegetables & Fruits', unit: '1 kg', price: 38, mrp: 42, barcode: '890126209003', status: 'LOCAL_ASSET_LINKED', localImage: 'http://localhost:4000/assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png' },
+    { id: 'v4', name: 'Green Capsicum (Shimla Mirch)', brand: 'Farm Fresh', category: 'Vegetables & Fruits', unit: '250 g', price: 36, mrp: 40, barcode: '890126209005', status: 'LOCAL_ASSET_LINKED', localImage: 'http://localhost:4000/assets/products/fresh-vegetables/079cdbf5-0e6e-4de4-ad0a-447e56ae8016.png' },
+    { id: 'v5', name: 'Hydroponic Baby Spinach (Palak)', brand: 'Farm Fresh', category: 'Vegetables & Fruits', unit: '250 g', price: 22, mrp: 25, barcode: '890126209006', status: 'LOCAL_ASSET_LINKED', localImage: 'http://localhost:4000/assets/products/fresh-vegetables/083c2cf1-36a0-4328-98a1-fbe6e0ec1d0a.png' },
+
     { id: '1', name: 'Amul Taaza Toned Fresh Milk', brand: 'Amul', category: 'Milk', unit: '500 ml', price: 27, mrp: 28, barcode: '890126202001', status: 'LOCAL_ASSET_LINKED', localImage: 'http://localhost:4000/assets/products/milk/imgi_10.png' },
     { id: '2', name: 'Amul Gold Full Cream Fresh Milk', brand: 'Amul', category: 'Milk', unit: '1 L', price: 66, mrp: 68, barcode: '890126202002', status: 'LOCAL_ASSET_LINKED', localImage: 'http://localhost:4000/assets/products/milk/imgi_11.png' },
     { id: '3', name: 'Mother Dairy Cow Milk', brand: 'Mother Dairy', category: 'Milk', unit: '500 ml', price: 28, mrp: 29, barcode: '890126202003', status: 'LOCAL_ASSET_LINKED', localImage: 'http://localhost:4000/assets/products/milk/imgi_12.png' },

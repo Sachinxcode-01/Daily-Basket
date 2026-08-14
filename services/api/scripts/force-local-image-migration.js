@@ -26,7 +26,9 @@ async function runForceLocalImageMigration() {
     { dirName: 'poha-daliya-grains', categoryKey: 'poha-daliya-grains', catName: 'Poha, Daliya & Grains' },
     { dirName: 'vermicelli', categoryKey: 'vermicelli-pasta', catName: 'Vermicelli & Pasta' },
     { dirName: 'curd-yogurt', categoryKey: 'curd-yogurt', catName: 'Curd & Yogurt' },
+    { dirName: 'fresh-vegetables', categoryKey: 'fresh-vegetables', catName: 'Fresh Vegetables' },
   ];
+
 
   let totalImagesFound = 0;
   let totalImagesCopied = 0;
