@@ -156,7 +156,7 @@ export default function DeliveryRiderDashboardPage() {
       {/* Today's Wallet Earnings summary */}
       <div className="bg-gradient-to-r from-emerald-900/60 to-teal-900/40 border border-emerald-500/40 p-5 rounded-3xl mb-6 shadow-xl flex items-center justify-between">
         <div>
-          <p className="text-xs text-emerald-300 font-bold uppercase tracking-wider">Today's Earnings</p>
+          <p className="text-xs text-emerald-300 font-bold uppercase tracking-wider">Today&apos;s Earnings</p>
           <h2 className="text-3xl font-black text-white mt-0.5">₹850</h2>
           <p className="text-[11px] text-emerald-200 mt-1">18 Orders Completed • ₹150 Incentive</p>
         </div>

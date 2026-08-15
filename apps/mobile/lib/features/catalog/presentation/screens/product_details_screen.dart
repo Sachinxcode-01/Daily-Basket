@@ -7,8 +7,9 @@ import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/providers/recently_viewed_provider.dart';
 import 'reviews_recommendations_screen.dart';
 
-/// Product Details Screen — Google Stitch Source of Truth Specification (ID: fed4975734304fada8e33c3c4c02a910)
-/// Features Multi-Image Gallery, FSSAI compliance, Nutrition Specs, Smart Stock Indicator, and Ask AI Chef.
+/// Product Details Screen — Google Stitch Source of Truth Specification
+/// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
+/// Screen: Product Details - Organic Avocados (ID: fed4975734304fada8e33c3c4c02a910)
 class ProductDetailsScreen extends StatefulWidget {
   final String productId;
   final String categoryTag;
@@ -25,12 +26,12 @@ class ProductDetailsScreen extends StatefulWidget {
     this.productId = 'prod_avocado',
     this.categoryTag = 'ORGANIC PRODUCE',
     this.productName = 'Organic Hass Avocados',
-    this.price = '₹120',
-    this.mrp = '₹150',
-    this.discountPercentage = '20% OFF',
+    this.price = '\$5.99',
+    this.mrp = '\$7.50',
+    this.discountPercentage = '-20%',
     this.unitDetails = '500g ~3-4 pieces',
     this.deliveryTime = '15-30 mins',
-    this.imageUrl = 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=800&q=80',
+    this.imageUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUZTLTSv5m1XvtD0eVooGUshRAE_TEf1VJ6rDo2p2NK8V-OtAgWRr9FnG7_wymxfNYoJbO-z3fuiHP_nel0NrAMmwbjTaJpS2Qn6gtKhCoGN6ltUY0Ye1kqsw-Lgi3oSwN5RBZcGCyK2PH3mZqTsqvfYztVjk3FZnajEMLUCbI6q8oB1hqEySrz4h9bFTXR1c7DcEprHGwUvQVM7TEPLq83eHICr5VanKASkHt7mYjWh7jE8sEGGd1',
   });
 
   @override
@@ -44,11 +45,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   List<String> get _galleryImages {
     final primary = widget.imageUrl.isNotEmpty
         ? widget.imageUrl
-        : 'http://localhost:4000/assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png';
+        : 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUZTLTSv5m1XvtD0eVooGUshRAE_TEf1VJ6rDo2p2NK8V-OtAgWRr9FnG7_wymxfNYoJbO-z3fuiHP_nel0NrAMmwbjTaJpS2Qn6gtKhCoGN6ltUY0Ye1kqsw-Lgi3oSwN5RBZcGCyK2PH3mZqTsqvfYztVjk3FZnajEMLUCbI6q8oB1hqEySrz4h9bFTXR1c7DcEprHGwUvQVM7TEPLq83eHICr5VanKASkHt7mYjWh7jE8sEGGd1';
     return [
       primary,
-      'http://localhost:4000/assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',
-      'http://localhost:4000/assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuBbsg5VxbvT11uRXXDRayoEzYGroBN6JL_q3OdBRxTV_NhUsAgXOLVnLt2AP4FjQ1VeLJ9Nu66ZOkgTwSPghddjYzSFJFH-nX61SZBAAjCBTQkjHnkshnkB9KTRoZj4KrKjCVLIhIkvkcNqEk4h79BfvPd-dbBBLoCQ-CEHU411SdMlg7TerXu1-n2q_kyKG2QiY7Cx6HvI4O9yNH2j5DTrGLp3HLDv5C71JMkQhsDUBUD-USNQ7Z-F',
+      'https://lh3.googleusercontent.com/aida-public/AB6AXuBxT-WRocvozm2WhECnL8JMwxCqiEnuJ7cKtNoLv-llUuIz1dEY2oBp5MdWHKwKfTDfhmhcZUDYamNJeXMOiQDXQErt0WRFRSJzAY4cxjLnMqG5f-EZz7kvpru8TOviGd0RTYku3CEMtUC_JLe6zQqHimHXCBkpnyde4yFl2cThVNJlqY4w66MTA4r1xi322PjWVu4NCiQxhPP4RjdOUhB39s8SgVQHbIIYzVhJX5H3YENCU6jqp-7U',
     ];
   }
 
@@ -62,28 +63,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       'id': 'sim_1',
       'name': 'Fresh Hybrid Tomatoes',
       'weight': '500g Pack',
-      'price': '₹24',
-      'mrp': '₹28',
-      'image': 'http://localhost:4000/assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+      'price': '\$2.40',
+      'mrp': '\$2.80',
+      'image': 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&q=80',
     },
     {
       'id': 'sim_2',
       'name': 'New Crop Potatoes',
       'weight': '1kg Pack',
-      'price': '₹32',
-      'mrp': '₹35',
-      'image': 'http://localhost:4000/assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',
+      'price': '\$3.20',
+      'mrp': '\$3.50',
+      'image': 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80',
     },
     {
       'id': 'sim_3',
-      'name': 'Fresh Nashik Red Onions',
+      'name': 'Fresh Red Onions',
       'weight': '1kg Pack',
-      'price': '₹38',
-      'mrp': '₹42',
-      'image': 'http://localhost:4000/assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',
+      'price': '\$3.80',
+      'mrp': '\$4.20',
+      'image': 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400&q=80',
     },
   ];
-
 
   @override
   void initState() {
@@ -142,7 +142,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                         ),
                         Text(
-                          'Instant recipes & nutrition hacks for ${widget.productName}',
+                          'Get instant recipes & nutrition hacks for ${widget.productName}',
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: AppColors.onSurfaceVariant,
@@ -278,7 +278,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. HD Zoomable Gallery Carousel
+                // 1. Image Gallery Carousel with Stitch Overlays
                 Container(
                   height: 260,
                   width: double.infinity,
@@ -310,26 +310,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         child: Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                               decoration: BoxDecoration(
                                 color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(8),
+                                borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Text(
-                                'ORGANIC',
-                                style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
-                              ),
-                            ),
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFEF3C7),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                'BEST SELLER',
-                                style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: const Color(0xFFD97706)),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.eco_rounded, color: Colors.white, size: 14),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Certified Organic',
+                                    style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                                  ),
+                                ],
                               ),
                             ),
                           ],
@@ -366,53 +360,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                 const SizedBox(height: 20),
 
-                // 2. Product Name, Brand & ETA Row
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.verified_rounded, color: AppColors.primary, size: 16),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Fresh Farm Co. • Certified Organic',
-                      style: GoogleFonts.inter(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFDCFCE7),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.bolt_rounded, color: AppColors.primary, size: 14),
-                          const SizedBox(width: 2),
-                          Text(
-                            widget.deliveryTime,
-                            style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                // 2. Product Brand & Name
+                Text(
+                  'Fresh Farm Co.',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
                 ),
-
-                const SizedBox(height: 8),
-
+                const SizedBox(height: 4),
                 Text(
                   widget.productName,
                   style: GoogleFonts.outfit(
-                    fontSize: 24,
+                    fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: AppColors.onSurface,
                   ),
@@ -420,22 +381,41 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                 const SizedBox(height: 8),
 
-                // 3. Pricing & Discount Row
+                // 3. Rating Row
                 Row(
+                  children: [
+                    const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
+                    const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
+                    const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
+                    const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
+                    const Icon(Icons.star_half_rounded, color: Colors.amber, size: 20),
+                    const SizedBox(width: 6),
+                    Text(
+                      '(128 Reviews)',
+                      style: GoogleFonts.inter(fontSize: 13, color: AppColors.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 12),
+
+                // 4. Pricing & ETA Row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
                       widget.price,
                       style: GoogleFonts.outfit(
-                        fontSize: 26,
+                        fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.primary,
+                        color: AppColors.onSurface,
                       ),
                     ),
                     const SizedBox(width: 10),
                     Text(
                       widget.mrp,
                       style: GoogleFonts.outfit(
-                        fontSize: 16,
+                        fontSize: 18,
                         decoration: TextDecoration.lineThrough,
                         color: AppColors.onSurfaceVariant,
                       ),
@@ -444,34 +424,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFFEE2E2),
+                        color: const Color(0xFFFFDAD6),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         widget.discountPercentage,
-                        style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.red),
+                        style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0xFF93000A)),
                       ),
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 14),
-
-                // Smart Stock Warning Indicator
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFFBEB),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFFDE68A)),
-                  ),
-                  child: Row(
+                const SizedBox(height: 6),
+                RichText(
+                  text: TextSpan(
+                    style: GoogleFonts.inter(fontSize: 13, color: AppColors.onSurfaceVariant),
                     children: [
-                      const Icon(Icons.warning_amber_rounded, color: Color(0xFFD97706), size: 18),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Smart Stock: Only 4 items left in Indiranagar Darkstore!',
-                        style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0xFFB45309)),
+                      const TextSpan(text: 'Delivery in '),
+                      TextSpan(
+                        text: widget.deliveryTime,
+                        style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppColors.primary),
                       ),
                     ],
                   ),
@@ -479,33 +450,48 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                 const SizedBox(height: 20),
 
-                // 4. Weight Option Selector
+                // 5. Select Weight Pack Size
                 Text(
-                  'Select Pack Size',
-                  style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                  'Select Weight',
+                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
                 Row(
                   children: _weightOptions.map((opt) {
                     final isSel = opt == _selectedWeight;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 12),
-                      child: ChoiceChip(
-                        label: Text(opt),
-                        selected: isSel,
-                        onSelected: (val) {
-                          if (val) setState(() => _selectedWeight = opt);
-                        },
-                        selectedColor: AppColors.primary,
-                        labelStyle: GoogleFonts.outfit(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: isSel ? Colors.white : AppColors.onSurface,
-                        ),
-                        backgroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: isSel ? AppColors.primary : const Color(0xFFCBD5E1)),
+                    return Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: InkWell(
+                          onTap: () => setState(() => _selectedWeight = opt),
+                          borderRadius: BorderRadius.circular(14),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            decoration: BoxDecoration(
+                              color: isSel ? AppColors.primary.withValues(alpha: 0.05) : Colors.white,
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(
+                                color: isSel ? AppColors.primary : const Color(0xFFE2E8F0),
+                                width: isSel ? 2 : 1,
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  opt.split(' ')[0],
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: isSel ? AppColors.primary : AppColors.onSurface,
+                                  ),
+                                ),
+                                Text(
+                                  opt.contains('~') ? opt.substring(opt.indexOf('~')) : '',
+                                  style: GoogleFonts.inter(fontSize: 11, color: AppColors.onSurfaceVariant),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     );
@@ -514,21 +500,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                 const SizedBox(height: 20),
 
-                // 5. Ask AI Chef CTA Card
+                // 6. Ask AI Chef Card
                 InkWell(
                   onTap: () => _showAiChefModal(context),
                   borderRadius: BorderRadius.circular(16),
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.primary.withValues(alpha: 0.12),
-                          AppColors.primary.withValues(alpha: 0.04),
-                        ],
-                      ),
+                      color: const Color(0xFFDCE5DD).withValues(alpha: 0.3),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                      border: Border.all(color: const Color(0xFFDCE5DD)),
                     ),
                     child: Row(
                       children: [
@@ -546,15 +527,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Ask AI Chef Assistant',
-                                style: GoogleFonts.outfit(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.onSurface,
-                                ),
+                                'Ask AI Chef',
+                                style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.onSurface),
                               ),
                               Text(
-                                'Get instant guacamole recipes, ripening tips, & nutrition pairing.',
+                                'Get instant recipe ideas, pairing suggestions, or nutritional breakdowns for these avocados.',
                                 style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
                               ),
                             ],
@@ -568,10 +545,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                 const SizedBox(height: 24),
 
-                // 6. Comprehensive Product Specifications & Compliance
+                // 7. Specifications Section
                 Text(
-                  'Product Specifications & Compliance',
+                  'Product Details',
                   style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Our premium Hass avocados are organically grown, hand-picked, and delivered at the perfect stage of ripeness. Known for their creamy texture and rich, nutty flavor, they are perfect for salads, toast, or your favorite guacamole recipe.',
+                  style: GoogleFonts.inter(fontSize: 14, color: AppColors.onSurfaceVariant, height: 1.5),
                 ),
                 const SizedBox(height: 12),
                 Container(
@@ -586,19 +568,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       _specRow('Brand', 'Fresh Farm Co. Organic'),
                       _specRow('Country of Origin', 'India 🇮🇳'),
                       _specRow('FSSAI Lic. No.', '11223344556677'),
-                      _specRow('Ingredients', '100% Raw Certified Organic Hass Avocados'),
-                      _specRow('Storage Instructions', 'Store at room temp until ripe, then refrigerate'),
-                      _specRow('Shelf Life', 'Best consumed within 5 days of delivery'),
-                      _specRow('Return Policy', '100% Doorstep Return eligible within 24 hours'),
+                      _specRow('Storage Instructions', 'Store at room temp until ripe'),
+                      _specRow('Return Policy', '100% Doorstep Return eligible'),
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 24),
 
-                // 7. Nutrition Facts Table
+                // 8. Nutrition Facts Table
                 Text(
-                  'Nutrition Facts (Per 100g)',
+                  'Nutritional Info (per 100g)',
                   style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
                 ),
                 const SizedBox(height: 12),
@@ -623,7 +603,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                 const SizedBox(height: 24),
 
-                // 8. Reviews & Recommendations Teaser Card
+                // 9. Reviews Card
                 InkWell(
                   onTap: () {
                     Navigator.of(context).push(
@@ -646,7 +626,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '4.8 Star Rating (1,248 Verified Reviews)',
+                              '4.8 Star Rating (128 Verified Reviews)',
                               style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.onSurface),
                             ),
                             Text(
@@ -664,7 +644,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                 const SizedBox(height: 24),
 
-                // 9. Similar Products Carousel
+                // 10. Similar Products
                 Text(
                   'Similar Fresh Recommendations',
                   style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
@@ -720,7 +700,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ),
           ),
 
-          // 10. Sticky Bottom Add-to-Cart Action Bar
+          // Sticky Bottom Add to Cart Bar
           Positioned(
             bottom: 0,
             left: 0,
@@ -770,7 +750,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             id: widget.productId,
                             name: widget.productName,
                             subtitle: _selectedWeight,
-                            price: 120.0,
+                            price: 5.99,
                             image: widget.imageUrl,
                             delta: 1,
                           );
@@ -778,12 +758,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          padding: const EdgeInsets.symmetric(horizontal: 28),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                         child: Text(
-                          'ADD TO BASKET',
-                          style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                          'Add to Cart - ${widget.price}',
+                          style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold),
                         ),
                       ),
                     )
@@ -803,7 +783,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 id: widget.productId,
                                 name: widget.productName,
                                 subtitle: _selectedWeight,
-                                price: 120.0,
+                                price: 5.99,
                                 image: widget.imageUrl,
                                 delta: -1,
                               );
@@ -823,7 +803,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 id: widget.productId,
                                 name: widget.productName,
                                 subtitle: _selectedWeight,
-                                price: 120.0,
+                                price: 5.99,
                                 image: widget.imageUrl,
                                 delta: 1,
                               );

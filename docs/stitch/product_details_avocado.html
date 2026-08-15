@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Daily Basket - Organic Hass Avocados</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-surface": "#2f3133",
+                        "on-surface": "#1a1c1e",
+                        "error": "#ba1a1a",
+                        "secondary-fixed-dim": "#c0c9c1",
+                        "surface-bright": "#f9f9fc",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-background": "#1a1c1e",
+                        "surface-variant": "#e2e2e5",
+                        "outline-variant": "#becab9",
+                        "tertiary-container": "#737575",
+                        "on-secondary-container": "#5e6660",
+                        "tertiary-fixed": "#e2e2e2",
+                        "on-surface-variant": "#3f4a3d",
+                        "tertiary": "#5a5c5c",
+                        "on-primary-fixed": "#002106",
+                        "inverse-on-surface": "#f0f0f3",
+                        "surface-container-high": "#e8e8ea",
+                        "secondary": "#58605a",
+                        "surface": "#f9f9fc",
+                        "on-tertiary-container": "#fcfcfc",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "surface-container-low": "#f3f3f6",
+                        "surface-tint": "#006e25",
+                        "secondary-container": "#dce5dd",
+                        "primary-container": "#078730",
+                        "outline": "#6e7a6c",
+                        "background": "#f9f9fc",
+                        "primary": "#006b23",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#404943",
+                        "inverse-primary": "#70dd7a",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#dadadc",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#f7fff2",
+                        "on-tertiary": "#ffffff",
+                        "secondary-fixed": "#dce5dd",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e2e2e5",
+                        "primary-fixed-dim": "#70dd7a",
+                        "surface-container": "#eeeef0",
+                        "on-primary-fixed-variant": "#00531a",
+                        "primary-fixed": "#8cfa93",
+                        "on-secondary-fixed": "#151d19",
+                        "on-tertiary-fixed-variant": "#454747"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "margin-desktop": "48px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Outfit"],
+                        "display": ["Outfit"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body antialiased pb-24 md:pb-0">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-on-background/80 backdrop-blur-xl shadow-[0px_4px_12px_rgba(0,0,0,0.08)] flex items-center justify-between px-margin-mobile h-16 w-full">
+<button class="text-primary dark:text-primary-fixed hover:opacity-80 transition-opacity active:scale-95 duration-150 ease-in-out p-2 -ml-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary dark:text-primary-fixed">Daily Basket</div>
+<button class="text-primary dark:text-primary-fixed hover:opacity-80 transition-opacity active:scale-95 duration-150 ease-in-out p-2 -mr-2 rounded-full">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+</header>
+<main class="pt-16 max-w-7xl mx-auto md:grid md:grid-cols-2 md:gap-8 md:p-margin-desktop md:pt-24">
+<!-- Image Gallery -->
+<section class="relative md:sticky md:top-24 h-fit">
+<div class="relative w-full aspect-square md:rounded-2xl overflow-hidden bg-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="A high-resolution, professional studio photograph of a wooden crate filled with perfect, ripe Hass avocados. The skin is deeply textured and dark green-black. The lighting is soft and natural, casting gentle shadows that highlight the freshness of the organic produce. The background is a clean, bright, white-washed wood surface, fitting a premium organic grocery brand aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUZTLTSv5m1XvtD0eVooGUshRAE_TEf1VJ6rDo2p2NK8V-OtAgWRr9FnG7_wymxfNYoJbO-z3fuiHP_nel0NrAMmwbjTaJpS2Qn6gtKhCoGN6ltUY0Ye1kqsw-Lgi3oSwN5RBZcGCyK2PH3mZqTsqvfYztVjk3FZnajEMLUCbI6q8oB1hqEySrz4h9bFTXR1c7DcEprHGwUvQVM7TEPLq83eHICr5VanKASkHt7mYjWh7jE8sEGGd1"/>
+<!-- Overlays -->
+<div class="absolute top-4 right-4 flex flex-col gap-3">
+<button class="w-10 h-10 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:bg-surface transition-colors shadow-sm">
+<span class="material-symbols-outlined" data-icon="favorite">favorite</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-surface/80 backdrop-blur-md flex items-center justify-center text-on-surface hover:bg-surface transition-colors shadow-sm">
+<span class="material-symbols-outlined" data-icon="share">share</span>
+</button>
+</div>
+<!-- Organic Chip -->
+<div class="absolute top-4 left-4 bg-primary-container text-on-primary-container px-3 py-1 rounded-full font-label text-[12px] font-semibold flex items-center gap-1 shadow-sm">
+<span class="material-symbols-outlined text-[16px]" data-icon="eco">eco</span>
+                    Certified Organic
+                </div>
+</div>
+<!-- Thumbnails -->
+<div class="flex gap-4 p-4 md:p-0 md:mt-4 overflow-x-auto hide-scrollbar">
+<div class="w-20 h-20 rounded-xl overflow-hidden border-2 border-primary flex-shrink-0 cursor-pointer">
+<img class="w-full h-full object-cover" data-alt="Close up shot of a perfectly halved Hass avocado revealing the bright, creamy yellow-green flesh and a smooth, round pit in the center. Studio lighting, premium organic food photography style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbsg5VxbvT11uRXXDRayoEzYGroBN6JL_q3OdBRxTV_NhUsAgXOLVnLt2AP4FjQ1VeLJ9Nu66ZOkgTwSPghddjYzSFJFH-nX61SZBAAjCBTQkjHnkshnkB9KTRoZj4KrKjCVLIhIkvkcNqEk4h79BfvPd-dbBBLoCQ-CEHU411SdMlg7TerXu1-n2q_kyKG2QiY7Cx6HvI4O9yNH2j5DTrGLp3HLDv5C71JMkQhsDUBUD-USNQ7Z-F"/>
+</div>
+<div class="w-20 h-20 rounded-xl overflow-hidden border-2 border-transparent hover:border-primary-fixed transition-colors flex-shrink-0 cursor-pointer opacity-70 hover:opacity-100">
+<img class="w-full h-full object-cover" data-alt="Several Hass avocados arranged on a minimalist white ceramic plate. Clean, bright lighting, emphasizing the natural texture and organic quality of the fruit." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxT-WRocvozm2WhECnL8JMwxCqiEnuJ7cKtNoLv-llUuIz1dEY2oBp5MdWHKwKfTDfhmhcZUDYamNJeXMOiQDXQErt0WRFRSJzAY4cxjLnMqG5f-EZz7kvpru8TOviGd0RTYku3CEMtUC_JLe6zQqHimHXCBkpnyde4yFl2cThVNJlqY4w66MTA4r1xi322PjWVu4NCiQxhPP4RjdOUhB39s8SgVQHbIIYzVhJX5H3YENCU6jqp-7U"/>
+</div>
+<div class="w-20 h-20 rounded-xl overflow-hidden border-2 border-transparent hover:border-primary-fixed transition-colors flex-shrink-0 cursor-pointer opacity-70 hover:opacity-100">
+<img class="w-full h-full object-cover" data-alt="A single ripe Hass avocado sitting next to a small wooden bowl of flaky sea salt on a light marble countertop. Soft, diffused morning light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSq_QYDvIYAokaG_Xb0aSEdkt6rgnOfZWYrSEpRCwZgVY8ZFsa6-G55x6ezOxSpSzOkFG-HrdO8r_qnDA86ninru2WzY79AePDW9gwFlVfTLtua-0JMMUC2DHhsV_rq31d038jm1na5gnKFmIJz1yNEKGQ_DlVbcGAx107AX8yJdBRBBuqGk9H64jhBE0W7Of0b4_B8p_PqCT445u2EabUNd7uHuAZNhKBXAKZKbf6E--1DRlNikRW"/>
+</div>
+</div>
+</section>
+<!-- Product Details -->
+<section class="px-margin-mobile md:px-0 flex flex-col gap-6">
+<!-- Header Info -->
+<div>
+<p class="text-primary font-label text-[14px] font-semibold mb-1">Fresh Farm Co.</p>
+<h1 class="font-headline text-3xl md:text-4xl font-bold text-on-surface mb-2">Organic Hass Avocados</h1>
+<div class="flex items-center gap-2 mb-4">
+<div class="flex items-center text-[#F59E0B]">
+<span class="material-symbols-outlined fill text-[18px]" data-icon="star">star</span>
+<span class="material-symbols-outlined fill text-[18px]" data-icon="star">star</span>
+<span class="material-symbols-outlined fill text-[18px]" data-icon="star">star</span>
+<span class="material-symbols-outlined fill text-[18px]" data-icon="star">star</span>
+<span class="material-symbols-outlined text-[18px]" data-icon="star_half">star_half</span>
+</div>
+<span class="text-on-surface-variant font-body text-sm">(128 Reviews)</span>
+</div>
+<div class="flex items-end gap-3 mb-2">
+<span class="font-headline text-3xl font-bold text-on-surface">$5.99</span>
+<span class="text-on-surface-variant line-through text-lg mb-1">$7.50</span>
+<span class="bg-error-container text-on-error-container px-2 py-0.5 rounded-md font-label text-xs font-bold mb-1.5">-20%</span>
+</div>
+<p class="text-on-surface-variant text-sm font-body">Delivery in <span class="font-semibold text-primary">15-30 mins</span></p>
+</div>
+<!-- Weight Selection -->
+<div class="border-t border-surface-variant pt-6">
+<h3 class="font-headline text-lg font-semibold mb-3 text-on-surface">Select Weight</h3>
+<div class="flex gap-3">
+<button class="flex-1 py-3 px-4 rounded-xl border-2 border-primary bg-primary/5 text-primary font-semibold flex flex-col items-center justify-center transition-all">
+<span class="text-lg">500g</span>
+<span class="text-xs opacity-80">~3-4 pieces</span>
+</button>
+<button class="flex-1 py-3 px-4 rounded-xl border border-surface-variant text-on-surface-variant hover:border-primary-fixed hover:bg-surface-container transition-all flex flex-col items-center justify-center">
+<span class="text-lg">1kg</span>
+<span class="text-xs opacity-80">~6-8 pieces</span>
+</button>
+</div>
+</div>
+<!-- Ask AI Bento Box -->
+<div class="bg-secondary-container/30 border border-secondary-container rounded-2xl p-5 relative overflow-hidden group cursor-pointer hover:bg-secondary-container/50 transition-colors">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-primary/20 transition-all"></div>
+<div class="flex items-start gap-4 relative z-10">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div>
+<h3 class="font-headline text-lg font-semibold text-on-surface mb-1">Ask AI Chef</h3>
+<p class="text-on-surface-variant text-sm font-body mb-3">Get instant recipe ideas, pairing suggestions, or nutritional breakdowns for these avocados.</p>
+<div class="flex gap-2">
+<span class="bg-surface px-3 py-1 rounded-full text-xs font-label text-on-surface border border-surface-variant shadow-sm hover:border-primary transition-colors">Guacamole recipe</span>
+<span class="bg-surface px-3 py-1 rounded-full text-xs font-label text-on-surface border border-surface-variant shadow-sm hover:border-primary transition-colors">Ripening tips</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Accordion Details -->
+<div class="mt-4 flex flex-col gap-4">
+<!-- Description -->
+<div class="border border-surface-variant rounded-2xl overflow-hidden bg-surface-container-lowest">
+<button class="w-full flex items-center justify-between p-4 bg-surface-container-lowest hover:bg-surface-container-low transition-colors text-left" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.icon').classList.toggle('rotate-180')">
+<span class="font-headline font-semibold text-on-surface">Product Details</span>
+<span class="material-symbols-outlined icon transition-transform duration-300" data-icon="expand_more">expand_more</span>
+</button>
+<div class="p-4 pt-0 text-sm text-on-surface-variant font-body leading-relaxed border-t border-surface-variant">
+                        Our premium Hass avocados are organically grown, hand-picked, and delivered at the perfect stage of ripeness. Known for their creamy texture and rich, nutty flavor, they are perfect for salads, toast, or your favorite guacamole recipe.
+                    </div>
+</div>
+<!-- Nutrition -->
+<div class="border border-surface-variant rounded-2xl overflow-hidden bg-surface-container-lowest">
+<button class="w-full flex items-center justify-between p-4 bg-surface-container-lowest hover:bg-surface-container-low transition-colors text-left" onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.icon').classList.toggle('rotate-180')">
+<span class="font-headline font-semibold text-on-surface">Nutritional Info (per 100g)</span>
+<span class="material-symbols-outlined icon transition-transform duration-300 rotate-180" data-icon="expand_more">expand_more</span>
+</button>
+<div class="p-4 pt-0 hidden border-t border-surface-variant">
+<ul class="flex flex-col gap-2 mt-3 text-sm font-body">
+<li class="flex justify-between border-b border-surface-variant/50 pb-1">
+<span class="text-on-surface-variant">Calories</span><span class="font-medium text-on-surface">160 kcal</span>
+</li>
+<li class="flex justify-between border-b border-surface-variant/50 pb-1">
+<span class="text-on-surface-variant">Fat</span><span class="font-medium text-on-surface">15g</span>
+</li>
+<li class="flex justify-between border-b border-surface-variant/50 pb-1">
+<span class="text-on-surface-variant">Carbs</span><span class="font-medium text-on-surface">9g</span>
+</li>
+<li class="flex justify-between border-b border-surface-variant/50 pb-1">
+<span class="text-on-surface-variant">Protein</span><span class="font-medium text-on-surface">2g</span>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<!-- Spacer for mobile bottom nav & action bar -->
+<div class="h-10 md:h-0"></div>
+</section>
+</main>
+<!-- Bottom Action Bar (Mobile Sticky, Desktop Relative) -->
+<div class="fixed bottom-20 md:bottom-0 left-0 w-full bg-surface border-t border-surface-variant p-4 z-40 md:relative md:border-none md:p-0 md:mt-8 md:bg-transparent">
+<div class="max-w-7xl mx-auto flex gap-4 md:justify-end">
+<div class="flex items-center justify-between bg-surface-container rounded-xl px-2 h-14 md:w-32 border border-surface-variant">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface hover:bg-surface-variant rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="remove">remove</span>
+</button>
+<span class="font-headline font-semibold text-lg w-8 text-center">1</span>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface hover:bg-surface-variant rounded-lg transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+<button class="flex-1 md:flex-none md:w-64 bg-primary hover:bg-primary-container text-on-primary font-headline font-semibold text-lg rounded-xl h-14 flex items-center justify-center shadow-md active:scale-95 transition-all">
+                Add to Cart - $5.99
+            </button>
+</div>
+</div>
+</body></html>
