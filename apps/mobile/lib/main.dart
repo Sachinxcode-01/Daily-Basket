@@ -23,6 +23,7 @@ import 'features/auth/presentation/screens/account_locked_screen.dart';
 
 // Store, Customer & Catalog Screens
 import 'features/home/presentation/screens/home_screen.dart';
+import 'features/home/presentation/screens/store_closed_screen.dart';
 import 'features/search/presentation/screens/search_results_screen.dart';
 import 'features/categories/presentation/screens/browse_categories_screen.dart';
 import 'features/catalog/presentation/screens/product_details_screen.dart';
@@ -44,6 +45,7 @@ import 'features/orders/presentation/screens/rate_delivery_screen.dart';
 import 'features/profile/presentation/screens/profile_screen.dart';
 import 'features/profile/presentation/screens/personal_info_screen.dart';
 import 'features/profile/presentation/screens/saved_addresses_screen.dart';
+import 'features/profile/presentation/screens/location_delivery_address_screen.dart';
 import 'features/profile/presentation/screens/add_address_screen.dart';
 import 'features/profile/presentation/screens/payment_methods_screen.dart';
 import 'features/settings/presentation/screens/security_settings_screen.dart';
@@ -172,6 +174,7 @@ class DailyBasketApp extends StatelessWidget {
         '/enable-biometrics': (context) => const EnableBiometricsScreen(),
         '/account-locked': (context) => const AccountLockedScreen(),
         '/customer/home': (context) => const CustomerHomeScreen(),
+        '/store-closed': (context) => const StoreClosedScreen(),
         '/search': (context) => const SearchResultsScreen(),
         '/categories': (context) => const BrowseCategoriesScreen(),
         '/favorites': (context) => const FavoritesScreen(),
@@ -189,6 +192,7 @@ class DailyBasketApp extends StatelessWidget {
         '/personal-info': (context) => const PersonalInfoScreen(),
         '/security': (context) => const SecuritySettingsScreen(),
         '/saved-addresses': (context) => const SavedAddressesScreen(),
+        '/select-location': (context) => const LocationDeliveryAddressScreen(),
         '/add-address': (context) => const AddAddressScreen(),
         '/payment-methods': (context) => const PaymentMethodsScreen(),
         '/help': (context) => const HelpCenterScreen(),

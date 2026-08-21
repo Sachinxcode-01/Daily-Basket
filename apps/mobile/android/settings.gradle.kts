@@ -1,3 +1,5 @@
+rootProject.name = "daily_basket_mobile_android"
+
 pluginManagement {
     val flutterSdkPath =
         run {

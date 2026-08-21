@@ -52,5 +52,6 @@ yarn-error.log*
 # Uploads & Media
 services/api/public/uploads/
 assets/products/
+graphify-out/
 
 

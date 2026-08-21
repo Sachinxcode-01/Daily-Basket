@@ -92,6 +92,7 @@ class AppNavigationDrawer extends StatelessWidget {
                   title: 'MAIN STORE & SHOPPING',
                   items: [
                     _RouteItem('Home Screen', '/customer/home', Icons.home_rounded),
+                    _RouteItem('Store Closed / Resting State', '/store-closed', Icons.storefront_rounded),
                     _RouteItem('Search Results', '/search', Icons.search_rounded),
                     _RouteItem('Browse Categories', '/categories', Icons.category_rounded),
                     _RouteItem('Fresh Produce Explorer', '/freshness', Icons.eco_rounded),
@@ -119,6 +120,7 @@ class AppNavigationDrawer extends StatelessWidget {
                   title: 'PROFILE & ACCOUNT SETTINGS',
                   items: [
                     _RouteItem('Customer Profile', '/profile', Icons.person_rounded),
+                    _RouteItem('Select Location & Address', '/select-location', Icons.location_pin),
                     _RouteItem('Personal Information', '/personal-info', Icons.badge_rounded),
                     _RouteItem('Saved Delivery Addresses', '/saved-addresses', Icons.location_on_rounded),
                     _RouteItem('Add New Address', '/add-address', Icons.add_location_alt_rounded),
