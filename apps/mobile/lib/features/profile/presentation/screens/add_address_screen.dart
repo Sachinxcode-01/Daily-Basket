@@ -95,15 +95,22 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     setState(() => _isLocating = true);
     final addressProvider = context.read<AddressProvider>();
     addressProvider.setPermissionState(LocationPermissionState.granted);
-
-    await Future.delayed(const Duration(milliseconds: 600));
+    final payload = await addressProvider.fetchLiveLocation();
 
     if (mounted) {
       setState(() {
         _isLocating = false;
-        _pincodeController.text = '560038';
-        _cityController.text = 'Bengaluru';
-        _areaController.text = 'Indiranagar 100ft Road';
+        if (payload != null) {
+          _pincodeController.text = payload.pincode;
+          _cityController.text = payload.city;
+          _areaController.text = payload.streetArea;
+          if (_houseController.text.isEmpty) {
+            _houseController.text = payload.houseFlat;
+          }
+          if (_landmarkController.text.isEmpty) {
+            _landmarkController.text = payload.landmark;
+          }
+        }
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -131,7 +138,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
     }
 
     setState(() => _isSaving = true);
-    await Future.delayed(const Duration(milliseconds: 500));
+    final addressProvider = context.read<AddressProvider>();
 
     final newAddress = {
       'id': widget.editAddressData?['id'] ?? 'addr_${DateTime.now().millisecondsSinceEpoch}',
@@ -145,7 +152,14 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       'landmark': _landmarkController.text.trim(),
       'addressText': '${_houseController.text.trim()}, ${_areaController.text.trim()}, ${_cityController.text.trim()} - ${_pincodeController.text.trim()}',
       'inRange': true,
+      'isDefault': widget.editAddressData?['isDefault'] ?? true,
     };
+
+    if (widget.editAddressData != null && widget.editAddressData!['id'] != null) {
+      await addressProvider.updateAddress(widget.editAddressData!['id'], newAddress);
+    } else {
+      await addressProvider.saveAddress(newAddress);
+    }
 
     if (mounted) {
       setState(() => _isSaving = false);
