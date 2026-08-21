@@ -24,6 +24,7 @@ import 'features/auth/presentation/screens/account_locked_screen.dart';
 // Store, Customer & Catalog Screens
 import 'features/home/presentation/screens/home_screen.dart';
 import 'features/home/presentation/screens/store_closed_screen.dart';
+import 'features/search/presentation/screens/search_screen.dart';
 import 'features/search/presentation/screens/search_results_screen.dart';
 import 'features/categories/presentation/screens/browse_categories_screen.dart';
 import 'features/catalog/presentation/screens/product_details_screen.dart';
@@ -175,7 +176,8 @@ class DailyBasketApp extends StatelessWidget {
         '/account-locked': (context) => const AccountLockedScreen(),
         '/customer/home': (context) => const CustomerHomeScreen(),
         '/store-closed': (context) => const StoreClosedScreen(),
-        '/search': (context) => const SearchResultsScreen(),
+        '/search': (context) => const SearchScreen(),
+        '/search-results': (context) => const SearchResultsScreen(),
         '/categories': (context) => const BrowseCategoriesScreen(),
         '/favorites': (context) => const FavoritesScreen(),
         '/catalog/favorites': (context) => const FavoritesScreen(),
