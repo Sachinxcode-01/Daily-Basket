@@ -27,6 +27,7 @@ import 'features/home/presentation/screens/store_closed_screen.dart';
 import 'features/search/presentation/screens/search_screen.dart';
 import 'features/search/presentation/screens/search_results_screen.dart';
 import 'features/categories/presentation/screens/browse_categories_screen.dart';
+import 'features/categories/presentation/screens/fresh_produce_listing_screen.dart';
 import 'features/catalog/presentation/screens/product_details_screen.dart';
 
 // Cart & Checkout Screens
@@ -179,6 +180,7 @@ class DailyBasketApp extends StatelessWidget {
         '/search': (context) => const SearchScreen(),
         '/search-results': (context) => const SearchResultsScreen(),
         '/categories': (context) => const BrowseCategoriesScreen(),
+        '/category/fruits-vegetables': (context) => const FreshProduceListingScreen(),
         '/favorites': (context) => const FavoritesScreen(),
         '/catalog/favorites': (context) => const FavoritesScreen(),
         '/cart': (context) => const CartScreen(),

@@ -1,142 +1,157 @@
-// Google Stitch Screen ID: 88a4f41595a748f4b9f9675d069f765c
-// Title: Categories - Daily Basket
-// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
-
 'use client';
 
-import React, { useState } from 'react';
-
+import React from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Search, Sparkles, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
-interface CategoryItem {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-  imageUrl: string;
-  subcategoriesCount: number;
-  isFeatured?: boolean;
-}
+/**
+ * Browse Categories Page — Daily Basket
+ * Stitch Screen ID: d4a9073676484431a88cd27d2cc1e87a
+ */
+export default function BrowseCategoriesPage() {
+  const featured = [
+    {
+      title: 'Fresh Fruits',
+      subtitle: 'Farm to table everyday',
+      href: '/categories/fruits-vegetables',
+      image:
+        'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=700&auto=format&fit=crop&q=80',
+    },
+    {
+      title: 'Organic Vegetables',
+      subtitle: 'Locally sourced produce',
+      href: '/categories/fruits-vegetables',
+      image:
+        'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=700&auto=format&fit=crop&q=80',
+    },
+  ];
 
-const all18Categories: CategoryItem[] = [
-  { id: 'cat-1', slug: 'fresh-fruits-vegetables', name: 'Fresh Fruits & Vegetables', description: 'Farm fresh organic vegetables, fresh fruits & leafy greens', imageUrl: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=500&q=80', subcategoriesCount: 6, isFeatured: true },
-  { id: 'cat-2', slug: 'dairy-bread-eggs', name: 'Dairy, Bread & Eggs', description: 'Fresh milk, butter, paneer, curd, fresh bread & eggs', imageUrl: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&q=80', subcategoriesCount: 7, isFeatured: true },
-  { id: 'cat-3', slug: 'snacks-packaged-foods', name: 'Snacks & Packaged Foods', description: 'Chips, namkeen, instant noodles, pasta & popcorn', imageUrl: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=500&q=80', subcategoriesCount: 7, isFeatured: true },
-  { id: 'cat-4', slug: 'grocery', name: 'Grocery', description: 'Basmati rice, premium atta, pulses, dals & dry fruits', imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=500&q=80', subcategoriesCount: 7, isFeatured: true },
-  { id: 'cat-5', slug: 'cooking-essentials', name: 'Cooking Essentials', description: 'Mustard oil, ghee, masalas, sauces & pickles', imageUrl: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500&q=80', subcategoriesCount: 9, isFeatured: true },
-  { id: 'cat-6', slug: 'pooja-needs', name: 'Pooja Needs', description: 'Agarbatti, dhoop, camphor, cotton wicks & kumkum', imageUrl: 'https://images.unsplash.com/photo-1609357605129-26f69add5d6e?w=500&q=80', subcategoriesCount: 10, isFeatured: false },
-  { id: 'cat-7', slug: 'cleaning-essentials', name: 'Cleaning Essentials', description: 'Floor cleaners, dishwash, detergents & garbage bags', imageUrl: 'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=500&q=80', subcategoriesCount: 9, isFeatured: false },
-  { id: 'cat-8', slug: 'household-lifestyle', name: 'Household & Lifestyle', description: 'Containers, aluminium foil, tissues & repellents', imageUrl: 'https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=500&q=80', subcategoriesCount: 9, isFeatured: false },
-  { id: 'cat-9', slug: 'personal-care', name: 'Personal Care', description: 'Soaps, shampoos, toothpastes & skincare lotions', imageUrl: 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=500&q=80', subcategoriesCount: 7, isFeatured: false },
-  { id: 'cat-10', slug: 'baby-care', name: 'Baby Care', description: 'Diapers, baby wipes, baby food & gentle skincare', imageUrl: 'https://images.unsplash.com/photo-1519689680058-324335c77eba?w=500&q=80', subcategoriesCount: 6, isFeatured: false },
-  { id: 'cat-11', slug: 'pet-care', name: 'Pet Care', description: 'Dog food, cat treats, litter sand & grooming shampoos', imageUrl: 'https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?w=500&q=80', subcategoriesCount: 6, isFeatured: false },
-  { id: 'cat-12', slug: 'cold-drinks-juices', name: 'Cold Drinks & Juices', description: 'Soft drinks, fruit juices, coconut water & energy drinks', imageUrl: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&q=80', subcategoriesCount: 6, isFeatured: true },
-  { id: 'cat-13', slug: 'tea-coffee-beverages', name: 'Tea, Coffee & Beverages', description: 'Assam tea, instant coffee, green tea & health mixes', imageUrl: 'https://images.unsplash.com/photo-1576092768241-dec231879fc3?w=500&q=80', subcategoriesCount: 6, isFeatured: false },
-  { id: 'cat-14', slug: 'biscuits-bakery', name: 'Biscuits & Bakery', description: 'Cookies, cream biscuits, rusks & artisan breads', imageUrl: 'https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=500&q=80', subcategoriesCount: 6, isFeatured: false },
-  { id: 'cat-15', slug: 'chocolates-ice-cream', name: 'Chocolates & Ice Cream', description: 'Milk chocolates, dark chocolates & ice cream tubs', imageUrl: 'https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500&q=80', subcategoriesCount: 5, isFeatured: true },
-  { id: 'cat-16', slug: 'organic-healthy-foods', name: 'Organic & Healthy Foods', description: 'Organic staples, cold-pressed oils, millets & quinoa', imageUrl: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=500&q=80', subcategoriesCount: 6, isFeatured: false },
-  { id: 'cat-17', slug: 'frozen-foods', name: 'Frozen Foods', description: 'French fries, veg momos, frozen parathas & green peas', imageUrl: 'https://images.unsplash.com/photo-1541592106381-b31e9677c0e5?w=500&q=80', subcategoriesCount: 5, isFeatured: false },
-  { id: 'cat-18', slug: 'meat-fish-eggs', name: 'Meat, Fish & Eggs', description: 'Fresh chicken, mutton, sea fish, prawns & eggs', imageUrl: 'https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=500&q=80', subcategoriesCount: 6, isFeatured: false },
-];
-
-export default function CategoriesPage() {
-  const [search, setSearch] = useState('');
-
-  const filtered = all18Categories.filter(
-    (c) =>
-      c.name.toLowerCase().includes(search.toLowerCase()) ||
-      c.description.toLowerCase().includes(search.toLowerCase()),
-  );
+  const categories = [
+    {
+      title: 'Dairy & Eggs',
+      items: '120+ items',
+      href: '/categories/fruits-vegetables',
+      image:
+        'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      title: 'Bakery',
+      items: '85+ items',
+      href: '/categories/fruits-vegetables',
+      image:
+        'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      title: 'Snacks',
+      items: '300+ items',
+      href: '/categories/fruits-vegetables',
+      image:
+        'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      title: 'Personal Care',
+      items: '150+ items',
+      href: '/categories/fruits-vegetables',
+      image:
+        'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      title: 'Beverages',
+      items: '210+ items',
+      href: '/categories/fruits-vegetables',
+      image:
+        'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80',
+    },
+    {
+      title: 'Home Essentials',
+      items: '95+ items',
+      href: '/categories/fruits-vegetables',
+      image:
+        'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=600&auto=format&fit=crop&q=80',
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-900 font-sans pb-24 text-white">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 px-4 sm:px-8 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="p-2 text-teal-400 hover:bg-slate-700 rounded-full transition">
-              <ArrowLeft className="w-6 h-6" />
-            </Link>
-            <h1 className="text-xl sm:text-2xl font-extrabold text-white font-outfit">
-              All Categories ({all18Categories.length})
-            </h1>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#f9f9fc] font-['Inter'] text-[#1a1c1e] pb-24">
+      {/* Top Header */}
+      <header className="sticky top-0 w-full z-50 bg-[#f9f9fc]/80 backdrop-blur-xl shadow-sm border-b border-[#e2e2e5] flex justify-between items-center px-4 h-16 max-w-7xl mx-auto">
+        <Link href="/select-location" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#078730]/10 text-[#006b23]">
+          <span className="material-symbols-outlined">location_on</span>
+        </Link>
+        <h1 className="font-['Outfit'] text-[22px] font-bold text-[#006b23]">
+          Daily Basket
+        </h1>
+        <Link href="/search" className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-[#078730]/10 text-[#006b23]">
+          <span className="material-symbols-outlined">search</span>
+        </Link>
       </header>
 
-      {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-8 pt-6">
-        {/* Quick Commerce Banner */}
-        <div className="mb-8 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 p-6 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-          <div>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-bold uppercase tracking-wider mb-2">
-              <Sparkles className="w-3.5 h-3.5" /> 10-Minute Quick Commerce Taxonomy
-            </span>
-            <h2 className="text-2xl md:text-3xl font-extrabold font-outfit mb-1">
-              Every Department Freshly Stocked
-            </h2>
-            <p className="text-white/90 text-sm font-inter">
-              Browse 18 quick-commerce departments with instant subcategory filtering and express delivery.
-            </p>
-          </div>
-        </div>
-
+      {/* Main Content */}
+      <main className="pt-4 px-4 max-w-7xl mx-auto">
         {/* Search Bar */}
-        <div className="mb-6 relative max-w-md">
-          <Search className="w-5 h-5 absolute left-3.5 top-3.5 text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search departments..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-11 pr-4 py-3 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-teal-500 transition"
-          />
+        <div className="mb-8">
+          <Link href="/search" className="flex items-center w-full bg-[#f3f3f6] rounded-xl py-3 px-4 text-[#6e7a6c] hover:bg-white border border-transparent hover:border-[#e2e2e5] transition-all">
+            <span className="material-symbols-outlined mr-3 text-[#6e7a6c]">search</span>
+            <span className="text-sm">Search groceries...</span>
+          </Link>
         </div>
 
-        {/* Categories Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/categories/${cat.slug}`}
-              className="group bg-slate-800 border border-slate-700/70 hover:border-teal-500/60 rounded-2xl overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-teal-500/10 flex flex-col justify-between"
-            >
-              <div>
-                <div className="relative h-44 overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
+        {/* Featured Categories */}
+        <section className="mb-10">
+          <h2 className="font-['Outfit'] text-[18px] font-semibold text-[#1a1c1e] mb-4">
+            Featured Categories
+          </h2>
+          <div className="flex overflow-x-auto gap-4 pb-4 snap-x hide-scrollbar">
+            {featured.map((item, idx) => (
+              <Link
+                key={idx}
+                href={item.href}
+                className="min-w-[280px] w-72 flex-shrink-0 snap-start bg-white rounded-2xl overflow-hidden shadow-sm relative group hover:shadow-md transition-shadow"
+              >
+                <div className="h-44 w-full relative">
                   <img
-                    src={cat.imageUrl}
-                    alt={cat.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80" />
-                  {cat.isFeatured && (
-                    <span className="absolute top-3 right-3 bg-pink-500 text-white text-xs font-bold px-2.5 py-1 rounded-md shadow">
-                      POPULAR
-                    </span>
-                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
                 </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold font-outfit text-white group-hover:text-teal-400 transition">
-                    {cat.name}
-                  </h3>
-                  <p className="text-xs text-slate-400 font-inter mt-1 line-clamp-2">
-                    {cat.description}
-                  </p>
+                <div className="absolute bottom-0 left-0 p-4 w-full text-white">
+                  <h3 className="font-['Outfit'] text-lg font-bold mb-0.5">{item.title}</h3>
+                  <p className="text-xs text-white/80">{item.subtitle}</p>
                 </div>
-              </div>
-              <div className="px-5 pb-5 pt-0 flex items-center justify-between border-t border-slate-700/50 mt-2">
-                <span className="text-xs text-teal-400 font-semibold font-inter">
-                  {cat.subcategoriesCount} subcategories
-                </span>
-                <span className="p-2 bg-slate-700/50 group-hover:bg-teal-500 group-hover:text-slate-950 text-slate-300 rounded-full transition">
-                  <ArrowRight className="w-4 h-4" />
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* All Categories Grid */}
+        <section className="mb-8">
+          <h2 className="font-['Outfit'] text-[18px] font-semibold text-[#1a1c1e] mb-4">
+            All Categories
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {categories.map((cat, idx) => (
+              <Link
+                key={idx}
+                href={cat.href}
+                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all p-3 flex flex-col items-center border border-[#e2e2e5]"
+              >
+                <div className="w-full aspect-square rounded-lg mb-3 overflow-hidden bg-[#f3f3f6]">
+                  <img
+                    src={cat.image}
+                    alt={cat.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  />
+                </div>
+                <h3 className="font-['Outfit'] text-sm font-semibold text-[#1a1c1e] text-center w-full truncate">
+                  {cat.title}
+                </h3>
+                <p className="text-[11px] text-[#6e7a6c] mt-0.5">{cat.items}</p>
+              </Link>
+            ))}
+          </div>
+        </section>
       </main>
     </div>
   );
