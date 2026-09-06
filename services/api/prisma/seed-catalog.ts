@@ -148,6 +148,19 @@ const catalog: SeedCategory[] = [
 async function main() {
   console.log('🌱 Seeding Daily Basket single-store catalog...');
 
+  // Guest shopper used by the persistent cart for unauthenticated sessions (userId 'usr_default').
+  // Cart.userId is a required FK to User, so this row must exist for guest carts to work.
+  await prisma.user.upsert({
+    where: { id: 'usr_default' },
+    update: {},
+    create: {
+      id: 'usr_default',
+      phoneNumber: '+910000000000',
+      fullName: 'Guest Shopper',
+      isVerified: true,
+    },
+  });
+
   const store = await prisma.store.upsert({
     where: { code: 'store_main_01' },
     update: { isOpen: true },

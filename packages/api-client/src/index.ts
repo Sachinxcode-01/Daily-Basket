@@ -185,6 +185,56 @@ export class ApiClient {
       body: JSON.stringify({ actions }),
     });
   }
+
+  // Cart Methods (persistent, backend-validated totals)
+  public async getCart(userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/cart?userId=${encodeURIComponent(userId)}`);
+  }
+
+  public async addToCart(
+    item: { variantId: string; productName: string; unitName: string; price: number; quantity?: number },
+    userId = 'usr_default',
+  ): Promise<any> {
+    return this.fetcher('/api/v1/cart/add', {
+      method: 'POST',
+      body: JSON.stringify({ ...item, userId }),
+    });
+  }
+
+  public async updateCartItem(itemId: string, quantity: number, userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/cart/item/${itemId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ quantity, userId }),
+    });
+  }
+
+  public async removeCartItem(itemId: string, userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/cart/item/${itemId}?userId=${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  public async clearCart(userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/cart/clear?userId=${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // Coupon Methods
+  public async getCoupons(): Promise<any> {
+    return this.fetcher('/api/v1/coupons');
+  }
+
+  public async applyCoupon(
+    code: string,
+    cartSubtotal: number,
+    userId = 'usr_default',
+  ): Promise<{ success: boolean; valid: boolean; code: string; discountType: string; discountAmount: number; message: string }> {
+    return this.fetcher('/api/v1/coupons/apply', {
+      method: 'POST',
+      body: JSON.stringify({ code, cartSubtotal, userId }),
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

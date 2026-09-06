@@ -6,9 +6,11 @@ import { ArrowLeft, Search, ShoppingBag, Heart, Star, Sparkles } from 'lucide-re
 import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
+import { useCart } from '../../../store/useCart';
 
 interface CardProduct {
   id: string;
+  variantId: string;
   name: string;
   subtitle: string;
   price: number;
@@ -22,6 +24,7 @@ function mapProduct(p: any): CardProduct {
     (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
   return {
     id: p?.id,
+    variantId: variant?.id ?? '',
     name: p?.name ?? '',
     subtitle: variant?.unitName ?? p?.brand ?? '',
     price: variant?.price ?? 0,
@@ -33,9 +36,9 @@ function mapProduct(p: any): CardProduct {
 
 export default function CategoryDetailPage({ params }: { params: { id: string } }) {
   const categoryId = params.id;
+  const { addItem, itemCount } = useCart();
 
   const [search, setSearch] = useState('');
-  const [cartCount, setCartCount] = useState(0);
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -86,9 +89,9 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
           </div>
           <Link href="/cart" className="relative p-2 text-teal-400 hover:bg-slate-700 rounded-full transition">
             <ShoppingBag className="w-6 h-6" />
-            {cartCount > 0 && (
+            {itemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-teal-500 text-slate-950 font-bold text-xs w-5 h-5 rounded-full flex items-center justify-center">
-                {cartCount}
+                {itemCount}
               </span>
             )}
           </Link>
@@ -209,8 +212,12 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
                       )}
                     </div>
                     <button
-                      onClick={() => setCartCount((c) => c + 1)}
-                      className="px-3.5 py-1.5 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-xs rounded-xl transition"
+                      onClick={() =>
+                        p.variantId &&
+                        addItem.mutate({ variantId: p.variantId, productName: p.name, unitName: p.subtitle, price: p.price, quantity: 1 })
+                      }
+                      disabled={addItem.isPending || !p.variantId}
+                      className="px-3.5 py-1.5 bg-teal-500 hover:bg-teal-400 disabled:opacity-50 text-slate-950 font-extrabold text-xs rounded-xl transition"
                     >
                       ADD
                     </button>

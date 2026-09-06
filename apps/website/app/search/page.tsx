@@ -11,9 +11,11 @@ import { Search, Camera, SlidersHorizontal, Plus, Check, ArrowLeft, X } from 'lu
 import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
+import { useCart } from '../../store/useCart';
 
 interface SearchItem {
   id: string;
+  variantId: string;
   name: string;
   weight: string;
   price: number;
@@ -27,6 +29,7 @@ function mapItem(p: any): SearchItem {
     (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
   return {
     id: p?.id,
+    variantId: variant?.id ?? '',
     name: p?.name ?? '',
     weight: variant?.unitName ?? '',
     price: variant?.price ?? 0,
@@ -40,8 +43,8 @@ export default function SearchPage() {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
-  const [cart, setCart] = useState<Record<string, number>>({});
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
+  const { activeItems, addItem, updateItem } = useCart();
 
   const filters = ['All', 'Organic', 'On Sale', 'Under ₹50'];
 
@@ -76,9 +79,16 @@ export default function SearchPage() {
     }
   }, [apiProducts, activeFilter]);
 
-  const toggleAdd = (id: string) => {
-    setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
+  const addToCart = (item: SearchItem) => {
+    if (!item.variantId) return;
+    const existing = activeItems.find((i) => i.variantId === item.variantId);
+    if (existing) {
+      updateItem.mutate({ itemId: existing.id, quantity: existing.quantity + 1 });
+    } else {
+      addItem.mutate({ variantId: item.variantId, productName: item.name, unitName: item.weight, price: item.price, quantity: 1 });
+    }
   };
+  const qtyFor = (variantId: string) => activeItems.find((i) => i.variantId === variantId)?.quantity ?? 0;
 
   const loading = isLoading || isFetching;
 
@@ -185,7 +195,7 @@ export default function SearchPage() {
         {!loading && !isError && results.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {results.map((item) => {
-              const count = cart[item.id] || 0;
+              const count = qtyFor(item.variantId);
               const discount = item.mrp > item.price ? Math.round(((item.mrp - item.price) / item.mrp) * 100) : 0;
               return (
                 <div
@@ -229,8 +239,9 @@ export default function SearchPage() {
                     </div>
 
                     <button
-                      onClick={() => toggleAdd(item.id)}
-                      className={`w-full h-9 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition ${
+                      onClick={() => addToCart(item)}
+                      disabled={addItem.isPending || !item.variantId}
+                      className={`w-full h-9 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition disabled:opacity-50 ${
                         count > 0 ? 'bg-teal-600 text-white' : 'bg-teal-500 text-slate-950 hover:bg-teal-400'
                       }`}
                     >

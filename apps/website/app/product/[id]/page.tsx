@@ -6,15 +6,18 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
+import { useCart } from '../../../store/useCart';
 
 export default function ProductDetailsPage({ params }: { params: { id?: string } }) {
   const productId = params.id ?? '';
+  const { addItem } = useCart();
 
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeThumb, setActiveThumb] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(true);
+  const [added, setAdded] = useState(false);
 
   const { data: product, isLoading, isError, refetch } = useQuery({
     queryKey: ['product', productId],
@@ -237,10 +240,28 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
           </div>
 
           <button
-            disabled={!selectedVariant}
+            disabled={!selectedVariant || addItem.isPending}
+            onClick={() => {
+              if (!selectedVariant) return;
+              addItem.mutate(
+                {
+                  variantId: selectedVariant.id,
+                  productName: p.name,
+                  unitName: selectedVariant.unitName,
+                  price: selectedVariant.price,
+                  quantity,
+                },
+                {
+                  onSuccess: () => {
+                    setAdded(true);
+                    setTimeout(() => setAdded(false), 2000);
+                  },
+                },
+              );
+            }}
             className="flex-1 md:flex-none md:w-64 bg-[#006b23] hover:bg-[#078730] disabled:opacity-50 text-white font-headline font-semibold text-lg rounded-xl h-14 flex items-center justify-center shadow-md active:scale-95 transition-all"
           >
-            Add to Cart - {formatCurrency(price * quantity)}
+            {addItem.isPending ? 'Adding…' : added ? '✓ Added to Cart' : `Add to Cart - ${formatCurrency(price * quantity)}`}
           </button>
         </div>
       </div>

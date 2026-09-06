@@ -12,9 +12,11 @@ import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import HeaderNavBar from '../components/navigation/HeaderNavBar';
+import { useCart } from '../store/useCart';
 
 interface Product {
   id: string;
+  variantId: string;
   name: string;
   brand: string;
   unitName: string;
@@ -33,6 +35,7 @@ function mapApiProduct(p: any): Product {
     (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
   return {
     id: p?.id,
+    variantId: variant?.id ?? '',
     name: p?.name ?? '',
     brand: p?.brand ?? '',
     unitName: variant?.unitName ?? '',
@@ -47,12 +50,9 @@ function mapApiProduct(p: any): Product {
 }
 
 export default function HomePage() {
-  const [cartItems, setCartItems] = useState<Record<string, number>>({});
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
 
   // Live catalog from the backend (single source of truth).
   const {
@@ -81,16 +81,25 @@ export default function HomePage() {
 
   const featuredProduct = catalog[0] ?? null;
 
-  const updateQty = (id: string, delta: number) => {
-    setCartItems((prev) => {
-      const current = prev[id] || 0;
-      const updated = Math.max(0, current + delta);
-      if (updated === 0) {
-        const { [id]: _, ...rest } = prev;
-        return rest;
-      }
-      return { ...prev, [id]: updated };
-    });
+  // Backend-backed persistent cart (validated totals).
+  const { activeItems, summary, itemCount, addItem, updateItem } = useCart();
+
+  const cartItemForVariant = (variantId: string) => activeItems.find((i) => i.variantId === variantId);
+  const qtyForVariant = (variantId: string) => cartItemForVariant(variantId)?.quantity ?? 0;
+
+  const addOne = (p: Product) => {
+    if (!p.variantId) return;
+    const existing = cartItemForVariant(p.variantId);
+    if (existing) {
+      updateItem.mutate({ itemId: existing.id, quantity: existing.quantity + 1 });
+    } else {
+      addItem.mutate({ variantId: p.variantId, productName: p.name, unitName: p.unitName, price: p.price, quantity: 1 });
+    }
+  };
+
+  const removeOne = (p: Product) => {
+    const existing = cartItemForVariant(p.variantId);
+    if (existing) updateItem.mutate({ itemId: existing.id, quantity: existing.quantity - 1 });
   };
 
   const filteredProducts = catalog.filter((p) => {
@@ -99,16 +108,7 @@ export default function HomePage() {
     return matchesCat && matchesSearch;
   });
 
-  const totalCartCount = Object.values(cartItems).reduce((a, b) => a + b, 0);
-
-  const cartSubtotal = Object.entries(cartItems).reduce((sum, [id, qty]) => {
-    const prod = catalog.find((p) => p.id === id);
-    return sum + (prod ? prod.price * qty : 0);
-  }, 0);
-
-  const deliveryFee = cartSubtotal >= 199 || cartSubtotal === 0 ? 0 : 25;
-  const couponDiscount = appliedCoupon === 'DAILY50' ? Math.min(50, cartSubtotal) : 0;
-  const grandTotal = Math.max(0, cartSubtotal + deliveryFee - couponDiscount);
+  const totalCartCount = itemCount;
 
   return (
     <div className="min-h-screen bg-background text-on-background font-body-lg antialiased pb-24 relative">
@@ -233,7 +233,7 @@ export default function HomePage() {
                   <div className="text-xs font-bold text-primary mt-0.5">{formatCurrency(featuredProduct.price)}</div>
                 </div>
                 <button
-                  onClick={() => updateQty(featuredProduct.id, 1)}
+                  onClick={() => addOne(featuredProduct)}
                   className="bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-surface-tint active:scale-95 transition-all"
                 >
                   + Add
@@ -365,7 +365,7 @@ export default function HomePage() {
           {!productsLoading && !productsError && filteredProducts.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
             {filteredProducts.map((p) => {
-              const qty = cartItems[p.id] || 0;
+              const qty = qtyForVariant(p.variantId);
               return (
                 <div
                   key={p.id}
@@ -424,7 +424,7 @@ export default function HomePage() {
 
                     {qty === 0 ? (
                       <button
-                        onClick={() => updateQty(p.id, 1)}
+                        onClick={() => addOne(p)}
                         className="px-3 py-1.5 bg-primary text-white text-xs font-bold rounded-full hover:bg-surface-tint active:scale-95 transition-all shadow-sm"
                       >
                         + Add
@@ -432,7 +432,7 @@ export default function HomePage() {
                     ) : (
                       <div className="flex items-center gap-1.5 bg-primary/10 border border-primary/20 rounded-full px-1.5 py-0.5">
                         <button
-                          onClick={() => updateQty(p.id, -1)}
+                          onClick={() => removeOne(p)}
                           className="w-5 h-5 rounded-full bg-primary text-white font-bold flex items-center justify-center text-xs hover:bg-surface-tint"
                         >
                           −
@@ -441,7 +441,7 @@ export default function HomePage() {
                           {qty}
                         </span>
                         <button
-                          onClick={() => updateQty(p.id, 1)}
+                          onClick={() => addOne(p)}
                           className="w-5 h-5 rounded-full bg-primary text-white font-bold flex items-center justify-center text-xs hover:bg-surface-tint"
                         >
                           +
@@ -495,9 +495,9 @@ export default function HomePage() {
               </button>
             </div>
 
-            {/* Items List */}
+            {/* Items List (backend cart) */}
             <div className="p-5 overflow-y-auto flex-1 space-y-4">
-              {Object.keys(cartItems).length === 0 ? (
+              {activeItems.length === 0 ? (
                 <div className="text-center py-12 text-slate-400 space-y-3">
                   <span className="text-4xl">🧺</span>
                   <p className="font-bold text-slate-600">Your basket is empty</p>
@@ -506,89 +506,57 @@ export default function HomePage() {
                   </button>
                 </div>
               ) : (
-                Object.entries(cartItems).map(([id, qty]) => {
-                  const prod = catalog.find((p) => p.id === id);
-                  if (!prod) return null;
-                  return (
-                    <div key={id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                      <Image src={prod.image} alt={prod.name} width={56} height={56} unoptimized className="w-14 h-14 rounded-xl object-cover" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-xs font-bold truncate">{prod.name}</div>
-                        <div className="text-[10px] text-slate-500">{prod.unitName}</div>
-                        <div className="text-xs font-bold text-[#006b23] mt-0.5">{formatCurrency(prod.price * qty)}</div>
-                      </div>
-                      <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-2 py-1">
-                        <button onClick={() => updateQty(id, -1)} className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs hover:bg-slate-200">
-                          −
-                        </button>
-                        <span className="text-xs font-bold text-[#006b23] min-w-[14px] text-center">{qty}</span>
-                        <button onClick={() => updateQty(id, 1)} className="w-5 h-5 rounded-full bg-[#006b23] text-white font-bold flex items-center justify-center text-xs">
-                          +
-                        </button>
-                      </div>
+                activeItems.map((item) => (
+                  <div key={item.id} className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div className="w-14 h-14 rounded-xl bg-slate-100 flex items-center justify-center text-2xl">🛒</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-bold truncate">{item.productName}</div>
+                      <div className="text-[10px] text-slate-500">{item.unitName}</div>
+                      <div className="text-xs font-bold text-[#006b23] mt-0.5">{formatCurrency(item.price * item.quantity)}</div>
                     </div>
-                  );
-                })
+                    <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-full px-2 py-1">
+                      <button onClick={() => updateItem.mutate({ itemId: item.id, quantity: item.quantity - 1 })} className="w-5 h-5 rounded-full bg-slate-100 text-slate-700 font-bold flex items-center justify-center text-xs hover:bg-slate-200">
+                        −
+                      </button>
+                      <span className="text-xs font-bold text-[#006b23] min-w-[14px] text-center">{item.quantity}</span>
+                      <button onClick={() => updateItem.mutate({ itemId: item.id, quantity: item.quantity + 1 })} className="w-5 h-5 rounded-full bg-[#006b23] text-white font-bold flex items-center justify-center text-xs">
+                        +
+                      </button>
+                    </div>
+                  </div>
+                ))
               )}
             </div>
 
-            {/* Coupon & Total Footer */}
-            {Object.keys(cartItems).length > 0 && (
+            {/* Total Footer (backend-validated) */}
+            {activeItems.length > 0 && summary && (
               <div className="p-5 border-t border-slate-200 bg-slate-50 space-y-4">
-                
-                {/* Coupon applicator */}
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    placeholder="Enter coupon (e.g. DAILY50)"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
-                    className="flex-1 text-xs border border-slate-200 rounded-full px-4 py-2 focus:outline-none focus:border-[#006b23]"
-                  />
-                  <button
-                    onClick={() => {
-                      if (couponCode === 'DAILY50') setAppliedCoupon('DAILY50');
-                    }}
-                    className="bg-[#006b23] text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-emerald-800"
-                  >
-                    Apply
-                  </button>
-                </div>
-                {appliedCoupon && (
-                  <div className="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full flex justify-between">
-                    <span>Coupon DAILY50 Applied</span>
-                    <span>-₹50</span>
-                  </div>
-                )}
-
-                {/* Calculation */}
                 <div className="space-y-1 text-xs text-slate-600">
                   <div className="flex justify-between">
                     <span>Items Subtotal</span>
-                    <span>{formatCurrency(cartSubtotal)}</span>
+                    <span>{formatCurrency(summary.itemTotal)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span>Delivery Charge (10 Mins)</span>
-                    <span>{deliveryFee === 0 ? <span className="text-emerald-600 font-bold">FREE</span> : formatCurrency(deliveryFee)}</span>
+                    <span>{summary.deliveryFee === 0 ? <span className="text-emerald-600 font-bold">FREE</span> : formatCurrency(summary.deliveryFee)}</span>
                   </div>
-                  {couponDiscount > 0 && (
-                    <div className="flex justify-between text-emerald-600 font-bold">
-                      <span>Discount</span>
-                      <span>-{formatCurrency(couponDiscount)}</span>
-                    </div>
-                  )}
+                  <div className="flex justify-between">
+                    <span>Handling & GST</span>
+                    <span>{formatCurrency(summary.platformFee + summary.packagingCharges + summary.taxGst)}</span>
+                  </div>
                   <div className="flex justify-between font-bold text-sm text-slate-900 pt-2 border-t border-slate-200">
                     <span>To Pay</span>
-                    <span className="text-[#006b23]">{formatCurrency(grandTotal)}</span>
+                    <span className="text-[#006b23]">{formatCurrency(summary.grandTotal)}</span>
                   </div>
                 </div>
 
                 <Link
-                  href="/checkout"
+                  href="/cart"
                   className="w-full bg-[#006b23] text-white font-bold text-sm py-3.5 rounded-full text-center block shadow-lg hover:bg-emerald-800 transition-colors"
                 >
-                  Proceed to Checkout ({formatCurrency(grandTotal)}) →
+                  View Cart & Checkout ({formatCurrency(summary.grandTotal)}) →
                 </Link>
+                <p className="text-[10px] text-center text-slate-400">Apply coupons at checkout</p>
               </div>
             )}
           </div>
