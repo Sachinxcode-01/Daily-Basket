@@ -1,6 +1,10 @@
 import { API_ROUTES } from '@daily-basket/constants';
 import { Product, Category, Order, CartItem } from '@daily-basket/shared-types';
 
+// Minimal ambient declaration so this shared package typechecks without @types/node.
+// Keeping the literal `process.env.NEXT_PUBLIC_*` access lets Next.js inline it at build time.
+declare const process: { env: Record<string, string | undefined> } | undefined;
+
 export class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
