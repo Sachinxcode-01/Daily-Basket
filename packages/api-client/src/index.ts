@@ -129,13 +129,56 @@ export class ApiClient {
 
   // Order Methods
   public async createOrder(orderPayload: {
-    items: CartItem[];
+    userId?: string;
+    items: any[];
     addressId: string;
     paymentMethod: string;
-  }): Promise<Order> {
+    couponCode?: string;
+    useWallet?: boolean;
+  }): Promise<any> {
     return this.fetcher(API_ROUTES.ORDERS.CREATE, {
       method: 'POST',
       body: JSON.stringify(orderPayload),
+    });
+  }
+
+  public async calculateOrderPricing(payload: {
+    items: { id: string; productName: string; price: number; mrp?: number; quantity: number }[];
+    couponCode?: string;
+    useWallet?: boolean;
+    paymentMethod?: string;
+  }): Promise<any> {
+    return this.fetcher('/api/v1/orders/calculate', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async getOrder(orderId: string): Promise<any> {
+    return this.fetcher(API_ROUTES.ORDERS.DETAILS(orderId));
+  }
+
+  public async listOrders(userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`${API_ROUTES.ORDERS.LIST}?userId=${encodeURIComponent(userId)}`);
+  }
+
+  // Address Methods
+  public async getAddresses(userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/addresses?userId=${encodeURIComponent(userId)}`);
+  }
+
+  // Payment Methods (Razorpay)
+  public async initiatePayment(orderId: string, amount: number): Promise<{ success: boolean; razorpayOrderId: string; amount: number; currency: string; keyId: string }> {
+    return this.fetcher(API_ROUTES.PAYMENTS.INITIATE, {
+      method: 'POST',
+      body: JSON.stringify({ orderId, amount }),
+    });
+  }
+
+  public async verifyPayment(payload: { paymentId: string; razorpayOrderId: string; razorpaySignature: string }): Promise<{ success: boolean; message: string }> {
+    return this.fetcher(API_ROUTES.PAYMENTS.VERIFY, {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   }
 

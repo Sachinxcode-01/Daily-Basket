@@ -161,6 +161,25 @@ async function main() {
     },
   });
 
+  // Default delivery address for the guest cart so checkout can create real orders.
+  await prisma.address.upsert({
+    where: { id: 'addr_guest_default' },
+    update: {},
+    create: {
+      id: 'addr_guest_default',
+      userId: 'usr_default',
+      label: 'HOME',
+      houseNo: '#42',
+      street: '100 Feet Road, 4th Block, Koramangala',
+      landmark: 'Near Sony World Signal',
+      city: 'Bengaluru',
+      pincode: '560034',
+      latitude: 12.9352,
+      longitude: 77.6245,
+      isDefault: true,
+    },
+  });
+
   const store = await prisma.store.upsert({
     where: { code: 'store_main_01' },
     update: { isOpen: true },
