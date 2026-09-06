@@ -4,11 +4,13 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
+import { apiClient } from '@daily-basket/api-client';
 import HeaderNavBar from '../components/navigation/HeaderNavBar';
 
 interface Product {
@@ -18,65 +20,66 @@ interface Product {
   unitName: string;
   price: number;
   mrp: number;
-  rating: number;
-  reviews: number;
+  rating?: number;
+  reviews?: number;
   category: string;
   tag?: string;
   image: string;
 }
 
-const catalog: Product[] = [
-  // Dairy
-  { id: 'mlk1', name: 'Full Cream Milk', brand: 'Amul', unitName: '1 L Pouch', price: 64, mrp: 68, rating: 4.7, reviews: 8420, category: 'Dairy', tag: 'Bestseller', image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&q=80' },
-  { id: 'mlk2', name: 'Toned Milk', brand: 'Mother Dairy', unitName: '500 ml Pouch', price: 30, mrp: 32, rating: 4.6, reviews: 6210, category: 'Dairy', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&q=80' },
-  { id: 'mlk3', name: 'Double Toned Milk', brand: 'Nandini', unitName: '1 L Pouch', price: 54, mrp: 58, rating: 4.5, reviews: 3120, category: 'Dairy', image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=500&q=80' },
-  { id: 'mlk4', name: 'Organic Cow Milk', brand: 'Akshayakalpa', unitName: '500 ml Bottle', price: 46, mrp: 50, rating: 4.8, reviews: 2890, category: 'Dairy', tag: 'Organic', image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=500&q=80' },
-  { id: 'crd1', name: 'Set Curd Cup', brand: 'Amul', unitName: '400 g Cup', price: 42, mrp: 45, rating: 4.6, reviews: 5340, category: 'Dairy', image: 'https://images.unsplash.com/photo-1571512599285-9b05c2b06e99?w=500&q=80' },
-  { id: 'lsi1', name: 'Sweet Lassi Bottle', brand: 'Amul', unitName: '200 ml Bottle', price: 25, mrp: 28, rating: 4.7, reviews: 4120, category: 'Dairy', image: 'https://images.unsplash.com/photo-1553361371-9b22f78e8b1d?w=500&q=80' },
-
-  // Beverages
-  { id: 'tea1', name: 'Brooke Bond Red Label Tea', brand: 'Red Label', unitName: '500 g Pack', price: 198, mrp: 210, rating: 4.8, reviews: 12400, category: 'Beverages', tag: 'Top Rated', image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=500&q=80' },
-  { id: 'tea2', name: 'Taj Mahal Natural Care Tea', brand: 'Taj Mahal', unitName: '250 g Pack', price: 138, mrp: 150, rating: 4.7, reviews: 9800, category: 'Beverages', image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=500&q=80' },
-  { id: 'tea3', name: 'Masala Tea Powder', brand: 'Wagh Bakri', unitName: '250 g Pack', price: 115, mrp: 125, rating: 4.6, reviews: 7300, category: 'Beverages', image: 'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=500&q=80' },
-  { id: 'tea4', name: 'Green Tea Bags', brand: 'Tata Gold', unitName: '100 g Pack', price: 89, mrp: 99, rating: 4.5, reviews: 5210, category: 'Beverages', image: 'https://images.unsplash.com/photo-1564890369478-c89ca3d9cde4?w=500&q=80' },
-
-  // Confectionery
-  { id: 'chc1', name: 'Dairy Milk Silk Bar', brand: 'Cadbury', unitName: '150 g Bar', price: 155, mrp: 170, rating: 4.8, reviews: 15600, category: 'Confectionery', tag: 'Trending', image: 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=500&q=80' },
-  { id: 'chc2', name: 'KitKat 4 Finger Bar', brand: 'Nestle', unitName: '41.5 g Bar', price: 30, mrp: 35, rating: 4.7, reviews: 11200, category: 'Confectionery', image: 'https://images.unsplash.com/photo-1526081347589-7fa3cb41d55b?w=500&q=80' },
-  { id: 'chc3', name: '5 Star Chocolate Bar', brand: 'Cadbury', unitName: '42 g Bar', price: 30, mrp: 35, rating: 4.6, reviews: 9300, category: 'Confectionery', image: 'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=500&q=80' },
-
-  // Personal Care
-  { id: 'shp1', name: 'Anti-Dandruff Shampoo', brand: 'Head & Shoulders', unitName: '340 ml Bottle', price: 265, mrp: 295, rating: 4.5, reviews: 18900, category: 'Personal Care', image: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=500&q=80' },
-  { id: 'shp2', name: 'Intense Damage Repair Shampoo', brand: 'Dove', unitName: '340 ml Bottle', price: 272, mrp: 295, rating: 4.6, reviews: 14300, category: 'Personal Care', image: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=500&q=80' },
-  { id: 'sop1', name: 'Dettol Original Soap', brand: 'Dettol', unitName: '75g x 4 Pack', price: 115, mrp: 128, rating: 4.7, reviews: 21000, category: 'Personal Care', tag: 'Essential', image: 'https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?w=500&q=80' },
-  { id: 'sop2', name: 'Dove Cream Beauty Bar', brand: 'Dove', unitName: '100 g Bar', price: 54, mrp: 60, rating: 4.7, reviews: 18400, category: 'Personal Care', image: 'https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?w=500&q=80' },
-
-  // Household
-  { id: 'wsh1', name: 'Surf Excel Easy Wash', brand: 'Surf Excel', unitName: '1 kg Pack', price: 155, mrp: 172, rating: 4.6, reviews: 24500, category: 'Household', tag: 'Popular', image: 'https://images.unsplash.com/photo-1585421514738-01798e348b17?w=500&q=80' },
-  { id: 'wsh2', name: 'Ariel Complete Powder', brand: 'Ariel', unitName: '1 kg Pack', price: 165, mrp: 185, rating: 4.7, reviews: 19800, category: 'Household', image: 'https://images.unsplash.com/photo-1585421514738-01798e348b17?w=500&q=80' },
-
-  // Staples
-  { id: 'att1', name: 'Chakki Fresh Atta', brand: 'Aashirvaad', unitName: '5 kg Bag', price: 242, mrp: 265, rating: 4.7, reviews: 28900, category: 'Staples', tag: 'Staple', image: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=500&q=80' },
-  { id: 'dal1', name: 'Unpolished Toor Dal', brand: 'Tata Sampann', unitName: '1 kg Pack', price: 145, mrp: 160, rating: 4.6, reviews: 14300, category: 'Staples', image: 'https://images.unsplash.com/photo-1546548970-71785318a17b?w=500&q=80' },
-
-  // Oil & Spices
-  { id: 'oil1', name: 'Parachute Pure Coconut Oil', brand: 'Parachute', unitName: '500 ml Jar', price: 188, mrp: 210, rating: 4.8, reviews: 32400, category: 'Oil', tag: 'Original', image: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=500&q=80' },
-  { id: 'msl1', name: 'MDH Garam Masala', brand: 'MDH', unitName: '100 g Pack', price: 78, mrp: 88, rating: 4.7, reviews: 22400, category: 'Spices', image: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=500&q=80' },
-
-  // Stationery
-  { id: 'stn1', name: 'HB Pencils 10 pcs Set', brand: 'Apsara', unitName: '10 Pencils Pack', price: 38, mrp: 45, rating: 4.5, reviews: 8900, category: 'Stationery', image: 'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=500&q=80' },
-  { id: 'stn3', name: 'Colour Pencils 24 Shades', brand: 'Camlin', unitName: '24 pcs Tin Box', price: 125, mrp: 140, rating: 4.7, reviews: 11800, category: 'Stationery', image: 'https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=500&q=80' },
-];
-
-const categoryList = ['All', 'Dairy', 'Beverages', 'Confectionery', 'Personal Care', 'Household', 'Staples', 'Oil', 'Spices', 'Stationery'];
+// Map the real API product (with variants + category relation) to the card shape used by this view.
+function mapApiProduct(p: any): Product {
+  const variant =
+    (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
+  return {
+    id: p?.id,
+    name: p?.name ?? '',
+    brand: p?.brand ?? '',
+    unitName: variant?.unitName ?? '',
+    price: variant?.price ?? 0,
+    mrp: variant?.mrp ?? variant?.price ?? 0,
+    rating: typeof p?.rating === 'number' && p.rating > 0 ? p.rating : undefined,
+    reviews: typeof p?.reviewCount === 'number' && p.reviewCount > 0 ? p.reviewCount : undefined,
+    category: p?.category?.name ?? '',
+    tag: p?.isOrganic ? 'Organic' : undefined,
+    image: (Array.isArray(p?.images) && p.images[0]) || '/images/daily_basket_logo.png',
+  };
+}
 
 export default function HomePage() {
-  const [cartItems, setCartItems] = useState<Record<string, number>>({ mlk1: 1, tea1: 1, crd1: 2 });
+  const [cartItems, setCartItems] = useState<Record<string, number>>({});
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+
+  // Live catalog from the backend (single source of truth).
+  const {
+    data: apiProducts,
+    isLoading: productsLoading,
+    isError: productsError,
+    refetch: refetchProducts,
+  } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => apiClient.getProducts(),
+  });
+
+  const catalog: Product[] = useMemo(
+    () => (Array.isArray(apiProducts) ? apiProducts.map(mapApiProduct) : []),
+    [apiProducts],
+  );
+
+  const categoryList = useMemo(() => {
+    const names = Array.from(new Set(catalog.map((p) => p.category).filter(Boolean)));
+    return ['All', ...names];
+  }, [catalog]);
+
+  // Live order banner is shown only when the customer actually has an active order.
+  // TODO(Batch 4): populate from the orders/tracking API + Socket.IO instead of a placeholder.
+  const activeOrder: { orderNumber: string; etaMins: number; riderName: string; distanceText: string; area: string } | null = null;
+
+  const featuredProduct = catalog[0] ?? null;
 
   const updateQty = (id: string, delta: number) => {
     setCartItems((prev) => {
@@ -120,7 +123,8 @@ export default function HomePage() {
       {/* ─── Main Desktop Storefront Canvas (1440px max) ───────────────────── */}
       <main className="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop space-y-12 pt-6">
 
-        {/* ─── Live Order Tracker Alert Strip ─────────────────────────────── */}
+        {/* ─── Live Order Tracker Alert Strip (only when a live order exists) ─────── */}
+        {activeOrder && (
         <section className="bg-gradient-to-r from-emerald-900 to-[#006b23] text-white rounded-2xl p-4 shadow-level-1 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-xl animate-pulse">
@@ -129,12 +133,12 @@ export default function HomePage() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-extrabold uppercase tracking-wider bg-emerald-400 text-emerald-950 px-2 py-0.5 rounded-full">
-                  LIVE ORDER #DB-88294
+                  LIVE ORDER #{activeOrder.orderNumber}
                 </span>
-                <span className="text-xs text-emerald-200">ETA: 4 Mins</span>
+                <span className="text-xs text-emerald-200">ETA: {activeOrder.etaMins} Mins</span>
               </div>
               <p className="text-sm font-semibold font-outfit mt-0.5">
-                Rider Rajesh is 450 meters away from your door • Koramangala 4th Block
+                Rider {activeOrder.riderName} is {activeOrder.distanceText} away from your door • {activeOrder.area}
               </p>
             </div>
           </div>
@@ -142,6 +146,7 @@ export default function HomePage() {
             Track Live Map →
           </Link>
         </section>
+        )}
 
         {/* ─── Hero Section ────────────────────────────────────────────────── */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -219,20 +224,26 @@ export default function HomePage() {
                 </h4>
                 <Link href="/cart" className="text-xs text-primary font-bold hover:underline">Reorder All</Link>
               </div>
+              {featuredProduct ? (
               <div className="flex items-center gap-3 bg-surface-container-lowest p-3 rounded-2xl border border-outline-variant/10 shadow-sm">
-                <Image src={catalog[0].image} alt="Milk" width={48} height={48} unoptimized className="w-12 h-12 rounded-xl object-cover" />
+                <Image src={featuredProduct.image} alt={featuredProduct.name} width={48} height={48} unoptimized className="w-12 h-12 rounded-xl object-cover" />
                 <div className="flex-1 min-w-0">
-                  <div className="text-xs font-bold truncate">{catalog[0].name}</div>
-                  <div className="text-[10px] text-on-surface-variant">{catalog[0].brand} • {catalog[0].unitName}</div>
-                  <div className="text-xs font-bold text-primary mt-0.5">{formatCurrency(catalog[0].price)}</div>
+                  <div className="text-xs font-bold truncate">{featuredProduct.name}</div>
+                  <div className="text-[10px] text-on-surface-variant">{featuredProduct.brand} • {featuredProduct.unitName}</div>
+                  <div className="text-xs font-bold text-primary mt-0.5">{formatCurrency(featuredProduct.price)}</div>
                 </div>
                 <button
-                  onClick={() => updateQty(catalog[0].id, 1)}
+                  onClick={() => updateQty(featuredProduct.id, 1)}
                   className="bg-primary text-white text-xs font-bold px-3 py-1.5 rounded-full hover:bg-surface-tint active:scale-95 transition-all"
                 >
                   + Add
                 </button>
               </div>
+              ) : (
+                <div className="flex items-center justify-center bg-surface-container-lowest p-4 rounded-2xl border border-outline-variant/10 text-[11px] text-on-surface-variant">
+                  Loading essentials…
+                </div>
+              )}
             </div>
 
           </div>
@@ -312,7 +323,46 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* Loading skeleton */}
+          {productsLoading && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="bg-surface-container-lowest border border-outline-variant/20 rounded-2xl p-3.5 animate-pulse">
+                  <div className="w-full aspect-square bg-surface-container-low rounded-xl mb-3" />
+                  <div className="h-2.5 bg-surface-container-low rounded w-1/2 mb-2" />
+                  <div className="h-3 bg-surface-container-low rounded w-3/4 mb-2" />
+                  <div className="h-4 bg-surface-container-low rounded w-1/3 mt-3" />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Error state */}
+          {productsError && (
+            <div className="text-center py-16 space-y-3">
+              <div className="text-4xl">⚠️</div>
+              <p className="font-bold text-on-surface">Couldn&rsquo;t load the catalog</p>
+              <p className="text-xs text-on-surface-variant">Please check your connection and try again.</p>
+              <button
+                onClick={() => refetchProducts()}
+                className="mt-2 bg-primary text-white text-xs font-bold px-5 py-2.5 rounded-full hover:bg-surface-tint active:scale-95 transition-all"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!productsLoading && !productsError && filteredProducts.length === 0 && (
+            <div className="text-center py-16 space-y-2">
+              <div className="text-4xl">🧺</div>
+              <p className="font-bold text-on-surface">No products found</p>
+              <p className="text-xs text-on-surface-variant">Try a different category or search term.</p>
+            </div>
+          )}
+
           {/* Product Grid (Responsive: 2-col mobile, 3-col tablet, 4-col laptop, 5-col desktop, 6-col wide) */}
+          {!productsLoading && !productsError && filteredProducts.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
             {filteredProducts.map((p) => {
               const qty = cartItems[p.id] || 0;
@@ -347,12 +397,16 @@ export default function HomePage() {
                     </h3>
                     <div className="text-[10px] text-on-surface-variant mt-1">{p.unitName}</div>
 
-                    {/* Rating */}
-                    <div className="flex items-center gap-1 mt-1.5">
-                      <span className="text-amber-500 text-xs">★</span>
-                      <span className="text-xs font-bold text-on-surface">{p.rating}</span>
-                      <span className="text-[10px] text-on-surface-variant">({(p.reviews / 1000).toFixed(1)}k)</span>
-                    </div>
+                    {/* Rating (only when available) */}
+                    {typeof p.rating === 'number' && (
+                      <div className="flex items-center gap-1 mt-1.5">
+                        <span className="text-amber-500 text-xs">★</span>
+                        <span className="text-xs font-bold text-on-surface">{p.rating}</span>
+                        {typeof p.reviews === 'number' && (
+                          <span className="text-[10px] text-on-surface-variant">({(p.reviews / 1000).toFixed(1)}k)</span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Price & Add */}
@@ -399,6 +453,7 @@ export default function HomePage() {
               );
             })}
           </div>
+          )}
         </section>
 
         {/* ─── Fresh Produce Traceability Banner ─────────────────────────── */}

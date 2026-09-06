@@ -31,7 +31,9 @@ async function bootstrap() {
   // Global Prefix & API Versioning
 
 
-  app.setGlobalPrefix('api/v1');
+  // Global prefix is just "api"; URI versioning appends "/v1" -> routes serve at /api/v1/...
+  // (Previously the prefix hardcoded "api/v1" AND versioning added "v1", producing /api/v1/v1/...)
+  app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',

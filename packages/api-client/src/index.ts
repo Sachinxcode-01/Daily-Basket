@@ -38,7 +38,18 @@ export class ApiClient {
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 
-    return response.json();
+    const payload = await response.json();
+    // The API wraps successful responses in { success, statusCode, data, timestamp }.
+    // Unwrap to the inner `data` so callers receive the domain object directly.
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      'data' in payload &&
+      'success' in payload
+    ) {
+      return (payload as { data: T }).data;
+    }
+    return payload as T;
   }
 
   // Auth Methods

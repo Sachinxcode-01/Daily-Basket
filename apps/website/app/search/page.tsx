@@ -4,11 +4,13 @@
 
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 import Link from 'next/link';
-import { Search, Camera, SlidersHorizontal, Plus, Check, ArrowLeft, Sparkles, Upload, X } from 'lucide-react';
+import { Search, Camera, SlidersHorizontal, Plus, Check, ArrowLeft, X } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
+import { apiClient } from '@daily-basket/api-client';
 
 interface SearchItem {
   id: string;
@@ -16,80 +18,69 @@ interface SearchItem {
   weight: string;
   price: number;
   mrp: number;
-  tag?: string;
+  isOrganic: boolean;
   image: string;
-  matchScore?: number;
 }
 
-const searchResults: SearchItem[] = [
-  {
-    id: 's1',
-    name: 'Organic Farm Fresh Tomatoes',
-    weight: '500g',
-    price: 24,
-    mrp: 40,
-    tag: '40% OFF',
-    image: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&q=80',
-    matchScore: 98,
-  },
-  {
-    id: 's2',
-    name: 'Fresh Cherry Tomatoes Pack',
-    weight: '250g',
-    price: 45,
-    mrp: 60,
-    tag: 'Organic',
-    image: 'https://images.unsplash.com/photo-1546470427-227c7369a649?w=400&q=80',
-    matchScore: 92,
-  },
-  {
-    id: 's3',
-    name: 'Aashirvaad Shuddh Chakki Atta',
-    weight: '5 kg',
-    price: 265,
-    mrp: 299,
-    tag: 'Best Seller',
-    image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80',
-    matchScore: 96,
-  },
-  {
-    id: 's4',
-    name: 'Amul Taaza Toned Fresh Milk',
-    weight: '1 L',
-    price: 54,
-    mrp: 56,
-    tag: 'Fresh',
-    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400&q=80',
-    matchScore: 99,
-  },
-];
+function mapItem(p: any): SearchItem {
+  const variant =
+    (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
+  return {
+    id: p?.id,
+    name: p?.name ?? '',
+    weight: variant?.unitName ?? '',
+    price: variant?.price ?? 0,
+    mrp: variant?.mrp ?? variant?.price ?? 0,
+    isOrganic: Boolean(p?.isOrganic),
+    image: (Array.isArray(p?.images) && p.images[0]) || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80',
+  };
+}
 
 export default function SearchPage() {
-  const [query, setQuery] = useState('Tomatoes');
+  const [query, setQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
   const [cart, setCart] = useState<Record<string, number>>({});
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [visionMode, setVisionMode] = useState(false);
 
   const filters = ['All', 'Organic', 'On Sale', 'Under ₹50'];
 
+  // Debounce the query so we don't hit the API on every keystroke.
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query.trim()), 350);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  const {
+    data: apiProducts,
+    isLoading,
+    isFetching,
+    isError,
+    refetch,
+  } = useQuery({
+    queryKey: ['search', debouncedQuery],
+    queryFn: () => apiClient.getProducts(undefined, debouncedQuery || undefined),
+  });
+
+  const results = useMemo(() => {
+    const mapped = Array.isArray(apiProducts) ? apiProducts.map(mapItem) : [];
+    switch (activeFilter) {
+      case 'Organic':
+        return mapped.filter((p) => p.isOrganic);
+      case 'On Sale':
+        return mapped.filter((p) => p.mrp > p.price);
+      case 'Under ₹50':
+        return mapped.filter((p) => p.price < 50);
+      default:
+        return mapped;
+    }
+  }, [apiProducts, activeFilter]);
+
   const toggleAdd = (id: string) => {
-    setCart((prev) => ({
-      ...prev,
-      [id]: (prev[id] || 0) + 1,
-    }));
+    setCart((prev) => ({ ...prev, [id]: (prev[id] || 0) + 1 }));
   };
 
-  const handleSimulateCameraSearch = () => {
-    setIsAnalyzing(true);
-    setTimeout(() => {
-      setIsAnalyzing(false);
-      setIsCameraModalOpen(false);
-      setVisionMode(true);
-      setQuery('AI Vision Captured Item');
-    }, 1400);
-  };
+  const loading = isLoading || isFetching;
 
   return (
     <div className="min-h-screen bg-slate-900 font-sans pb-24 text-white">
@@ -105,14 +96,10 @@ export default function SearchPage() {
             <input
               type="text"
               value={query}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                setVisionMode(false);
-              }}
+              onChange={(e) => setQuery(e.target.value)}
               placeholder="Search for groceries, brand or scan camera..."
               className="w-full h-11 bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-12 text-sm font-medium text-white placeholder:text-slate-400 focus:outline-none focus:border-teal-500 transition"
             />
-            {/* Camera Action Button inside search bar */}
             <button
               onClick={() => setIsCameraModalOpen(true)}
               title="Search by Camera"
@@ -147,97 +134,125 @@ export default function SearchPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 pt-6">
-        {visionMode && (
-          <div className="mb-6 p-4 rounded-2xl bg-teal-950/60 border border-teal-500/40 flex items-center gap-3">
-            <Sparkles className="w-5 h-5 text-teal-400 shrink-0" />
-            <div>
-              <h3 className="text-sm font-bold font-outfit text-white">
-                Results from AI Vision Camera Search
-              </h3>
-              <p className="text-xs text-teal-300 font-inter">
-                Ranked by AI confidence match percentage & instant inventory availability.
-              </p>
-            </div>
-          </div>
-        )}
-
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm font-medium text-slate-400 font-inter">
-            Showing <span className="font-bold text-white">{searchResults.length} results</span> for &ldquo;{query}&rdquo;
+            {debouncedQuery
+              ? <>Showing <span className="font-bold text-white">{results.length} results</span> for &ldquo;{debouncedQuery}&rdquo;</>
+              : <>Showing <span className="font-bold text-white">{results.length}</span> products</>}
           </p>
         </div>
 
-        {/* Search Results Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {searchResults.map((item) => {
-            const count = cart[item.id] || 0;
-            return (
-              <div
-                key={item.id}
-                className="bg-slate-800 border border-slate-700/70 hover:border-teal-500/50 rounded-2xl p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-teal-500/5"
-              >
-                <div>
-                  <div className="relative aspect-square rounded-xl overflow-hidden mb-3 bg-slate-900">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition"
-                    />
-                    {item.matchScore && visionMode && (
-                      <span className="absolute top-2 left-2 bg-teal-500 text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded shadow">
-                        {item.matchScore}% MATCH
-                      </span>
-                    )}
-                    {item.tag && !visionMode && (
-                      <span className="absolute top-2 left-2 bg-emerald-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow">
-                        {item.tag}
-                      </span>
-                    )}
-                  </div>
-
-                  <h3 className="font-bold text-sm text-white font-outfit line-clamp-2 mb-1">
-                    {item.name}
-                  </h3>
-                  <p className="text-xs text-slate-400 font-inter mb-3">{item.weight}</p>
-                </div>
-
-                <div>
-                  <div className="flex items-baseline gap-1.5 mb-3">
-                    <span className="text-base font-extrabold text-teal-400 font-outfit">
-                      {formatCurrency(item.price)}
-                    </span>
-                    <span className="text-xs text-slate-500 line-through font-inter">
-                      {formatCurrency(item.mrp)}
-                    </span>
-                  </div>
-
-                  <button
-                    onClick={() => toggleAdd(item.id)}
-                    className={`w-full h-9 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition ${
-                      count > 0
-                        ? 'bg-teal-600 text-white'
-                        : 'bg-teal-500 text-slate-950 hover:bg-teal-400'
-                    }`}
-                  >
-                    {count > 0 ? (
-                      <>
-                        <Check className="w-4 h-4" /> Added ({count})
-                      </>
-                    ) : (
-                      <>
-                        <Plus className="w-4 h-4" /> ADD
-                      </>
-                    )}
-                  </button>
-                </div>
+        {/* Loading */}
+        {loading && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="bg-slate-800 border border-slate-700/70 rounded-2xl p-4 animate-pulse">
+                <div className="aspect-square rounded-xl mb-3 bg-slate-700/50" />
+                <div className="h-3 bg-slate-700/50 rounded w-3/4 mb-2" />
+                <div className="h-3 bg-slate-700/50 rounded w-1/2 mb-3" />
+                <div className="h-9 bg-slate-700/50 rounded-xl" />
               </div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
+
+        {/* Error */}
+        {!loading && isError && (
+          <div className="text-center py-16 space-y-3">
+            <div className="text-4xl">⚠️</div>
+            <p className="font-bold text-white">Search failed</p>
+            <button
+              onClick={() => refetch()}
+              className="mt-1 bg-teal-500 text-slate-950 text-xs font-bold px-5 py-2.5 rounded-xl hover:bg-teal-400"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Empty */}
+        {!loading && !isError && results.length === 0 && (
+          <div className="text-center py-16 space-y-2">
+            <div className="text-4xl">🔍</div>
+            <p className="font-bold text-white">No products found</p>
+            <p className="text-xs text-slate-400">
+              {debouncedQuery ? 'Try a different search term or filter.' : 'Start typing to search the catalog.'}
+            </p>
+          </div>
+        )}
+
+        {/* Results Grid */}
+        {!loading && !isError && results.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {results.map((item) => {
+              const count = cart[item.id] || 0;
+              const discount = item.mrp > item.price ? Math.round(((item.mrp - item.price) / item.mrp) * 100) : 0;
+              return (
+                <div
+                  key={item.id}
+                  className="bg-slate-800 border border-slate-700/70 hover:border-teal-500/50 rounded-2xl p-4 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-teal-500/5"
+                >
+                  <div>
+                    <Link href={`/product/${item.id}`} className="relative block aspect-square rounded-xl overflow-hidden mb-3 bg-slate-900">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      {item.isOrganic && (
+                        <span className="absolute top-2 left-2 bg-emerald-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow">
+                          Organic
+                        </span>
+                      )}
+                      {!item.isOrganic && discount > 0 && (
+                        <span className="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow">
+                          {discount}% OFF
+                        </span>
+                      )}
+                    </Link>
+
+                    <Link href={`/product/${item.id}`}>
+                      <h3 className="font-bold text-sm text-white font-outfit line-clamp-2 mb-1 hover:text-teal-400 transition">
+                        {item.name}
+                      </h3>
+                    </Link>
+                    <p className="text-xs text-slate-400 font-inter mb-3">{item.weight}</p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-baseline gap-1.5 mb-3">
+                      <span className="text-base font-extrabold text-teal-400 font-outfit">
+                        {formatCurrency(item.price)}
+                      </span>
+                      {item.mrp > item.price && (
+                        <span className="text-xs text-slate-500 line-through font-inter">
+                          {formatCurrency(item.mrp)}
+                        </span>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={() => toggleAdd(item.id)}
+                      className={`w-full h-9 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition ${
+                        count > 0 ? 'bg-teal-600 text-white' : 'bg-teal-500 text-slate-950 hover:bg-teal-400'
+                      }`}
+                    >
+                      {count > 0 ? (
+                        <>
+                          <Check className="w-4 h-4" /> Added ({count})
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-4 h-4" /> ADD
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </main>
 
-      {/* Camera Search Modal */}
+      {/* Camera Search Modal (visual search is a planned feature) */}
       {isCameraModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
           <div className="bg-slate-800 border border-slate-700 rounded-3xl max-w-md w-full p-6 text-center relative overflow-hidden shadow-2xl">
@@ -256,32 +271,15 @@ export default function SearchPage() {
               AI Visual Search by Camera
             </h3>
             <p className="text-xs text-slate-300 font-inter mb-6">
-              Point your camera at any grocery package, food label, bottle, or barcode to instantly search Daily Basket catalog.
+              Point your camera at any grocery package to search the Daily Basket catalog. This feature is coming soon.
             </p>
 
-            {isAnalyzing ? (
-              <div className="py-8 flex flex-col items-center gap-3">
-                <div className="w-8 h-8 border-3 border-teal-500 border-t-transparent rounded-full animate-spin" />
-                <p className="text-xs font-bold text-teal-400 animate-pulse">
-                  Analyzing packaging & recognizing product...
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <button
-                  onClick={handleSimulateCameraSearch}
-                  className="w-full py-3 bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-sm rounded-xl transition flex items-center justify-center gap-2"
-                >
-                  <Camera className="w-4 h-4" /> Open Camera / Scan Item
-                </button>
-                <button
-                  onClick={handleSimulateCameraSearch}
-                  className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm rounded-xl transition flex items-center justify-center gap-2"
-                >
-                  <Upload className="w-4 h-4" /> Upload Image from Device
-                </button>
-              </div>
-            )}
+            <button
+              onClick={() => setIsCameraModalOpen(false)}
+              className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm rounded-xl transition"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
