@@ -6,11 +6,28 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { User, MapPin, CreditCard, ShoppingBag, Heart, Shield, Bell, Award, LogOut, ArrowLeft, ChevronRight, Zap } from 'lucide-react';
+import { User, MapPin, CreditCard, ShoppingBag, Award, ArrowLeft, Zap, ChevronRight } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { formatCurrency } from '@daily-basket/shared-utils';
+import { apiClient } from '@daily-basket/api-client';
 import HeaderNavBar from '../../components/navigation/HeaderNavBar';
+import { useCurrentUserId } from '../../store/useCart';
 
 export default function CustomerProfileDashboardPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses' | 'wallet'>('profile');
+  const userId = useCurrentUserId();
+
+  const { data: ordersData, isLoading: ordersLoading } = useQuery({
+    queryKey: ['orders', userId],
+    queryFn: () => apiClient.listOrders(userId),
+  });
+  const orders: any[] = Array.isArray(ordersData) ? ordersData : [];
+
+  const { data: addressesData } = useQuery({
+    queryKey: ['addresses', userId],
+    queryFn: () => apiClient.getAddresses(userId),
+  });
+  const addresses: any[] = Array.isArray(addressesData) ? addressesData : [];
 
   const user = {
     name: 'Sachin Kumar',
@@ -147,22 +164,45 @@ export default function CustomerProfileDashboardPage() {
                 <h3 className="text-xl font-bold font-outfit text-gray-900 border-b border-gray-100 pb-4">
                   Recent Orders
                 </h3>
-                <div className="space-y-4">
-                  {user.recentOrders.map((ord) => (
-                    <div key={ord.id} className="p-5 rounded-2xl border border-gray-100 hover:border-emerald-200 transition flex items-center justify-between">
-                      <div>
-                        <div className="font-bold text-gray-900">{ord.id}</div>
-                        <div className="text-xs text-gray-500">{ord.date} • {ord.itemsCount} items</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-bold text-gray-900">₹{ord.total}</div>
-                        <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
-                          {ord.status}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                {ordersLoading ? (
+                  <div className="space-y-3">
+                    {[0, 1, 2].map((i) => (
+                      <div key={i} className="p-5 rounded-2xl border border-gray-100 animate-pulse h-16 bg-gray-50" />
+                    ))}
+                  </div>
+                ) : orders.length === 0 ? (
+                  <div className="text-center py-10 space-y-3">
+                    <ShoppingBag className="w-12 h-12 text-gray-300 mx-auto" />
+                    <p className="text-sm text-gray-500">No orders yet.</p>
+                    <Link href="/" className="inline-block text-sm font-bold text-[#006B23] hover:underline">Start shopping →</Link>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {orders.map((ord) => (
+                      <Link
+                        key={ord.id}
+                        href={`/tracking/${ord.id}`}
+                        className="p-5 rounded-2xl border border-gray-100 hover:border-emerald-200 transition flex items-center justify-between"
+                      >
+                        <div>
+                          <div className="font-bold text-gray-900">{ord.orderNumber}</div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(ord.createdAt).toLocaleDateString()} • {ord.items?.length ?? 0} items
+                          </div>
+                        </div>
+                        <div className="text-right flex items-center gap-3">
+                          <div>
+                            <div className="font-bold text-gray-900">{formatCurrency(ord.totalAmount)}</div>
+                            <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
+                              {ord.status}
+                            </span>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -171,24 +211,34 @@ export default function CustomerProfileDashboardPage() {
                 <h3 className="text-xl font-bold font-outfit text-gray-900 border-b border-gray-100 pb-4">
                   Saved Delivery Addresses
                 </h3>
-                <div className="space-y-4">
-                  {user.savedAddresses.map((addr) => (
-                    <div key={addr.id} className="p-5 rounded-2xl border border-gray-100 flex items-start gap-4">
-                      <MapPin className="w-5 h-5 text-[#006B23] mt-0.5" />
-                      <div>
-                        <div className="font-bold text-sm text-gray-900 flex items-center gap-2">
-                          <span>{addr.type}</span>
-                          {addr.isDefault && (
-                            <span className="text-[10px] bg-emerald-100 text-[#006B23] px-2 py-0.5 rounded-full font-bold">
-                              DEFAULT
-                            </span>
-                          )}
+                {addresses.length === 0 ? (
+                  <div className="text-center py-10 space-y-3">
+                    <MapPin className="w-12 h-12 text-gray-300 mx-auto" />
+                    <p className="text-sm text-gray-500">No saved addresses.</p>
+                    <Link href="/add-address" className="inline-block text-sm font-bold text-[#006B23] hover:underline">Add an address →</Link>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {addresses.map((addr) => (
+                      <div key={addr.id} className="p-5 rounded-2xl border border-gray-100 flex items-start gap-4">
+                        <MapPin className="w-5 h-5 text-[#006B23] mt-0.5" />
+                        <div>
+                          <div className="font-bold text-sm text-gray-900 flex items-center gap-2">
+                            <span>{addr.label}</span>
+                            {addr.isDefault && (
+                              <span className="text-[10px] bg-emerald-100 text-[#006B23] px-2 py-0.5 rounded-full font-bold">
+                                DEFAULT
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                            {addr.houseNo}, {addr.street}, {addr.city} - {addr.pincode}
+                          </p>
                         </div>
-                        <p className="text-xs text-gray-600 mt-1 leading-relaxed">{addr.address}</p>
                       </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
