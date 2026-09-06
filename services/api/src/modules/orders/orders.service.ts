@@ -50,9 +50,7 @@ export class OrdersService {
 
       const subtotal = pricing.subtotal;
       const deliveryFee = pricing.deliveryFee;
-      const discount = pricing.couponDiscount + pricing.itemDiscounts;
       const totalAmount = pricing.finalPayable;
-      const paymentMethod = pricing.selectedPaymentMethod;
       const deliveryOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
       const order = await this.prisma.order.create({
