@@ -75,9 +75,10 @@ export class ApiClient {
   }
 
   public async registerEmail(data: { email: string; pass: string; name: string }): Promise<{ success: boolean; message: string }> {
+    // Backend RegisterEmailDto expects `password` (min 8), while login uses `pass`.
     return this.fetcher('/api/v1/auth/register-email', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ email: data.email, password: data.pass, name: data.name }),
     });
   }
 
@@ -260,6 +261,16 @@ export class ApiClient {
   public async clearCart(userId = 'usr_default'): Promise<any> {
     return this.fetcher(`/api/v1/cart/clear?userId=${encodeURIComponent(userId)}`, {
       method: 'DELETE',
+    });
+  }
+
+  public async mergeGuestCart(
+    items: { variantId: string; productName: string; unitName: string; price: number; quantity?: number }[],
+    userId: string,
+  ): Promise<any> {
+    return this.fetcher('/api/v1/cart/merge', {
+      method: 'POST',
+      body: JSON.stringify({ items, userId }),
     });
   }
 

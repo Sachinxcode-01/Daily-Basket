@@ -12,10 +12,12 @@ import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import HeaderNavBar from '../../components/navigation/HeaderNavBar';
 import { useCurrentUserId } from '../../store/useCart';
+import { useAuthStore } from '../../store/useAuthStore';
 
 export default function CustomerProfileDashboardPage() {
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses' | 'wallet'>('profile');
   const userId = useCurrentUserId();
+  const { user: authUser, isAuthenticated } = useAuthStore();
 
   const { data: ordersData, isLoading: ordersLoading } = useQuery({
     queryKey: ['orders', userId],
@@ -29,21 +31,13 @@ export default function CustomerProfileDashboardPage() {
   });
   const addresses: any[] = Array.isArray(addressesData) ? addressesData : [];
 
+  const au: any = authUser || {};
   const user = {
-    name: 'Sachin Kumar',
-    email: 'sachin.k@example.com',
-    phone: '+91 98765 43210',
-    memberTier: 'PLATINUM_VIP',
-    loyaltyPoints: 1240,
-    walletBalance: 450.0,
-    savedAddresses: [
-      { id: 'addr_1', type: 'HOME', address: 'Flat 402, Green Valley Apartments, Indiranagar, Bengaluru - 560038', isDefault: true },
-      { id: 'addr_2', type: 'WORK', address: 'Tech Park Tower B, 6th Floor, Outer Ring Road, Bengaluru - 560103', isDefault: false },
-    ],
-    recentOrders: [
-      { id: 'ORD-9824', date: '2026-08-09', total: 384, status: 'DELIVERED', itemsCount: 4 },
-      { id: 'ORD-9750', date: '2026-08-05', total: 612, status: 'DELIVERED', itemsCount: 7 },
-    ],
+    name: au.name || au.fullName || 'Guest Shopper',
+    email: au.email || '—',
+    phone: au.phone || au.phoneNumber || '—',
+    loyaltyPoints: 0,
+    walletBalance: 0,
   };
 
   return (
@@ -55,6 +49,15 @@ export default function CustomerProfileDashboardPage() {
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Home</span>
         </Link>
+
+        {!isAuthenticated && (
+          <div className="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-between gap-4">
+            <p className="text-sm text-[#006B23] font-medium">Sign in to view your saved details, orders and addresses.</p>
+            <Link href="/login" className="text-sm font-bold text-white bg-[#006B23] hover:bg-[#00531a] px-5 py-2.5 rounded-full whitespace-nowrap transition">
+              Login
+            </Link>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Left Column: Sidebar & Profile Badge */}
