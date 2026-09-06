@@ -34,16 +34,18 @@ export class OrdersService {
 
     try {
       const orderNumber = `DB-${Date.now().toString().slice(-6)}`;
-      const pricing = this.orderPricingService.calculatePricing({
+      const pricing = await this.orderPricingService.calculatePricing({
         items: data.items.map((i) => ({
           id: i.variantId || i.id || 'prod_01',
           productName: i.productName || i.name || 'Item',
           price: i.price,
+          mrp: i.mrp,
           quantity: i.quantity || i.qty || 1,
         })),
         couponCode: data.couponCode,
         useWallet: data.useWallet,
         paymentMethod: typeof data.paymentMethod === 'string' ? data.paymentMethod : data.paymentMethod?.id,
+        userId,
       });
 
       const subtotal = pricing.subtotal;
@@ -61,7 +63,7 @@ export class OrdersService {
           addressId: data.addressId,
           subtotal,
           deliveryFee,
-          discount: 0,
+          discount: pricing.couponDiscount,
           totalAmount,
           paymentMethod: data.paymentMethod,
           status: OrderStatus.CONFIRMED,

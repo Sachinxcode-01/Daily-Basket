@@ -1,9 +1,13 @@
-import { Controller, Post, Get, Param, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { Controller, Post, Get, Param, Body, ForbiddenException, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { OrderPricingService, CalculatePricingDto } from './order-pricing.service';
+import { OptionalJwtAuthGuard } from '../../common/guards/optional-jwt-auth.guard';
+import { ResolvedUserId } from '../../common/decorators/resolved-user-id.decorator';
 
 @ApiTags('Orders')
+@ApiBearerAuth()
+@UseGuards(OptionalJwtAuthGuard)
 @Controller('orders')
 export class OrdersController {
   constructor(
@@ -13,33 +17,43 @@ export class OrdersController {
 
   @Post('calculate')
   @ApiOperation({ summary: 'Calculate dynamic order pricing, delivery fees, taxes, discounts & payment methods' })
-  async calculatePricing(@Body() body: CalculatePricingDto) {
-    return this.orderPricingService.calculatePricing(body);
+  async calculatePricing(@ResolvedUserId() userId: string, @Body() body: CalculatePricingDto) {
+    return this.orderPricingService.calculatePricing({ ...body, userId });
   }
 
   @Post()
   @ApiOperation({ summary: 'Create new 10-minute quick-commerce order' })
-  async createOrder(@Body() body: { userId: string; addressId: string; paymentMethod: any; items: any[]; couponCode?: string; useWallet?: boolean }) {
-    return this.ordersService.createOrder(body.userId || 'demo_user_01', body);
+  async createOrder(
+    @ResolvedUserId() userId: string,
+    @Body() body: { addressId: string; paymentMethod: any; items: any[]; couponCode?: string; useWallet?: boolean },
+  ) {
+    return this.ordersService.createOrder(userId, body);
   }
 
   @Get()
-  @ApiOperation({ summary: 'List orders for a user (order history)' })
-  @ApiQuery({ name: 'userId', required: true })
-  async listOrders(@Query('userId') userId: string) {
-    return this.ordersService.findByUser(userId || 'demo_user_01');
+  @ApiOperation({ summary: 'List orders for the current user (order history)' })
+  async listOrders(@ResolvedUserId() userId: string) {
+    return this.ordersService.findByUser(userId);
   }
 
   @Get(':id/tracking')
   @ApiOperation({ summary: 'Get live GPS tracking and delivery step status' })
-  async getOrderTracking(@Param('id') id: string) {
-    return this.ordersService.getOrderTracking(id);
+  async getOrderTracking(@ResolvedUserId() userId: string, @Param('id') id: string) {
+    const result = await this.ordersService.getOrderTracking(id);
+    if (result?.order && result.order.userId !== userId) {
+      throw new ForbiddenException('You do not have access to this order.');
+    }
+    return result;
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get single order details by id' })
-  async getOrder(@Param('id') id: string) {
-    return this.ordersService.findOne(id);
+  async getOrder(@ResolvedUserId() userId: string, @Param('id') id: string) {
+    const order = await this.ordersService.findOne(id);
+    if (order.userId !== userId) {
+      throw new ForbiddenException('You do not have access to this order.');
+    }
+    return order;
   }
 
   @Post(':id/assign-rider')

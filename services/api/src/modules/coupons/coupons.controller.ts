@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CouponsService, CouponDto } from './coupons.service';
+import { OptionalJwtAuthGuard } from '../../common/guards/optional-jwt-auth.guard';
+import { ResolvedUserId } from '../../common/decorators/resolved-user-id.decorator';
 
 @ApiTags('Coupons')
+@ApiBearerAuth()
+@UseGuards(OptionalJwtAuthGuard)
 @Controller('coupons')
 export class CouponsController {
   constructor(private readonly couponsService: CouponsService) {}
@@ -15,7 +19,7 @@ export class CouponsController {
 
   @Get('history')
   @ApiOperation({ summary: 'Get user coupon redemption history' })
-  async getHistory(@Query('userId') userId?: string) {
+  async getHistory(@ResolvedUserId() userId: string) {
     return this.couponsService.getHistory(userId);
   }
 
@@ -27,8 +31,8 @@ export class CouponsController {
 
   @Post('apply')
   @ApiOperation({ summary: 'Validate and calculate coupon discount for cart' })
-  async applyCoupon(@Body() body: { code: string; cartSubtotal: number; userId?: string }) {
-    return this.couponsService.validateCoupon(body.code, body.cartSubtotal, body.userId);
+  async applyCoupon(@ResolvedUserId() userId: string, @Body() body: { code: string; cartSubtotal: number }) {
+    return this.couponsService.validateCoupon(body.code, body.cartSubtotal, userId);
   }
 
   @Delete('remove')
