@@ -1,5 +1,5 @@
-import { Controller, Post, Get, Param, Body } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Controller, Post, Get, Param, Body, Query } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { OrderPricingService, CalculatePricingDto } from './order-pricing.service';
 
@@ -23,10 +23,23 @@ export class OrdersController {
     return this.ordersService.createOrder(body.userId || 'demo_user_01', body);
   }
 
+  @Get()
+  @ApiOperation({ summary: 'List orders for a user (order history)' })
+  @ApiQuery({ name: 'userId', required: true })
+  async listOrders(@Query('userId') userId: string) {
+    return this.ordersService.findByUser(userId || 'demo_user_01');
+  }
+
   @Get(':id/tracking')
   @ApiOperation({ summary: 'Get live GPS tracking and delivery step status' })
   async getOrderTracking(@Param('id') id: string) {
     return this.ordersService.getOrderTracking(id);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get single order details by id' })
+  async getOrder(@Param('id') id: string) {
+    return this.ordersService.findOne(id);
   }
 
   @Post(':id/assign-rider')

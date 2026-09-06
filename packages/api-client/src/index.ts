@@ -5,8 +5,13 @@ export class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
 
-  constructor(baseUrl = 'http://localhost:4000') {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl?: string) {
+    // Prefer an explicit argument, then the public runtime env var, then a local dev default.
+    const envUrl =
+      typeof process !== 'undefined' && process.env
+        ? process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL
+        : undefined;
+    this.baseUrl = (baseUrl || envUrl || 'http://localhost:4000').replace(/\/$/, '');
   }
 
   public setAuthToken(token: string | null) {
@@ -52,42 +57,42 @@ export class ApiClient {
   }
 
   public async loginEmail(data: { email: string; pass: string }): Promise<{ token: string; accessToken: string; user: any }> {
-    return this.fetcher('/auth/login-email', {
+    return this.fetcher('/api/v1/auth/login-email', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
   public async registerEmail(data: { email: string; pass: string; name: string }): Promise<{ success: boolean; message: string }> {
-    return this.fetcher('/auth/register-email', {
+    return this.fetcher('/api/v1/auth/register-email', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
   public async googleOAuthLogin(idToken: string): Promise<{ token: string; accessToken: string; user: any }> {
-    return this.fetcher('/auth/google-login', {
+    return this.fetcher('/api/v1/auth/google-login', {
       method: 'POST',
       body: JSON.stringify({ idToken }),
     });
   }
 
   public async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
-    return this.fetcher('/auth/forgot-password', {
+    return this.fetcher('/api/v1/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     });
   }
 
   public async resetPassword(token: string, newPass: string): Promise<{ success: boolean; message: string }> {
-    return this.fetcher('/auth/reset-password', {
+    return this.fetcher('/api/v1/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({ token, newPass }),
     });
   }
 
   public async verifyEmailToken(token: string): Promise<{ success: boolean; message: string }> {
-    return this.fetcher('/auth/verify-email', {
+    return this.fetcher('/api/v1/auth/verify-email', {
       method: 'POST',
       body: JSON.stringify({ token }),
     });
@@ -135,14 +140,14 @@ export class ApiClient {
   // Notifications & FCM Methods
 
   public async registerFcmToken(userId: string, token: string, platform?: string): Promise<{ success: boolean; registeredTokensCount: number }> {
-    return this.fetcher('/notifications/register-token', {
+    return this.fetcher('/api/v1/notifications/register-token', {
       method: 'POST',
       body: JSON.stringify({ userId, token, platform }),
     });
   }
 
   public async sendTestPushNotification(userId: string, title?: string, body?: string): Promise<{ success: boolean; messageId: string }> {
-    return this.fetcher('/notifications/test-push', {
+    return this.fetcher('/api/v1/notifications/test-push', {
       method: 'POST',
       body: JSON.stringify({ userId, title, body }),
     });
@@ -150,21 +155,21 @@ export class ApiClient {
 
   // Geofence & Delivery Methods
   public async evaluateGeofence(lat: number, lng: number, itemTotal?: number): Promise<any> {
-    return this.fetcher('/delivery/geofence-check', {
+    return this.fetcher('/api/v1/delivery/geofence-check', {
       method: 'POST',
       body: JSON.stringify({ lat, lng, itemTotal }),
     });
   }
 
   public async calculateSurgePricing(lat: number, lng: number, itemTotal?: number): Promise<any> {
-    return this.fetcher('/delivery/surge-pricing', {
+    return this.fetcher('/api/v1/delivery/surge-pricing', {
       method: 'POST',
       body: JSON.stringify({ lat, lng, itemTotal }),
     });
   }
 
   public async syncOfflineDeliveryQueue(actions: any[]): Promise<{ success: boolean; syncedCount: number; processedActionIds: string[] }> {
-    return this.fetcher('/delivery/sync-offline-queue', {
+    return this.fetcher('/api/v1/delivery/sync-offline-queue', {
       method: 'POST',
       body: JSON.stringify({ actions }),
     });

@@ -169,6 +169,27 @@ export class OrdersService {
     return { order: updatedOrder, invoice };
   }
 
+  async findByUser(userId: string) {
+    return this.prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: { items: true, address: true },
+    });
+  }
+
+  async findOne(orderId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { items: true, address: true, deliveryPartner: true },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order ${orderId} not found`);
+    }
+
+    return order;
+  }
+
   async getOrderTracking(orderId: string) {
     const order = await this.prisma.order.findUnique({
       where: { id: orderId },
