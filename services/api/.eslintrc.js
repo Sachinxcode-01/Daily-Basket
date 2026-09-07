@@ -20,5 +20,12 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    // Node app intentionally uses dynamic require() (e.g. lazy static-asset serving in main.ts).
+    '@typescript-eslint/no-var-requires': 'off',
+    // Unused vars are reported as warnings (non-blocking); underscore-prefixed are ignored.
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      { argsIgnorePattern: '^_', varsIgnorePattern: '^_', ignoreRestSiblings: true },
+    ],
   },
 };
