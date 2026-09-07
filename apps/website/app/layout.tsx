@@ -1,6 +1,7 @@
 import React from 'react';
 import { APP_NAME } from '@daily-basket/constants';
 import { QueryProvider } from '../providers/QueryProvider';
+import { RealtimeProvider } from '../providers/RealtimeProvider';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
 import QuickNavMenu from '../components/navigation/QuickNavMenu';
 import './globals.css';
@@ -34,8 +35,10 @@ export default function RootLayout({
       <body className="bg-background text-on-background font-body-lg antialiased min-h-screen">
         <ErrorBoundary>
           <QueryProvider>
-            {children}
-            <QuickNavMenu />
+            <RealtimeProvider>
+              {children}
+              <QuickNavMenu />
+            </RealtimeProvider>
           </QueryProvider>
         </ErrorBoundary>
       </body>

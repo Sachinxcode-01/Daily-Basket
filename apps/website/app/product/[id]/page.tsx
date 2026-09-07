@@ -1,25 +1,76 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useQuery } from '@tanstack/react-query';
+import { formatCurrency } from '@daily-basket/shared-utils';
+import { apiClient } from '@daily-basket/api-client';
+import { useCart } from '../../../store/useCart';
 
 export default function ProductDetailsPage({ params }: { params: { id?: string } }) {
-  const [selectedWeight, setSelectedWeight] = useState<'500g' | '1kg'>('500g');
+  const productId = params.id ?? '';
+  const { addItem } = useCart();
+
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeThumb, setActiveThumb] = useState(0);
   const [isFavorited, setIsFavorited] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(true);
-  const [nutritionOpen, setNutritionOpen] = useState(false);
+  const [added, setAdded] = useState(false);
 
-  const images = [
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuAUZTLTSv5m1XvtD0eVooGUshRAE_TEf1VJ6rDo2p2NK8V-OtAgWRr9FnG7_wymxfNYoJbO-z3fuiHP_nel0NrAMmwbjTaJpS2Qn6gtKhCoGN6ltUY0Ye1kqsw-Lgi3oSwN5RBZcGCyK2PH3mZqTsqvfYztVjk3FZnajEMLUCbI6q8oB1hqEySrz4h9bFTXR1c7DcEprHGwUvQVM7TEPLq83eHICr5VanKASkHt7mYjWh7jE8sEGGd1',
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuBbsg5VxbvT11uRXXDRayoEzYGroBN6JL_q3OdBRxTV_NhUsAgXOLVnLt2AP4FjQ1VeLJ9Nu66ZOkgTwSPghddjYzSFJFH-nX61SZBAAjCBTQkjHnkshnkB9KTRoZj4KrKjCVLIhIkvkcNqEk4h79BfvPd-dbBBLoCQ-CEHU411SdMlg7TerXu1-n2q_kyKG2QiY7Cx6HvI4O9yNH2j5DTrGLp3HLDv5C71JMkQhsDUBUD-USNQ7Z-F',
-    'https://lh3.googleusercontent.com/aida-public/AB6AXuBxT-WRocvozm2WhECnL8JMwxCqiEnuJ7cKtNoLv-llUuIz1dEY2oBp5MdWHKwKfTDfhmhcZUDYamNJeXMOiQDXQErt0WRFRSJzAY4cxjLnMqG5f-EZz7kvpru8TOviGd0RTYku3CEMtUC_JLe6zQqHimHXCBkpnyde4yFl2cThVNJlqY4w66MTA4r1xi322PjWVu4NCiQxhPP4RjdOUhB39s8SgVQHbIIYzVhJX5H3YENCU6jqp-7U',
-  ];
+  const { data: product, isLoading, isError, refetch } = useQuery({
+    queryKey: ['product', productId],
+    queryFn: () => apiClient.getProductDetails(productId),
+    enabled: Boolean(productId),
+  });
 
-  const price = selectedWeight === '500g' ? 5.99 : 10.99;
-  const mrp = selectedWeight === '500g' ? 7.50 : 13.50;
+  const p: any = product;
+  const images: string[] = useMemo(
+    () => (Array.isArray(p?.images) && p.images.length > 0 ? p.images : ['https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80']),
+    [p],
+  );
+  const variants: any[] = Array.isArray(p?.variants) ? p.variants : [];
+  const selectedVariant = useMemo(
+    () => variants.find((v) => v.id === selectedVariantId) ?? variants.find((v) => v.isAvailable) ?? variants[0] ?? null,
+    [variants, selectedVariantId],
+  );
+  const price = selectedVariant?.price ?? 0;
+  const mrp = selectedVariant?.mrp ?? price;
+  const discount = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
+  const reviewCount = Array.isArray(p?.reviews) ? p.reviews.length : 0;
+
+  if (isLoading) {
+    return (
+      <div className="bg-[#f9f9fc] min-h-screen pt-20 max-w-7xl mx-auto md:grid md:grid-cols-2 md:gap-8 md:p-12 md:pt-24 animate-pulse">
+        <div className="w-full aspect-square bg-[#eeeef0] md:rounded-2xl" />
+        <div className="p-4 md:p-0 space-y-4">
+          <div className="h-4 bg-[#eeeef0] rounded w-1/3" />
+          <div className="h-8 bg-[#eeeef0] rounded w-2/3" />
+          <div className="h-6 bg-[#eeeef0] rounded w-1/4" />
+          <div className="h-24 bg-[#eeeef0] rounded" />
+        </div>
+      </div>
+    );
+  }
+
+  if (isError || !product) {
+    return (
+      <div className="bg-[#f9f9fc] min-h-screen flex flex-col items-center justify-center gap-4 text-center px-4">
+        <div className="text-5xl">🛒</div>
+        <h1 className="text-xl font-bold text-[#1a1c1e]">Product not found</h1>
+        <p className="text-sm text-[#3f4a3d]">This product may be unavailable or the link is invalid.</p>
+        <div className="flex gap-3">
+          <button onClick={() => refetch()} className="bg-[#006b23] text-white text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-[#078730]">
+            Retry
+          </button>
+          <Link href="/" className="bg-[#eeeef0] text-[#1a1c1e] text-sm font-bold px-5 py-2.5 rounded-xl hover:bg-[#e2e2e5]">
+            Back to Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#f9f9fc] text-[#1a1c1e] font-sans antialiased pb-24 md:pb-0 min-h-screen">
@@ -29,9 +80,9 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
           <span className="material-symbols-outlined">arrow_back</span>
         </Link>
         <div className="font-headline text-xl font-bold text-[#006b23]">Daily Basket</div>
-        <button className="text-[#006b23] p-2 -mr-2 rounded-full hover:opacity-80 transition-opacity">
+        <Link href="/search" className="text-[#006b23] p-2 -mr-2 rounded-full hover:opacity-80 transition-opacity">
           <span className="material-symbols-outlined">search</span>
-        </button>
+        </Link>
       </header>
 
       {/* Main Container */}
@@ -40,12 +91,11 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
         <section className="relative md:sticky md:top-24 h-fit">
           <div className="relative w-full aspect-square md:rounded-2xl overflow-hidden bg-[#f3f3f6]">
             <img
-              src={images[activeThumb]}
-              alt="Organic Hass Avocados"
+              src={images[activeThumb] ?? images[0]}
+              alt={p.name}
               className="w-full h-full object-cover"
             />
 
-            {/* Top Right Overlays */}
             <div className="absolute top-4 right-4 flex flex-col gap-3">
               <button
                 onClick={() => setIsFavorited(!isFavorited)}
@@ -60,120 +110,96 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
               </button>
             </div>
 
-            {/* Organic Chip */}
-            <div className="absolute top-4 left-4 bg-[#078730] text-[#f7fff2] px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-sm">
-              <span className="material-symbols-outlined text-[16px]">eco</span>
-              Certified Organic
-            </div>
+            {p.isOrganic && (
+              <div className="absolute top-4 left-4 bg-[#078730] text-[#f7fff2] px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1 shadow-sm">
+                <span className="material-symbols-outlined text-[16px]">eco</span>
+                Certified Organic
+              </div>
+            )}
           </div>
 
           {/* Thumbnails */}
-          <div className="flex gap-4 p-4 md:p-0 md:mt-4 overflow-x-auto">
-            {images.map((img, index) => (
-              <div
-                key={index}
-                onClick={() => setActiveThumb(index)}
-                className={`w-20 h-20 rounded-xl overflow-hidden border-2 cursor-pointer flex-shrink-0 transition-all ${
-                  activeThumb === index ? 'border-[#006b23]' : 'border-transparent opacity-70 hover:opacity-100'
-                }`}
-              >
-                <img src={img} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
-              </div>
-            ))}
-          </div>
+          {images.length > 1 && (
+            <div className="flex gap-4 p-4 md:p-0 md:mt-4 overflow-x-auto">
+              {images.map((img, index) => (
+                <div
+                  key={index}
+                  onClick={() => setActiveThumb(index)}
+                  className={`w-20 h-20 rounded-xl overflow-hidden border-2 cursor-pointer flex-shrink-0 transition-all ${
+                    activeThumb === index ? 'border-[#006b23]' : 'border-transparent opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  <img src={img} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Product Details Section */}
         <section className="px-4 md:px-0 flex flex-col gap-6">
           {/* Header Info */}
           <div>
-            <p className="text-[#006b23] text-sm font-semibold mb-1">Fresh Farm Co.</p>
+            {p.brand && <p className="text-[#006b23] text-sm font-semibold mb-1">{p.brand}</p>}
             <h1 className="font-headline text-3xl md:text-4xl font-bold text-[#1a1c1e] mb-2">
-              Organic Hass Avocados
+              {p.name}
             </h1>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="flex items-center text-[#F59E0B]">
-                <span className="material-symbols-outlined fill text-[18px]">star</span>
-                <span className="material-symbols-outlined fill text-[18px]">star</span>
-                <span className="material-symbols-outlined fill text-[18px]">star</span>
-                <span className="material-symbols-outlined fill text-[18px]">star</span>
-                <span className="material-symbols-outlined text-[18px]">star_half</span>
+            {reviewCount > 0 && (
+              <div className="flex items-center gap-2 mb-4">
+                <span className="material-symbols-outlined fill text-[18px] text-[#F59E0B]">star</span>
+                <span className="text-[#3f4a3d] text-sm">({reviewCount} Reviews)</span>
               </div>
-              <span className="text-[#3f4a3d] text-sm">(128 Reviews)</span>
-            </div>
+            )}
 
             <div className="flex items-end gap-3 mb-2">
               <span className="font-headline text-3xl font-bold text-[#1a1c1e]">
-                ${(price * quantity).toFixed(2)}
+                {formatCurrency(price * quantity)}
               </span>
-              <span className="text-[#3f4a3d] line-through text-lg mb-1">
-                ${(mrp * quantity).toFixed(2)}
-              </span>
-              <span className="bg-[#ffdad6] text-[#93000a] px-2 py-0.5 rounded-md text-xs font-bold mb-1.5">
-                -20%
-              </span>
+              {mrp > price && (
+                <>
+                  <span className="text-[#3f4a3d] line-through text-lg mb-1">
+                    {formatCurrency(mrp * quantity)}
+                  </span>
+                  <span className="bg-[#ffdad6] text-[#93000a] px-2 py-0.5 rounded-md text-xs font-bold mb-1.5">
+                    -{discount}%
+                  </span>
+                </>
+              )}
             </div>
             <p className="text-[#3f4a3d] text-sm">
-              Delivery in <span className="font-semibold text-[#006b23]">15-30 mins</span>
+              Delivery in <span className="font-semibold text-[#006b23]">10 mins</span>
             </p>
           </div>
 
-          {/* Weight Selection */}
-          <div className="border-t border-[#e2e2e5] pt-6">
-            <h3 className="font-headline text-lg font-semibold mb-3 text-[#1a1c1e]">Select Weight</h3>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setSelectedWeight('500g')}
-                className={`flex-1 py-3 px-4 rounded-xl border-2 font-semibold flex flex-col items-center justify-center transition-all ${
-                  selectedWeight === '500g'
-                    ? 'border-[#006b23] bg-[#006b23]/5 text-[#006b23]'
-                    : 'border-[#e2e2e5] text-[#3f4a3d] hover:bg-[#eeeef0]'
-                }`}
-              >
-                <span className="text-lg">500g</span>
-                <span className="text-xs opacity-80">~3-4 pieces</span>
-              </button>
-
-              <button
-                onClick={() => setSelectedWeight('1kg')}
-                className={`flex-1 py-3 px-4 rounded-xl border-2 font-semibold flex flex-col items-center justify-center transition-all ${
-                  selectedWeight === '1kg'
-                    ? 'border-[#006b23] bg-[#006b23]/5 text-[#006b23]'
-                    : 'border-[#e2e2e5] text-[#3f4a3d] hover:bg-[#eeeef0]'
-                }`}
-              >
-                <span className="text-lg">1kg</span>
-                <span className="text-xs opacity-80">~6-8 pieces</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Ask AI Chef Bento Box */}
-          <div className="bg-[#dce5dd]/30 border border-[#dce5dd] rounded-2xl p-5 relative overflow-hidden group cursor-pointer hover:bg-[#dce5dd]/50 transition-colors">
-            <div className="flex items-start gap-4 relative z-10">
-              <div className="w-10 h-10 rounded-full bg-[#006b23] text-white flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined">auto_awesome</span>
-              </div>
-              <div>
-                <h3 className="font-headline text-lg font-semibold text-[#1a1c1e] mb-1">Ask AI Chef</h3>
-                <p className="text-[#3f4a3d] text-sm mb-3">
-                  Get instant recipe ideas, pairing suggestions, or nutritional breakdowns for these avocados.
-                </p>
-                <div className="flex gap-2">
-                  <span className="bg-white px-3 py-1 rounded-full text-xs text-[#1a1c1e] border border-[#e2e2e5] shadow-sm hover:border-[#006b23] transition-colors">
-                    Guacamole recipe
-                  </span>
-                  <span className="bg-white px-3 py-1 rounded-full text-xs text-[#1a1c1e] border border-[#e2e2e5] shadow-sm hover:border-[#006b23] transition-colors">
-                    Ripening tips
-                  </span>
-                </div>
+          {/* Variant Selection */}
+          {variants.length > 0 && (
+            <div className="border-t border-[#e2e2e5] pt-6">
+              <h3 className="font-headline text-lg font-semibold mb-3 text-[#1a1c1e]">Select Pack</h3>
+              <div className="flex gap-3 flex-wrap">
+                {variants.map((v) => {
+                  const isSelected = selectedVariant?.id === v.id;
+                  return (
+                    <button
+                      key={v.id}
+                      disabled={!v.isAvailable}
+                      onClick={() => setSelectedVariantId(v.id)}
+                      className={`py-3 px-4 rounded-xl border-2 font-semibold flex flex-col items-center justify-center transition-all min-w-[96px] ${
+                        isSelected
+                          ? 'border-[#006b23] bg-[#006b23]/5 text-[#006b23]'
+                          : 'border-[#e2e2e5] text-[#3f4a3d] hover:bg-[#eeeef0]'
+                      } ${!v.isAvailable ? 'opacity-40 cursor-not-allowed' : ''}`}
+                    >
+                      <span className="text-lg">{v.unitName}</span>
+                      <span className="text-xs opacity-80">{formatCurrency(v.price)}</span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
-          </div>
+          )}
 
           {/* Accordion Details */}
           <div className="mt-4 flex flex-col gap-4">
-            {/* Description */}
             <div className="border border-[#e2e2e5] rounded-2xl overflow-hidden bg-white">
               <button
                 onClick={() => setDetailsOpen(!detailsOpen)}
@@ -186,42 +212,7 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
               </button>
               {detailsOpen && (
                 <div className="p-4 pt-0 text-sm text-[#3f4a3d] leading-relaxed border-t border-[#e2e2e5]">
-                  Our premium Hass avocados are organically grown, hand-picked, and delivered at the perfect stage of ripeness. Known for their creamy texture and rich, nutty flavor, they are perfect for salads, toast, or your favorite guacamole recipe.
-                </div>
-              )}
-            </div>
-
-            {/* Nutrition */}
-            <div className="border border-[#e2e2e5] rounded-2xl overflow-hidden bg-white">
-              <button
-                onClick={() => setNutritionOpen(!nutritionOpen)}
-                className="w-full flex items-center justify-between p-4 text-left hover:bg-[#f3f3f6] transition-colors"
-              >
-                <span className="font-headline font-semibold text-[#1a1c1e]">Nutritional Info (per 100g)</span>
-                <span className={`material-symbols-outlined transition-transform duration-300 ${nutritionOpen ? 'rotate-180' : ''}`}>
-                  expand_more
-                </span>
-              </button>
-              {nutritionOpen && (
-                <div className="p-4 pt-0 border-t border-[#e2e2e5]">
-                  <ul className="flex flex-col gap-2 mt-3 text-sm">
-                    <li className="flex justify-between border-b border-[#e2e2e5]/50 pb-1">
-                      <span className="text-[#3f4a3d]">Calories</span>
-                      <span className="font-medium text-[#1a1c1e]">160 kcal</span>
-                    </li>
-                    <li className="flex justify-between border-b border-[#e2e2e5]/50 pb-1">
-                      <span className="text-[#3f4a3d]">Fat</span>
-                      <span className="font-medium text-[#1a1c1e]">15g</span>
-                    </li>
-                    <li className="flex justify-between border-b border-[#e2e2e5]/50 pb-1">
-                      <span className="text-[#3f4a3d]">Carbs</span>
-                      <span className="font-medium text-[#1a1c1e]">9g</span>
-                    </li>
-                    <li className="flex justify-between border-b border-[#e2e2e5]/50 pb-1">
-                      <span className="text-[#3f4a3d]">Protein</span>
-                      <span className="font-medium text-[#1a1c1e]">2g</span>
-                    </li>
-                  </ul>
+                  {p.description || 'No description available for this product.'}
                 </div>
               )}
             </div>
@@ -248,8 +239,29 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
             </button>
           </div>
 
-          <button className="flex-1 md:flex-none md:w-64 bg-[#006b23] hover:bg-[#078730] text-white font-headline font-semibold text-lg rounded-xl h-14 flex items-center justify-center shadow-md active:scale-95 transition-all">
-            Add to Cart - ${(price * quantity).toFixed(2)}
+          <button
+            disabled={!selectedVariant || addItem.isPending}
+            onClick={() => {
+              if (!selectedVariant) return;
+              addItem.mutate(
+                {
+                  variantId: selectedVariant.id,
+                  productName: p.name,
+                  unitName: selectedVariant.unitName,
+                  price: selectedVariant.price,
+                  quantity,
+                },
+                {
+                  onSuccess: () => {
+                    setAdded(true);
+                    setTimeout(() => setAdded(false), 2000);
+                  },
+                },
+              );
+            }}
+            className="flex-1 md:flex-none md:w-64 bg-[#006b23] hover:bg-[#078730] disabled:opacity-50 text-white font-headline font-semibold text-lg rounded-xl h-14 flex items-center justify-center shadow-md active:scale-95 transition-all"
+          >
+            {addItem.isPending ? 'Adding…' : added ? '✓ Added to Cart' : `Add to Cart - ${formatCurrency(price * quantity)}`}
           </button>
         </div>
       </div>

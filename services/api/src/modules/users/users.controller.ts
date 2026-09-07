@@ -1,6 +1,8 @@
-import { Controller, Get, Put, Post, Delete, Body, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, Put, Post, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService, UserProfileDto, UserAddressDto, NotificationSettingsDto } from './users.service';
+import { OptionalJwtAuthGuard } from '../../common/guards/optional-jwt-auth.guard';
+import { ResolvedUserId } from '../../common/decorators/resolved-user-id.decorator';
 
 @ApiTags('Users & Profile')
 @Controller()
@@ -20,21 +22,27 @@ export class UsersController {
   }
 
   @Get('addresses')
-  @ApiOperation({ summary: 'Get saved user delivery addresses' })
-  async getAddresses(@Query('userId') userId?: string) {
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Get saved delivery addresses (user derived from token)' })
+  async getAddresses(@ResolvedUserId() userId: string) {
     return this.usersService.getAddresses(userId);
   }
 
   @Post('addresses')
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Create new user delivery address' })
-  async createAddress(@Query('userId') userId: string, @Body() body: UserAddressDto) {
+  async createAddress(@ResolvedUserId() userId: string, @Body() body: UserAddressDto) {
     return this.usersService.createAddress(userId, body);
   }
 
   @Put('addresses/:id')
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Update existing user delivery address' })
   async updateAddress(
-    @Query('userId') userId: string,
+    @ResolvedUserId() userId: string,
     @Param('id') id: string,
     @Body() body: Partial<UserAddressDto>,
   ) {
@@ -42,8 +50,10 @@ export class UsersController {
   }
 
   @Delete('addresses/:id')
+  @UseGuards(OptionalJwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete user delivery address' })
-  async deleteAddress(@Query('userId') userId: string, @Param('id') id: string) {
+  async deleteAddress(@ResolvedUserId() userId: string, @Param('id') id: string) {
     return this.usersService.deleteAddress(userId, id);
   }
 

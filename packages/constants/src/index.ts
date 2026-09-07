@@ -7,7 +7,7 @@ export const API_ROUTES = {
   AUTH: {
     LOGIN_OTP: '/api/v1/auth/login-otp',
     VERIFY_OTP: '/api/v1/auth/verify-otp',
-    REFRESH_TOKEN: '/api/v1/auth/refresh',
+    REFRESH_TOKEN: '/api/v1/auth/refresh-token',
     LOGOUT: '/api/v1/auth/logout',
   },
   PRODUCTS: {

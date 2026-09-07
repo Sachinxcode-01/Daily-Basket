@@ -1,12 +1,21 @@
 import { API_ROUTES } from '@daily-basket/constants';
 import { Product, Category, Order, CartItem } from '@daily-basket/shared-types';
 
+// Minimal ambient declaration so this shared package typechecks without @types/node.
+// Keeping the literal `process.env.NEXT_PUBLIC_*` access lets Next.js inline it at build time.
+declare const process: { env: Record<string, string | undefined> } | undefined;
+
 export class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
 
-  constructor(baseUrl = 'http://localhost:4000') {
-    this.baseUrl = baseUrl;
+  constructor(baseUrl?: string) {
+    // Prefer an explicit argument, then the public runtime env var, then a local dev default.
+    const envUrl =
+      typeof process !== 'undefined' && process.env
+        ? process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL
+        : undefined;
+    this.baseUrl = (baseUrl || envUrl || 'http://localhost:4000').replace(/\/$/, '');
   }
 
   public setAuthToken(token: string | null) {
@@ -33,7 +42,18 @@ export class ApiClient {
       throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
 
-    return response.json();
+    const payload = await response.json();
+    // The API wraps successful responses in { success, statusCode, data, timestamp }.
+    // Unwrap to the inner `data` so callers receive the domain object directly.
+    if (
+      payload &&
+      typeof payload === 'object' &&
+      'data' in payload &&
+      'success' in payload
+    ) {
+      return (payload as { data: T }).data;
+    }
+    return payload as T;
   }
 
   // Auth Methods
@@ -52,42 +72,43 @@ export class ApiClient {
   }
 
   public async loginEmail(data: { email: string; pass: string }): Promise<{ token: string; accessToken: string; user: any }> {
-    return this.fetcher('/auth/login-email', {
+    return this.fetcher('/api/v1/auth/login-email', {
       method: 'POST',
       body: JSON.stringify(data),
     });
   }
 
   public async registerEmail(data: { email: string; pass: string; name: string }): Promise<{ success: boolean; message: string }> {
-    return this.fetcher('/auth/register-email', {
+    // Backend RegisterEmailDto expects `password` (min 8), while login uses `pass`.
+    return this.fetcher('/api/v1/auth/register-email', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ email: data.email, password: data.pass, name: data.name }),
     });
   }
 
   public async googleOAuthLogin(idToken: string): Promise<{ token: string; accessToken: string; user: any }> {
-    return this.fetcher('/auth/google-login', {
+    return this.fetcher('/api/v1/auth/google-login', {
       method: 'POST',
       body: JSON.stringify({ idToken }),
     });
   }
 
   public async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
-    return this.fetcher('/auth/forgot-password', {
+    return this.fetcher('/api/v1/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     });
   }
 
   public async resetPassword(token: string, newPass: string): Promise<{ success: boolean; message: string }> {
-    return this.fetcher('/auth/reset-password', {
+    return this.fetcher('/api/v1/auth/reset-password', {
       method: 'POST',
       body: JSON.stringify({ token, newPass }),
     });
   }
 
   public async verifyEmailToken(token: string): Promise<{ success: boolean; message: string }> {
-    return this.fetcher('/auth/verify-email', {
+    return this.fetcher('/api/v1/auth/verify-email', {
       method: 'POST',
       body: JSON.stringify({ token }),
     });
@@ -113,13 +134,56 @@ export class ApiClient {
 
   // Order Methods
   public async createOrder(orderPayload: {
-    items: CartItem[];
+    userId?: string;
+    items: any[];
     addressId: string;
     paymentMethod: string;
-  }): Promise<Order> {
+    couponCode?: string;
+    useWallet?: boolean;
+  }): Promise<any> {
     return this.fetcher(API_ROUTES.ORDERS.CREATE, {
       method: 'POST',
       body: JSON.stringify(orderPayload),
+    });
+  }
+
+  public async calculateOrderPricing(payload: {
+    items: { id: string; productName: string; price: number; mrp?: number; quantity: number }[];
+    couponCode?: string;
+    useWallet?: boolean;
+    paymentMethod?: string;
+  }): Promise<any> {
+    return this.fetcher('/api/v1/orders/calculate', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async getOrder(orderId: string): Promise<any> {
+    return this.fetcher(API_ROUTES.ORDERS.DETAILS(orderId));
+  }
+
+  public async listOrders(userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`${API_ROUTES.ORDERS.LIST}?userId=${encodeURIComponent(userId)}`);
+  }
+
+  // Address Methods
+  public async getAddresses(userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/addresses?userId=${encodeURIComponent(userId)}`);
+  }
+
+  // Payment Methods (Razorpay)
+  public async initiatePayment(orderId: string, amount: number): Promise<{ success: boolean; razorpayOrderId: string; amount: number; currency: string; keyId: string }> {
+    return this.fetcher(API_ROUTES.PAYMENTS.INITIATE, {
+      method: 'POST',
+      body: JSON.stringify({ orderId, amount }),
+    });
+  }
+
+  public async verifyPayment(payload: { paymentId: string; razorpayOrderId: string; razorpaySignature: string }): Promise<{ success: boolean; message: string }> {
+    return this.fetcher(API_ROUTES.PAYMENTS.VERIFY, {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   }
 
@@ -135,14 +199,14 @@ export class ApiClient {
   // Notifications & FCM Methods
 
   public async registerFcmToken(userId: string, token: string, platform?: string): Promise<{ success: boolean; registeredTokensCount: number }> {
-    return this.fetcher('/notifications/register-token', {
+    return this.fetcher('/api/v1/notifications/register-token', {
       method: 'POST',
       body: JSON.stringify({ userId, token, platform }),
     });
   }
 
   public async sendTestPushNotification(userId: string, title?: string, body?: string): Promise<{ success: boolean; messageId: string }> {
-    return this.fetcher('/notifications/test-push', {
+    return this.fetcher('/api/v1/notifications/test-push', {
       method: 'POST',
       body: JSON.stringify({ userId, title, body }),
     });
@@ -150,23 +214,83 @@ export class ApiClient {
 
   // Geofence & Delivery Methods
   public async evaluateGeofence(lat: number, lng: number, itemTotal?: number): Promise<any> {
-    return this.fetcher('/delivery/geofence-check', {
+    return this.fetcher('/api/v1/delivery/geofence-check', {
       method: 'POST',
       body: JSON.stringify({ lat, lng, itemTotal }),
     });
   }
 
   public async calculateSurgePricing(lat: number, lng: number, itemTotal?: number): Promise<any> {
-    return this.fetcher('/delivery/surge-pricing', {
+    return this.fetcher('/api/v1/delivery/surge-pricing', {
       method: 'POST',
       body: JSON.stringify({ lat, lng, itemTotal }),
     });
   }
 
   public async syncOfflineDeliveryQueue(actions: any[]): Promise<{ success: boolean; syncedCount: number; processedActionIds: string[] }> {
-    return this.fetcher('/delivery/sync-offline-queue', {
+    return this.fetcher('/api/v1/delivery/sync-offline-queue', {
       method: 'POST',
       body: JSON.stringify({ actions }),
+    });
+  }
+
+  // Cart Methods (persistent, backend-validated totals)
+  public async getCart(userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/cart?userId=${encodeURIComponent(userId)}`);
+  }
+
+  public async addToCart(
+    item: { variantId: string; productName: string; unitName: string; price: number; quantity?: number },
+    userId = 'usr_default',
+  ): Promise<any> {
+    return this.fetcher('/api/v1/cart/add', {
+      method: 'POST',
+      body: JSON.stringify({ ...item, userId }),
+    });
+  }
+
+  public async updateCartItem(itemId: string, quantity: number, userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/cart/item/${itemId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ quantity, userId }),
+    });
+  }
+
+  public async removeCartItem(itemId: string, userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/cart/item/${itemId}?userId=${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  public async clearCart(userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/cart/clear?userId=${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  public async mergeGuestCart(
+    items: { variantId: string; productName: string; unitName: string; price: number; quantity?: number }[],
+    userId: string,
+  ): Promise<any> {
+    return this.fetcher('/api/v1/cart/merge', {
+      method: 'POST',
+      body: JSON.stringify({ items, userId }),
+    });
+  }
+
+  // Coupon Methods
+  public async getCoupons(): Promise<any> {
+    return this.fetcher('/api/v1/coupons');
+  }
+
+  public async applyCoupon(
+    code: string,
+    cartSubtotal: number,
+    userId = 'usr_default',
+  ): Promise<{ success: boolean; valid: boolean; code: string; discountType: string; discountAmount: number; message: string }> {
+    return this.fetcher('/api/v1/coupons/apply', {
+      method: 'POST',
+      body: JSON.stringify({ code, cartSubtotal, userId }),
     });
   }
 }

@@ -6,12 +6,47 @@ import { useRouter } from 'next/navigation';
 import { ShoppingBasket, Mail, Lock, Eye, EyeOff, ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
 import OrganicShaderBackground from '../../../components/auth/OrganicShaderBackground';
 import { GoogleGLogo } from '../../../components/auth/AnimatedIcons';
+import { useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@daily-basket/api-client';
 import { useAuthStore } from '../../../store/useAuthStore';
 
 export default function LoginPage() {
   const router = useRouter();
   const setAuth = useAuthStore((state) => state.setAuth);
+  const queryClient = useQueryClient();
+
+  // Persist the session and fold any guest cart items into the user's cart.
+  const finishLogin = async (user: any, token: string) => {
+    let guestItems: any[] = [];
+    try {
+      const guestCart = await apiClient.getCart('usr_default');
+      guestItems = guestCart?.activeItems ?? [];
+    } catch {
+      /* ignore guest cart read errors */
+    }
+
+    setAuth(user, token);
+
+    if (user?.id && guestItems.length > 0) {
+      try {
+        await apiClient.mergeGuestCart(
+          guestItems.map((i: any) => ({
+            variantId: i.variantId,
+            productName: i.productName,
+            unitName: i.unitName,
+            price: i.price,
+            quantity: i.quantity,
+          })),
+          user.id,
+        );
+        await apiClient.clearCart('usr_default');
+      } catch {
+        /* non-fatal: user can re-add items */
+      }
+    }
+    queryClient.invalidateQueries({ queryKey: ['cart'] });
+    router.push('/success');
+  };
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,8 +68,7 @@ export default function LoginPage() {
     setErrorMsg('');
     try {
       const res = await apiClient.loginEmail({ email, pass: password });
-      setAuth(res.user, res.accessToken || res.token || 'demo_jwt_token');
-      router.push('/success');
+      await finishLogin(res.user, res.accessToken || res.token || 'demo_jwt_token');
     } catch (err: any) {
       setErrorMsg(err.message || 'Invalid email or password.');
     } finally {
@@ -47,8 +81,7 @@ export default function LoginPage() {
     setErrorMsg('');
     try {
       const res = await apiClient.googleOAuthLogin('mock_google_id_token');
-      setAuth(res.user, res.accessToken || res.token || 'demo_google_token');
-      router.push('/success');
+      await finishLogin(res.user, res.accessToken || res.token || 'demo_google_token');
     } catch (err: any) {
       setErrorMsg('Google login failed.');
     } finally {
