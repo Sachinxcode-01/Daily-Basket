@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import 'category_products_screen.dart';
 import 'fresh_produce_listing_screen.dart';
 
 /// Browse Categories Screen — Google Stitch Exact Design
@@ -86,7 +87,7 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
   }
 
   void _navigateToCategory(String slug, String title) {
-    if (slug == 'fruits-vegetables') {
+    if (slug == 'fruits-vegetables' || slug == 'fresh-fruits-vegetables') {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -94,10 +95,11 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
         ),
       );
     } else {
-      Navigator.pushNamed(
+      Navigator.push(
         context,
-        '/search-results',
-        arguments: title,
+        MaterialPageRoute(
+          builder: (_) => CategoryProductsScreen(categorySlug: slug),
+        ),
       );
     }
   }

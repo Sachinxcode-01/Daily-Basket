@@ -7,6 +7,7 @@ import '../../../../core/providers/categories_provider.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../search/presentation/screens/camera_search_screen.dart';
 import 'category_products_screen.dart';
+import 'fresh_produce_listing_screen.dart';
 
 /// All Categories Screen — Google Stitch Specification (ID: 9f448a28c96e448a8dac91adcbce72b2)
 /// Includes voice & camera search, Daily Basket Plus loyalty banner, and complete 2-column grocery grid.
@@ -267,7 +268,9 @@ class _AllCategoriesScreenState extends State<AllCategoriesScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (_) => CategoryProductsScreen(categorySlug: cat.slug),
+                                    builder: (_) => cat.slug == 'fresh-fruits-vegetables'
+                                        ? const FreshProduceListingScreen()
+                                        : CategoryProductsScreen(categorySlug: cat.slug),
                                   ),
                                 );
                               },
