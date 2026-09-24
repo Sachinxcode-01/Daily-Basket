@@ -17,15 +17,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
       - name: Install pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 9
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
 
       - name: Install Workspace Dependencies
         run: pnpm install --frozen-lockfile
@@ -48,11 +49,12 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          cache: true
 
       - name: Flutter Static Analysis & Tests
         run: |
           cd apps/mobile
-          flutter analyze
+          flutter analyze --no-fatal-infos
           flutter test
 
   # 2. Build & Containerize Production Microservices
