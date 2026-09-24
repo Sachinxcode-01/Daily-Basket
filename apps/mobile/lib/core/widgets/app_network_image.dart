@@ -51,6 +51,21 @@ class AppNetworkImage extends StatelessWidget {
       return fallbackWidget();
     }
 
+    if (imageUrl.startsWith('assets/')) {
+      return ClipRRect(
+        borderRadius: effectiveRadius,
+        child: Image.asset(
+          imageUrl,
+          width: width,
+          height: height,
+          fit: fit,
+          errorBuilder: (context, error, stackTrace) {
+            return fallbackWidget();
+          },
+        ),
+      );
+    }
+
     return ClipRRect(
       borderRadius: effectiveRadius,
       child: Image.network(
