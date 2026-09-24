@@ -378,7 +378,7 @@ export default function HomePage() {
                     </span>
                   )}
 
-                  <div>
+                  <Link href={`/product/${p.id}`} className="block">
                     {/* Image */}
                     <div className="relative w-full aspect-square bg-surface-container-low rounded-xl overflow-hidden mb-3">
                       <Image
@@ -407,7 +407,7 @@ export default function HomePage() {
                         )}
                       </div>
                     )}
-                  </div>
+                  </Link>
 
                   {/* Price & Add */}
                   <div className="mt-3 pt-2.5 border-t border-outline-variant/10 flex items-center justify-between">

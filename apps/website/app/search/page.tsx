@@ -7,11 +7,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
 import Link from 'next/link';
-import { Search, Camera, SlidersHorizontal, Plus, Check, ArrowLeft, X } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, Camera, SlidersHorizontal, Plus, Check, ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../store/useCart';
+import { BarcodeScanner } from '../../components/BarcodeScanner';
 
 interface SearchItem {
   id: string;
@@ -40,11 +42,32 @@ function mapItem(p: any): SearchItem {
 }
 
 export default function SearchPage() {
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
+  const [scanNotice, setScanNotice] = useState<string | null>(null);
   const { activeItems, addItem, updateItem } = useCart();
+
+  // Barcode scan: look up the catalog and open the product; otherwise fall back to text search.
+  const handleScan = async (code: string) => {
+    setIsCameraModalOpen(false);
+    const c = code.trim();
+    if (!c) return;
+    try {
+      const res: any = await apiClient.searchByBarcode(c);
+      const products = Array.isArray(res?.products) ? res.products : Array.isArray(res) ? res : [];
+      if (products.length > 0 && products[0]?.id) {
+        router.push(`/product/${products[0].id}`);
+        return;
+      }
+    } catch {
+      /* fall through to text search */
+    }
+    setScanNotice(`No product matched barcode "${c}". Showing search results instead.`);
+    setQuery(c);
+  };
 
   const filters = ['All', 'Organic', 'On Sale', 'Under ₹50'];
 
@@ -106,7 +129,7 @@ export default function SearchPage() {
             <input
               type="text"
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e) => { setQuery(e.target.value); if (scanNotice) setScanNotice(null); }}
               placeholder="Search for groceries, brand or scan camera..."
               className="w-full h-11 bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-12 text-sm font-medium text-white placeholder:text-slate-400 focus:outline-none focus:border-teal-500 transition"
             />
@@ -144,6 +167,11 @@ export default function SearchPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 pt-6">
+        {scanNotice && (
+          <div className="mb-4 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
+            {scanNotice}
+          </div>
+        )}
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm font-medium text-slate-400 font-inter">
             {debouncedQuery
@@ -263,36 +291,9 @@ export default function SearchPage() {
         )}
       </main>
 
-      {/* Camera Search Modal (visual search is a planned feature) */}
+      {/* Live camera barcode scanner */}
       {isCameraModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4">
-          <div className="bg-slate-800 border border-slate-700 rounded-3xl max-w-md w-full p-6 text-center relative overflow-hidden shadow-2xl">
-            <button
-              onClick={() => setIsCameraModalOpen(false)}
-              className="absolute top-4 right-4 text-slate-400 hover:text-white p-2 rounded-full"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            <div className="w-16 h-16 bg-teal-500/20 text-teal-400 rounded-full flex items-center justify-center mx-auto mb-4 border border-teal-500/30">
-              <Camera className="w-8 h-8" />
-            </div>
-
-            <h3 className="text-xl font-bold font-outfit text-white mb-2">
-              AI Visual Search by Camera
-            </h3>
-            <p className="text-xs text-slate-300 font-inter mb-6">
-              Point your camera at any grocery package to search the Daily Basket catalog. This feature is coming soon.
-            </p>
-
-            <button
-              onClick={() => setIsCameraModalOpen(false)}
-              className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-bold text-sm rounded-xl transition"
-            >
-              Close
-            </button>
-          </div>
-        </div>
+        <BarcodeScanner onDetected={handleScan} onClose={() => setIsCameraModalOpen(false)} />
       )}
     </div>
   );

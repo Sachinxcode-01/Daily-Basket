@@ -278,6 +278,26 @@ export class ApiClient {
     });
   }
 
+  // AI Methods
+  public async getProductInsight(productId: string): Promise<any> {
+    return this.fetcher(`/api/v1/ai/product-insight?productId=${encodeURIComponent(productId)}`);
+  }
+
+  public async aiChat(message: string, context?: Record<string, any>, userId = 'usr_default'): Promise<{ content: string; providerUsed?: string; latencyMs?: number }> {
+    return this.fetcher('/api/v1/ai/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message, context, userId }),
+    });
+  }
+
+  // Barcode / catalog scan lookup
+  public async searchByBarcode(barcode: string): Promise<any> {
+    return this.fetcher('/api/v1/search/barcode', {
+      method: 'POST',
+      body: JSON.stringify({ barcode }),
+    });
+  }
+
   // Coupon Methods
   public async getCoupons(): Promise<any> {
     return this.fetcher('/api/v1/coupons');

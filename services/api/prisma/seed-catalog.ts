@@ -26,6 +26,7 @@ interface SeedProduct {
   brand: string;
   image: string;
   isOrganic?: boolean;
+  barcode?: string;
   tags: string[];
   variants: SeedVariant[];
 }
@@ -73,7 +74,7 @@ const catalog: SeedCategory[] = [
     isFeatured: true,
     sortOrder: 2,
     products: [
-      { name: 'Amul Taaza Toned Milk', slug: 'amul-taaza-toned-milk-1l', description: 'Homogenised toned milk, pasteurised for freshness.', brand: 'Amul', image: img('photo-1563636619-e9143da7973b'), tags: ['dairy', 'milk'], variants: [{ unitName: '500 ml', price: 27, mrp: 28, sku: 'DAI-MILK-500', stock: 400 }, { unitName: '1 L', price: 54, mrp: 56, sku: 'DAI-MILK-1000', stock: 350 }] },
+      { name: 'Amul Taaza Toned Milk', slug: 'amul-taaza-toned-milk-1l', barcode: '8901262010016', description: 'Homogenised toned milk, pasteurised for freshness.', brand: 'Amul', image: img('photo-1563636619-e9143da7973b'), tags: ['dairy', 'milk'], variants: [{ unitName: '500 ml', price: 27, mrp: 28, sku: 'DAI-MILK-500', stock: 400 }, { unitName: '1 L', price: 54, mrp: 56, sku: 'DAI-MILK-1000', stock: 350 }] },
       { name: 'Amul Set Curd', slug: 'amul-set-curd', description: 'Thick and creamy set curd.', brand: 'Amul', image: img('photo-1571512599285-9b05c2b06e99'), tags: ['dairy', 'curd'], variants: [{ unitName: '400 g Cup', price: 42, mrp: 45, sku: 'DAI-CURD-400', stock: 180 }] },
       { name: 'Farm Eggs (White)', slug: 'farm-eggs-white', description: 'Protein-rich fresh white eggs.', brand: 'Daily Basket', image: img('photo-1582722872445-44dc5f7e3c8f'), tags: ['eggs'], variants: [{ unitName: '6 pcs', price: 48, mrp: 60, sku: 'EGG-WHT-6', stock: 220 }, { unitName: '12 pcs', price: 92, mrp: 115, sku: 'EGG-WHT-12', stock: 160 }] },
       { name: 'Whole Wheat Bread', slug: 'whole-wheat-bread', description: '100% whole wheat sandwich bread.', brand: 'Britannia', image: img('photo-1509440159596-0249088772ff'), tags: ['bread', 'bakery'], variants: [{ unitName: '400 g', price: 45, mrp: 50, sku: 'BRD-WW-400', stock: 140 }] },
@@ -90,7 +91,7 @@ const catalog: SeedCategory[] = [
     isFeatured: false,
     sortOrder: 3,
     products: [
-      { name: 'Coca-Cola', slug: 'coca-cola-750ml', description: 'Chilled classic Coca-Cola.', brand: 'Coca-Cola', image: img('photo-1554866585-cd94860890b7'), tags: ['beverage', 'soft-drink'], variants: [{ unitName: '750 ml', price: 40, mrp: 45, sku: 'BEV-COKE-750', stock: 260 }] },
+      { name: 'Coca-Cola', slug: 'coca-cola-750ml', barcode: '8901764001019', description: 'Chilled classic Coca-Cola.', brand: 'Coca-Cola', image: img('photo-1554866585-cd94860890b7'), tags: ['beverage', 'soft-drink'], variants: [{ unitName: '750 ml', price: 40, mrp: 45, sku: 'BEV-COKE-750', stock: 260 }] },
       { name: 'Real Mixed Fruit Juice', slug: 'real-mixed-fruit-juice', description: 'Made from concentrate, no added preservatives.', brand: 'Real', image: img('photo-1600271886742-f049cd451bba'), tags: ['beverage', 'juice'], variants: [{ unitName: '1 L', price: 110, mrp: 130, sku: 'BEV-REAL-1000', stock: 120 }] },
       { name: 'Bru Instant Coffee', slug: 'bru-instant-coffee', description: 'Rich and aromatic instant coffee.', brand: 'Bru', image: img('photo-1509042239860-f550ce710b93'), tags: ['beverage', 'coffee'], variants: [{ unitName: '100 g Jar', price: 165, mrp: 190, sku: 'BEV-BRU-100', stock: 95 }] },
       { name: 'Red Label Tea', slug: 'red-label-tea', description: 'Strong and refreshing everyday tea.', brand: 'Brooke Bond', image: img('photo-1597318181409-cf64d0b5d8a2'), tags: ['beverage', 'tea'], variants: [{ unitName: '500 g', price: 198, mrp: 210, sku: 'BEV-TEA-500', stock: 130 }] },
@@ -107,8 +108,8 @@ const catalog: SeedCategory[] = [
     sortOrder: 4,
     products: [
       { name: "Lay's Classic Salted Chips", slug: 'lays-classic-salted', description: 'Crispy potato chips, classic salted.', brand: "Lay's", image: img('photo-1566478989037-eec170784d0b'), tags: ['snack', 'chips'], variants: [{ unitName: '52 g', price: 20, mrp: 20, sku: 'SNK-LAYS-52', stock: 300 }] },
-      { name: 'Parle-G Biscuits', slug: 'parle-g-biscuits', description: 'The original glucose biscuits.', brand: 'Parle', image: img('photo-1558961363-fa8fdf82db35'), tags: ['snack', 'biscuit'], variants: [{ unitName: '250 g', price: 25, mrp: 28, sku: 'SNK-PARLE-250', stock: 400 }] },
-      { name: 'Dairy Milk Silk', slug: 'dairy-milk-silk', description: 'Smooth and creamy milk chocolate bar.', brand: 'Cadbury', image: img('photo-1549007994-cb92caebd54b'), tags: ['snack', 'chocolate'], variants: [{ unitName: '150 g', price: 155, mrp: 170, sku: 'SNK-SILK-150', stock: 110 }] },
+      { name: 'Parle-G Biscuits', slug: 'parle-g-biscuits', barcode: '8901719101015', description: 'The original glucose biscuits.', brand: 'Parle', image: img('photo-1558961363-fa8fdf82db35'), tags: ['snack', 'biscuit'], variants: [{ unitName: '250 g', price: 25, mrp: 28, sku: 'SNK-PARLE-250', stock: 400 }] },
+      { name: 'Dairy Milk Silk', slug: 'dairy-milk-silk', barcode: '7622210991010', description: 'Smooth and creamy milk chocolate bar.', brand: 'Cadbury', image: img('photo-1549007994-cb92caebd54b'), tags: ['snack', 'chocolate'], variants: [{ unitName: '150 g', price: 155, mrp: 170, sku: 'SNK-SILK-150', stock: 110 }] },
       { name: 'Haldiram Aloo Bhujia', slug: 'haldiram-aloo-bhujia', description: 'Crunchy spiced potato namkeen.', brand: 'Haldiram', image: img('photo-1626074353765-517a681e40be'), tags: ['snack', 'namkeen'], variants: [{ unitName: '200 g', price: 52, mrp: 60, sku: 'SNK-BHUJIA-200', stock: 170 }] },
     ],
   },
@@ -122,7 +123,7 @@ const catalog: SeedCategory[] = [
     isFeatured: true,
     sortOrder: 5,
     products: [
-      { name: 'Aashirvaad Whole Wheat Atta', slug: 'aashirvaad-atta', description: 'Chakki-fresh whole wheat flour.', brand: 'Aashirvaad', image: img('photo-1574323347407-f5e1ad6d020b'), tags: ['staple', 'atta', 'flour'], variants: [{ unitName: '5 kg', price: 242, mrp: 265, sku: 'STP-ATTA-5000', stock: 90 }] },
+      { name: 'Aashirvaad Whole Wheat Atta', slug: 'aashirvaad-atta', barcode: '8901725100017', description: 'Chakki-fresh whole wheat flour.', brand: 'Aashirvaad', image: img('photo-1574323347407-f5e1ad6d020b'), tags: ['staple', 'atta', 'flour'], variants: [{ unitName: '5 kg', price: 242, mrp: 265, sku: 'STP-ATTA-5000', stock: 90 }] },
       { name: 'India Gate Basmati Rice', slug: 'india-gate-basmati', description: 'Aged premium long-grain basmati rice.', brand: 'India Gate', image: img('photo-1586201375761-83865001e31c'), tags: ['staple', 'rice'], variants: [{ unitName: '1 kg', price: 135, mrp: 160, sku: 'STP-RICE-1000', stock: 140 }, { unitName: '5 kg', price: 640, mrp: 750, sku: 'STP-RICE-5000', stock: 50 }] },
       { name: 'Tata Sampann Toor Dal', slug: 'tata-toor-dal', description: 'Unpolished protein-rich toor dal.', brand: 'Tata Sampann', image: img('photo-1546548970-71785318a17b'), tags: ['staple', 'dal', 'pulses'], variants: [{ unitName: '1 kg', price: 145, mrp: 160, sku: 'STP-TOOR-1000', stock: 120 }] },
       { name: 'Fortune Sunflower Oil', slug: 'fortune-sunflower-oil', description: 'Light and healthy refined sunflower oil.', brand: 'Fortune', image: img('photo-1474979266404-7eaacbcd87c5'), tags: ['staple', 'oil'], variants: [{ unitName: '1 L Pouch', price: 135, mrp: 155, sku: 'STP-OIL-1000', stock: 160 }] },
@@ -138,7 +139,7 @@ const catalog: SeedCategory[] = [
     isFeatured: false,
     sortOrder: 6,
     products: [
-      { name: 'Surf Excel Easy Wash Detergent', slug: 'surf-excel-easy-wash', description: 'Tough stain removal detergent powder.', brand: 'Surf Excel', image: img('photo-1585421514738-01798e348b17'), tags: ['household', 'detergent'], variants: [{ unitName: '1 kg', price: 155, mrp: 172, sku: 'HHD-SURF-1000', stock: 130 }] },
+      { name: 'Surf Excel Easy Wash Detergent', slug: 'surf-excel-easy-wash', barcode: '8901030700012', description: 'Tough stain removal detergent powder.', brand: 'Surf Excel', image: img('photo-1585421514738-01798e348b17'), tags: ['household', 'detergent'], variants: [{ unitName: '1 kg', price: 155, mrp: 172, sku: 'HHD-SURF-1000', stock: 130 }] },
       { name: 'Vim Dishwash Gel', slug: 'vim-dishwash-gel', description: 'Lemon dishwash gel, tough on grease.', brand: 'Vim', image: img('photo-1610557892470-55d9e80c0bce'), tags: ['household', 'dishwash'], variants: [{ unitName: '750 ml', price: 115, mrp: 135, sku: 'HHD-VIM-750', stock: 150 }] },
       { name: 'Harpic Toilet Cleaner', slug: 'harpic-toilet-cleaner', description: 'Powerful 10x cleaning toilet liquid.', brand: 'Harpic', image: img('photo-1583947215259-38e31be8751f'), tags: ['household', 'cleaner'], variants: [{ unitName: '1 L', price: 99, mrp: 120, sku: 'HHD-HARPIC-1000', stock: 110 }] },
     ],
@@ -232,6 +233,7 @@ async function main() {
           brand: p.brand,
           images: [p.image],
           isOrganic: p.isOrganic ?? false,
+          barcode: p.barcode ?? null,
           tags: p.tags,
           searchKeywords: [p.name.toLowerCase(), p.brand.toLowerCase(), ...p.tags],
           categoryId: category.id,
@@ -246,6 +248,7 @@ async function main() {
           brand: p.brand,
           images: [p.image],
           isOrganic: p.isOrganic ?? false,
+          barcode: p.barcode ?? null,
           tags: p.tags,
           searchKeywords: [p.name.toLowerCase(), p.brand.toLowerCase(), ...p.tags],
         },
