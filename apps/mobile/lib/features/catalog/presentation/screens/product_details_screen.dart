@@ -45,12 +45,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   List<String> get _galleryImages {
     final primary = widget.imageUrl.isNotEmpty
         ? widget.imageUrl
-        : 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUZTLTSv5m1XvtD0eVooGUshRAE_TEf1VJ6rDo2p2NK8V-OtAgWRr9FnG7_wymxfNYoJbO-z3fuiHP_nel0NrAMmwbjTaJpS2Qn6gtKhCoGN6ltUY0Ye1kqsw-Lgi3oSwN5RBZcGCyK2PH3mZqTsqvfYztVjk3FZnajEMLUCbI6q8oB1hqEySrz4h9bFTXR1c7DcEprHGwUvQVM7TEPLq83eHICr5VanKASkHt7mYjWh7jE8sEGGd1';
-    return [
-      primary,
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBbsg5VxbvT11uRXXDRayoEzYGroBN6JL_q3OdBRxTV_NhUsAgXOLVnLt2AP4FjQ1VeLJ9Nu66ZOkgTwSPghddjYzSFJFH-nX61SZBAAjCBTQkjHnkshnkB9KTRoZj4KrKjCVLIhIkvkcNqEk4h79BfvPd-dbBBLoCQ-CEHU411SdMlg7TerXu1-n2q_kyKG2QiY7Cx6HvI4O9yNH2j5DTrGLp3HLDv5C71JMkQhsDUBUD-USNQ7Z-F',
-      'https://lh3.googleusercontent.com/aida-public/AB6AXuBxT-WRocvozm2WhECnL8JMwxCqiEnuJ7cKtNoLv-llUuIz1dEY2oBp5MdWHKwKfTDfhmhcZUDYamNJeXMOiQDXQErt0WRFRSJzAY4cxjLnMqG5f-EZz7kvpru8TOviGd0RTYku3CEMtUC_JLe6zQqHimHXCBkpnyde4yFl2cThVNJlqY4w66MTA4r1xi322PjWVu4NCiQxhPP4RjdOUhB39s8SgVQHbIIYzVhJX5H3YENCU6jqp-7U',
-    ];
+        : 'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png';
+    return [primary];
   }
 
   final List<String> _weightOptions = [
@@ -233,6 +229,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     } catch (_) {}
 
     final currentQty = cartProvider?.getQuantity(widget.productId) ?? 0;
+    final cleanPriceStr = widget.price.replaceAll(RegExp(r'[^0-9.]'), '');
+    final unitPrice = double.tryParse(cleanPriceStr) ?? 24.0;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
@@ -297,12 +295,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20),
-                        child: Image.network(
-                          _galleryImages[_selectedImageIndex],
-                          width: double.infinity,
-                          height: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
+                        child: _galleryImages[_selectedImageIndex].startsWith('assets/')
+                            ? Image.asset(
+                                _galleryImages[_selectedImageIndex],
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.contain,
+                              )
+                            : Image.network(
+                                _galleryImages[_selectedImageIndex],
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                                errorBuilder: (ctx, err, stack) => const Center(
+                                  child: Icon(Icons.shopping_basket_rounded, size: 64, color: AppColors.primary),
+                                ),
+                              ),
                       ),
                       Positioned(
                         top: 12,
@@ -750,7 +758,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             id: widget.productId,
                             name: widget.productName,
                             subtitle: _selectedWeight,
-                            price: 5.99,
+                            price: unitPrice,
                             image: widget.imageUrl,
                             delta: 1,
                           );
@@ -783,7 +791,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 id: widget.productId,
                                 name: widget.productName,
                                 subtitle: _selectedWeight,
-                                price: 5.99,
+                                price: unitPrice,
                                 image: widget.imageUrl,
                                 delta: -1,
                               );
@@ -803,7 +811,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 id: widget.productId,
                                 name: widget.productName,
                                 subtitle: _selectedWeight,
-                                price: 5.99,
+                                price: unitPrice,
                                 image: widget.imageUrl,
                                 delta: 1,
                               );

@@ -878,13 +878,21 @@ export class AuthService {
       throw new BadRequestException('Invalid or expired 6-digit OTP code.');
     }
 
-    const user = await this.prisma.user.findFirst({ where: { email } }).catch(() => null) || {
-      id: 'usr_admin_01',
-      email: email || 'admin@dailybasket.com',
-      fullName: 'Ananya R.',
-      role: 'SUPER_ADMIN',
-      profileComplete: true,
-    };
+    let user: any = null;
+    try {
+      user = await this.prisma.user.findFirst({ where: { email } });
+    } catch {
+      user = null;
+    }
+    if (!user) {
+      user = {
+        id: 'usr_admin_01',
+        email: email || 'admin@dailybasket.com',
+        fullName: 'Ananya R.',
+        role: 'SUPER_ADMIN',
+        profileComplete: true,
+      };
+    }
 
     const tokens = await this.generateTokens(user as any);
     await this.createOrUpdateDeviceSession(user.id, tokens.refreshToken, deviceData);

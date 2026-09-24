@@ -31,7 +31,9 @@ async function bootstrap() {
   // Global Prefix & API Versioning
 
 
-  app.setGlobalPrefix('api/v1');
+  // Global prefix is just "api"; URI versioning appends "/v1" -> routes serve at /api/v1/...
+  // (Previously the prefix hardcoded "api/v1" AND versioning added "v1", producing /api/v1/v1/...)
+  app.setGlobalPrefix('api');
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
@@ -53,9 +55,24 @@ async function bootstrap() {
     }),
   );
 
-  // Strict CORS Policy
+  // Strict CORS Policy — allowlist driven (wildcard origin is invalid with credentials).
+  const defaultOrigins = [
+    'http://localhost:3005', // customer website
+    'http://localhost:3001', // admin dashboard
+    'http://localhost:3002', // delivery PWA
+  ];
+  const allowedOrigins = (process.env.CORS_ORIGINS || defaultOrigins.join(','))
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
   app.enableCors({
-    origin: '*',
+    origin: (origin, callback) => {
+      // Allow non-browser clients (no Origin header) and any explicitly allowlisted origin.
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+    },
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Accept, Authorization, X-Correlation-ID, X-Idempotency-Key, If-None-Match',

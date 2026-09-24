@@ -31,6 +31,13 @@ flutter:
   assets:
     - assets/illustrations/
     - assets/images/
+    - assets/products/bread-pav/
+    - assets/products/curd-yogurt/
+    - assets/products/flakes-kids-cereals/
+    - assets/products/fresh-vegetables/
+    - assets/products/milk/
+    - assets/products/poha-daliya-grains/
+    - assets/products/vermicelli/
 
 flutter_launcher_icons:
   android: true

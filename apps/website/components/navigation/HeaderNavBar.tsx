@@ -3,7 +3,9 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
+import { useAuthStore } from '../../store/useAuthStore';
 
 interface HeaderNavBarProps {
   cartCount?: number;
@@ -13,7 +15,25 @@ interface HeaderNavBarProps {
 
 export default function HeaderNavBar({ cartCount = 0, onSearch, onCartClick }: HeaderNavBarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const { user, isAuthenticated, logout } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState('');
+
+  const handleLogout = () => {
+    logout();
+    queryClient.invalidateQueries({ queryKey: ['cart'] });
+    queryClient.invalidateQueries({ queryKey: ['orders'] });
+    router.push('/');
+  };
+
+  const displayName = (user as any)?.name || (user as any)?.fullName || 'Account';
+  const initials = String(displayName)
+    .split(' ')
+    .map((n: string) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -134,6 +154,38 @@ export default function HeaderNavBar({ cartCount = 0, onSearch, onCartClick }: H
             <span className="text-sm">🔔</span>
             <span className="absolute top-1 right-1 w-2 h-2 bg-error rounded-full" />
           </Link>
+
+          {/* Account / Auth */}
+          {isAuthenticated ? (
+            <div className="flex items-center gap-1.5">
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 bg-surface-container-low border border-outline-variant/30 pl-1.5 pr-3 py-1.5 rounded-full hover:bg-surface-container-lowest transition-colors"
+                title={displayName}
+              >
+                <span className="w-6 h-6 rounded-full bg-primary text-on-primary text-[10px] font-extrabold flex items-center justify-center">
+                  {initials}
+                </span>
+                <span className="text-xs font-bold text-on-surface max-w-[90px] truncate hidden md:block" style={{ fontFamily: 'Outfit' }}>
+                  {displayName}
+                </span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="text-[11px] font-bold text-on-surface-variant hover:text-error px-2 py-1.5 rounded-full transition-colors"
+                title="Log out"
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              className="text-xs font-bold text-primary border border-primary/30 hover:bg-primary/10 px-4 py-2 rounded-full transition-colors"
+            >
+              Login
+            </Link>
+          )}
 
           {/* Shopping Basket Button */}
           {onCartClick ? (

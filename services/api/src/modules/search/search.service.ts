@@ -143,7 +143,7 @@ export class SearchService {
     let intent: SearchIntent['intent'] = 'GENERAL';
     const dietaryTags: string[] = [];
     let maxPrice: number | null = null;
-    let suggestedCategory: string | null = null;
+    const suggestedCategory: string | null = null;
     let suggestedBrand: string | null = null;
 
     // Rule-based intent detection for ultra-fast response

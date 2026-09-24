@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { CouponsService } from '../coupons/coupons.service';
 
 export interface CalculatePricingDto {
   items: {
@@ -14,6 +15,7 @@ export interface CalculatePricingDto {
   paymentMethod?: string;
   deliverySlot?: string;
   userWalletBalance?: number;
+  userId?: string;
 }
 
 export interface OrderPricingResult {
@@ -48,7 +50,9 @@ export interface OrderPricingResult {
 
 @Injectable()
 export class OrderPricingService {
-  calculatePricing(dto: CalculatePricingDto): OrderPricingResult {
+  constructor(private readonly couponsService: CouponsService) {}
+
+  async calculatePricing(dto: CalculatePricingDto): Promise<OrderPricingResult> {
     const items = dto.items || [];
     const userWalletBalance = dto.userWalletBalance ?? 150.0;
     const selectedPaymentMethod = dto.paymentMethod || 'UPI';
@@ -65,20 +69,26 @@ export class OrderPricingService {
       }
     }
 
-    // 2. Coupon Discount Calculation
+    // 2. Coupon Discount — single source of truth is the CouponsService (DB coupons,
+    //    expiry, min-order, per-user usage & first-order rules). Invalid/ineligible
+    //    coupons are simply not applied (the cart surfaces the specific error separately).
     let couponDiscount = 0;
     let appliedCoupon: string | null = null;
     if (dto.couponCode) {
-      const code = dto.couponCode.toUpperCase().trim();
-      if (code === 'DAILY50' && subtotal >= 199) {
-        couponDiscount = 50.0;
-        appliedCoupon = 'DAILY50';
-      } else if (code === 'FRESH20' && subtotal >= 299) {
-        couponDiscount = +(subtotal * 0.2).toFixed(2);
-        appliedCoupon = 'FRESH20';
-      } else if (code === 'WELCOME100' && subtotal >= 499) {
-        couponDiscount = 100.0;
-        appliedCoupon = 'WELCOME100';
+      try {
+        const result = await this.couponsService.validateCoupon(
+          dto.couponCode,
+          subtotal,
+          dto.userId || 'usr_default',
+        );
+        if (result?.valid) {
+          couponDiscount = result.discountAmount;
+          appliedCoupon = result.code;
+        }
+      } catch {
+        // Coupon not applicable for this cart — proceed without the discount.
+        couponDiscount = 0;
+        appliedCoupon = null;
       }
     }
 

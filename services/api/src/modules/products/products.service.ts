@@ -12,74 +12,70 @@ export class ProductsService {
       orderBy: { sortOrder: 'asc' },
     });
 
-    const mockBanners = [
-      {
-        id: 'banner_01',
-        title: '⚡ 10-Minute Farm Fresh Vegetables',
-        subtitle: 'Up to 40% OFF on Organic Produce',
-        bgGradient: 'from-emerald-600 to-teal-800',
-        imageUrl: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=800&q=80',
+    // Pull real catalog products (with their cheapest available variant) to build
+    // the home feed dynamically instead of returning hardcoded arrays.
+    const products = await this.prisma.product.findMany({
+      include: {
+        category: true,
+        variants: { where: { isAvailable: true }, orderBy: { price: 'asc' } },
       },
-      {
-        id: 'banner_02',
-        title: '🥛 Fresh Dairy & Breakfast Essentials',
-        subtitle: 'Milk, Eggs, Bread delivered instantly',
-        bgGradient: 'from-amber-600 to-orange-800',
-        imageUrl: 'https://images.unsplash.com/photo-1528498033373-3c6c08e93d79?w=800&q=80',
-      },
-    ];
+    });
 
-    const flashDeals = [
-      {
-        id: 'p1',
-        name: 'Fresh Organic Farm Tomatoes',
-        unitName: '500g',
-        price: 24,
-        mrp: 40,
-        discountPercent: 40,
-        imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&q=80',
-        rating: 4.8,
-      },
-      {
-        id: 'p2',
-        name: 'Amul Taaza Toned Fresh Milk',
-        unitName: '1 Litre',
-        price: 54,
-        mrp: 56,
-        discountPercent: 4,
-        imageUrl: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=400&q=80',
-        rating: 4.9,
-      },
-      {
-        id: 'p3',
-        name: 'Whole Wheat Brown Sandwich Bread',
-        unitName: '400g',
-        price: 45,
-        mrp: 50,
-        discountPercent: 10,
-        imageUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=400&q=80',
-        rating: 4.7,
-      },
-      {
-        id: 'p4',
-        name: 'Fresh Alphonso Mangoes (Box)',
-        unitName: '1 kg',
-        price: 299,
-        mrp: 450,
-        discountPercent: 33,
-        imageUrl: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80',
-        rating: 5.0,
-      },
-    ];
+    const withPricing = products
+      .filter((p) => p.variants.length > 0)
+      .map((p) => {
+        const v = p.variants[0];
+        const discountPercent = v.mrp > v.price ? Math.round(((v.mrp - v.price) / v.mrp) * 100) : 0;
+        return {
+          id: p.id,
+          productId: p.id,
+          variantId: v.id,
+          name: p.name,
+          brand: p.brand,
+          unitName: v.unitName,
+          price: v.price,
+          mrp: v.mrp,
+          discountPercent,
+          imageUrl: p.images?.[0] ?? null,
+          categoryId: p.categoryId,
+          categoryName: p.category?.name ?? null,
+        };
+      });
+
+    // Flash deals = biggest real discounts.
+    const flashDeals = [...withPricing]
+      .filter((p) => p.discountPercent > 0)
+      .sort((a, b) => b.discountPercent - a.discountPercent)
+      .slice(0, 8);
+
+    // Best sellers = featured-category products (fallback to any) as a deterministic slice.
+    const featuredCategoryIds = new Set(
+      categories.filter((c) => c.isFeatured).map((c) => c.id),
+    );
+    const bestSellers = withPricing
+      .filter((p) => featuredCategoryIds.has(p.categoryId))
+      .slice(0, 8);
+
+    // Banners derived from featured categories (no separate Banner entity exists).
+    const banners = categories
+      .filter((c) => c.isFeatured)
+      .slice(0, 3)
+      .map((c) => ({
+        id: `banner_${c.id}`,
+        title: c.name,
+        subtitle: c.description ?? 'Fresh essentials delivered in 10 minutes',
+        imageUrl: c.bannerImage ?? c.imageUrl ?? null,
+        categoryId: c.id,
+        categorySlug: c.slug,
+      }));
 
     return {
       etaMins: 10,
-      currentAddress: 'Koramangala 4th Block, Bengaluru',
-      banners: mockBanners,
+      banners,
       categories,
       flashDeals,
-      bestSellers: flashDeals.slice(0, 3),
-      quickReorder: flashDeals.slice(1, 4),
+      bestSellers: bestSellers.length > 0 ? bestSellers : withPricing.slice(0, 8),
+      quickReorder: withPricing.slice(0, 6),
     };
   }
 

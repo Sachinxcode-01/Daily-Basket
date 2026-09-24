@@ -34,23 +34,23 @@ export class OrdersService {
 
     try {
       const orderNumber = `DB-${Date.now().toString().slice(-6)}`;
-      const pricing = this.orderPricingService.calculatePricing({
+      const pricing = await this.orderPricingService.calculatePricing({
         items: data.items.map((i) => ({
           id: i.variantId || i.id || 'prod_01',
           productName: i.productName || i.name || 'Item',
           price: i.price,
+          mrp: i.mrp,
           quantity: i.quantity || i.qty || 1,
         })),
         couponCode: data.couponCode,
         useWallet: data.useWallet,
         paymentMethod: typeof data.paymentMethod === 'string' ? data.paymentMethod : data.paymentMethod?.id,
+        userId,
       });
 
       const subtotal = pricing.subtotal;
       const deliveryFee = pricing.deliveryFee;
-      const discount = pricing.couponDiscount + pricing.itemDiscounts;
       const totalAmount = pricing.finalPayable;
-      const paymentMethod = pricing.selectedPaymentMethod;
       const deliveryOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
       const order = await this.prisma.order.create({
@@ -61,7 +61,7 @@ export class OrdersService {
           addressId: data.addressId,
           subtotal,
           deliveryFee,
-          discount: 0,
+          discount: pricing.couponDiscount,
           totalAmount,
           paymentMethod: data.paymentMethod,
           status: OrderStatus.CONFIRMED,
@@ -167,6 +167,27 @@ export class OrdersService {
 
     this.eventsGateway.broadcastOrderDelivered(orderId, order.userId, invoice);
     return { order: updatedOrder, invoice };
+  }
+
+  async findByUser(userId: string) {
+    return this.prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: { items: true, address: true },
+    });
+  }
+
+  async findOne(orderId: string) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { items: true, address: true, deliveryPartner: true },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order ${orderId} not found`);
+    }
+
+    return order;
   }
 
   async getOrderTracking(orderId: string) {
