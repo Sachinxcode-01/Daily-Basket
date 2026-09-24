@@ -15,7 +15,9 @@
     "docker:up": "docker-compose -f infrastructure/docker-compose.yml up -d",
     "docker:down": "docker-compose -f infrastructure/docker-compose.yml down",
     "prisma:generate": "pnpm --filter api prisma generate",
-    "prisma:migrate": "pnpm --filter api prisma migrate dev"
+    "prisma:migrate": "pnpm --filter api prisma migrate dev",
+    "seed": "pnpm --filter api seed",
+    "sync:r2": "node scripts/sync-images-to-r2.js"
   },
   "devDependencies": {
     "prettier": "^3.2.5",

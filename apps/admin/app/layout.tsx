@@ -14,11 +14,12 @@ import {
   Store,
   Bell,
   Search,
+  Zap,
 } from 'lucide-react';
 
 export const metadata = {
   title: 'Daily Basket | Store Admin & Quick-Commerce Suite',
-  description: 'Inventory management, order dispatch, rider tracking, and analytics dashboard.',
+  description: 'Inventory management, daily mandi pricing, order dispatch, and rider tracking.',
 };
 
 export default function AdminLayout({
@@ -61,12 +62,42 @@ export default function AdminLayout({
                 <span className="font-bold">Executive Analytics</span>
               </Link>
 
+              {/* Fast Daily Price Editor Highlight */}
+              <Link
+                href="/products/daily-pricing"
+                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[#006b23] bg-[#006b23]/10 hover:bg-[#006b23]/15 transition border border-[#006b23]/20"
+              >
+                <div className="flex items-center gap-3">
+                  <Zap className="w-4 h-4 text-[#006b23] fill-current" />
+                  <span>Daily Price Editor</span>
+                </div>
+                <span className="text-[10px] uppercase font-black bg-[#006b23] text-white px-1.5 py-0.5 rounded-md">
+                  60s
+                </span>
+              </Link>
+
+              <Link
+                href="/products"
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+              >
+                <Package className="w-4 h-4" />
+                <span>Product Catalog</span>
+              </Link>
+
+              <Link
+                href="/products/editor"
+                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+              >
+                <Edit3 className="w-4 h-4" />
+                <span>Product Editor</span>
+              </Link>
+
               <Link
                 href="/inventory"
                 className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
               >
                 <Package className="w-4 h-4" />
-                <span>Inventory</span>
+                <span>Inventory & Batches</span>
               </Link>
 
               <Link
@@ -83,14 +114,6 @@ export default function AdminLayout({
               >
                 <Users className="w-4 h-4" />
                 <span>Customer Insights</span>
-              </Link>
-
-              <Link
-                href="/products/editor"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
-              >
-                <Edit3 className="w-4 h-4" />
-                <span>Product Editor</span>
               </Link>
 
               <Link
@@ -122,11 +145,11 @@ export default function AdminLayout({
             <div className="p-4 border-t border-[#e2e2e5] flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-[#006b23] text-white flex items-center justify-center font-bold text-xs">
-                  AD
+                  KB
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-[#1a1c1e]">Admin Supervisor</p>
-                  <p className="text-[10px] text-[#3f4a3d]">Dark Store #402 (BLR)</p>
+                  <p className="text-xs font-bold text-[#1a1c1e]">Kirana Owner</p>
+                  <p className="text-[10px] text-[#3f4a3d]">Daily Basket Store #01</p>
                 </div>
               </div>
             </div>
@@ -141,17 +164,26 @@ export default function AdminLayout({
                   <Search className="w-4 h-4 text-[#3f4a3d] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="Search SKU, order ID, or rider name..."
+                    placeholder="Search SKU, produce, or daily rates..."
                     className="w-full pl-9 pr-4 py-1.5 bg-[#f3f3f6] border border-transparent rounded-xl text-xs focus:outline-none focus:border-[#006b23] focus:bg-white transition"
                   />
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <button className="flex items-center gap-2 px-3 py-1.5 bg-[#f3f3f6] text-[#1a1c1e] rounded-xl text-xs font-semibold hover:bg-[#e2e2e5] transition">
+                <Link
+                  href="/products/daily-pricing"
+                  className="flex items-center gap-2 px-3 py-1.5 bg-[#006b23]/10 text-[#006b23] rounded-xl text-xs font-bold hover:bg-[#006b23]/20 transition"
+                >
+                  <Zap className="w-3.5 h-3.5" />
+                  <span>Update Today’s Prices</span>
+                </Link>
+
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-[#f3f3f6] text-[#1a1c1e] rounded-xl text-xs font-semibold">
                   <Store className="w-3.5 h-3.5 text-[#006b23]" />
-                  <span>Dark Store: Indiranagar Hub</span>
-                </button>
+                  <span>Main Kirana Hub</span>
+                </div>
+
                 <button className="p-2 text-[#3f4a3d] hover:bg-[#f3f3f6] rounded-xl transition relative">
                   <Bell className="w-4 h-4" />
                   <span className="w-2 h-2 rounded-full bg-[#ba1a1a] absolute top-1.5 right-1.5" />
@@ -160,7 +192,7 @@ export default function AdminLayout({
             </header>
 
             {/* Page Content */}
-            <main className="p-6 md:p-8 flex-1">{children}</main>
+            <main className="flex-1">{children}</main>
           </div>
         </div>
       </body>

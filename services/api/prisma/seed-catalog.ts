@@ -44,6 +44,7 @@ interface SeedCategory {
 }
 
 const img = (id: string) => `https://images.unsplash.com/${id}?w=500&q=80`;
+const productImg = (cat: string, file: string) => `/products/${cat}/${file}`;
 
 const catalog: SeedCategory[] = [
   {
@@ -52,16 +53,17 @@ const catalog: SeedCategory[] = [
     slug: 'fresh-vegetables-fruits',
     description: 'Farm-fresh vegetables and seasonal fruits',
     iconName: 'apple',
-    imageUrl: img('photo-1610832958506-aa56368176cf'),
+    imageUrl: productImg('fresh-vegetables', '00124fbd-0fa5-441d-adeb-301d694bf0f4.png'),
     isFeatured: true,
     sortOrder: 1,
     products: [
-      { name: 'Farm Fresh Tomatoes', slug: 'farm-fresh-tomatoes', description: 'Juicy red tomatoes, hand-picked from local farms.', brand: 'Local Farm', image: img('photo-1592924357228-91a4daadcfea'), isOrganic: true, tags: ['vegetable', 'tomato'], variants: [{ unitName: '500 g', price: 24, mrp: 40, sku: 'VEG-TOM-500', stock: 200 }, { unitName: '1 kg', price: 46, mrp: 78, sku: 'VEG-TOM-1000', stock: 150 }] },
-      { name: 'Onions', slug: 'fresh-onions', description: 'Everyday cooking onions, fresh stock.', brand: 'Local Farm', image: img('photo-1518977956812-cd3dbadaaf31'), tags: ['vegetable', 'onion'], variants: [{ unitName: '1 kg', price: 38, mrp: 50, sku: 'VEG-ONI-1000', stock: 300 }] },
-      { name: 'Potatoes', slug: 'fresh-potatoes', description: 'Premium quality potatoes for all your recipes.', brand: 'Local Farm', image: img('photo-1518977676601-b53f82aba655'), tags: ['vegetable', 'potato'], variants: [{ unitName: '1 kg', price: 32, mrp: 45, sku: 'VEG-POT-1000', stock: 280 }] },
+      { name: 'Farm Fresh Tomatoes', slug: 'farm-fresh-tomatoes', description: 'Juicy red country tomatoes, hand-picked from local mandi.', brand: 'Local Farm', image: productImg('fresh-vegetables', '00124fbd-0fa5-441d-adeb-301d694bf0f4.png'), isOrganic: true, tags: ['vegetable', 'tomato'], variants: [{ unitName: '500 g', price: 24, mrp: 35, sku: 'VEG-TOM-500', stock: 200 }, { unitName: '1 kg', price: 46, mrp: 68, sku: 'VEG-TOM-1000', stock: 150 }] },
+      { name: 'Fresh Red Onions', slug: 'fresh-onions', description: 'Everyday cooking red onions, fresh stock.', brand: 'Local Farm', image: productImg('fresh-vegetables', '00f0d26a-7b61-4e84-8903-abed0e2c4f69.png'), tags: ['vegetable', 'onion'], variants: [{ unitName: '1 kg', price: 35, mrp: 50, sku: 'VEG-ONI-1000', stock: 300 }] },
+      { name: 'Jyoti Potatoes', slug: 'fresh-potatoes', description: 'Premium quality potatoes for all recipes.', brand: 'Local Farm', image: productImg('fresh-vegetables', '02df8262-1ccc-4078-a215-991a85ded7b0.png'), tags: ['vegetable', 'potato'], variants: [{ unitName: '1 kg', price: 28, mrp: 40, sku: 'VEG-POT-1000', stock: 280 }] },
       { name: 'Bananas (Robusta)', slug: 'robusta-bananas', description: 'Naturally ripened robusta bananas.', brand: 'Local Farm', image: img('photo-1571771894821-ce9b6c11b08e'), tags: ['fruit', 'banana'], variants: [{ unitName: '6 pcs', price: 40, mrp: 54, sku: 'FRU-BAN-6', stock: 120 }] },
       { name: 'Alphonso Mangoes', slug: 'alphonso-mangoes', description: 'Sweet Ratnagiri Alphonso mangoes, in season.', brand: 'Local Farm', image: img('photo-1553279768-865429fa0078'), tags: ['fruit', 'mango'], variants: [{ unitName: '1 kg Box', price: 299, mrp: 450, sku: 'FRU-MAN-1000', stock: 60 }] },
-      { name: 'Baby Spinach', slug: 'baby-spinach', description: 'Tender organic baby spinach leaves.', brand: 'Local Farm', image: img('photo-1576045057995-568f588f82fb'), isOrganic: true, tags: ['vegetable', 'spinach', 'greens'], variants: [{ unitName: '250 g', price: 29, mrp: 40, sku: 'VEG-SPI-250', stock: 90 }] },
+      { name: 'Farm Fresh Palak (Spinach)', slug: 'baby-spinach', description: 'Tender organic green palak spinach leaves.', brand: 'Local Farm', image: productImg('fresh-vegetables', '079cdbf5-0e6e-4de4-ad0a-447e56ae8016.png'), isOrganic: true, tags: ['vegetable', 'spinach', 'greens'], variants: [{ unitName: '250 g', price: 20, mrp: 30, sku: 'VEG-SPI-250', stock: 90 }] },
+      { name: 'Green Chillies (Hari Mirch)', slug: 'green-chillies', description: 'Spicy, fresh green chillies.', brand: 'Local Farm', image: productImg('fresh-vegetables', '083c2cf1-36a0-4328-98a1-fbe6e0ec1d0a.png'), tags: ['vegetable', 'chilli'], variants: [{ unitName: '100 g', price: 14, mrp: 20, sku: 'VEG-CHI-100', stock: 150 }] },
     ],
   },
   {
@@ -70,14 +72,15 @@ const catalog: SeedCategory[] = [
     slug: 'dairy-bread-eggs',
     description: 'Fresh milk, eggs, curd, butter and bakery bread',
     iconName: 'milk',
-    imageUrl: img('photo-1550583724-b2692b85b150'),
+    imageUrl: productImg('milk', '1ded64a0-9f20-4a1d-8211-156f221b377b.png'),
     isFeatured: true,
     sortOrder: 2,
     products: [
-      { name: 'Amul Taaza Toned Milk', slug: 'amul-taaza-toned-milk-1l', barcode: '8901262010016', description: 'Homogenised toned milk, pasteurised for freshness.', brand: 'Amul', image: img('photo-1563636619-e9143da7973b'), tags: ['dairy', 'milk'], variants: [{ unitName: '500 ml', price: 27, mrp: 28, sku: 'DAI-MILK-500', stock: 400 }, { unitName: '1 L', price: 54, mrp: 56, sku: 'DAI-MILK-1000', stock: 350 }] },
-      { name: 'Amul Set Curd', slug: 'amul-set-curd', description: 'Thick and creamy set curd.', brand: 'Amul', image: img('photo-1571512599285-9b05c2b06e99'), tags: ['dairy', 'curd'], variants: [{ unitName: '400 g Cup', price: 42, mrp: 45, sku: 'DAI-CURD-400', stock: 180 }] },
+      { name: 'Amul Taaza Toned Milk', slug: 'amul-taaza-toned-milk-1l', barcode: '8901262010016', description: 'Homogenised toned milk, pasteurised for freshness.', brand: 'Amul', image: productImg('milk', '1ded64a0-9f20-4a1d-8211-156f221b377b.png'), tags: ['dairy', 'milk'], variants: [{ unitName: '500 ml', price: 28, mrp: 28, sku: 'DAI-MILK-500', stock: 400 }, { unitName: '1 L', price: 56, mrp: 56, sku: 'DAI-MILK-1000', stock: 350 }] },
+      { name: 'Amul Masti Dahi', slug: 'amul-set-curd', description: 'Thick and creamy set curd cup.', brand: 'Amul', image: productImg('curd-yogurt', '01278ea4-9aef-4263-8ea8-6a3eab2bd076.png'), tags: ['dairy', 'curd'], variants: [{ unitName: '400 g Cup', price: 44, mrp: 45, sku: 'DAI-CURD-400', stock: 180 }] },
       { name: 'Farm Eggs (White)', slug: 'farm-eggs-white', description: 'Protein-rich fresh white eggs.', brand: 'Daily Basket', image: img('photo-1582722872445-44dc5f7e3c8f'), tags: ['eggs'], variants: [{ unitName: '6 pcs', price: 48, mrp: 60, sku: 'EGG-WHT-6', stock: 220 }, { unitName: '12 pcs', price: 92, mrp: 115, sku: 'EGG-WHT-12', stock: 160 }] },
-      { name: 'Whole Wheat Bread', slug: 'whole-wheat-bread', description: '100% whole wheat sandwich bread.', brand: 'Britannia', image: img('photo-1509440159596-0249088772ff'), tags: ['bread', 'bakery'], variants: [{ unitName: '400 g', price: 45, mrp: 50, sku: 'BRD-WW-400', stock: 140 }] },
+      { name: 'Sandwich White Bread', slug: 'whole-wheat-bread', description: 'Daily fresh bakery sandwich bread.', brand: 'Britannia', image: productImg('bread-pav', '007ea008-b857-4dd5-9005-fb6c4d98601b.png'), tags: ['bread', 'bakery'], variants: [{ unitName: '400 g', price: 40, mrp: 45, sku: 'BRD-WW-400', stock: 140 }] },
+      { name: 'Soft Ladi Pav', slug: 'soft-ladi-pav', description: 'Oven fresh soft ladi pav for vada pav and bhaji.', brand: 'Local Bakery', image: productImg('bread-pav', '036bad6d-4fbc-4c42-a18a-4bf33a3dfb6b.png'), tags: ['bread', 'pav'], variants: [{ unitName: '6 pcs', price: 25, mrp: 30, sku: 'BRD-PAV-6', stock: 120 }] },
       { name: 'Amul Butter', slug: 'amul-butter', description: 'The utterly butterly delicious table butter.', brand: 'Amul', image: img('photo-1589985270826-4b7bb135bc9d'), tags: ['dairy', 'butter'], variants: [{ unitName: '100 g', price: 58, mrp: 62, sku: 'DAI-BUT-100', stock: 200 }] },
     ],
   },
@@ -107,6 +110,7 @@ const catalog: SeedCategory[] = [
     isFeatured: false,
     sortOrder: 4,
     products: [
+      { name: 'Choco Crunch Flakes & Kids Cereal', slug: 'choco-crunch-flakes', description: 'Crunchy chocolate multigrain cereal for kids breakfast.', brand: "Kellogg's", image: productImg('flakes-kids-cereals', '01e92a08-b40b-4d6f-aca7-8537cd382447.png'), tags: ['cereal', 'breakfast'], variants: [{ unitName: '375 g', price: 175, mrp: 210, sku: 'SNK-CHOC-375', stock: 120 }] },
       { name: "Lay's Classic Salted Chips", slug: 'lays-classic-salted', description: 'Crispy potato chips, classic salted.', brand: "Lay's", image: img('photo-1566478989037-eec170784d0b'), tags: ['snack', 'chips'], variants: [{ unitName: '52 g', price: 20, mrp: 20, sku: 'SNK-LAYS-52', stock: 300 }] },
       { name: 'Parle-G Biscuits', slug: 'parle-g-biscuits', barcode: '8901719101015', description: 'The original glucose biscuits.', brand: 'Parle', image: img('photo-1558961363-fa8fdf82db35'), tags: ['snack', 'biscuit'], variants: [{ unitName: '250 g', price: 25, mrp: 28, sku: 'SNK-PARLE-250', stock: 400 }] },
       { name: 'Dairy Milk Silk', slug: 'dairy-milk-silk', barcode: '7622210991010', description: 'Smooth and creamy milk chocolate bar.', brand: 'Cadbury', image: img('photo-1549007994-cb92caebd54b'), tags: ['snack', 'chocolate'], variants: [{ unitName: '150 g', price: 155, mrp: 170, sku: 'SNK-SILK-150', stock: 110 }] },
@@ -117,12 +121,14 @@ const catalog: SeedCategory[] = [
     id: 'cat_staples',
     name: 'Atta, Rice & Dals',
     slug: 'atta-rice-dals',
-    description: 'Flour, rice, pulses and cooking staples',
+    description: 'Flour, rice, pulses, poha and cooking staples',
     iconName: 'wheat',
-    imageUrl: img('photo-1586201375761-83865001e31c'),
+    imageUrl: productImg('poha-daliya-grains', '1092_1643384330629.png'),
     isFeatured: true,
     sortOrder: 5,
     products: [
+      { name: 'Thick Poha (Flattened Rice)', slug: 'thick-poha-500g', description: 'Premium thick poha for breakfast cooking.', brand: 'Daily Basket', image: productImg('poha-daliya-grains', '1092_1643384330629.png'), tags: ['staple', 'poha', 'breakfast'], variants: [{ unitName: '500 g', price: 34, mrp: 42, sku: 'STP-POHA-500', stock: 180 }] },
+      { name: 'Roasted Wheat Vermicelli (Sevai)', slug: 'roasted-vermicelli', description: 'Non-sticky roasted vermicelli for upma and payasam.', brand: 'Bambino', image: productImg('vermicelli', '3da21b8f-16e5-4727-9899-c5ef3e1db668.png'), tags: ['staple', 'vermicelli', 'sevai'], variants: [{ unitName: '400 g', price: 42, mrp: 50, sku: 'STP-VERM-400', stock: 150 }] },
       { name: 'Aashirvaad Whole Wheat Atta', slug: 'aashirvaad-atta', barcode: '8901725100017', description: 'Chakki-fresh whole wheat flour.', brand: 'Aashirvaad', image: img('photo-1574323347407-f5e1ad6d020b'), tags: ['staple', 'atta', 'flour'], variants: [{ unitName: '5 kg', price: 242, mrp: 265, sku: 'STP-ATTA-5000', stock: 90 }] },
       { name: 'India Gate Basmati Rice', slug: 'india-gate-basmati', description: 'Aged premium long-grain basmati rice.', brand: 'India Gate', image: img('photo-1586201375761-83865001e31c'), tags: ['staple', 'rice'], variants: [{ unitName: '1 kg', price: 135, mrp: 160, sku: 'STP-RICE-1000', stock: 140 }, { unitName: '5 kg', price: 640, mrp: 750, sku: 'STP-RICE-5000', stock: 50 }] },
       { name: 'Tata Sampann Toor Dal', slug: 'tata-toor-dal', description: 'Unpolished protein-rich toor dal.', brand: 'Tata Sampann', image: img('photo-1546548970-71785318a17b'), tags: ['staple', 'dal', 'pulses'], variants: [{ unitName: '1 kg', price: 145, mrp: 160, sku: 'STP-TOOR-1000', stock: 120 }] },
