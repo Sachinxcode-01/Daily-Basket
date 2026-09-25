@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/user_provider.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
 
@@ -375,7 +377,16 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: _isLoading ? null : () async {
                               setState(() => _isLoading = true);
                               final navigator = Navigator.of(context);
-                              await Future.delayed(const Duration(milliseconds: 600));
+                              if (mounted) {
+                                try {
+                                  context.read<UserProvider>().updatePersonalInfo(
+                                    name: 'Sachin Kumar',
+                                    email: 'sachiii8827@gmail.com',
+                                    phone: '+91 98765 43210',
+                                  );
+                                } catch (_) {}
+                              }
+                              await Future.delayed(const Duration(milliseconds: 500));
                               if (!mounted) return;
                               setState(() => _isLoading = false);
                               navigator.pushReplacementNamed('/customer/home');

@@ -152,7 +152,6 @@ class _AppPressableState extends State<AppPressable>
 
   void _onTapUp(TapUpDetails _) {
     _ctrl.reverse();
-    widget.onTap?.call();
   }
 
   void _onTapCancel() => _ctrl.reverse();
@@ -160,9 +159,14 @@ class _AppPressableState extends State<AppPressable>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: _onTapCancel,
+      onTap: () {
+        _ctrl.reverse();
+        widget.onTap?.call();
+      },
       child: ScaleTransition(scale: _scale, child: widget.child),
     );
   }

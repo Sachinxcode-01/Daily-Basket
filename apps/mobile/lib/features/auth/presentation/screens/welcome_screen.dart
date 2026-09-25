@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_motion.dart';
+import '../../../../core/providers/user_provider.dart';
 import 'login_screen.dart';
 import 'onboarding_screen.dart';
 
@@ -265,21 +267,28 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             label: 'Continue with Google',
                             icon: Icons.g_mobiledata_rounded,
                             iconColor: const Color(0xFF4285F4),
-                            onTap: () {
+                            onTap: () async {
+                              try {
+                                context.read<UserProvider>().updatePersonalInfo(
+                                  name: 'Sachin Kumar',
+                                  email: 'sachiii8827@gmail.com',
+                                  phone: '+91 98765 43210',
+                                );
+                              } catch (_) {}
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text('Connecting Google account...', style: GoogleFonts.inter(fontSize: 13, color: Colors.white)),
+                                  content: Text(
+                                    'Connected with Google account (Sachin Kumar)',
+                                    style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
+                                  ),
                                   backgroundColor: AppColors.primary,
                                   duration: const Duration(seconds: 1),
                                 ),
                               );
-                              Future.delayed(const Duration(milliseconds: 600), () {
-                                if (context.mounted) {
-                                  Navigator.of(context).push(
-                                    AppPageTransitions.sharedAxisX(const OnboardingScreen(pageIndex: 0)),
-                                  );
-                                }
-                              });
+                              await Future.delayed(const Duration(milliseconds: 500));
+                              if (context.mounted) {
+                                Navigator.of(context).pushReplacementNamed('/customer/home');
+                              }
                             },
                           ),
                           const SizedBox(height: AppTheme.spacingSm),
