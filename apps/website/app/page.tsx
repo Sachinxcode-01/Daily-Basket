@@ -13,6 +13,7 @@ import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import HeaderNavBar from '../components/navigation/HeaderNavBar';
 import { useCart } from '../store/useCart';
+import { ALL_WEBSITE_PRODUCTS, normalizeImagePath } from '../lib/catalog';
 
 interface Product {
   id: string;
@@ -27,14 +28,6 @@ interface Product {
   category: string;
   tag?: string;
   image: string;
-}
-
-function normalizeImagePath(raw?: string): string {
-  if (!raw) return '/images/daily_basket_logo.png';
-  if (raw.startsWith('assets/')) {
-    return `/${raw.replace(/^assets\//, '')}`;
-  }
-  return raw;
 }
 
 // Map the real API product (with variants + category relation) to the card shape used by this view.
@@ -74,10 +67,12 @@ export default function HomePage() {
     queryFn: () => apiClient.getProducts(),
   });
 
-  const catalog: Product[] = useMemo(
-    () => (Array.isArray(apiProducts) ? apiProducts.map(mapApiProduct) : []),
-    [apiProducts],
-  );
+  const catalog: Product[] = useMemo(() => {
+    if (Array.isArray(apiProducts) && apiProducts.length > 0) {
+      return apiProducts.map(mapApiProduct);
+    }
+    return ALL_WEBSITE_PRODUCTS;
+  }, [apiProducts]);
 
   const categoryList = useMemo(() => {
     const names = Array.from(new Set(catalog.map((p) => p.category).filter(Boolean)));

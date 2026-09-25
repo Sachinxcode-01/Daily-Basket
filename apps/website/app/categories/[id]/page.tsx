@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../../store/useCart';
+import { ALL_WEBSITE_PRODUCTS } from '../../../lib/catalog';
 
 interface CardProduct {
   id: string;
@@ -74,10 +75,29 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
     category?.imageUrl ||
     'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=1200&q=80';
 
-  const products = useMemo(
-    () => (Array.isArray(apiProducts) ? apiProducts.map(mapProduct) : []),
-    [apiProducts],
-  );
+  const products = useMemo(() => {
+    if (Array.isArray(apiProducts) && apiProducts.length > 0) {
+      return apiProducts.map(mapProduct);
+    }
+    const catLower = categoryId.toLowerCase();
+    const fallback = ALL_WEBSITE_PRODUCTS.filter(
+      (p) =>
+        p.categorySlug.toLowerCase() === catLower ||
+        p.category.toLowerCase().replace(/[^a-z0-9]+/g, '-') === catLower ||
+        p.category.toLowerCase().includes(catLower) ||
+        catLower.includes(p.categorySlug.toLowerCase()),
+    );
+    return fallback.map((p) => ({
+      id: p.id,
+      variantId: p.variantId,
+      name: p.name,
+      subtitle: p.unitName,
+      price: p.price,
+      mrp: p.mrp,
+      imageUrl: p.image,
+      rating: p.rating,
+    }));
+  }, [apiProducts, categoryId]);
 
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase()),

@@ -1,8 +1,11 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+
+import { ALL_WEBSITE_PRODUCTS } from '../../../lib/catalog';
 
 /**
  * Fresh Fruits & Vegetables Product Listing Page
@@ -15,7 +18,23 @@ export default function FreshFruitsVegetablesPage() {
 
   const filters = ['Sort', 'Seasonal', 'Organic', 'Price'];
 
-  const products = [
+  const realVegProducts = ALL_WEBSITE_PRODUCTS.filter(
+    (p) => p.categorySlug === 'fresh-vegetables',
+  ).map((p) => ({
+    id: p.id,
+    name: p.name,
+    subtitle: p.brand || 'Daily Basket Fresh',
+    unit: p.unitName,
+    price: p.price,
+    mrp: p.mrp,
+    badge: p.tag || (p.isOrganic ? 'Organic' : 'Fresh Harvest'),
+    badgeClass: p.isOrganic ? 'bg-[#078730] text-white' : 'bg-[#ba1a1a] text-white',
+    inStock: p.inStock,
+    category: p.isOrganic ? 'Organic' : 'Seasonal',
+    image: p.image,
+  }));
+
+  const products = realVegProducts.length > 0 ? realVegProducts : [
     {
       id: 'prod_gala_apple',
       name: 'Royal Gala Apple',
@@ -42,34 +61,6 @@ export default function FreshFruitsVegetablesPage() {
       category: 'Organic',
       image:
         'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=600&auto=format&fit=crop&q=80',
-    },
-    {
-      id: 'prod_baby_spinach',
-      name: 'Organic Baby Spinach',
-      subtitle: 'Local Farm',
-      unit: '200g',
-      price: 45,
-      mrp: 55,
-      badge: 'Daily Basket Select',
-      badgeClass: 'bg-[#078730] text-white',
-      inStock: true,
-      category: 'Organic',
-      image:
-        'https://images.unsplash.com/photo-1576045057995-568f588f82fb?w=600&auto=format&fit=crop&q=80',
-    },
-    {
-      id: 'prod_dutch_carrots',
-      name: 'Dutch Carrots with Tops',
-      subtitle: 'Daily Basket Select',
-      unit: '1 Bunch',
-      price: 55,
-      mrp: 65,
-      badge: 'New',
-      badgeClass: 'bg-[#dce5dd] text-[#404943]',
-      inStock: true,
-      category: 'Seasonal',
-      image:
-        'https://images.unsplash.com/photo-1598170845058-32b9d6a5da37?w=600&auto=format&fit=crop&q=80',
     },
   ];
 

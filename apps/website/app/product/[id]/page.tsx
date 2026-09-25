@@ -11,6 +11,7 @@ import {
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../../store/useCart';
+import { getProductById, normalizeImagePath } from '../../../lib/catalog';
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80';
 
@@ -33,13 +34,15 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
   const [chefInput, setChefInput] = useState('');
   const [chefLoading, setChefLoading] = useState(false);
 
+  const fallbackProduct = useMemo(() => getProductById(productId), [productId]);
+
   const { data: product, isLoading, isError, refetch } = useQuery({
     queryKey: ['product', productId],
     queryFn: () => apiClient.getProductDetails(productId),
     enabled: Boolean(productId),
   });
 
-  const p: any = product;
+  const p: any = product || fallbackProduct;
 
   const { data: insight } = useQuery({
     queryKey: ['product-insight', productId],
@@ -47,11 +50,34 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
     enabled: Boolean(productId && p),
   });
 
-  const images: string[] = useMemo(
-    () => (Array.isArray(p?.images) && p.images.length > 0 ? p.images : [PLACEHOLDER]),
-    [p],
-  );
-  const variants: any[] = Array.isArray(p?.variants) ? p.variants : [];
+  const images: string[] = useMemo(() => {
+    if (Array.isArray(p?.images) && p.images.length > 0) {
+      return p.images.map((img: string) => normalizeImagePath(img));
+    }
+    if (p?.image) {
+      return [normalizeImagePath(p.image)];
+    }
+    return [PLACEHOLDER];
+  }, [p]);
+
+  const variants: any[] = useMemo(() => {
+    if (Array.isArray(p?.variants) && p.variants.length > 0) {
+      return p.variants;
+    }
+    if (fallbackProduct) {
+      return [
+        {
+          id: fallbackProduct.variantId,
+          sku: `SKU-${fallbackProduct.id.toUpperCase()}`,
+          unitName: fallbackProduct.unitName,
+          price: fallbackProduct.price,
+          mrp: fallbackProduct.mrp,
+          isAvailable: fallbackProduct.inStock,
+        },
+      ];
+    }
+    return [];
+  }, [p, fallbackProduct]);
   const selectedVariant = useMemo(
     () => variants.find((v) => v.id === selectedVariantId) ?? variants.find((v) => v.isAvailable) ?? variants[0] ?? null,
     [variants, selectedVariantId],
@@ -81,7 +107,7 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
     }
   };
 
-  if (isLoading) {
+  if (isLoading && !fallbackProduct) {
     return (
       <div className="bg-[#f9f9fc] min-h-screen pt-20 max-w-5xl mx-auto md:grid md:grid-cols-2 md:gap-8 md:p-12 md:pt-24 animate-pulse">
         <div className="w-full aspect-square bg-[#eeeef0] md:rounded-2xl" />
@@ -95,7 +121,7 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
     );
   }
 
-  if (isError || !product) {
+  if ((isError || !product) && !fallbackProduct) {
     return (
       <div className="bg-[#f9f9fc] min-h-screen flex flex-col items-center justify-center gap-4 text-center px-4">
         <div className="text-5xl">🛒</div>

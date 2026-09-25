@@ -14,6 +14,7 @@ import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../store/useCart';
 import { BarcodeScanner } from '../../components/BarcodeScanner';
+import { searchProducts, normalizeImagePath } from '../../lib/catalog';
 
 interface SearchItem {
   id: string;
@@ -29,15 +30,16 @@ interface SearchItem {
 function mapItem(p: any): SearchItem {
   const variant =
     (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
+  const rawImage = (Array.isArray(p?.images) && p.images[0]) || p.image || null;
   return {
     id: p?.id,
-    variantId: variant?.id ?? '',
+    variantId: variant?.id ?? p?.variantId ?? '',
     name: p?.name ?? '',
-    weight: variant?.unitName ?? '',
-    price: variant?.price ?? 0,
-    mrp: variant?.mrp ?? variant?.price ?? 0,
+    weight: variant?.unitName ?? p?.unitName ?? '',
+    price: variant?.price ?? p?.price ?? 0,
+    mrp: variant?.mrp ?? p?.mrp ?? variant?.price ?? p?.price ?? 0,
     isOrganic: Boolean(p?.isOrganic),
-    image: (Array.isArray(p?.images) && p.images[0]) || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80',
+    image: normalizeImagePath(rawImage),
   };
 }
 
@@ -89,18 +91,23 @@ export default function SearchPage() {
   });
 
   const results = useMemo(() => {
-    const mapped = Array.isArray(apiProducts) ? apiProducts.map(mapItem) : [];
+    let source: any[] = [];
+    if (Array.isArray(apiProducts) && apiProducts.length > 0) {
+      source = apiProducts.map(mapItem);
+    } else {
+      source = searchProducts(debouncedQuery).map(mapItem);
+    }
     switch (activeFilter) {
       case 'Organic':
-        return mapped.filter((p) => p.isOrganic);
+        return source.filter((p) => p.isOrganic);
       case 'On Sale':
-        return mapped.filter((p) => p.mrp > p.price);
+        return source.filter((p) => p.mrp > p.price);
       case 'Under ₹50':
-        return mapped.filter((p) => p.price < 50);
+        return source.filter((p) => p.price < 50);
       default:
-        return mapped;
+        return source;
     }
-  }, [apiProducts, activeFilter]);
+  }, [apiProducts, debouncedQuery, activeFilter]);
 
   const addToCart = (item: SearchItem) => {
     if (!item.variantId) return;
