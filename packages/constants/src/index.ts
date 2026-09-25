@@ -21,6 +21,15 @@ export const API_ROUTES = {
     LIST: '/api/v1/orders',
     DETAILS: (id: string) => `/api/v1/orders/${id}`,
     TRACKING: (id: string) => `/api/v1/orders/${id}/tracking`,
+    ASSIGN_RIDER: (id: string) => `/api/v1/orders/${id}/assign-rider`,
+    START_DELIVERY: (id: string) => `/api/v1/orders/${id}/start-delivery`,
+    COMPLETE_DELIVERY: (id: string) => `/api/v1/orders/${id}/complete-delivery`,
+  },
+  DELIVERY: {
+    STATUS_UPDATE: '/api/v1/delivery/status-update',
+    TRACK: (id: string) => `/api/v1/delivery/track/${id}`,
+    CHECK_LOCATION: '/api/v1/delivery/check-location',
+    SYNC_OFFLINE_QUEUE: '/api/v1/delivery/sync-offline-queue',
   },
   PAYMENTS: {
     INITIATE: '/api/v1/payments/initiate',

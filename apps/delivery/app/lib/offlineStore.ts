@@ -64,7 +64,9 @@ export class OfflineSyncEngine {
   /**
    * Flush and sync queued offline actions to backend NestJS API
    */
-  static async flushQueue(apiBaseUrl: string = 'http://localhost:3001'): Promise<{
+  static async flushQueue(
+    apiBaseUrl: string = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL) || 'http://localhost:4000',
+  ): Promise<{
     syncedCount: number;
     failedCount: number;
   }> {

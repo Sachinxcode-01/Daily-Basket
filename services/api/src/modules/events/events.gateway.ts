@@ -79,6 +79,21 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return { status: 'acknowledged' };
   }
 
+  @SubscribeMessage('update_delivery_status')
+  handleUpdateDeliveryStatus(
+    @MessageBody() payload: { orderId: string; status: string; riderId?: string; lat?: number; lng?: number },
+  ) {
+    this.server.to(`order_${payload.orderId}`).emit('order_status_update', payload);
+    if (payload.status === 'DELIVERED') {
+      this.server.to(`order_${payload.orderId}`).emit('order_delivered', {
+        orderId: payload.orderId,
+        status: 'DELIVERED',
+        deliveredAt: new Date().toISOString(),
+      });
+    }
+    return { status: 'acknowledged' };
+  }
+
   @SubscribeMessage('chat_message')
   handleChatMessage(
     @MessageBody() payload: { ticketId: string; sender: string; message: string; timestamp: string },

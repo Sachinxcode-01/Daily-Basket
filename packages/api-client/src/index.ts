@@ -196,6 +196,33 @@ export class ApiClient {
     return this.fetcher(API_ROUTES.ORDERS.TRACKING(orderId));
   }
 
+  public async assignRider(orderId: string, payload: { riderId: string; riderName?: string; riderPhone?: string }): Promise<any> {
+    return this.fetcher(API_ROUTES.ORDERS.ASSIGN_RIDER(orderId), {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  }
+
+  public async startDelivery(orderId: string): Promise<any> {
+    return this.fetcher(API_ROUTES.ORDERS.START_DELIVERY(orderId), {
+      method: 'POST',
+    });
+  }
+
+  public async completeDelivery(orderId: string, otp?: string): Promise<{ order: any; invoice: any }> {
+    return this.fetcher(API_ROUTES.ORDERS.COMPLETE_DELIVERY(orderId), {
+      method: 'POST',
+      body: JSON.stringify({ otp }),
+    });
+  }
+
+  public async updateDeliveryStatus(orderId: string, status: string): Promise<any> {
+    return this.fetcher(API_ROUTES.DELIVERY.STATUS_UPDATE, {
+      method: 'POST',
+      body: JSON.stringify({ orderId, status }),
+    });
+  }
+
   // Notifications & FCM Methods
 
   public async registerFcmToken(userId: string, token: string, platform?: string): Promise<{ success: boolean; registeredTokensCount: number }> {

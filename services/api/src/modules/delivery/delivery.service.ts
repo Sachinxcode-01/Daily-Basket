@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
+import { EventsGateway } from '../events/events.gateway';
 
 @Injectable()
 export class DeliveryService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private eventsGateway: EventsGateway,
+  ) {}
 
   async getOrderTracking(orderId: string) {
     const order = await this.prisma.order.findUnique({
@@ -50,7 +54,30 @@ export class DeliveryService {
     const order = await this.prisma.order.update({
       where: { id: orderId },
       data: { status },
+      include: { items: true, address: true, deliveryPartner: true },
     });
+
+    // Real-time Socket.IO broadcasts
+    if (status === 'PACKING') {
+      this.eventsGateway.broadcastOrderPacking(order);
+    } else if (status === 'READY_FOR_PICKUP' || status === 'ASSIGNED') {
+      this.eventsGateway.broadcastRiderAssigned(
+        order.id,
+        order.userId,
+        order.deliveryPartnerId || 'rider_01',
+        order.deliveryPartner || { name: 'Ramesh Kumar', phone: '+91 98765 00112', vehicleNumber: 'KA 01 EB 4821' },
+      );
+    } else if (status === 'OUT_FOR_DELIVERY' || status === 'PICKED_UP') {
+      this.eventsGateway.broadcastLiveLocation(order.id, order.deliveryPartnerId || 'rider_01', 12.937, 77.621);
+      this.eventsGateway.broadcastOrderUpdated(order);
+    } else if (status === 'DELIVERED') {
+      this.eventsGateway.broadcastOrderDelivered(order.id, order.userId, {
+        invoiceNumber: `INV-${Date.now().toString().slice(-8)}`,
+        totalPaid: order.totalAmount,
+      });
+    } else {
+      this.eventsGateway.broadcastOrderUpdated(order);
+    }
 
     return {
       success: true,
