@@ -36,6 +36,7 @@ const INITIAL_ORDERS = [
     customer: 'Rahul Sharma',
     address: '12, Green Park Avenue, Block C, HSR',
     phone: '+91 98765 43210',
+    hasMissingRequiredData: false,
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
     amount: '₹1,240',
     isPriority: true,
@@ -43,12 +44,14 @@ const INITIAL_ORDERS = [
     time: '10:24 AM (5m ago)',
     paymentMethod: 'Paid via UPI',
     items: ['Organic Avocados x4', 'Aashirvaad Atta 5kg', 'Amul Butter 500g'],
+    isSimulated: false,
   },
   {
     id: '#DB-9840',
     customer: 'Priya Desai',
     address: 'Sector 4, HSR Layout, Bengaluru',
     phone: '+91 98765 12345',
+    hasMissingRequiredData: false,
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
     amount: '₹450',
     isPriority: false,
@@ -56,12 +59,14 @@ const INITIAL_ORDERS = [
     time: '09:45 AM (44m ago)',
     paymentMethod: 'Paid via Card',
     items: ['Fresh Paneer 200g', 'Free-range Eggs 6pk'],
+    isSimulated: false,
   },
   {
     id: '#DB-9838',
     customer: 'Ananya R.',
     address: '102, Sun City Apts, Sarjapur Road',
     phone: '+91 91234 56789',
+    hasMissingRequiredData: false,
     avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150',
     amount: '₹890',
     isPriority: true,
@@ -69,12 +74,14 @@ const INITIAL_ORDERS = [
     time: '10:28 AM (1m ago)',
     paymentMethod: 'Paid via Wallet',
     items: ['Greek Yogurt 400g', 'Cold Pressed Juice 1L', 'Blueberries 125g'],
+    isSimulated: false,
   },
   {
     id: '#DB-9835',
     customer: 'Vikram Malhotra',
     address: '45, Koramangala 5th Block, Bengaluru',
     phone: '+91 99887 76655',
+    hasMissingRequiredData: false,
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
     amount: '₹1,560',
     isPriority: false,
@@ -82,6 +89,7 @@ const INITIAL_ORDERS = [
     time: '09:12 AM (1h ago)',
     paymentMethod: 'Paid via UPI',
     items: ['Basmati Rice 5kg', 'Sunflower Oil 2L', 'Toor Dal 1kg'],
+    isSimulated: false,
   },
 ];
 
@@ -105,14 +113,20 @@ export default function OrderManagementPage() {
       const orderNumber = orderPayload.orderNumber || orderPayload.id || `DB-${Date.now().toString().slice(-4)}`;
       const formattedId = orderNumber.startsWith('#') ? orderNumber : `#${orderNumber}`;
 
+      const rawAddress = orderPayload.address;
+      const streetAddress = typeof rawAddress?.streetAddress === 'string' ? rawAddress.streetAddress.trim() : '';
+      const phoneNumber = typeof rawAddress?.phoneNumber === 'string' ? rawAddress.phoneNumber.trim() : '';
+      const hasRequiredAddress = Boolean(rawAddress && streetAddress && phoneNumber);
+
       setOrders((prev) => {
         if (prev.some((o) => o.id === formattedId)) return prev;
         return [
           {
             id: formattedId,
             customer: orderPayload.address?.name || 'Customer App User',
-            address: orderPayload.address?.streetAddress || 'Koramangala 4th Block, Bengaluru',
-            phone: orderPayload.address?.phoneNumber || '+91 98765 43210',
+            address: streetAddress || '[Missing Street Address]',
+            phone: phoneNumber || '[Missing Phone Number]',
+            hasMissingRequiredData: !hasRequiredAddress,
             avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
             amount: `₹${orderPayload.totalAmount || 320}`,
             isPriority: true,
@@ -122,6 +136,7 @@ export default function OrderManagementPage() {
             items: Array.isArray(orderPayload.items)
               ? orderPayload.items.map((i: any) => `${i.productName} x${i.quantity || 1}`)
               : ['Express Fresh Basket x1'],
+            isSimulated: false,
           },
           ...prev,
         ];
@@ -153,42 +168,75 @@ export default function OrderManagementPage() {
   }, []);
 
   const handleAdvanceStep = async (orderId: string) => {
-    let nextStepNum = 0;
-    setOrders((prev) =>
-      prev.map((o) => {
-        if (o.id === orderId && o.statusStep < 4) {
-          nextStepNum = o.statusStep + 1;
-          return { ...o, statusStep: nextStepNum };
-        }
-        return o;
-      })
+    const targetOrder = orders.find((o) => o.id === orderId);
+    if (!targetOrder) return;
+
+    // Block the action until required address and phone are present
+    if (targetOrder.hasMissingRequiredData) {
+      setLiveToast(`⚠️ Cannot advance ${orderId}: Missing required address or phone number.`);
+      setTimeout(() => setLiveToast(null), 4000);
+      return;
+    }
+
+    // When statusStep is 4 and no step advances, prevent completed action from sending status
+    if (targetOrder.statusStep >= 4) {
+      return;
+    }
+
+    // Precompute transition before external calls
+    const nextStepNum = targetOrder.statusStep + 1;
+    // 0: New -> 1: Accept -> 2: Pack -> 3: Assign/Dispatch -> 4: Done
+    const stepToStatus: Record<number, string> = {
+      1: 'CONFIRMED',
+      2: 'PACKING',
+      3: 'OUT_FOR_DELIVERY',
+      4: 'DELIVERED',
+    };
+    const newStatus = stepToStatus[nextStepNum];
+    if (!newStatus) return;
+
+    const isSimulated = Boolean(
+      targetOrder.isSimulated ||
+      orderId.startsWith('#SIM-') ||
+      orderId.startsWith('#TEST-')
     );
 
-    // Map step to backend delivery status
-    // 0: New -> 1: Accept -> 2: Pack -> 3: Assign/Dispatch -> 4: Done
-    const stepToStatus = ['CONFIRMED', 'CONFIRMED', 'PACKING', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+    // Simulated orders remain distinguishable; updates only modify the simulated row without external calls
+    if (isSimulated) {
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, statusStep: nextStepNum } : o))
+      );
+      return;
+    }
+
+    // For real orders, ensure rejected API update does not leave advanced step or publish socket update
     const cleanId = orderId.replace('#', '');
-    const newStatus = stepToStatus[nextStepNum] || 'CONFIRMED';
-
-    // Broadcast across Socket.IO to Customer App & Delivery App
-    emitAdminStatusUpdate(cleanId, newStatus, 'rider_01');
-
-    // Call REST API
     try {
       await apiClient.updateDeliveryStatus(cleanId, newStatus);
-    } catch {
-      // offline / mock fallback
+
+      // Advance step in state only after API confirms update
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, statusStep: nextStepNum } : o))
+      );
+
+      // Publish socket update only after successful API update
+      emitAdminStatusUpdate(cleanId, newStatus, 'rider_01');
+    } catch (err: any) {
+      setLiveToast(`❌ Failed to update status for ${orderId}: ${err?.message || 'Server error'}`);
+      setTimeout(() => setLiveToast(null), 5000);
     }
   };
 
   const handleSimulateNewOrder = () => {
-    const randomId = `#DB-${Math.floor(1000 + Math.random() * 9000)}`;
+    // Test-only namespace that cannot collide with real #DB-#### IDs
+    const randomTestId = `#SIM-TEST-${Math.floor(1000 + Math.random() * 9000)}`;
     setOrders((prev) => [
       {
-        id: randomId,
-        customer: 'Sneha Patel',
+        id: randomTestId,
+        customer: 'Sneha Patel (Simulation)',
         address: '#88 1st Cross, Indiranagar, Bengaluru',
         phone: '+91 99001 22334',
+        hasMissingRequiredData: false,
         avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150',
         amount: '₹480',
         isPriority: true,
@@ -196,10 +244,11 @@ export default function OrderManagementPage() {
         time: 'Just now (Simulated ⚡)',
         paymentMethod: 'Paid via UPI',
         items: ['Organic Whole Milk 1L x2', 'Free-range Eggs 12pk x1'],
+        isSimulated: true,
       },
       ...prev,
     ]);
-    setLiveToast(`⚡ Simulated Test Order ${randomId} Ingested!`);
+    setLiveToast(`⚡ Simulated Test Order ${randomTestId} Ingested!`);
     setTimeout(() => setLiveToast(null), 5000);
   };
 
@@ -445,13 +494,26 @@ export default function OrderManagementPage() {
                   <div className="flex gap-2 pt-1">
                     <button
                       onClick={() => handleAdvanceStep(ord.id)}
-                      className="flex-1 py-2 bg-[#006837] text-white text-xs font-bold rounded-xl hover:bg-[#00522b] transition"
+                      disabled={ord.statusStep >= 4 || ord.hasMissingRequiredData}
+                      className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
+                        ord.statusStep >= 4
+                          ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                          : ord.hasMissingRequiredData
+                          ? 'bg-amber-100 text-amber-700 border border-amber-300 cursor-not-allowed'
+                          : 'bg-[#006837] text-white hover:bg-[#00522b]'
+                      }`}
                     >
-                      {ord.statusStep === 0 && 'Accept Order'}
-                      {ord.statusStep === 1 && 'Mark as Packed'}
-                      {ord.statusStep === 2 && 'Assign Delivery'}
-                      {ord.statusStep === 3 && 'Mark Delivered'}
-                      {ord.statusStep === 4 && 'Completed'}
+                      {ord.hasMissingRequiredData
+                        ? 'Missing Info'
+                        : ord.statusStep === 0
+                        ? 'Accept Order'
+                        : ord.statusStep === 1
+                        ? 'Mark as Packed'
+                        : ord.statusStep === 2
+                        ? 'Assign Delivery'
+                        : ord.statusStep === 3
+                        ? 'Mark Delivered'
+                        : 'Completed'}
                     </button>
                     <button
                       onClick={() => setSelectedOrderForPrint(ord.id)}
@@ -616,13 +678,26 @@ export default function OrderManagementPage() {
                 <div className="flex gap-3 pt-1">
                   <button
                     onClick={() => handleAdvanceStep(ord.id)}
-                    className="flex-1 py-2.5 bg-[#006837] text-white text-xs font-bold rounded-xl hover:bg-[#00522b] transition shadow-sm"
+                    disabled={ord.statusStep >= 4 || ord.hasMissingRequiredData}
+                    className={`flex-1 py-2.5 text-xs font-bold rounded-xl transition shadow-sm ${
+                      ord.statusStep >= 4
+                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                        : ord.hasMissingRequiredData
+                        ? 'bg-amber-100 text-amber-700 border border-amber-300 cursor-not-allowed'
+                        : 'bg-[#006837] text-white hover:bg-[#00522b]'
+                    }`}
                   >
-                    {ord.statusStep === 0 && 'Accept Order'}
-                    {ord.statusStep === 1 && 'Mark as Packed'}
-                    {ord.statusStep === 2 && 'Assign Delivery Rider'}
-                    {ord.statusStep === 3 && 'Mark as Delivered'}
-                    {ord.statusStep === 4 && 'Completed'}
+                    {ord.hasMissingRequiredData
+                      ? 'Action Blocked: Missing Address Info'
+                      : ord.statusStep === 0
+                      ? 'Accept Order'
+                      : ord.statusStep === 1
+                      ? 'Mark as Packed'
+                      : ord.statusStep === 2
+                      ? 'Assign Delivery Rider'
+                      : ord.statusStep === 3
+                      ? 'Mark as Delivered'
+                      : 'Completed'}
                   </button>
                   <button
                     onClick={() => setSelectedOrderForPrint(ord.id)}
@@ -667,9 +742,20 @@ export default function OrderManagementPage() {
                     <td className="py-3.5">
                       <button
                         onClick={() => handleAdvanceStep(ord.id)}
-                        className="px-3 py-1.5 bg-[#006837] text-white rounded-xl text-xs font-bold hover:bg-[#00522b]"
+                        disabled={ord.statusStep >= 4 || ord.hasMissingRequiredData}
+                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
+                          ord.statusStep >= 4
+                            ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                            : ord.hasMissingRequiredData
+                            ? 'bg-amber-100 text-amber-700 border border-amber-300 cursor-not-allowed'
+                            : 'bg-[#006837] text-white hover:bg-[#00522b]'
+                        }`}
                       >
-                        Advance Step
+                        {ord.hasMissingRequiredData
+                          ? 'Missing Info'
+                          : ord.statusStep >= 4
+                          ? 'Completed'
+                          : 'Advance Step'}
                       </button>
                     </td>
                   </tr>

@@ -46,15 +46,26 @@ export default function DeliveryManagementPage() {
     lat: 12.9372,
     lng: 77.6210,
   });
-  const [lastTelemetryUpdate, setLastTelemetryUpdate] = useState<string>('Live Connected');
-  const [telemetryPingsReceived, setTelemetryPingsReceived] = useState<number>(14);
+  const [socketStatus, setSocketStatus] = useState<'unknown' | 'connected' | 'disconnected'>('unknown');
+  const [lastTelemetryUpdate, setLastTelemetryUpdate] = useState<string>('Unknown (awaiting telemetry)');
+  const [telemetryPingsReceived, setTelemetryPingsReceived] = useState<number>(0);
 
   useEffect(() => {
     const socket = getAdminSocket('admin_fleet');
     joinAdminRoom('admin');
 
+    const handleConnect = () => setSocketStatus('connected');
+    const handleDisconnect = () => setSocketStatus('disconnected');
+
+    if (socket.connected) {
+      setSocketStatus('connected');
+    }
+
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
+
     const handleFleetLocation = (payload: any) => {
-      if (payload?.lat && payload?.lng) {
+      if (typeof payload?.lat === 'number' && typeof payload?.lng === 'number') {
         setLiveRiderCoords({ lat: payload.lat, lng: payload.lng });
         setLastTelemetryUpdate(new Date().toLocaleTimeString());
         setTelemetryPingsReceived((prev) => prev + 1);
@@ -66,6 +77,8 @@ export default function DeliveryManagementPage() {
     socket.on('delivery.location', handleFleetLocation);
 
     return () => {
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
       socket.off('fleet_location_tick', handleFleetLocation);
       socket.off('rider_location_update', handleFleetLocation);
       socket.off('delivery.location', handleFleetLocation);
@@ -240,8 +253,11 @@ export default function DeliveryManagementPage() {
                     </div>
                   </div>
 
-                  {/* Live Fleet Tracking Map Card */}
+                  {/* Schematic Fleet Tracking Map Card */}
                   <div className="relative w-full h-48 rounded-3xl overflow-hidden border border-[#e2e8f0] shadow-sm bg-[#E8F0E8]">
+                    <div className="absolute top-2 left-2 z-20 bg-white/90 backdrop-blur px-2 py-0.5 rounded-lg text-[9px] font-bold text-[#475569] border border-slate-200">
+                      Schematic Grid (Sector #4)
+                    </div>
                     <svg className="absolute inset-0 w-full h-full stroke-white stroke-[8]" xmlns="http://www.w3.org/2000/svg">
                       <line x1="0" y1="35%" x2="100%" y2="35%" />
                       <line x1="0" y1="70%" x2="100%" y2="70%" />
@@ -253,13 +269,13 @@ export default function DeliveryManagementPage() {
                       <line x1="30%" y1="35%" x2="75%" y2="70%" stroke="#006837" strokeWidth="3" strokeDasharray="5,3" />
                     </svg>
 
-                    {/* Rider Marker */}
+                    {/* Schematic Rider Marker */}
                     <div className="absolute left-[52%] top-[52%] -translate-x-1/2 -translate-y-1/2 text-center z-10">
-                      <div className="w-8 h-8 rounded-full bg-[#006837] text-white flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-emerald-400/40 animate-bounce">
+                      <div className="w-8 h-8 rounded-full bg-[#006837] text-white flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-emerald-400/40">
                         <Bike className="w-4 h-4 text-white" />
                       </div>
                       <span className="text-[8px] font-bold text-[#006837] bg-white px-1.5 py-0.5 rounded shadow mt-0.5 inline-block">
-                        Ramesh K.
+                        Ramesh K. (Schematic Pin)
                       </span>
                     </div>
 
@@ -269,14 +285,20 @@ export default function DeliveryManagementPage() {
                           <Compass className="w-3.5 h-3.5" />
                         </div>
                         <div>
-                          <p className="font-bold text-[11px] text-[#1e2923]">Live Fleet Tracking</p>
+                          <p className="font-bold text-[11px] text-[#1e2923]">Telemetry Stream Readout</p>
                           <p className="text-[9px] text-[#64748b] font-mono">
                             {liveRiderCoords.lat.toFixed(4)}, {liveRiderCoords.lng.toFixed(4)}
                           </p>
                         </div>
                       </div>
-                      <span className="px-2 py-0.5 bg-emerald-100 text-[#006837] text-[10px] font-bold rounded-lg">
-                        18 Online
+                      <span className="px-2 py-0.5 bg-emerald-100 text-[#006837] text-[9px] font-bold rounded-lg font-mono">
+                        {socketStatus === 'connected'
+                          ? telemetryPingsReceived > 0
+                            ? `Pings: ${telemetryPingsReceived}`
+                            : 'Connected'
+                          : socketStatus === 'disconnected'
+                          ? 'Disconnected'
+                          : 'Unknown'}
                       </span>
                     </div>
                   </div>
@@ -520,8 +542,12 @@ export default function DeliveryManagementPage() {
                   </div>
                 </div>
 
-                {/* Live Interactive Fleet Map Canvas */}
+                {/* Schematic Fleet Dispatch Canvas */}
                 <div className="relative w-full h-80 rounded-3xl overflow-hidden border border-[#e2e8f0] shadow-sm bg-[#E8F0E8]">
+                  <div className="absolute top-3 left-3 z-20 bg-white/90 backdrop-blur px-3 py-1 rounded-xl text-xs font-bold text-[#475569] border border-slate-200">
+                    Schematic Street Grid (Non-Geographic Representation)
+                  </div>
+
                   {/* Street Grid SVG */}
                   <svg className="absolute inset-0 w-full h-full stroke-white stroke-[10]" xmlns="http://www.w3.org/2000/svg">
                     <line x1="0" y1="28%" x2="100%" y2="28%" />
@@ -547,13 +573,13 @@ export default function DeliveryManagementPage() {
                     </span>
                   </div>
 
-                  {/* Rider 1: Ramesh Kumar (Live GPS Stream) */}
+                  {/* Rider 1: Ramesh Kumar (Schematic Marker) */}
                   <div className="absolute left-[52%] top-[56%] -translate-x-1/2 -translate-y-1/2 text-center z-20">
-                    <div className="w-10 h-10 rounded-full bg-[#006837] text-white flex items-center justify-center shadow-xl border-2 border-white ring-4 ring-emerald-400/40 animate-bounce">
+                    <div className="w-10 h-10 rounded-full bg-[#006837] text-white flex items-center justify-center shadow-xl border-2 border-white ring-4 ring-emerald-400/40">
                       <Bike className="w-5 h-5 text-white" />
                     </div>
                     <span className="text-[10px] font-extrabold text-[#006837] bg-white px-2 py-0.5 rounded-full shadow-md mt-1 inline-block whitespace-nowrap">
-                      Ramesh K. • 24 km/h
+                      Ramesh K. (Schematic Pin)
                     </span>
                   </div>
 
@@ -563,7 +589,7 @@ export default function DeliveryManagementPage() {
                       <Bike className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-[9px] font-bold text-slate-800 bg-white/90 px-1.5 py-0.5 rounded shadow mt-1 inline-block">
-                      Sarah K. (En Route)
+                      Sarah K. (Schematic Pin)
                     </span>
                   </div>
 
@@ -575,20 +601,26 @@ export default function DeliveryManagementPage() {
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <p className="font-bold text-sm text-[#1e2923]">Live Fleet Dispatch Grid</p>
+                          <p className="font-bold text-sm text-[#1e2923]">Schematic Fleet Dispatch Grid</p>
                           <span className="bg-emerald-100 text-[#006837] text-[10px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#006837] animate-pulse" />
-                            {telemetryPingsReceived} pings
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#006837]" />
+                            {socketStatus === 'connected'
+                              ? telemetryPingsReceived > 0
+                                ? `${telemetryPingsReceived} pings received`
+                                : 'Connected (Awaiting pings)'
+                              : socketStatus === 'disconnected'
+                              ? 'Disconnected'
+                              : 'Connecting...'}
                           </span>
                         </div>
                         <p className="text-xs text-[#64748b] font-mono">
-                          Active Stream: {liveRiderCoords.lat.toFixed(4)}, {liveRiderCoords.lng.toFixed(4)} • {lastTelemetryUpdate}
+                          Telemetry Readout: Lat {liveRiderCoords.lat.toFixed(4)}, Lng {liveRiderCoords.lng.toFixed(4)} • {lastTelemetryUpdate}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs font-bold text-[#006837] bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 inline-block">
-                        18 Riders Online
+                      <span className="text-xs font-bold text-[#006837] bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 inline-block font-mono">
+                        Status: {socketStatus.toUpperCase()}
                       </span>
                     </div>
                   </div>

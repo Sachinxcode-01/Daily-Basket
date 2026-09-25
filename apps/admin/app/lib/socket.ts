@@ -3,6 +3,7 @@
 import { io, Socket } from 'socket.io-client';
 
 let socket: Socket | null = null;
+const joinedRooms = new Set<string>();
 
 function apiBase(): string {
   const env =
@@ -19,20 +20,31 @@ export function getAdminSocket(adminId = 'admin_01'): Socket {
   if (socket) return socket;
   socket = io(`${apiBase()}/ws`, {
     query: { adminId, role: 'admin', userId: `admin_${adminId}` },
-    transports: ['websocket', 'polling'],
+    transports: ['polling', 'websocket'],
+    tryAllTransports: true,
     reconnection: true,
-    reconnectionAttempts: 10,
+    reconnectionAttempts: Infinity,
     reconnectionDelay: 1000,
   });
+
+  // Re-join tracked rooms whenever the socket reconnects
+  socket.on('connect', () => {
+    joinedRooms.forEach((room) => {
+      socket?.emit('join_room', room);
+    });
+  });
+
   return socket;
 }
 
 export function joinAdminRoom(room = 'admin') {
+  joinedRooms.add(room);
   const s = getAdminSocket();
   s.emit('join_room', room);
 }
 
 export function leaveAdminRoom(room = 'admin') {
+  joinedRooms.delete(room);
   socket?.emit('leave_room', room);
 }
 

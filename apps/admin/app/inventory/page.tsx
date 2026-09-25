@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getAdminSocket, joinAdminRoom, leaveAdminRoom } from '../lib/socket';
 import {
   Search,
@@ -132,6 +132,7 @@ export default function InventoryManagementPage() {
   const [viewMode, setViewMode] = useState<'card' | 'table' | 'mobile'>('card');
   const [items, setItems] = useState(INITIAL_INVENTORY);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const socket = getAdminSocket('admin_inventory');
@@ -139,32 +140,39 @@ export default function InventoryManagementPage() {
 
     return () => {
       leaveAdminRoom('admin');
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
     };
   }, []);
 
   const handleUpdateStock = (id: string, delta: number) => {
+    const currentItem = items.find((it) => it.id === id);
+    if (!currentItem) return;
+
+    const newStock = Math.max(0, currentItem.stock + delta);
+    const isLow = newStock < 20;
+
+    // Pure state updater with zero side effects
     setItems((prev) =>
-      prev.map((it) => {
-        if (it.id === id) {
-          const newStock = Math.max(0, it.stock + delta);
-          const isLow = newStock < 20;
-
-          // Emit real-time inventory update
-          const socket = getAdminSocket();
-          socket.emit('stock_updated', {
-            productId: it.id,
-            newStock,
-            isAvailable: newStock > 0,
-          });
-
-          setToastMessage(`Stock updated: ${it.name} ➔ ${newStock} units`);
-          setTimeout(() => setToastMessage(null), 3000);
-
-          return { ...it, stock: newStock, isLowStock: isLow };
-        }
-        return it;
-      })
+      prev.map((it) => (it.id === id ? { ...it, stock: newStock, isLowStock: isLow } : it))
     );
+
+    // Side effects executed outside updater
+    const socket = getAdminSocket();
+    socket.emit('stock_updated', {
+      productId: currentItem.id,
+      newStock,
+      isAvailable: newStock > 0,
+    });
+
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current);
+    }
+    setToastMessage(`Stock updated: ${currentItem.name} ➔ ${newStock} units`);
+    toastTimeoutRef.current = setTimeout(() => {
+      setToastMessage(null);
+    }, 3000);
   };
 
   const handleRestock = (id: string) => {
