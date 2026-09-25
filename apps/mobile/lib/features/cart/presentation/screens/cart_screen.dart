@@ -1060,12 +1060,16 @@ color: Color(0xFF6E7A6C),
                 child: SizedBox(
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/checkout');
-                    },
+                    onPressed: activeItems.isEmpty
+                        ? null
+                        : () {
+                            Navigator.of(context).pushNamed('/checkout');
+                          },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF006B23),
                       foregroundColor: Colors.white,
+                      disabledBackgroundColor: const Color(0xFFC4D1C3),
+                      disabledForegroundColor: Colors.white.withValues(alpha: 0.7),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

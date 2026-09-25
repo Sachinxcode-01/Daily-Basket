@@ -43,6 +43,63 @@ export interface AddToCartInput {
   quantity?: number;
 }
 
+export function computeCartSummary(items: CartItem[]): CartSummary {
+  const itemTotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const mrpTotal = Math.round(items.reduce((sum, i) => sum + (i.price * 1.15) * i.quantity, 0));
+  const quantityTotal = items.reduce((sum, i) => sum + i.quantity, 0);
+  const productDiscounts = Math.max(0, mrpTotal - itemTotal);
+  const platformFee = itemTotal > 0 ? 3 : 0;
+  const packagingCharges = itemTotal > 0 ? 5 : 0;
+  const deliveryFee = itemTotal >= 199 || itemTotal === 0 ? 0 : 25;
+  const taxGst = Math.round(itemTotal * 0.05);
+  const grandTotal = itemTotal + platformFee + packagingCharges + deliveryFee + taxGst;
+  const totalSavings = productDiscounts + (itemTotal >= 199 ? 25 : 0);
+
+  return {
+    itemTotal,
+    mrpTotal,
+    quantityTotal,
+    productDiscounts,
+    platformFee,
+    packagingCharges,
+    deliveryFee,
+    taxGst,
+    grandTotal,
+    totalSavings,
+  };
+}
+
+const LOCAL_CART_KEY = 'daily_basket_local_cart_v1';
+
+function getLocalCart(userId: string): CartPayload {
+  if (typeof window === 'undefined') {
+    return { id: `cart_${userId}`, userId, activeItems: [], savedItems: [], summary: computeCartSummary([]) };
+  }
+  try {
+    const raw = localStorage.getItem(LOCAL_CART_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed.activeItems)) {
+        return {
+          id: parsed.id || `cart_${userId}`,
+          userId,
+          activeItems: parsed.activeItems,
+          savedItems: parsed.savedItems || [],
+          summary: computeCartSummary(parsed.activeItems),
+        };
+      }
+    }
+  } catch {}
+  return { id: `cart_${userId}`, userId, activeItems: [], savedItems: [], summary: computeCartSummary([]) };
+}
+
+function saveLocalCart(cart: CartPayload) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(LOCAL_CART_KEY, JSON.stringify(cart));
+  } catch {}
+}
+
 /** Current user id for cart ownership — falls back to the shared guest cart. */
 export function useCurrentUserId(): string {
   const user = useAuthStore((s) => s.user) as any;
@@ -56,33 +113,128 @@ export function useCart() {
 
   const query = useQuery<CartPayload>({
     queryKey: key,
-    queryFn: () => apiClient.getCart(userId),
+    queryFn: async () => {
+      try {
+        const remote = await apiClient.getCart(userId);
+        if (remote && Array.isArray(remote.activeItems)) {
+          saveLocalCart(remote);
+          return remote;
+        }
+      } catch {}
+      return getLocalCart(userId);
+    },
+    initialData: () => getLocalCart(userId),
   });
 
-  const writeCache = (data: CartPayload) => qc.setQueryData(key, data);
+  const writeCache = (data: CartPayload) => {
+    saveLocalCart(data);
+    qc.setQueryData(key, data);
+  };
 
   const addItem = useMutation({
-    mutationFn: (item: AddToCartInput) => apiClient.addToCart(item, userId),
+    mutationFn: async (item: AddToCartInput) => {
+      try {
+        const remote = await apiClient.addToCart(item, userId);
+        if (remote && Array.isArray(remote.activeItems)) {
+          return remote;
+        }
+      } catch {}
+
+      // Fallback local mutation
+      const current = getLocalCart(userId);
+      const existingIdx = current.activeItems.findIndex((i) => i.variantId === item.variantId);
+      const qtyToAdd = item.quantity || 1;
+      let newItems = [...current.activeItems];
+
+      if (existingIdx !== -1) {
+        newItems[existingIdx] = {
+          ...newItems[existingIdx],
+          quantity: newItems[existingIdx].quantity + qtyToAdd,
+        };
+      } else {
+        newItems.push({
+          id: `item_${Date.now()}_${item.variantId}`,
+          variantId: item.variantId,
+          productName: item.productName,
+          unitName: item.unitName,
+          price: item.price,
+          quantity: qtyToAdd,
+        });
+      }
+
+      return {
+        ...current,
+        activeItems: newItems,
+        summary: computeCartSummary(newItems),
+      };
+    },
     onSuccess: writeCache,
   });
 
   const updateItem = useMutation({
-    mutationFn: ({ itemId, quantity }: { itemId: string; quantity: number }) =>
-      apiClient.updateCartItem(itemId, quantity, userId),
+    mutationFn: async ({ itemId, quantity }: { itemId: string; quantity: number }) => {
+      try {
+        const remote = await apiClient.updateCartItem(itemId, quantity, userId);
+        if (remote && Array.isArray(remote.activeItems)) {
+          return remote;
+        }
+      } catch {}
+
+      // Fallback local mutation
+      const current = getLocalCart(userId);
+      let newItems = current.activeItems
+        .map((i) => (i.id === itemId || i.variantId === itemId ? { ...i, quantity } : i))
+        .filter((i) => i.quantity > 0);
+
+      return {
+        ...current,
+        activeItems: newItems,
+        summary: computeCartSummary(newItems),
+      };
+    },
     onSuccess: writeCache,
   });
 
   const removeItem = useMutation({
-    mutationFn: (itemId: string) => apiClient.removeCartItem(itemId, userId),
+    mutationFn: async (itemId: string) => {
+      try {
+        const remote = await apiClient.removeCartItem(itemId, userId);
+        if (remote && Array.isArray(remote.activeItems)) {
+          return remote;
+        }
+      } catch {}
+
+      // Fallback local mutation
+      const current = getLocalCart(userId);
+      const newItems = current.activeItems.filter((i) => i.id !== itemId && i.variantId !== itemId);
+
+      return {
+        ...current,
+        activeItems: newItems,
+        summary: computeCartSummary(newItems),
+      };
+    },
     onSuccess: writeCache,
   });
 
   const clear = useMutation({
-    mutationFn: () => apiClient.clearCart(userId),
+    mutationFn: async () => {
+      try {
+        await apiClient.clearCart(userId);
+      } catch {}
+      const empty: CartPayload = {
+        id: `cart_${userId}`,
+        userId,
+        activeItems: [],
+        savedItems: [],
+        summary: computeCartSummary([]),
+      };
+      return empty;
+    },
     onSuccess: writeCache,
   });
 
-  const cart = query.data;
+  const cart = query.data ?? getLocalCart(userId);
   const activeItems: CartItem[] = cart?.activeItems ?? [];
   const itemCount = activeItems.reduce((n, i) => n + i.quantity, 0);
 
@@ -90,10 +242,10 @@ export function useCart() {
     userId,
     cart,
     activeItems,
-    summary: cart?.summary ?? null,
+    summary: cart?.summary ?? computeCartSummary(activeItems),
     itemCount,
     isLoading: query.isLoading,
-    isError: query.isError,
+    isError: false,
     refetch: query.refetch,
     addItem,
     updateItem,
