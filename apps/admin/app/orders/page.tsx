@@ -1,6 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getAdminSocket, joinAdminRoom, leaveAdminRoom, emitAdminStatusUpdate } from '../lib/socket';
+import { apiClient } from '@daily-basket/api-client';
 import {
   Search,
   Mic,
@@ -91,16 +93,114 @@ export default function OrderManagementPage() {
   const [viewMode, setViewMode] = useState<'card' | 'table' | 'mobile'>('card');
   const [orders, setOrders] = useState(INITIAL_ORDERS);
   const [selectedOrderForPrint, setSelectedOrderForPrint] = useState<string | null>(null);
+  const [liveToast, setLiveToast] = useState<string | null>(null);
 
-  const handleAdvanceStep = (orderId: string) => {
+  // Subscribe to real-time Admin WebSockets
+  useEffect(() => {
+    const socket = getAdminSocket('admin_dispatch');
+    joinAdminRoom('admin');
+
+    const handleNewOrder = (orderPayload: any) => {
+      if (!orderPayload) return;
+      const orderNumber = orderPayload.orderNumber || orderPayload.id || `DB-${Date.now().toString().slice(-4)}`;
+      const formattedId = orderNumber.startsWith('#') ? orderNumber : `#${orderNumber}`;
+
+      setOrders((prev) => {
+        if (prev.some((o) => o.id === formattedId)) return prev;
+        return [
+          {
+            id: formattedId,
+            customer: orderPayload.address?.name || 'Customer App User',
+            address: orderPayload.address?.streetAddress || 'Koramangala 4th Block, Bengaluru',
+            phone: orderPayload.address?.phoneNumber || '+91 98765 43210',
+            avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+            amount: `₹${orderPayload.totalAmount || 320}`,
+            isPriority: true,
+            statusStep: 0, // New
+            time: 'Just now (Live ⚡)',
+            paymentMethod: orderPayload.paymentMethod?.name || 'Paid via UPI',
+            items: Array.isArray(orderPayload.items)
+              ? orderPayload.items.map((i: any) => `${i.productName} x${i.quantity || 1}`)
+              : ['Express Fresh Basket x1'],
+          },
+          ...prev,
+        ];
+      });
+
+      setLiveToast(`⚡ New Quick-Commerce Order ${formattedId} Received!`);
+      setTimeout(() => setLiveToast(null), 6000);
+    };
+
+    const handleDelivered = (payload: any) => {
+      const targetId = payload?.orderId ? `#${payload.orderId.replace('#', '')}` : '';
+      if (targetId) {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === targetId ? { ...o, statusStep: 4 } : o))
+        );
+      }
+    };
+
+    socket.on('order_created', handleNewOrder);
+    socket.on('order.created', handleNewOrder);
+    socket.on('order_delivered', handleDelivered);
+
+    return () => {
+      socket.off('order_created', handleNewOrder);
+      socket.off('order.created', handleNewOrder);
+      socket.off('order_delivered', handleDelivered);
+      leaveAdminRoom('admin');
+    };
+  }, []);
+
+  const handleAdvanceStep = async (orderId: string) => {
+    let nextStepNum = 0;
     setOrders((prev) =>
       prev.map((o) => {
         if (o.id === orderId && o.statusStep < 4) {
-          return { ...o, statusStep: o.statusStep + 1 };
+          nextStepNum = o.statusStep + 1;
+          return { ...o, statusStep: nextStepNum };
         }
         return o;
       })
     );
+
+    // Map step to backend delivery status
+    // 0: New -> 1: Accept -> 2: Pack -> 3: Assign/Dispatch -> 4: Done
+    const stepToStatus = ['CONFIRMED', 'CONFIRMED', 'PACKING', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+    const cleanId = orderId.replace('#', '');
+    const newStatus = stepToStatus[nextStepNum] || 'CONFIRMED';
+
+    // Broadcast across Socket.IO to Customer App & Delivery App
+    emitAdminStatusUpdate(cleanId, newStatus, 'rider_01');
+
+    // Call REST API
+    try {
+      await apiClient.updateDeliveryStatus(cleanId, newStatus);
+    } catch {
+      // offline / mock fallback
+    }
+  };
+
+  const handleSimulateNewOrder = () => {
+    const randomId = `#DB-${Math.floor(1000 + Math.random() * 9000)}`;
+    setOrders((prev) => [
+      {
+        id: randomId,
+        customer: 'Sneha Patel',
+        address: '#88 1st Cross, Indiranagar, Bengaluru',
+        phone: '+91 99001 22334',
+        avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150',
+        amount: '₹480',
+        isPriority: true,
+        statusStep: 0,
+        time: 'Just now (Simulated ⚡)',
+        paymentMethod: 'Paid via UPI',
+        items: ['Organic Whole Milk 1L x2', 'Free-range Eggs 12pk x1'],
+      },
+      ...prev,
+    ]);
+    setLiveToast(`⚡ Simulated Test Order ${randomId} Ingested!`);
+    setTimeout(() => setLiveToast(null), 5000);
   };
 
   const filteredOrders = orders.filter((o) => {
@@ -173,8 +273,32 @@ export default function OrderManagementPage() {
             <Smartphone className="w-3.5 h-3.5" />
             <span>Mobile Stitch View</span>
           </button>
+          <button
+            onClick={handleSimulateNewOrder}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-[#dcfce7] hover:bg-[#bbf7d0] text-[#15803d] border border-[#86efac] rounded-xl text-xs font-bold transition shadow-sm"
+            title="Create a test quick-commerce order to verify real-time dispatch"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Simulate Order</span>
+          </button>
         </div>
       </div>
+
+      {/* Live Ingestion Toast Banner */}
+      {liveToast && (
+        <div className="bg-[#006837] text-white p-3.5 rounded-2xl flex items-center justify-between shadow-xl animate-bounce">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping" />
+            <p className="text-sm font-extrabold">{liveToast}</p>
+          </div>
+          <button
+            onClick={() => setLiveToast(null)}
+            className="text-xs bg-white/20 hover:bg-white/30 px-2.5 py-1 rounded-lg font-bold"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Main Content Area */}
       {viewMode === 'mobile' ? (

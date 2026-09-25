@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getAdminSocket, joinAdminRoom, leaveAdminRoom } from '../lib/socket';
 import {
   Search,
   Mic,
@@ -12,6 +13,7 @@ import {
   QrCode,
   MoreVertical,
   Plus,
+  Minus,
   ShoppingCart,
   Zap,
   Tag,
@@ -23,7 +25,8 @@ import {
   TrendingUp,
   Smartphone,
   LayoutGrid,
-  Table as TableIcon
+  Table as TableIcon,
+  CheckCircle2,
 } from 'lucide-react';
 
 // Google Stitch Source of Truth Specs
@@ -32,44 +35,94 @@ import {
 
 const INITIAL_INVENTORY = [
   {
-    id: 'AV-ORG-001',
-    name: 'Organic Hass Avocados',
-    sku: 'SKU: AV-ORG-001',
-    price: '$2.49',
-    unit: '/ ea',
-    stock: 124,
+    id: 'VEG-TOM-001',
+    name: 'Fresh Hybrid Tomatoes',
+    sku: 'SKU: VEG-TOM-001',
+    price: '₹42',
+    unit: '/ 1 kg',
+    stock: 85,
     isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=300',
+    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300',
   },
   {
-    id: 'MK-FR-002',
-    name: 'Farm Fresh Milk',
-    sku: 'SKU: MK-FR-002',
-    price: '$4.99',
-    unit: '/ gal',
+    id: 'MLK-NAN-002',
+    name: 'Nandini Toned Fresh Milk',
+    sku: 'SKU: MLK-NAN-002',
+    price: '₹24',
+    unit: '/ 500 ml',
     stock: 8,
     isLowStock: true,
     image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300',
   },
   {
-    id: 'BD-SD-003',
-    name: 'Artisan Sourdough',
-    sku: 'SKU: BD-SD-003',
-    price: '$6.50',
-    unit: '/ loaf',
-    stock: 42,
+    id: 'BRD-ENG-003',
+    name: 'English Oven 100% Whole Wheat Bread',
+    sku: 'SKU: BRD-ENG-003',
+    price: '₹50',
+    unit: '/ 400 g',
+    stock: 34,
     isLowStock: false,
     image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=300',
   },
   {
-    id: 'HNY-ORG-004',
-    name: 'Organic Wildflower Honey',
-    sku: 'SKU: HNY-ORG-004',
-    price: '$8.99',
-    unit: '/ jar',
-    stock: 15,
+    id: 'EGG-FRM-004',
+    name: 'Fresh Farm Free-Range Eggs',
+    sku: 'SKU: EGG-FRM-004',
+    price: '₹95',
+    unit: '/ 12 pcs',
+    stock: 62,
     isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1587049352847-4a222e784d38?w=300',
+    image: 'https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=300',
+  },
+  {
+    id: 'FRT-MAN-005',
+    name: 'Alphonso Mangoes Ratnagiri',
+    sku: 'SKU: FRT-MAN-005',
+    price: '₹280',
+    unit: '/ 1 kg',
+    stock: 14,
+    isLowStock: true,
+    image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=300',
+  },
+  {
+    id: 'FLK-KEL-006',
+    name: "Kellogg's Corn Flakes Original",
+    sku: 'SKU: FLK-KEL-006',
+    price: '₹195',
+    unit: '/ 500 g',
+    stock: 48,
+    isLowStock: false,
+    image: 'https://images.unsplash.com/photo-1584473457406-6240486418e9?w=300',
+  },
+  {
+    id: 'VER-BAM-007',
+    name: 'Bambino Roasted Short Vermicelli',
+    sku: 'SKU: VER-BAM-007',
+    price: '₹45',
+    unit: '/ 400 g',
+    stock: 52,
+    isLowStock: false,
+    image: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?w=300',
+  },
+  {
+    id: 'GRA-POH-008',
+    name: 'Fortune Thick Raw Poha',
+    sku: 'SKU: GRA-POH-008',
+    price: '₹38',
+    unit: '/ 500 g',
+    stock: 40,
+    isLowStock: false,
+    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=300',
+  },
+  {
+    id: 'CRD-MLK-009',
+    name: 'Milky Mist Natural Set Curd',
+    sku: 'SKU: CRD-MLK-009',
+    price: '₹40',
+    unit: '/ 400 g',
+    stock: 18,
+    isLowStock: true,
+    image: 'https://images.unsplash.com/photo-1571212515416-fef01fc43637?w=300',
   },
 ];
 
@@ -78,6 +131,45 @@ export default function InventoryManagementPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'card' | 'table' | 'mobile'>('card');
   const [items, setItems] = useState(INITIAL_INVENTORY);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const socket = getAdminSocket('admin_inventory');
+    joinAdminRoom('admin');
+
+    return () => {
+      leaveAdminRoom('admin');
+    };
+  }, []);
+
+  const handleUpdateStock = (id: string, delta: number) => {
+    setItems((prev) =>
+      prev.map((it) => {
+        if (it.id === id) {
+          const newStock = Math.max(0, it.stock + delta);
+          const isLow = newStock < 20;
+
+          // Emit real-time inventory update
+          const socket = getAdminSocket();
+          socket.emit('stock_updated', {
+            productId: it.id,
+            newStock,
+            isAvailable: newStock > 0,
+          });
+
+          setToastMessage(`Stock updated: ${it.name} ➔ ${newStock} units`);
+          setTimeout(() => setToastMessage(null), 3000);
+
+          return { ...it, stock: newStock, isLowStock: isLow };
+        }
+        return it;
+      })
+    );
+  };
+
+  const handleRestock = (id: string) => {
+    handleUpdateStock(id, 50);
+  };
 
   const filteredItems = items.filter((item) => {
     const matchesFilter =
@@ -141,6 +233,22 @@ export default function InventoryManagementPage() {
           </button>
         </div>
       </div>
+
+      {/* Live Inventory Update Toast */}
+      {toastMessage && (
+        <div className="bg-[#006837] text-white p-3.5 rounded-2xl flex items-center justify-between shadow-xl animate-bounce">
+          <div className="flex items-center gap-2.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping" />
+            <p className="text-sm font-extrabold">{toastMessage}</p>
+          </div>
+          <button
+            onClick={() => setToastMessage(null)}
+            className="text-xs bg-white/20 hover:bg-white/30 px-2.5 py-1 rounded-lg font-bold"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Main Content Area */}
       {viewMode === 'mobile' ? (
@@ -281,16 +389,20 @@ export default function InventoryManagementPage() {
                   {/* Actions */}
                   <div className="flex gap-2 pt-1">
                     <button
-                      className={`flex-1 py-2 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition ${
+                      onClick={() => handleRestock(item.id)}
+                      className={`flex-1 py-2 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95 ${
                         item.isLowStock ? 'bg-[#b91c1c] hover:bg-[#991b1b]' : 'bg-[#006837] hover:bg-[#00522b]'
                       }`}
                     >
                       {item.isLowStock ? <Zap className="w-3.5 h-3.5 text-white" /> : <ShoppingCart className="w-3.5 h-3.5 text-white" />}
-                      <span>{item.isLowStock ? 'Urgent Restock' : 'Restock'}</span>
+                      <span>{item.isLowStock ? 'Urgent Restock (+50)' : 'Restock (+50)'}</span>
                     </button>
-                    <button className="flex-1 py-2 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 hover:bg-[#f8fafc]">
-                      {item.isLowStock ? <Tag className="w-3.5 h-3.5 text-[#1e2923]" /> : <Edit className="w-3.5 h-3.5 text-[#1e2923]" />}
-                      <span>{item.isLowStock ? 'Price' : 'Edit'}</span>
+                    <button
+                      onClick={() => handleUpdateStock(item.id, 10)}
+                      className="flex-1 py-2 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 hover:bg-[#f8fafc] active:scale-95 transition"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-[#006837]" />
+                      <span>Quick +10</span>
                     </button>
                   </div>
                 </div>
@@ -406,20 +518,41 @@ export default function InventoryManagementPage() {
                       <p className="font-black text-lg text-[#006837]">
                         {item.price} <span className="text-xs font-normal text-[#64748b]">{item.unit}</span>
                       </p>
-                      <span
-                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
-                          item.isLowStock
-                            ? 'bg-[#fee2e2] text-[#b91c1c]'
-                            : 'bg-[#dcfce7] text-[#15803d]'
-                        }`}
-                      >
+                      <div className="flex items-center gap-2">
                         <span
-                          className={`w-2 h-2 rounded-full ${
-                            item.isLowStock ? 'bg-[#dc2626]' : 'bg-[#16a34a]'
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                            item.isLowStock
+                              ? 'bg-[#fee2e2] text-[#b91c1c]'
+                              : 'bg-[#dcfce7] text-[#15803d]'
                           }`}
-                        />
-                        {item.isLowStock ? `Low Stock (${item.stock})` : `In Stock (${item.stock})`}
-                      </span>
+                        >
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              item.isLowStock ? 'bg-[#dc2626]' : 'bg-[#16a34a]'
+                            }`}
+                          />
+                          {item.isLowStock ? `Low (${item.stock})` : `In Stock (${item.stock})`}
+                        </span>
+
+                        {/* Quick Stock Counter +/- */}
+                        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl border border-slate-200">
+                          <button
+                            onClick={() => handleUpdateStock(item.id, -5)}
+                            className="w-6 h-6 rounded-lg bg-white hover:bg-slate-200 flex items-center justify-center font-bold text-xs shadow-xs text-slate-700"
+                            title="Decrease stock by 5"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="font-mono font-bold text-xs px-1 text-slate-900">{item.stock}</span>
+                          <button
+                            onClick={() => handleUpdateStock(item.id, 5)}
+                            className="w-6 h-6 rounded-lg bg-white hover:bg-slate-200 flex items-center justify-center font-bold text-xs shadow-xs text-[#006837]"
+                            title="Increase stock by 5"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -427,16 +560,20 @@ export default function InventoryManagementPage() {
                 {/* Actions */}
                 <div className="flex gap-3 pt-1">
                   <button
+                    onClick={() => handleRestock(item.id)}
                     className={`flex-1 py-2.5 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm transition ${
                       item.isLowStock ? 'bg-[#b91c1c] hover:bg-[#991b1b]' : 'bg-[#006837] hover:bg-[#00522b]'
                     }`}
                   >
                     {item.isLowStock ? <Zap className="w-4 h-4 text-white" /> : <ShoppingCart className="w-4 h-4 text-white" />}
-                    <span>{item.isLowStock ? 'Urgent Restock' : 'Restock'}</span>
+                    <span>{item.isLowStock ? 'Urgent Restock (+50)' : 'Restock (+50)'}</span>
                   </button>
-                  <button className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]">
-                    {item.isLowStock ? <Tag className="w-4 h-4 text-[#1e2923]" /> : <Edit className="w-4 h-4 text-[#1e2923]" />}
-                    <span>{item.isLowStock ? 'Price' : 'Edit'}</span>
+                  <button
+                    onClick={() => handleUpdateStock(item.id, 10)}
+                    className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]"
+                  >
+                    <Plus className="w-4 h-4 text-[#006837]" />
+                    <span>Quick +10</span>
                   </button>
                 </div>
               </div>
@@ -477,13 +614,33 @@ export default function InventoryManagementPage() {
                       </span>
                     </td>
                     <td className="py-3.5">
-                      <button
-                        className={`px-3 py-1.5 text-white rounded-xl text-xs font-bold ${
-                          item.isLowStock ? 'bg-[#b91c1c]' : 'bg-[#006837]'
-                        }`}
-                      >
-                        {item.isLowStock ? 'Urgent Restock' : 'Restock'}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+                          <button
+                            onClick={() => handleUpdateStock(item.id, -5)}
+                            className="w-5 h-5 rounded bg-white hover:bg-slate-200 flex items-center justify-center font-bold text-xs shadow-xs text-slate-700"
+                            title="Decrease by 5"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="font-mono font-bold text-xs px-1 text-slate-900">{item.stock}</span>
+                          <button
+                            onClick={() => handleUpdateStock(item.id, 5)}
+                            className="w-5 h-5 rounded bg-white hover:bg-slate-200 flex items-center justify-center font-bold text-xs shadow-xs text-[#006837]"
+                            title="Increase by 5"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+                        <button
+                          onClick={() => handleRestock(item.id)}
+                          className={`px-3 py-1.5 text-white rounded-xl text-xs font-bold transition hover:opacity-90 active:scale-95 ${
+                            item.isLowStock ? 'bg-[#b91c1c]' : 'bg-[#006837]'
+                          }`}
+                        >
+                          {item.isLowStock ? 'Urgent (+50)' : 'Restock (+50)'}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}

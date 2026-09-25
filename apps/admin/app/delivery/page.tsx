@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { getAdminSocket, joinAdminRoom, leaveAdminRoom } from '../lib/socket';
 import {
   ArrowLeft,
   Search,
@@ -26,6 +27,7 @@ import {
   Smartphone,
   LayoutGrid,
   Zap,
+  Radio,
 } from 'lucide-react';
 
 // Google Stitch Source of Truth Specs
@@ -38,6 +40,38 @@ export default function DeliveryManagementPage() {
   const [viewMode, setViewMode] = useState<'web' | 'mobile'>('web');
   const [isAutoDispatchApplied, setIsAutoDispatchApplied] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
+
+  // Real-time Fleet Telemetry State
+  const [liveRiderCoords, setLiveRiderCoords] = useState<{ lat: number; lng: number }>({
+    lat: 12.9372,
+    lng: 77.6210,
+  });
+  const [lastTelemetryUpdate, setLastTelemetryUpdate] = useState<string>('Live Connected');
+  const [telemetryPingsReceived, setTelemetryPingsReceived] = useState<number>(14);
+
+  useEffect(() => {
+    const socket = getAdminSocket('admin_fleet');
+    joinAdminRoom('admin');
+
+    const handleFleetLocation = (payload: any) => {
+      if (payload?.lat && payload?.lng) {
+        setLiveRiderCoords({ lat: payload.lat, lng: payload.lng });
+        setLastTelemetryUpdate(new Date().toLocaleTimeString());
+        setTelemetryPingsReceived((prev) => prev + 1);
+      }
+    };
+
+    socket.on('fleet_location_tick', handleFleetLocation);
+    socket.on('rider_location_update', handleFleetLocation);
+    socket.on('delivery.location', handleFleetLocation);
+
+    return () => {
+      socket.off('fleet_location_tick', handleFleetLocation);
+      socket.off('rider_location_update', handleFleetLocation);
+      socket.off('delivery.location', handleFleetLocation);
+      leaveAdminRoom('admin');
+    };
+  }, []);
 
   const dashboardData = {
     activeDeliveries: 42,
@@ -207,26 +241,43 @@ export default function DeliveryManagementPage() {
                   </div>
 
                   {/* Live Fleet Tracking Map Card */}
-                  <div className="relative w-full h-48 rounded-3xl overflow-hidden border border-[#e2e8f0] shadow-sm">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800"
-                      alt="Fleet Map"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur p-3 rounded-2xl border border-[#e2e8f0] flex items-center justify-between shadow-md">
+                  <div className="relative w-full h-48 rounded-3xl overflow-hidden border border-[#e2e8f0] shadow-sm bg-[#E8F0E8]">
+                    <svg className="absolute inset-0 w-full h-full stroke-white stroke-[8]" xmlns="http://www.w3.org/2000/svg">
+                      <line x1="0" y1="35%" x2="100%" y2="35%" />
+                      <line x1="0" y1="70%" x2="100%" y2="70%" />
+                      <line x1="30%" y1="0" x2="30%" y2="100%" />
+                      <line x1="75%" y1="0" x2="75%" y2="100%" />
+                    </svg>
+
+                    <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                      <line x1="30%" y1="35%" x2="75%" y2="70%" stroke="#006837" strokeWidth="3" strokeDasharray="5,3" />
+                    </svg>
+
+                    {/* Rider Marker */}
+                    <div className="absolute left-[52%] top-[52%] -translate-x-1/2 -translate-y-1/2 text-center z-10">
+                      <div className="w-8 h-8 rounded-full bg-[#006837] text-white flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-emerald-400/40 animate-bounce">
+                        <Bike className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="text-[8px] font-bold text-[#006837] bg-white px-1.5 py-0.5 rounded shadow mt-0.5 inline-block">
+                        Ramesh K.
+                      </span>
+                    </div>
+
+                    <div className="absolute bottom-2 left-2 right-2 bg-white/95 backdrop-blur p-2.5 rounded-2xl border border-[#e2e8f0] flex items-center justify-between shadow-md z-20">
                       <div className="flex items-center gap-2">
-                        <div className="p-2 bg-[#006837] text-white rounded-full">
-                          <Compass className="w-4 h-4" />
+                        <div className="p-1.5 bg-[#006837] text-white rounded-full">
+                          <Compass className="w-3.5 h-3.5" />
                         </div>
                         <div>
-                          <p className="font-bold text-xs text-[#1e2923]">Live Fleet Tracking</p>
-                          <p className="text-[10px] text-[#64748b]">{dashboardData.activeZones} zones active</p>
+                          <p className="font-bold text-[11px] text-[#1e2923]">Live Fleet Tracking</p>
+                          <p className="text-[9px] text-[#64748b] font-mono">
+                            {liveRiderCoords.lat.toFixed(4)}, {liveRiderCoords.lng.toFixed(4)}
+                          </p>
                         </div>
                       </div>
-                      <button className="px-3 py-1 border border-[#cbd5e1] text-xs font-bold rounded-xl text-[#1e2923]">
-                        Expand
-                      </button>
+                      <span className="px-2 py-0.5 bg-emerald-100 text-[#006837] text-[10px] font-bold rounded-lg">
+                        18 Online
+                      </span>
                     </div>
                   </div>
 
@@ -469,21 +520,77 @@ export default function DeliveryManagementPage() {
                   </div>
                 </div>
 
-                {/* Fleet Map */}
-                <div className="relative w-full h-80 rounded-3xl overflow-hidden border border-[#e2e8f0] shadow-sm">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src="https://images.unsplash.com/photo-1524661135-423995f22d0b?w=800" alt="Fleet Map" className="w-full h-full object-cover" />
-                  <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur p-4 rounded-2xl border border-[#e2e8f0] flex items-center justify-between shadow-md">
+                {/* Live Interactive Fleet Map Canvas */}
+                <div className="relative w-full h-80 rounded-3xl overflow-hidden border border-[#e2e8f0] shadow-sm bg-[#E8F0E8]">
+                  {/* Street Grid SVG */}
+                  <svg className="absolute inset-0 w-full h-full stroke-white stroke-[10]" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="0" y1="28%" x2="100%" y2="28%" />
+                    <line x1="0" y1="65%" x2="100%" y2="65%" />
+                    <line x1="25%" y1="0" x2="25%" y2="100%" />
+                    <line x1="60%" y1="0" x2="60%" y2="100%" />
+                    <line x1="85%" y1="0" x2="85%" y2="100%" />
+                  </svg>
+
+                  {/* Active Delivery Route Lines */}
+                  <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                    <line x1="25%" y1="28%" x2="60%" y2="65%" stroke="#006837" strokeWidth="4" strokeDasharray="6,4" />
+                    <line x1="25%" y1="28%" x2="85%" y2="28%" stroke="#0284c7" strokeWidth="3" strokeDasharray="4,4" />
+                  </svg>
+
+                  {/* Hub Store Marker */}
+                  <div className="absolute left-[25%] top-[28%] -translate-x-1/2 -translate-y-1/2 text-center z-10">
+                    <div className="w-9 h-9 rounded-full bg-[#1e2923] text-white flex items-center justify-center text-xs font-bold shadow-lg border-2 border-white">
+                      🏪
+                    </div>
+                    <span className="text-[10px] font-extrabold text-[#1e2923] bg-white/95 px-2 py-0.5 rounded shadow mt-1 inline-block">
+                      Hub #01 Koramangala
+                    </span>
+                  </div>
+
+                  {/* Rider 1: Ramesh Kumar (Live GPS Stream) */}
+                  <div className="absolute left-[52%] top-[56%] -translate-x-1/2 -translate-y-1/2 text-center z-20">
+                    <div className="w-10 h-10 rounded-full bg-[#006837] text-white flex items-center justify-center shadow-xl border-2 border-white ring-4 ring-emerald-400/40 animate-bounce">
+                      <Bike className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-[10px] font-extrabold text-[#006837] bg-white px-2 py-0.5 rounded-full shadow-md mt-1 inline-block whitespace-nowrap">
+                      Ramesh K. • 24 km/h
+                    </span>
+                  </div>
+
+                  {/* Rider 2: Sarah K. */}
+                  <div className="absolute left-[75%] top-[28%] -translate-x-1/2 -translate-y-1/2 text-center z-10">
+                    <div className="w-8 h-8 rounded-full bg-[#0284c7] text-white flex items-center justify-center shadow-md border-2 border-white">
+                      <Bike className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-[9px] font-bold text-slate-800 bg-white/90 px-1.5 py-0.5 rounded shadow mt-1 inline-block">
+                      Sarah K. (En Route)
+                    </span>
+                  </div>
+
+                  {/* Bottom Telemetry Overlay */}
+                  <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur p-4 rounded-2xl border border-[#e2e8f0] flex items-center justify-between shadow-md z-20">
                     <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-[#006837] text-white rounded-full"><Compass className="w-5 h-5" /></div>
+                      <div className="p-2.5 bg-[#006837] text-white rounded-full">
+                        <Compass className="w-5 h-5" />
+                      </div>
                       <div>
-                        <p className="font-bold text-sm text-[#1e2923]">Live Fleet Tracking</p>
-                        <p className="text-xs text-[#64748b]">{dashboardData.activeZones} zones active across city</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-sm text-[#1e2923]">Live Fleet Dispatch Grid</p>
+                          <span className="bg-emerald-100 text-[#006837] text-[10px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#006837] animate-pulse" />
+                            {telemetryPingsReceived} pings
+                          </span>
+                        </div>
+                        <p className="text-xs text-[#64748b] font-mono">
+                          Active Stream: {liveRiderCoords.lat.toFixed(4)}, {liveRiderCoords.lng.toFixed(4)} • {lastTelemetryUpdate}
+                        </p>
                       </div>
                     </div>
-                    <button className="px-4 py-2 border border-[#cbd5e1] text-xs font-bold rounded-xl hover:bg-[#f8fafc]">
-                      Full Screen Map
-                    </button>
+                    <div className="text-right">
+                      <span className="text-xs font-bold text-[#006837] bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 inline-block">
+                        18 Riders Online
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
