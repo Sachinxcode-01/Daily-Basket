@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Menu,
   Bell,
@@ -23,84 +23,76 @@ import {
   LayoutGrid,
   Table as TableIcon,
 } from 'lucide-react';
+import { apiClient } from '@daily-basket/api-client';
+import catalogJson from '@daily-basket/shared-types/src/products_catalog.json';
 
 // Google Stitch Source of Truth Specs
 // Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
 // Screen: Product Management Dashboard (ID: 7f4ce4c9d581414bbd9ee1df7768f876)
 
-const INITIAL_PRODUCTS = [
-  {
-    id: 'FR-BAN-001',
-    brand: 'FRESH FARMS',
-    name: 'Organic Bananas (Robusta)',
-    sku: 'SKU: FR-BAN-001',
-    category: 'Fruits',
-    price: '$1.99',
-    originalPrice: '$2.35',
-    discount: '-15%',
-    margin: 'Margin: 42%',
-    stockAvailable: 345,
-    reserved: 12,
-    stockBadge: 'Good',
-    isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=300',
-  },
-  {
-    id: 'DY-MLK-042',
-    brand: 'VALLEY DAIRY',
-    name: 'Whole Milk (1L Glass)',
-    sku: 'SKU: DY-MLK-042',
-    category: 'Dairy',
-    price: '$4.50',
-    originalPrice: '$4.50',
-    discount: null,
-    margin: 'Margin: 28%',
-    stockAvailable: 14,
-    reserved: 4,
-    stockBadge: 'Alert',
-    isLowStock: true,
-    image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300',
-  },
-  {
-    id: 'BD-SD-003',
-    brand: 'ARTISAN BAKERY',
-    name: 'Sourdough Loaf (Whole Grain)',
-    sku: 'SKU: BD-SD-003',
-    category: 'Bakery',
-    price: '$5.99',
-    originalPrice: '$6.99',
-    discount: '-14%',
-    margin: 'Margin: 38%',
-    stockAvailable: 88,
-    reserved: 6,
-    stockBadge: 'Good',
-    isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=300',
-  },
-  {
-    id: 'BEV-JUC-012',
-    brand: 'TROPICAL SUN',
-    name: 'Cold Pressed Orange Juice 1L',
-    sku: 'SKU: BEV-JUC-012',
-    category: 'Beverages',
-    price: '$3.75',
-    originalPrice: '$4.20',
-    discount: '-10%',
-    margin: 'Margin: 35%',
-    stockAvailable: 120,
-    reserved: 8,
-    stockBadge: 'Good',
-    isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1621506289937-a8e4df240d0b?w=300',
-  },
-];
+const FLATTENED_CATALOG = Object.entries(catalogJson as Record<string, any[]>).flatMap(([catKey, items]) => {
+  return items.map((p, idx) => {
+    const webImg = p.image?.startsWith('assets/') ? `/${p.image.replace(/^assets\//, '')}` : p.image;
+    const discountNum = p.mrp > p.price ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : null;
+    return {
+      id: p.id,
+      brand: (p.brand || 'Daily Basket').toUpperCase(),
+      name: p.name,
+      sku: `SKU: ${catKey.substring(0, 3).toUpperCase()}-${p.id.replace('prod_', '').toUpperCase()}`,
+      category: p.sub || catKey.replace(/-/g, ' '),
+      price: `₹${p.price.toFixed(0)}`,
+      originalPrice: `₹${p.mrp.toFixed(0)}`,
+      discount: discountNum ? `-${discountNum}%` : null,
+      margin: `Margin: ${Math.round(20 + (p.price % 25))}%`,
+      stockAvailable: 250 - (idx % 15) * 5,
+      reserved: (idx % 5) * 2,
+      stockBadge: 'Good',
+      isLowStock: false,
+      image: webImg,
+    };
+  });
+});
 
 export default function ProductsManagementPage() {
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('All Products');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'card' | 'table' | 'mobile'>('card');
-  const [products] = useState(INITIAL_PRODUCTS);
+  const [products, setProducts] = useState(FLATTENED_CATALOG);
+
+  useEffect(() => {
+    apiClient.getProducts()
+      .then((apiItems: any) => {
+        if (Array.isArray(apiItems) && apiItems.length > 0) {
+          const mapped = apiItems.map((p: any) => {
+            const v = (Array.isArray(p.variants) && p.variants[0]) || {};
+            const price = v.price ?? 0;
+            const mrp = v.mrp ?? price;
+            const discountNum = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : null;
+            const img = (Array.isArray(p.images) && p.images[0]) || '/images/daily_basket_logo.png';
+            const webImg = img.startsWith('assets/') ? `/${img.replace(/^assets\//, '')}` : img;
+            return {
+              id: p.id,
+              brand: (p.brand || 'Daily Basket').toUpperCase(),
+              name: p.name,
+              sku: v.sku || `SKU: ${p.id.substring(0, 8)}`,
+              category: p.category?.name || 'General',
+              price: `₹${price.toFixed(0)}`,
+              originalPrice: `₹${mrp.toFixed(0)}`,
+              discount: discountNum ? `-${discountNum}%` : null,
+              margin: 'Margin: 35%',
+              stockAvailable: v.stockQuantity ?? 250,
+              reserved: 4,
+              stockBadge: (v.stockQuantity ?? 250) < 20 ? 'Alert' : 'Good',
+              isLowStock: (v.stockQuantity ?? 250) < 20,
+              image: webImg,
+            };
+          });
+          setProducts(mapped);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const filteredProducts = products.filter((p) => {
     const matchesStatus =

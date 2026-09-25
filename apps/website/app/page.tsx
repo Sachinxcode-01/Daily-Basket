@@ -29,10 +29,19 @@ interface Product {
   image: string;
 }
 
+function normalizeImagePath(raw?: string): string {
+  if (!raw) return '/images/daily_basket_logo.png';
+  if (raw.startsWith('assets/')) {
+    return `/${raw.replace(/^assets\//, '')}`;
+  }
+  return raw;
+}
+
 // Map the real API product (with variants + category relation) to the card shape used by this view.
 function mapApiProduct(p: any): Product {
   const variant =
     (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
+  const rawImage = Array.isArray(p?.images) && p.images[0] ? p.images[0] : null;
   return {
     id: p?.id,
     variantId: variant?.id ?? '',
@@ -45,7 +54,7 @@ function mapApiProduct(p: any): Product {
     reviews: typeof p?.reviewCount === 'number' && p.reviewCount > 0 ? p.reviewCount : undefined,
     category: p?.category?.name ?? '',
     tag: p?.isOrganic ? 'Organic' : undefined,
-    image: (Array.isArray(p?.images) && p.images[0]) || '/images/daily_basket_logo.png',
+    image: normalizeImagePath(rawImage),
   };
 }
 

@@ -8,6 +8,7 @@ build
 .next
 out
 *.d.ts.map
+*.tsbuildinfo
 
 # Flutter & Mobile
 .dart_tool/

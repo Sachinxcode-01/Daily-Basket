@@ -51,11 +51,18 @@ class AppNetworkImage extends StatelessWidget {
       return fallbackWidget();
     }
 
-    if (imageUrl.startsWith('assets/')) {
+    String resolvedUrl = imageUrl;
+    if (resolvedUrl.startsWith('/products/')) {
+      resolvedUrl = 'assets$resolvedUrl';
+    } else if (resolvedUrl.startsWith('products/')) {
+      resolvedUrl = 'assets/$resolvedUrl';
+    }
+
+    if (resolvedUrl.startsWith('assets/')) {
       return ClipRRect(
         borderRadius: effectiveRadius,
         child: Image.asset(
-          imageUrl,
+          resolvedUrl,
           width: width,
           height: height,
           fit: fit,

@@ -19,9 +19,18 @@ interface CardProduct {
   rating?: number;
 }
 
+function normalizeImagePath(raw?: string): string {
+  if (!raw) return 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80';
+  if (raw.startsWith('assets/')) {
+    return `/${raw.replace(/^assets\//, '')}`;
+  }
+  return raw;
+}
+
 function mapProduct(p: any): CardProduct {
   const variant =
     (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
+  const rawImage = Array.isArray(p?.images) && p.images[0] ? p.images[0] : null;
   return {
     id: p?.id,
     variantId: variant?.id ?? '',
@@ -29,7 +38,7 @@ function mapProduct(p: any): CardProduct {
     subtitle: variant?.unitName ?? p?.brand ?? '',
     price: variant?.price ?? 0,
     mrp: variant?.mrp ?? variant?.price ?? 0,
-    imageUrl: (Array.isArray(p?.images) && p.images[0]) || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400&q=80',
+    imageUrl: normalizeImagePath(rawImage),
     rating: typeof p?.rating === 'number' && p.rating > 0 ? p.rating : undefined,
   };
 }

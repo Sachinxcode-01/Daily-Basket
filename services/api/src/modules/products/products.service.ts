@@ -81,17 +81,33 @@ export class ProductsService {
 
   async findAll(categoryId?: string, query?: string) {
     const where: any = {};
-    if (categoryId) where.categoryId = categoryId;
-    if (query) {
+    if (categoryId) {
       where.OR = [
+        { categoryId: categoryId },
+        { category: { slug: categoryId } },
+      ];
+    }
+    if (query) {
+      const searchConditions = [
         { name: { contains: query, mode: 'insensitive' } },
         { description: { contains: query, mode: 'insensitive' } },
+        { brand: { contains: query, mode: 'insensitive' } },
       ];
+      if (where.OR) {
+        where.AND = [
+          { OR: where.OR },
+          { OR: searchConditions },
+        ];
+        delete where.OR;
+      } else {
+        where.OR = searchConditions;
+      }
     }
 
     return this.prisma.product.findMany({
       where,
       include: { category: true, variants: true },
+      orderBy: { createdAt: 'desc' },
     });
   }
 
