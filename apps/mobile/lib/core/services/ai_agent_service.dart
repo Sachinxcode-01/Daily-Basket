@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../network/api_client.dart';
 
 /// Enterprise AI Agent Service
 /// Connects to Daily Basket NestJS backend AI module.
@@ -11,9 +12,9 @@ import 'package:http/http.dart' as http;
 class AiAgentService {
   final String baseUrl;
   final int _maxRetries = 2;
-  final Duration _timeout = const Duration(milliseconds: 500);
+  final Duration _timeout = const Duration(seconds: 15);
 
-  AiAgentService({this.baseUrl = 'http://10.0.2.2:3000/api'});
+  AiAgentService({String? baseUrl}) : baseUrl = baseUrl ?? ApiClient.defaultBaseUrl;
 
   // ─── Headers ──────────────────────────────────────────────────────────────
 

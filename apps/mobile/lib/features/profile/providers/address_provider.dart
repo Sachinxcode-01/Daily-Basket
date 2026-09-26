@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../../../../core/network/api_client.dart';
 
 enum LocationPermissionState { granted, denied, prompt }
 
@@ -34,7 +35,7 @@ class AddressProvider extends ChangeNotifier {
   LocationPermissionState _permissionState = LocationPermissionState.prompt;
   String _fetchingProgressText = 'Detecting GPS Location...';
   bool _isLoading = false;
-  final String _baseUrl = 'http://localhost:4000/api';
+  final String _baseUrl = ApiClient.defaultBaseUrl;
 
   final List<Map<String, dynamic>> _addresses = [
     {

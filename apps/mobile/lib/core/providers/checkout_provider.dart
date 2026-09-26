@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'cart_provider.dart';
+import '../network/api_client.dart';
 
 export 'cart_provider.dart';
 
@@ -67,7 +68,7 @@ class CheckoutProvider extends ChangeNotifier {
 
   PricingBreakdown? _pricing;
 
-  CheckoutProvider({this.baseUrl = 'http://10.0.2.2:3000/api'});
+  CheckoutProvider({String? baseUrl}) : baseUrl = baseUrl ?? ApiClient.defaultBaseUrl;
 
   // Getters
   String get selectedPaymentMethod => _selectedPaymentMethod;

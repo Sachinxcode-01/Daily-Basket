@@ -66,7 +66,7 @@ export class AiController {
     );
   }
 
-  @Post('analyze-image')
+  @Post(['analyze-image', 'image-analysis'])
   @ApiOperation({ summary: 'AI Image Analysis using Gemini Vision model' })
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data', 'application/json')

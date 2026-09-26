@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import '../../../../core/network/api_client.dart';
 
 import '../../../../core/navigation/app_navigation_drawer.dart';
 import '../../../../core/providers/cart_provider.dart';
@@ -55,7 +56,7 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
     try {
       final response = await http
           .get(
-            Uri.parse('http://localhost:4000/api/store-operations/status'),
+            Uri.parse('${ApiClient.defaultBaseUrl}/store-operations/status'),
             headers: {'Content-Type': 'application/json'},
           )
           .timeout(const Duration(seconds: 4));
