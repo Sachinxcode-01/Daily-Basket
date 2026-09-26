@@ -1,7 +1,9 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_motion.dart';
 import '../../../../shared/widgets/favorite_button.dart';
 import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/providers/recently_viewed_provider.dart';
@@ -26,8 +28,8 @@ class ProductDetailsScreen extends StatefulWidget {
     this.productId = 'prod_avocado',
     this.categoryTag = 'ORGANIC PRODUCE',
     this.productName = 'Organic Hass Avocados',
-    this.price = '\$5.99',
-    this.mrp = '\$7.50',
+    this.price = '₹180',
+    this.mrp = '₹225',
     this.discountPercentage = '-20%',
     this.unitDetails = '500g ~3-4 pieces',
     this.deliveryTime = '15-30 mins',
@@ -59,24 +61,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       'id': 'sim_1',
       'name': 'Fresh Hybrid Tomatoes',
       'weight': '500g Pack',
-      'price': '\$2.40',
-      'mrp': '\$2.80',
+      'price': '₹24',
+      'mrp': '₹28',
       'image': 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&q=80',
     },
     {
       'id': 'sim_2',
       'name': 'New Crop Potatoes',
       'weight': '1kg Pack',
-      'price': '\$3.20',
-      'mrp': '\$3.50',
+      'price': '₹32',
+      'mrp': '₹35',
       'image': 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80',
     },
     {
       'id': 'sim_3',
       'name': 'Fresh Red Onions',
       'weight': '1kg Pack',
-      'price': '\$3.80',
-      'mrp': '\$4.20',
+      'price': '₹38',
+      'mrp': '₹42',
       'image': 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400&q=80',
     },
   ];
@@ -470,9 +472,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     return Expanded(
                       child: Padding(
                         padding: const EdgeInsets.only(right: 8),
-                        child: InkWell(
+                        child: AppPressable(
                           onTap: () => setState(() => _selectedWeight = opt),
-                          borderRadius: BorderRadius.circular(14),
+                          scaleFactor: 0.96,
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             decoration: BoxDecoration(
@@ -713,114 +715,138 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             bottom: 0,
             left: 0,
             right: 0,
-            child: Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 10,
-                    offset: const Offset(0, -4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        widget.price,
-                        style: GoogleFonts.outfit(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.onSurface,
-                        ),
+            child: ClipRect(
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.90),
+                    border: Border(
+                      top: BorderSide(
+                        color: const Color(0xFFBECAB9).withValues(alpha: 0.30),
+                        width: 0.5,
                       ),
-                      Text(
-                        _selectedWeight,
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: AppColors.onSurfaceVariant,
-                        ),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.06),
+                        blurRadius: 16,
+                        offset: const Offset(0, -4),
                       ),
                     ],
                   ),
-                  const Spacer(),
-                  if (currentQty == 0)
-                    SizedBox(
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          cartProvider?.updateQuantityById(
-                            id: widget.productId,
-                            name: widget.productName,
-                            subtitle: _selectedWeight,
-                            price: unitPrice,
-                            image: widget.imageUrl,
-                            delta: 1,
-                          );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 28),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        child: Text(
-                          'Add to Cart - ${widget.price}',
-                          style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    )
-                  else
-                    Container(
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
+                  child: Row(
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          IconButton(
-                            icon: const Icon(Icons.remove_rounded, color: Colors.white),
-                            onPressed: () {
-                              cartProvider?.updateQuantityById(
-                                id: widget.productId,
-                                name: widget.productName,
-                                subtitle: _selectedWeight,
-                                price: unitPrice,
-                                image: widget.imageUrl,
-                                delta: -1,
-                              );
-                            },
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            child: Text(
-                              '$currentQty',
-                              style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                          Text(
+                            widget.price,
+                            style: GoogleFonts.outfit(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.onSurface,
                             ),
                           ),
-                          IconButton(
-                            icon: const Icon(Icons.add_rounded, color: Colors.white),
-                            onPressed: () {
-                              cartProvider?.updateQuantityById(
-                                id: widget.productId,
-                                name: widget.productName,
-                                subtitle: _selectedWeight,
-                                price: unitPrice,
-                                image: widget.imageUrl,
-                                delta: 1,
-                              );
-                            },
+                          Text(
+                            _selectedWeight,
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: AppColors.onSurfaceVariant,
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                ],
+                      const Spacer(),
+                      if (currentQty == 0)
+                        AppPressable(
+                          child: SizedBox(
+                            height: 48,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                cartProvider?.updateQuantityById(
+                                  id: widget.productId,
+                                  name: widget.productName,
+                                  subtitle: _selectedWeight,
+                                  price: unitPrice,
+                                  image: widget.imageUrl,
+                                  delta: 1,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(horizontal: 28),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: Text(
+                                'Add to Cart - ${widget.price}',
+                                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ),
+                        )
+                      else
+                        Container(
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              AppPressable(
+                                onTap: () {
+                                  cartProvider?.updateQuantityById(
+                                    id: widget.productId,
+                                    name: widget.productName,
+                                    subtitle: _selectedWeight,
+                                    price: unitPrice,
+                                    image: widget.imageUrl,
+                                    delta: -1,
+                                  );
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  child: Icon(Icons.remove_rounded, color: Colors.white, size: 20),
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: AnimatedSwitcher(
+                                  duration: const Duration(milliseconds: 180),
+                                  transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                                  child: Text(
+                                    '$currentQty',
+                                    key: ValueKey<int>(currentQty),
+                                    style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                  ),
+                                ),
+                              ),
+                              AppPressable(
+                                onTap: () {
+                                  cartProvider?.updateQuantityById(
+                                    id: widget.productId,
+                                    name: widget.productName,
+                                    subtitle: _selectedWeight,
+                                    price: unitPrice,
+                                    image: widget.imageUrl,
+                                    delta: 1,
+                                  );
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  child: Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

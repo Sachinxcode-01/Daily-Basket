@@ -2,10 +2,12 @@
 // Title: Daily Basket - Premium Home Experience
 // Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
 
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/widgets/staggered_animation_wrappers.dart';
+import '../../../../core/widgets/app_motion.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/providers/language_provider.dart';
@@ -174,23 +176,40 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     );
   }
 
-  Widget _buildBottomNav(int cartCount, LanguageProvider? languageProvider) => Container(
-        height: 72,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -2))],
-        ),
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _navItem(0, Icons.home_rounded, languageProvider?.translate('shop', 'Home') ?? 'Home'),
-            _navItem(1, Icons.grid_view_rounded, languageProvider?.translate('categories', 'Categories') ?? 'Categories'),
-            _navItem(2, Icons.search_rounded, languageProvider?.translate('search', 'Search') ?? 'Search'),
-            _navItem(3, Icons.shopping_basket_outlined, languageProvider?.translate('cart', 'Cart') ?? 'Cart', badge: cartCount),
-            _navItem(4, Icons.receipt_long_rounded, languageProvider?.translate('orders', 'Orders') ?? 'Orders'),
-            _navItem(5, Icons.person_outline_rounded, languageProvider?.translate('account', 'Profile') ?? 'Profile'),
-          ],
+  Widget _buildBottomNav(int cartCount, LanguageProvider? languageProvider) => ClipRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+          child: Container(
+            height: 72,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.88),
+              border: Border(
+                top: BorderSide(
+                  color: const Color(0xFFBECAB9).withValues(alpha: 0.25),
+                  width: 0.5,
+                ),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 12,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _navItem(0, Icons.home_rounded, languageProvider?.translate('shop', 'Home') ?? 'Home'),
+                _navItem(1, Icons.grid_view_rounded, languageProvider?.translate('categories', 'Categories') ?? 'Categories'),
+                _navItem(2, Icons.search_rounded, languageProvider?.translate('search', 'Search') ?? 'Search'),
+                _navItem(3, Icons.shopping_basket_outlined, languageProvider?.translate('cart', 'Cart') ?? 'Cart', badge: cartCount),
+                _navItem(4, Icons.receipt_long_rounded, languageProvider?.translate('orders', 'Orders') ?? 'Orders'),
+                _navItem(5, Icons.person_outline_rounded, languageProvider?.translate('account', 'Profile') ?? 'Profile'),
+              ],
+            ),
+          ),
         ),
       );
 
@@ -653,7 +672,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   Widget _buildCard(_Product p, [CartProvider? cartProvider]) {
     final qty = _getItemQty(p.id, cartProvider);
-    return GestureDetector(
+    return AppPressable(
+      scaleFactor: 0.98,
       onTap: () {
         try {
           context.read<RecentlyViewedProvider>().addRecentlyViewed({
@@ -751,21 +771,37 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 ]),
                 const SizedBox(height: 7),
                 qty == 0
-                    ? SizedBox(
-                        width: double.infinity, height: 32,
-                        child: ElevatedButton(
-                          onPressed: () => _updateProductQty(p, 1, cartProvider),
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF006B23), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: EdgeInsets.zero),
-                          child: Text('Add', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600)),
+                    ? AppPressable(
+                        child: SizedBox(
+                          width: double.infinity, height: 32,
+                          child: ElevatedButton(
+                            onPressed: () => _updateProductQty(p, 1, cartProvider),
+                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF006B23), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: EdgeInsets.zero),
+                            child: Text('Add', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600)),
+                          ),
                         ),
                       )
                     : Container(
                         height: 32,
                         decoration: BoxDecoration(color: const Color(0xFF006B23), borderRadius: BorderRadius.circular(8)),
                         child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                          GestureDetector(onTap: () => _updateProductQty(p, -1, cartProvider), child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.remove, color: Colors.white, size: 16))),
-                          Text('$qty', style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white)),
-                          GestureDetector(onTap: () => _updateProductQty(p, 1, cartProvider), child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.add, color: Colors.white, size: 16))),
+                          AppPressable(
+                            onTap: () => _updateProductQty(p, -1, cartProvider),
+                            child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.remove, color: Colors.white, size: 16)),
+                          ),
+                          AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 180),
+                            transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                            child: Text(
+                              '$qty',
+                              key: ValueKey<int>(qty),
+                              style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
+                            ),
+                          ),
+                          AppPressable(
+                            onTap: () => _updateProductQty(p, 1, cartProvider),
+                            child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.add, color: Colors.white, size: 16)),
+                          ),
                         ]),
                       ),
               ]),
@@ -780,8 +816,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   Widget _navItem(int index, IconData icon, String label, {int badge = 0}) {
     final active = _navIndex == index;
-    return GestureDetector(
+    return AppPressable(
       onTap: () => setState(() => _navIndex = index),
+      scaleFactor: 0.94,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -789,11 +826,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Stack(clipBehavior: Clip.none, children: [
             Icon(icon, color: active ? Colors.white : const Color(0xFF6E7A6C), size: 22),
-            if (badge > 0 && !active) Positioned(top: -4, right: -6, child: Container(
-              padding: const EdgeInsets.all(2),
-              decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-              constraints: const BoxConstraints(minWidth: 14, minHeight: 14),
-              child: Text('$badge', style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+            if (badge > 0 && !active) Positioned(top: -4, right: -6, child: AnimatedScale(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.elasticOut,
+              scale: 1.0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                decoration: const BoxDecoration(color: Color(0xFFBA1A1A), shape: BoxShape.circle),
+                constraints: const BoxConstraints(minWidth: 15, minHeight: 15),
+                child: Text('$badge', style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+              ),
             )),
           ]),
           if (active) ...[const SizedBox(width: 6), Text(label, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12))],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_motion.dart';
 
 /// Empty Basket Screen — Exact Google Stitch Specification
 /// Matches:
@@ -20,13 +21,15 @@ class EmptyBasketScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white.withValues(alpha: 0.90),
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: AppColors.primary,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading: Navigator.of(context).canPop()
+            ? IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_rounded,
+                  color: AppColors.primary,
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            : null,
         title: Text(
           'Your Shopping Basket',
           style: GoogleFonts.outfit(
@@ -109,27 +112,33 @@ class EmptyBasketScreen extends StatelessWidget {
 
                     const SizedBox(height: 32),
 
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushReplacementNamed('/customer/home');
-                        },
-                        icon: const Icon(Icons.auto_awesome_rounded, size: 20),
-                        label: Text(
-                          'Start Shopping',
-                          style: GoogleFonts.outfit(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
+                    AppPressable(
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 52,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            if (Navigator.of(context).canPop()) {
+                              Navigator.of(context).pop();
+                            } else {
+                              Navigator.of(context)
+                                  .pushReplacementNamed('/customer/home');
+                            }
+                          },
+                          icon: const Icon(Icons.auto_awesome_rounded, size: 20),
+                          label: Text(
+                            'Start Shopping',
+                            style: GoogleFonts.outfit(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          shape: const StadiumBorder(),
-                          elevation: 0,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            shape: const StadiumBorder(),
+                            elevation: 0,
+                          ),
                         ),
                       ),
                     ),

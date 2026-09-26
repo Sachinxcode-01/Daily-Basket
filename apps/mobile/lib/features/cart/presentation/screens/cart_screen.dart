@@ -5,6 +5,7 @@ import '../../../../core/providers/language_provider.dart';
 import '../../../../core/providers/cart_provider.dart';
 import '../../../referral/providers/coupon_provider.dart';
 import '../../../wallet/providers/wallet_provider.dart';
+import 'empty_basket_screen.dart';
 
 /// Your Basket / Cart Screen — Google Stitch Design System Exact Replica
 class CartScreen extends StatefulWidget {
@@ -344,6 +345,10 @@ class _CartScreenState extends State<CartScreen> {
 
     final bool isWalletActive = walletProvider?.useWalletForPayment ?? false;
     final double walletBalance = walletProvider?.balance ?? 150.0;
+
+    if (activeItems.isEmpty) {
+      return const EmptyBasketScreen();
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
