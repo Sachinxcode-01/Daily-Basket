@@ -40,6 +40,12 @@ export const API_ROUTES = {
     ORDERS: '/api/v1/admin/orders',
     ANALYTICS: '/api/v1/admin/analytics',
   },
+  FAVORITES: {
+    LIST: '/api/v1/favorites',
+    CHECK: (id: string) => `/api/v1/favorites/${id}/check`,
+    ADD: (id: string) => `/api/v1/favorites/${id}`,
+    REMOVE: (id: string) => `/api/v1/favorites/${id}`,
+  },
 };
 
 export const ERROR_CODES = {

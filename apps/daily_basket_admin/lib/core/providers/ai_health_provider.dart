@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../network/admin_api_client.dart';
 
 class AiProviderStatus {
   final String key;
@@ -30,7 +31,7 @@ class AiProviderStatus {
 
 class AiHealthProvider extends ChangeNotifier {
   bool _isLoading = false;
-  String _apiBaseUrl = 'http://localhost:3000/api';
+  String _apiBaseUrl = AdminApiClient.baseUrl;
   List<AiProviderStatus> _providers = [];
   Map<String, dynamic> _testResults = {};
 

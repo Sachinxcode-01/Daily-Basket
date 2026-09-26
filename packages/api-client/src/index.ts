@@ -340,6 +340,27 @@ export class ApiClient {
       body: JSON.stringify({ code, cartSubtotal, userId }),
     });
   }
+
+  // Favorite & Wishlist Methods
+  public async getFavorites(userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`${API_ROUTES.FAVORITES.LIST}?userId=${encodeURIComponent(userId)}`);
+  }
+
+  public async checkIsFavorite(productId: string, userId = 'usr_default'): Promise<{ productId: string; isFavorite: boolean }> {
+    return this.fetcher(`${API_ROUTES.FAVORITES.CHECK(productId)}?userId=${encodeURIComponent(userId)}`);
+  }
+
+  public async addFavorite(productId: string, userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`${API_ROUTES.FAVORITES.ADD(productId)}?userId=${encodeURIComponent(userId)}`, {
+      method: 'POST',
+    });
+  }
+
+  public async removeFavorite(productId: string, userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`${API_ROUTES.FAVORITES.REMOVE(productId)}?userId=${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+    });
+  }
 }
 
 export const apiClient = new ApiClient();

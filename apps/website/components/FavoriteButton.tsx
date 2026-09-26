@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { apiClient } from '@daily-basket/api-client';
 
 interface FavoriteButtonProps {
   productId: string;
@@ -25,10 +26,12 @@ export const FavoriteButton: React.FC<FavoriteButtonProps> = ({
     const newStatus = !isFavorite;
     setIsFavorite(newStatus);
 
-    // Call NestJS API asynchronously
-    fetch(`http://localhost:3000/api/favorites/${productId}`, {
-      method: newStatus ? 'POST' : 'DELETE',
-    }).catch(() => {});
+    // Call NestJS API via unified apiClient
+    if (newStatus) {
+      apiClient.addFavorite(productId).catch(() => {});
+    } else {
+      apiClient.removeFavorite(productId).catch(() => {});
+    }
   };
 
   return (

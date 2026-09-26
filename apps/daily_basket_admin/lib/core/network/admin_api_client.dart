@@ -1,8 +1,16 @@
 import 'dart:convert';
+import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
 class AdminApiClient {
-  static const String baseUrl = 'http://localhost:4000/api/v1';
+  static String get baseUrl {
+    if (kIsWeb) return 'http://localhost:4000/api/v1';
+    try {
+      if (Platform.isAndroid) return 'http://10.0.2.2:4000/api/v1';
+    } catch (_) {}
+    return 'http://localhost:4000/api/v1';
+  }
   static String? authToken;
 
   static Future<Map<String, dynamic>> post(String path, Map<String, dynamic> body) async {

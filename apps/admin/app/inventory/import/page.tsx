@@ -118,7 +118,11 @@ export default function BulkProductImportPage() {
     setLogs((prev) => [...prev, '⚠️ Executing "Delete All Products" database purge...']);
 
     try {
-      await fetch('http://localhost:3001/products/delete-all', { method: 'POST' }).catch(() => null);
+      const apiBase =
+        (typeof process !== 'undefined' && (process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL)) ||
+        'http://localhost:4000';
+      const cleanBase = apiBase.replace(/\/$/, '');
+      await fetch(`${cleanBase}/api/v1/products/delete-all`, { method: 'POST' }).catch(() => null);
       setLogs((prev) => [
         ...prev,
         '✅ Database purged cleanly! 0 products remaining in catalog.',

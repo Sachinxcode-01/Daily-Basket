@@ -76,7 +76,12 @@ export default function AiAnalyticsPage() {
   const [newKeyword, setNewKeyword] = useState<string>('');
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/ai/admin/metrics')
+    const apiBase =
+      (typeof process !== 'undefined' && (process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL)) ||
+      'http://localhost:4000';
+    const cleanBase = apiBase.replace(/\/$/, '');
+
+    fetch(`${cleanBase}/api/v1/ai/admin/metrics`)
       .then((res) => res.json())
       .then((data) => {
         if (data && data.totalRequests !== undefined) {
@@ -85,7 +90,7 @@ export default function AiAnalyticsPage() {
       })
       .catch((err) => console.log('Using default client metrics demo:', err));
 
-    fetch('http://localhost:3000/api/ai/admin/prompts')
+    fetch(`${cleanBase}/api/v1/ai/admin/prompts`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data) && data.length > 0) {
@@ -104,7 +109,12 @@ export default function AiAnalyticsPage() {
   };
 
   const handleSavePrompt = () => {
-    fetch(`http://localhost:3000/api/ai/admin/prompts/${selectedPromptKey}`, {
+    const apiBase =
+      (typeof process !== 'undefined' && (process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL)) ||
+      'http://localhost:4000';
+    const cleanBase = apiBase.replace(/\/$/, '');
+
+    fetch(`${cleanBase}/api/v1/ai/admin/prompts/${selectedPromptKey}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ template: editPromptText }),

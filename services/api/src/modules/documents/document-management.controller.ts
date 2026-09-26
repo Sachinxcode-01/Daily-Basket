@@ -5,7 +5,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-@Controller('api/documents')
+@Controller(['documents', 'api/documents'])
 export class DocumentManagementController {
   constructor(private readonly docService: DocumentManagementService) {}
 

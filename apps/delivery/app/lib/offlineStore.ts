@@ -65,7 +65,7 @@ export class OfflineSyncEngine {
    * Flush and sync queued offline actions to backend NestJS API
    */
   static async flushQueue(
-    apiBaseUrl: string = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_URL) || 'http://localhost:4000',
+    apiBaseUrl: string = (typeof process !== 'undefined' && (process.env?.NEXT_PUBLIC_API_URL || process.env?.API_BASE_URL)) || 'http://localhost:4000',
   ): Promise<{
     syncedCount: number;
     failedCount: number;
@@ -73,8 +73,13 @@ export class OfflineSyncEngine {
     const queue = this.getQueue();
     if (queue.length === 0) return { syncedCount: 0, failedCount: 0 };
 
+    const cleanBase = apiBaseUrl.replace(/\/$/, '');
+    const endpoint = cleanBase.includes('/api/v1')
+      ? `${cleanBase}/delivery/sync-offline-queue`
+      : `${cleanBase}/api/v1/delivery/sync-offline-queue`;
+
     try {
-      const response = await fetch(`${apiBaseUrl}/delivery/sync-offline-queue`, {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ actions: queue }),

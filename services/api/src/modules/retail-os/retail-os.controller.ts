@@ -8,7 +8,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-@Controller('api/v1/retail-os')
+@Controller(['retail-os', 'api/v1/retail-os'])
 export class RetailOsController {
   constructor(
     private readonly retailOsService: RetailOsService,

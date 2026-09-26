@@ -5,7 +5,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-@Controller('api/purchase-management')
+@Controller(['purchase-management', 'api/purchase-management'])
 export class PurchaseManagementController {
   constructor(private readonly purchaseService: PurchaseManagementService) {}
 

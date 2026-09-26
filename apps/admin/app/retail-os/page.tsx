@@ -58,7 +58,12 @@ export default function RetailOsSuperPanelPage() {
     const newMsgs: CopilotMsg[] = [...messages, { sender: 'USER', text: userText }];
     setMessages(newMsgs);
 
-    fetch('http://localhost:3000/api/v1/retail-os/copilot/query', {
+    const apiBase =
+      (typeof process !== 'undefined' && (process.env.NEXT_PUBLIC_API_URL || process.env.API_BASE_URL)) ||
+      'http://localhost:4000';
+    const cleanBase = apiBase.replace(/\/$/, '');
+
+    fetch(`${cleanBase}/api/v1/retail-os/copilot/query`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ query: userText }),

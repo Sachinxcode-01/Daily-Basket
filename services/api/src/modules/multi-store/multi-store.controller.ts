@@ -5,7 +5,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-@Controller('api/multi-store')
+@Controller(['multi-store', 'api/multi-store'])
 export class MultiStoreController {
   constructor(private readonly multiStoreService: MultiStoreService) {}
 

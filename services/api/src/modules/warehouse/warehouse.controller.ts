@@ -5,7 +5,7 @@ import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Role } from '@prisma/client';
 
-@Controller('api/warehouse')
+@Controller(['warehouse', 'api/warehouse'])
 export class WarehouseController {
   constructor(private readonly warehouseService: WarehouseService) {}
 
