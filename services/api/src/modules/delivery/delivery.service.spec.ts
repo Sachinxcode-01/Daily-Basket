@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DeliveryService } from './delivery.service';
 import { PrismaService } from '../../database/prisma.service';
+import { EventsGateway } from '../events/events.gateway';
 
 describe('DeliveryService Offline Sync', () => {
   let service: DeliveryService;
@@ -14,11 +15,19 @@ describe('DeliveryService Offline Sync', () => {
     },
   };
 
+  const mockEventsGateway = {
+    server: {
+      emit: jest.fn(),
+      to: jest.fn().mockReturnThis(),
+    },
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DeliveryService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: EventsGateway, useValue: mockEventsGateway },
       ],
     }).compile();
 

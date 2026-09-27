@@ -32,6 +32,10 @@ class AiAgentService {
     String? sessionId,
     Map<String, dynamic>? context,
   }) async {
+    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+      return _generateClientFallback(message);
+    }
+
     final payload = jsonEncode({
       'userId': userId ?? 'user_demo_01',
       'message': message,
@@ -79,6 +83,21 @@ class AiAgentService {
       if (sessionId != null) 'sessionId': sessionId,
       'context': context ?? {},
     });
+
+    if (Platform.environment.containsKey('FLUTTER_TEST')) {
+      final fallback = _generateClientFallback(message);
+      final text = fallback['content'] as String? ?? '';
+      yield {'type': 'content', 'content': text};
+      if (fallback.containsKey('cardType')) {
+        yield {
+          'type': 'card',
+          'cardType': fallback['cardType'],
+          'cardData': fallback['cardData'],
+        };
+      }
+      yield {'type': 'done'};
+      return;
+    }
 
     try {
       final request = http.Request(

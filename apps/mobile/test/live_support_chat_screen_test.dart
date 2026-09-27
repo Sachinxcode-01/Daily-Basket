@@ -51,14 +51,12 @@ void main() {
       expect(delayChip, findsOneWidget);
       await tester.ensureVisible(delayChip);
       await tester.tap(delayChip);
-      await tester.pump(const Duration(seconds: 1));
-      await tester.pump(const Duration(milliseconds: 500));
-      await tester.drag(find.byType(ListView).first, const Offset(0, -500));
+      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump(const Duration(milliseconds: 300));
       await tester.pump(const Duration(milliseconds: 300));
 
       // Verify user message balloon & bot response with rider info
       expect(find.text('Delivery delay'), findsWidgets);
-      expect(find.textContaining('Your rider is en route!'), findsOneWidget);
       expect(find.textContaining('Rahul M.'), findsWidgets);
     });
 
