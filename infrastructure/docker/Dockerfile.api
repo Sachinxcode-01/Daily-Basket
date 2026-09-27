@@ -1,44 +1,54 @@
-# Production Dockerfile for Daily Basket NestJS API
+# Build stage
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-RUN apk add --no-libc-compat --no-cache python3 make g++
+RUN apk add --no-cache openssl libc6-compat
 
-# Copy package files from services/api
-COPY services/api/package*.json ./
-COPY services/api/prisma ./prisma/
+RUN corepack enable && corepack prepare pnpm@9 --activate
 
-# Install dependencies using standalone package-lock.json
-RUN npm ci
+# Copy workspace metadata first
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
-# Copy NestJS API source code
-COPY services/api/ ./
+# Copy package manifests needed for dependency resolution
+COPY services/api/package.json ./services/api/package.json
+COPY packages/ ./packages/
+COPY apps/admin/package.json ./apps/admin/package.json
+COPY apps/delivery/package.json ./apps/delivery/package.json
+COPY apps/website/package.json ./apps/website/package.json
 
-# Generate Prisma Client & Build NestJS app
-RUN npm run prisma:generate
-RUN npm run build
-RUN npm prune --production
+RUN pnpm install --frozen-lockfile
 
-# Production Runner Stage
+# Copy only application source and Prisma files.
+# Do not copy node_modules from the host.
+COPY services/api/nest-cli.json services/api/tsconfig*.json ./services/api/
+COPY services/api/prisma ./services/api/prisma
+COPY services/api/src ./services/api/src
+COPY services/api/test ./services/api/test
+
+WORKDIR /app/services/api
+
+RUN pnpm exec prisma generate
+RUN pnpm run build
+
+# Production stage
 FROM node:20-alpine AS runner
 
 WORKDIR /app
+
+RUN apk add --no-cache openssl libc6-compat \
+    && addgroup -g 1001 -S nodejs \
+    && adduser -S nestjs -u 1001
+
 ENV NODE_ENV=production
-ENV PORT=4000
 
-# Security: Add non-root user
-RUN addgroup -g 1001 -S nodejs && adduser -S nestjs -u 1001 -G nodejs
-
-# Copy built application and node_modules from builder
-COPY --chown=nestjs:nodejs --from=builder /app/package*.json ./
-COPY --chown=nestjs:nodejs --from=builder /app/node_modules ./node_modules
-COPY --chown=nestjs:nodejs --from=builder /app/dist ./dist
-COPY --chown=nestjs:nodejs --from=builder /app/prisma ./prisma
+COPY --from=builder /app/services/api/dist ./dist
+COPY --from=builder /app/services/api/node_modules ./node_modules
+COPY --from=builder /app/services/api/package.json ./package.json
+COPY --from=builder /app/services/api/prisma ./prisma
 
 USER nestjs
 
 EXPOSE 4000
 
 CMD ["node", "dist/main"]
-
