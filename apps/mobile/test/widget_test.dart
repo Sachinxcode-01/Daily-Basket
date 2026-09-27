@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import 'package:daily_basket_mobile/core/providers/cart_provider.dart';
 import 'package:daily_basket_mobile/core/providers/checkout_provider.dart';
 import 'package:daily_basket_mobile/core/providers/user_provider.dart';
 import 'package:daily_basket_mobile/core/providers/app_theme_provider.dart';

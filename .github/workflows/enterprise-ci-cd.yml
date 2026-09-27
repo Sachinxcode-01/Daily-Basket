@@ -119,7 +119,7 @@ jobs:
 
       - name: Configure Kubeconfig & Deploy Kubernetes Manifests
         env:
-          KUBE_CONFIG: ${{ secrets.KUBECONFIG || '' }}
+          KUBE_CONFIG: ${{ secrets.KUBECONFIG }}
         run: |
           if [ -n "$KUBE_CONFIG" ]; then
             mkdir -p ~/.kube
