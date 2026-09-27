@@ -34,11 +34,11 @@ VERMICELLI_ITEMS = [
 ]
 
 POHA_ITEMS = [
-    ("Nestlé Everyday Dairy Whitener", "400 g Pouch", "Nestlé", 240.0, 260.0, "Dairy Whitener", "Daily Essential"),
+    ("Nestle Everyday Dairy Whitener", "400 g Pouch", "Nestle", 240.0, 260.0, "Dairy Whitener", "Daily Essential"),
     ("MTR Roasted Vermicelli", "400 g Pouch", "MTR", 42.0, 50.0, "Roasted Vermicelli", "16% OFF"),
     ("Cavin's Kaju Butterscotch Milkshake", "200 ml Tetra", "Cavin's", 38.0, 45.0, "Flavoured Milk", "15% OFF"),
     ("Rajdhani Thick Poha", "500 g Pack", "Rajdhani", 34.0, 42.0, "Poha", "19% OFF"),
-    ("Nestlé Milkmaid Condensed Milk", "380 g Tin", "Nestlé", 144.0, 155.0, "Condensed Milk", "Dessert Essential"),
+    ("Nestle Milkmaid Condensed Milk", "380 g Tin", "Nestle", 144.0, 155.0, "Condensed Milk", "Dessert Essential"),
     ("Godrej Yummiez Chicken Pepper & Herb Sausages", "250 g Pack", "Godrej Yummiez", 195.0, 225.0, "Ready to Cook", "Non-Veg"),
     ("iD Fresh Idly & Dosa Batter", "1 kg Pouch", "iD Fresh", 85.0, 95.0, "Fresh Batter", "Fresh Daily"),
     ("MTR 3 Minute Breakfast Seviyan Upma", "160 g Pack", "MTR", 45.0, 55.0, "Instant Breakfast", "Quick Cook"),
@@ -70,7 +70,7 @@ MILK_ITEMS = [
     ("Mother Dairy Pure Buffalo Milk", "1 L Pouch", "Mother Dairy", 72.0, 74.0, "Buffalo Milk", "Creamy"),
     ("Country Delight Farm Fresh Buffalo Milk", "1 L Pouch", "Country Delight", 84.0, 88.0, "Buffalo Milk", "Pure Farm"),
     ("Mother Dairy LiveLite Low Fat Milk", "500 ml Pouch", "Mother Dairy", 27.0, 29.0, "Low Fat Milk", "Weight Care"),
-    ("Nestlé a+ Slim Skimmed Milk", "1 L Carton", "Nestlé", 88.0, 95.0, "Skimmed Milk", "Zero Fat"),
+    ("Nestle a+ Slim Skimmed Milk", "1 L Carton", "Nestle", 88.0, 95.0, "Skimmed Milk", "Zero Fat"),
     ("Amul Taaza Toned Milk Carton", "1 L Carton", "Amul", 72.0, 75.0, "Toned Milk", "Homogenised"),
     ("Amul Lactose Free Milk", "1 L Carton", "Amul", 95.0, 105.0, "Lactose Free", "Easy Digest"),
     ("Amul T-Special High Fat Milk", "1 L Pouch", "Amul", 68.0, 70.0, "Special Milk", "Chai Special"),
@@ -85,7 +85,7 @@ MILK_ITEMS = [
     ("Amul Slim 'n' Trim Skimmed Milk", "1 L Carton", "Amul", 74.0, 78.0, "Skimmed Milk", "Fit Choice"),
     ("Amul Cow Milk Pasteurised", "500 ml Pouch", "Amul", 29.0, 30.0, "Cow Milk", "Cow Purity"),
     ("Amul Buffalo Milk Fresh Pouch", "500 ml Pouch", "Amul", 35.0, 36.0, "Buffalo Milk", "Rich Quality"),
-    ("Nestlé a+ Nourish Toned Milk", "1 L Carton", "Nestlé", 82.0, 88.0, "Toned Milk", "Nourish+"),
+    ("Nestle a+ Nourish Toned Milk", "1 L Carton", "Nestle", 82.0, 88.0, "Toned Milk", "Nourish+"),
     ("Mother Dairy Homogenised Long Life Milk", "1 L Carton", "Mother Dairy", 74.0, 78.0, "Toned Milk", "UHT Purity"),
     ("Amul Moti Long Life 90 Days Milk", "450 ml Pouch", "Amul", 32.0, 33.0, "Toned Milk", "90 Days Fresh"),
     ("Amul Desi Cow Milk Farm Fresh", "500 ml Pouch", "Amul", 32.0, 34.0, "Cow Milk", "Desi Breed"),
@@ -186,8 +186,10 @@ def build_catalog():
             'badgeColor': '0xFFBA1A1A' if '%' in item[6] else '0xFF006B23',
             'badgeTextColor': '0xFFFFFFFF',
             'inStock': True,
-            'category': 'Staples',
-            'sub': 'Sooji',
+            'category': 'Vermicelli & Seviyan',
+            'sub': 'Vermicelli',
+            'categorySlug': 'vermicelli',
+            'folder': 'vermicelli',
             'rating': round(4.5 + (i % 5) * 0.1, 1),
             'reviews': f"{320 + i * 45}",
             'image': f'assets/products/vermicelli/{fn}'
@@ -211,8 +213,10 @@ def build_catalog():
             'badgeColor': '0xFFBA1A1A' if '%' in item[6] else '0xFF006B23',
             'badgeTextColor': '0xFFFFFFFF',
             'inStock': True,
-            'category': 'Staples',
+            'category': 'Grains & Poha',
             'sub': 'Poha' if 'Poha' in item[0] else 'Grains',
+            'categorySlug': 'poha-daliya-grains',
+            'folder': 'poha-daliya-grains',
             'rating': round(4.6 + (i % 4) * 0.1, 1),
             'reviews': f"{410 + i * 55}",
             'image': f'assets/products/poha-daliya-grains/{fn}'
@@ -236,8 +240,10 @@ def build_catalog():
             'badgeColor': '0xFF006B23' if 'Fresh' in item[6] or 'Daily' in item[6] else '0xFF00569E',
             'badgeTextColor': '0xFFFFFFFF',
             'inStock': True,
-            'category': 'Dairy',
+            'category': 'Milk & Dairy',
             'sub': 'Milk',
+            'categorySlug': 'milk',
+            'folder': 'milk',
             'rating': round(4.7 + (i % 3) * 0.1, 1),
             'reviews': f"{1200 + i * 110}",
             'image': f'assets/products/milk/{fn}'
@@ -245,9 +251,9 @@ def build_catalog():
     products_by_category['milk'] = m_list
 
     # 4. Flakes & Kids Cereals (53 files)
-    cereal_brands = ["Kellogg's", "Tata Soulfull", "Bagrry's", "Kwality", "Nestlé", "Slurrp Farm", "Zerobeli", "Organic Tattva"]
+    cereal_brands = ["Kellogg's", "Tata Soulfull", "Bagrry's", "Kwality", "Nestle", "Slurrp Farm", "Zerobeli", "Organic Tattva"]
     cereal_types = [
-        ("Munch Choco Fills Cereal", "375 g Box", "Nestlé", 165.0, 195.0, "Choco Fills", "15% OFF"),
+        ("Munch Choco Fills Cereal", "375 g Box", "Nestle", 165.0, 195.0, "Choco Fills", "15% OFF"),
         ("Kwality Cookie Rings Breakfast Cereal", "375 g Box", "Kwality", 145.0, 180.0, "Cookie Rings", "19% OFF"),
         ("Kwality Fruit Rings & Choco Fills Family Pack", "500 g Combo", "Kwality", 210.0, 260.0, "Cereal Combo", "Value Pack"),
         ("Kellogg's All-Bran Wheat Flakes High Fibre", "425 g Box", "Kellogg's", 185.0, 215.0, "Wheat Flakes", "High Fibre"),
@@ -265,7 +271,7 @@ def build_catalog():
         ("Bagrry's Choco+ Multigrain Crunch Super Saver", "750 g Pouch", "Bagrry's", 255.0, 320.0, "Choco Flakes", "Super Saver"),
         ("Bagrry's Corn Flakes+ Added Fibre Low Fat", "800 g Pack", "Bagrry's", 215.0, 270.0, "Corn Flakes", "Added Fibre"),
         ("Bagrry's Corn Flakes+ Almond & Honey", "400 g Box", "Bagrry's", 165.0, 200.0, "Corn Flakes", "Almond Honey"),
-        ("Nestlé Munch Crunchy Chocolate Breakfast Cereal", "350 g Pouch", "Nestlé", 155.0, 185.0, "Crunchy Cereal", "Hot Deal"),
+        ("Nestle Munch Crunchy Chocolate Breakfast Cereal", "350 g Pouch", "Nestle", 155.0, 185.0, "Crunchy Cereal", "Hot Deal"),
         ("Parle Hide & Seek Fills Chocolate Hazelnut", "250 g Pack", "Parle", 130.0, 150.0, "Choco Fills", "50% Choco"),
         ("Kellogg's Corn Flakes Real Almond & Honey Trial Pack", "150 g Pouch", "Kellogg's", 65.0, 75.0, "Corn Flakes", "Trial Pack"),
         ("Kellogg's Corn Flakes Original Family Saver", "1.2 kg Box", "Kellogg's", 345.0, 410.0, "Corn Flakes", "Family Pack"),
@@ -289,8 +295,10 @@ def build_catalog():
             'badgeColor': '0xFFBA1A1A' if '%' in t[6] else '0xFF006B23',
             'badgeTextColor': '0xFFFFFFFF',
             'inStock': True,
-            'category': 'Breakfast',
-            'sub': 'Ready To Eat',
+            'category': 'Flakes & Kids Cereals',
+            'sub': 'Kids Cereals',
+            'categorySlug': 'flakes-kids-cereals',
+            'folder': 'flakes-kids-cereals',
             'rating': round(4.6 + (i % 4) * 0.1, 1),
             'reviews': f"{520 + i * 40}",
             'image': f'assets/products/flakes-kids-cereals/{fn}'
@@ -312,9 +320,9 @@ def build_catalog():
         ("High Protein Ghar Jaisa Dahi Pro by Gaurav Taneja", "400 g Tub", "HealthPro", 60.0, 70.0, "Protein Dahi", "15% OFF"),
         ("Amul Masti Dahi Pouch", "400 g Pouch", "Amul", 35.0, 36.0, "Fresh Curd", "Daily Essential"),
         ("Epigamia Crunch Cup Greek Yogurt with Granola", "110 g Cup", "Epigamia", 70.0, 75.0, "Crunch Cup", "Snack Cup"),
-        ("Nestlé a+ Dahi Rich & Creamy Curd", "400 g Cup", "Nestlé", 50.0, 55.0, "Creamy Dahi", "Purity Assured"),
-        ("Agápi Greek Yogurt Blueberry Delight", "100 g Cup", "Agápi", 60.0, 65.0, "Greek Yogurt", "Artisanal"),
-        ("Agápi Greek Yogurt Strawberry Sensation", "100 g Cup", "Agápi", 60.0, 65.0, "Greek Yogurt", "Real Berries"),
+        ("Nestle a+ Dahi Rich & Creamy Curd", "400 g Cup", "Nestle", 50.0, 55.0, "Creamy Dahi", "Purity Assured"),
+        ("Agapi Greek Yogurt Blueberry Delight", "100 g Cup", "Agapi", 60.0, 65.0, "Greek Yogurt", "Artisanal"),
+        ("Agapi Greek Yogurt Strawberry Sensation", "100 g Cup", "Agapi", 60.0, 65.0, "Greek Yogurt", "Real Berries"),
         ("Doodhvale Farms Taaza Matka Dahi Natural Clay Pot", "500 g Clay Pot", "Doodhvale Farms", 85.0, 100.0, "Matka Dahi", "Authentic Clay"),
         ("Amul Dahi Classic Pouch", "1 kg Pouch", "Amul", 78.0, 80.0, "Fresh Curd", "Family Pack"),
         ("Epigamia Zero Sugar Greek Yogurt Natural Cup", "120 g Cup", "Epigamia", 55.0, 60.0, "Greek Yogurt", "Zero Sugar"),
@@ -342,8 +350,10 @@ def build_catalog():
             'badgeColor': '0xFF006B23' if 'Daily' in t[6] or 'Protein' in t[6] else '0xFF00569E',
             'badgeTextColor': '0xFFFFFFFF',
             'inStock': True,
-            'category': 'Dairy',
+            'category': 'Curd & Yogurt',
             'sub': 'Curd & Yogurt',
+            'categorySlug': 'curd-yogurt',
+            'folder': 'curd-yogurt',
             'rating': round(4.7 + (i % 3) * 0.1, 1),
             'reviews': f"{780 + i * 45}",
             'image': f'assets/products/curd-yogurt/{fn}'
@@ -370,8 +380,10 @@ def build_catalog():
             'badgeColor': '0xFFBA1A1A' if '%' in t[7] else '0xFF006B23',
             'badgeTextColor': '0xFFFFFFFF',
             'inStock': True,
-            'category': t[6],
+            'category': 'Fresh Vegetables',
             'sub': t[5],
+            'categorySlug': 'fresh-vegetables',
+            'folder': 'fresh-vegetables',
             'rating': round(4.7 + (i % 3) * 0.1, 1),
             'reviews': f"{950 + i * 50}",
             'image': f'assets/products/fresh-vegetables/{fn}'
@@ -434,8 +446,10 @@ def build_catalog():
             'badgeColor': '0xFF006B23' if 'Fresh' in t[6] or 'Daily' in t[6] or 'Zero' in t[6] else '0xFFBA1A1A',
             'badgeTextColor': '0xFFFFFFFF',
             'inStock': True,
-            'category': 'Bakery',
-            'sub': 'Bread & Pav' if 'Bread' in t[0] or 'Pav' in t[0] or 'Loaf' in t[0] or 'Sub' in t[0] or 'Kulcha' in t[0] or 'Parota' in t[0] or 'Chapati' in t[0] else ('Eggs' if 'Egg' in t[0] else 'Bread & Pav'),
+            'category': 'Bread, Pav & Bakery',
+            'sub': 'Bread & Pav' if 'Bread' in t[0] or 'Pav' in t[0] or 'Loaf' in t[0] or 'Sub' in t[0] or 'Kulcha' in t[0] or 'Parota' in t[0] or 'Chapati' in t[0] else ('Eggs' if 'Egg' in t[0] else 'Bakery'),
+            'categorySlug': 'bread-pav',
+            'folder': 'bread-pav',
             'rating': round(4.7 + (i % 3) * 0.1, 1),
             'reviews': f"{650 + i * 35}",
             'image': f'assets/products/bread-pav/{fn}'
@@ -447,7 +461,10 @@ def build_catalog():
     # 2. 'dairy-bread-eggs': milk + curd-yogurt + bread-pav
     # 3. 'snacks-packaged-foods': flakes-kids-cereals
     # 4. 'grocery': poha-daliya-grains + vermicelli
+    all_607_products = veg_list + bread_list + curd_list + m_list + f_list + p_list + v_list
     high_level = {
+        'all': all_607_products,
+        'all-products': all_607_products,
         'fresh-fruits-vegetables': veg_list,
         'dairy-bread-eggs': m_list + curd_list + bread_list,
         'snacks-packaged-foods': f_list,

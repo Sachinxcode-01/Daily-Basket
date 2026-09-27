@@ -4,36 +4,41 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_motion.dart';
+import '../../../../core/widgets/app_network_image.dart';
+import '../../../../core/data/products_catalog_data.dart';
 import '../../../../shared/widgets/favorite_button.dart';
 import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/providers/recently_viewed_provider.dart';
 import 'reviews_recommendations_screen.dart';
 
 /// Product Details Screen — Google Stitch Source of Truth Specification
-/// Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
-/// Screen: Product Details - Organic Avocados (ID: fed4975734304fada8e33c3c4c02a910)
+/// Project: Daily Basket Quick-Commerce Suite
 class ProductDetailsScreen extends StatefulWidget {
   final String productId;
   final String categoryTag;
   final String productName;
+  final String? brand;
   final String price;
   final String mrp;
   final String discountPercentage;
   final String unitDetails;
   final String deliveryTime;
   final String imageUrl;
+  final String? description;
 
   const ProductDetailsScreen({
     super.key,
     this.productId = 'prod_avocado',
     this.categoryTag = 'ORGANIC PRODUCE',
     this.productName = 'Organic Hass Avocados',
+    this.brand,
     this.price = '₹180',
     this.mrp = '₹225',
     this.discountPercentage = '-20%',
     this.unitDetails = '500g ~3-4 pieces',
     this.deliveryTime = '15-30 mins',
     this.imageUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUZTLTSv5m1XvtD0eVooGUshRAE_TEf1VJ6rDo2p2NK8V-OtAgWRr9FnG7_wymxfNYoJbO-z3fuiHP_nel0NrAMmwbjTaJpS2Qn6gtKhCoGN6ltUY0Ye1kqsw-Lgi3oSwN5RBZcGCyK2PH3mZqTsqvfYztVjk3FZnajEMLUCbI6q8oB1hqEySrz4h9bFTXR1c7DcEprHGwUvQVM7TEPLq83eHICr5VanKASkHt7mYjWh7jE8sEGGd1',
+    this.description,
   });
 
   @override
@@ -42,7 +47,41 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _selectedImageIndex = 0;
-  String _selectedWeight = '500g ~3-4 pieces';
+  late String _selectedWeight;
+
+  Map<String, dynamic>? get _catalogProduct {
+    final all = kAllCatalogProducts['all'] ?? [];
+    for (final p in all) {
+      if (p['id'] == widget.productId || (p['name'] == widget.productName && p['image'] == widget.imageUrl)) {
+        return p;
+      }
+    }
+    return null;
+  }
+
+  String get _effectiveBrand =>
+      widget.brand ?? (_catalogProduct?['brand'] as String?) ?? 'Daily Basket Select';
+
+  String get _effectiveCategory =>
+      (_catalogProduct?['category'] as String?) ??
+      (_catalogProduct?['sub'] as String?) ??
+      widget.categoryTag;
+
+  String get _effectiveUnit {
+    if (widget.unitDetails.isNotEmpty && widget.unitDetails != '500g ~3-4 pieces') {
+      return widget.unitDetails;
+    }
+    final raw = (_catalogProduct?['unit'] ?? _catalogProduct?['subtitle'] ?? '1 Pack').toString();
+    return raw;
+  }
+
+  String get _effectiveDescription {
+    if (widget.description != null && widget.description!.isNotEmpty) {
+      return widget.description!;
+    }
+    final sub = _catalogProduct?['sub'] ?? _effectiveCategory;
+    return "${widget.productName} ($_effectiveUnit). Premium quality $sub sourced fresh and quality tested by $_effectiveBrand. Delivered in 10-15 minutes.";
+  }
 
   List<String> get _galleryImages {
     final primary = widget.imageUrl.isNotEmpty
@@ -51,47 +90,55 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return [primary];
   }
 
-  final List<String> _weightOptions = [
-    '500g ~3-4 pieces',
-    '1kg ~6-8 pieces',
-  ];
+  List<String> get _weightOptions {
+    final unit = _effectiveUnit;
+    if (unit.contains('Pack') || unit.contains('g') || unit.contains('ml') || unit.contains('L')) {
+      return [unit, 'Value Saver (2x)'];
+    }
+    return [unit];
+  }
 
-  final List<Map<String, String>> _similarProducts = [
-    {
-      'id': 'sim_1',
-      'name': 'Fresh Hybrid Tomatoes',
-      'weight': '500g Pack',
-      'price': '₹24',
-      'mrp': '₹28',
-      'image': 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&q=80',
-    },
-    {
-      'id': 'sim_2',
-      'name': 'New Crop Potatoes',
-      'weight': '1kg Pack',
-      'price': '₹32',
-      'mrp': '₹35',
-      'image': 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80',
-    },
-    {
-      'id': 'sim_3',
-      'name': 'Fresh Red Onions',
-      'weight': '1kg Pack',
-      'price': '₹38',
-      'mrp': '₹42',
-      'image': 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?w=400&q=80',
-    },
-  ];
+  List<Map<String, String>> get _similarProducts {
+    final all = kAllCatalogProducts['all'] ?? [];
+    final currentCat = _catalogProduct?['category'] ?? _catalogProduct?['sub'];
+    final currentFolder = widget.imageUrl.contains('products/')
+        ? widget.imageUrl.split('products/').last.split('/').first
+        : '';
+
+    final matches = all.where((p) {
+      if (p['id'] == widget.productId) return false;
+      if (currentFolder.isNotEmpty && p['image'].toString().contains('products/$currentFolder/')) {
+        return true;
+      }
+      if (currentCat != null && (p['category'] == currentCat || p['sub'] == currentCat)) {
+        return true;
+      }
+      return false;
+    }).take(4).toList();
+
+    final sourceList = matches.isNotEmpty ? matches : all.take(4).toList();
+    return sourceList.map((p) => {
+      'id': p['id'].toString(),
+      'name': p['name'].toString(),
+      'weight': (p['unit'] ?? p['subtitle'] ?? '1 Pack').toString(),
+      'price': '₹${(p['price'] as num).round()}',
+      'mrp': '₹${((p['mrp'] as num?) ?? (p['price'] as num) * 1.25).round()}',
+      'image': p['image'].toString(),
+      'brand': (p['brand'] ?? 'Daily Basket').toString(),
+      'category': (p['category'] ?? '').toString(),
+    }).toList();
+  }
 
   @override
   void initState() {
     super.initState();
+    _selectedWeight = _effectiveUnit;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       try {
         context.read<RecentlyViewedProvider>().addRecentlyViewed({
           'id': widget.productId,
           'name': widget.productName,
-          'brand': 'Fresh Farm Co.',
+          'brand': _effectiveBrand,
           'unit': _selectedWeight,
           'price': widget.price,
           'mrp': widget.mrp,
@@ -372,7 +419,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                 // 2. Product Brand & Name
                 Text(
-                  'Fresh Farm Co.',
+                  _effectiveBrand,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -541,7 +588,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.onSurface),
                               ),
                               Text(
-                                'Get instant recipe ideas, pairing suggestions, or nutritional breakdowns for these avocados.',
+                                'Get instant recipe ideas, pairing suggestions, or preparation tips for ${widget.productName}.',
                                 style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
                               ),
                             ],
@@ -562,7 +609,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Our premium Hass avocados are organically grown, hand-picked, and delivered at the perfect stage of ripeness. Known for their creamy texture and rich, nutty flavor, they are perfect for salads, toast, or your favorite guacamole recipe.',
+                  _effectiveDescription,
                   style: GoogleFonts.inter(fontSize: 14, color: AppColors.onSurfaceVariant, height: 1.5),
                 ),
                 const SizedBox(height: 12),
@@ -575,10 +622,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                   child: Column(
                     children: [
-                      _specRow('Brand', 'Fresh Farm Co. Organic'),
+                      _specRow('Brand', _effectiveBrand),
+                      _specRow('Pack Unit', _effectiveUnit),
+                      _specRow('Category', _effectiveCategory),
                       _specRow('Country of Origin', 'India 🇮🇳'),
-                      _specRow('FSSAI Lic. No.', '11223344556677'),
-                      _specRow('Storage Instructions', 'Store at room temp until ripe'),
+                      _specRow('Storage Instructions', 'Store in a cool & dry place'),
                       _specRow('Return Policy', '100% Doorstep Return eligible'),
                     ],
                   ),
@@ -668,39 +716,59 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     itemCount: _similarProducts.length,
                     itemBuilder: (ctx, idx) {
                       final item = _similarProducts[idx];
-                      return Container(
-                        width: 140,
-                        margin: const EdgeInsets.only(right: 12),
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(color: const Color(0xFFE2E8F0)),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: Image.network(
-                                item['image']!,
-                                height: 90,
-                                width: double.infinity,
-                                fit: BoxFit.cover,
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => ProductDetailsScreen(
+                                productId: item['id']!,
+                                productName: item['name']!,
+                                price: item['price']!,
+                                mrp: item['mrp']!,
+                                unitDetails: item['weight']!,
+                                imageUrl: item['image']!,
+                                brand: item['brand'],
+                                categoryTag: item['category'] ?? '',
                               ),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              item['name']!,
-                              style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onSurface),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              item['price']!,
-                              style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primary),
-                            ),
-                          ],
+                          );
+                        },
+                        borderRadius: BorderRadius.circular(14),
+                        child: Container(
+                          width: 140,
+                          margin: const EdgeInsets.only(right: 12),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: AppNetworkImage(
+                                  imageUrl: item['image']!,
+                                  height: 90,
+                                  width: double.infinity,
+                                  fit: BoxFit.contain,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                item['name']!,
+                                style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                item['price']!,
+                                style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primary),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },

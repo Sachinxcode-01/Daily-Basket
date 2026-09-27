@@ -9,6 +9,9 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/providers/search_history_provider.dart';
+import '../../../../core/providers/cart_provider.dart';
+import '../../../../core/data/products_catalog_data.dart';
+import '../../../catalog/presentation/screens/product_details_screen.dart';
 
 /// Search Results Screen — Exact Google Stitch Specification
 class SearchResultsScreen extends StatefulWidget {
@@ -26,17 +29,18 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
 
   String _selectedFilter = 'All';
   String _selectedSort = 'Relevance';
-  final Map<String, int> _cartQuantities = {};
 
   static const List<String> _trendingSearches = [
-    'Tomatoes',
     'Amul Milk',
-    'Atta 5kg',
-    'Farm Eggs',
-    'Paneer',
     'Brown Bread',
-    'Dark Chocolate',
-    'Organic Honey',
+    'Pav',
+    'Curd',
+    'Corn Flakes',
+    'Poha',
+    'Vermicelli',
+    'Tomatoes',
+    'Potatoes',
+    'Onions',
   ];
 
   @override
@@ -62,63 +66,41 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
     'Under ₹50',
   ];
 
-  final List<Map<String, dynamic>> _allProducts = [
-    {
-      'id': 's1',
-      'name': 'Organic Farm Fresh Tomatoes',
-      'weight': '500g',
-      'price': 24,
-      'priceStr': '₹24',
-      'mrpStr': '₹40',
-      'tag': '40% OFF',
-      'isOrganic': true,
-      'isFast': true,
-      'discountPercent': 40,
-      'image':
-          'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400&q=80',
-    },
-    {
-      'id': 's2',
-      'name': 'Fresh Cherry Tomatoes Pack',
-      'weight': '250g',
-      'price': 45,
-      'priceStr': '₹45',
-      'mrpStr': '₹60',
-      'tag': 'Organic',
-      'isOrganic': true,
-      'isFast': true,
-      'discountPercent': 25,
-      'image':
-          'https://images.unsplash.com/photo-1546470427-227c7369a649?w=400&q=80',
-    },
-    {
-      'id': 's3',
-      'name': 'Tomato Puree Tetra Pack',
-      'weight': '200g',
-      'price': 30,
-      'priceStr': '₹30',
-      'mrpStr': '₹35',
-      'isOrganic': false,
-      'isFast': false,
-      'discountPercent': 14,
-      'image':
-          'https://images.unsplash.com/photo-1590779033100-9f60a05a013d?w=400&q=80',
-    },
-    {
-      'id': 's4',
-      'name': 'Italian Sun-Dried Tomatoes',
-      'weight': '150g',
-      'price': 120,
-      'priceStr': '₹120',
-      'mrpStr': '₹150',
-      'tag': 'Imported',
-      'isOrganic': false,
-      'isFast': false,
-      'discountPercent': 20,
-      'image':
-          'https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=400&q=80',
-    },
-  ];
+  List<Map<String, dynamic>> get _allProducts {
+    final raw = kAllCatalogProducts['all'] ?? [];
+    if (raw.isNotEmpty) {
+      return raw.map((p) {
+        final priceNum = (p['price'] as num).toDouble();
+        final mrpNum = (p['mrp'] as num?)?.toDouble() ?? (priceNum * 1.25);
+        final badge = (p['badge'] ?? '').toString();
+        final isOrg = badge.toLowerCase().contains('organic') ||
+            (p['category'] ?? '').toString().toLowerCase().contains('organic') ||
+            (p['name'] ?? '').toString().toLowerCase().contains('organic');
+        final disc = mrpNum > priceNum ? (((mrpNum - priceNum) / mrpNum) * 100).round() : 0;
+
+        return {
+          'id': p['id'] as String,
+          'name': p['name'] as String,
+          'brand': (p['brand'] ?? 'Daily Basket') as String,
+          'weight': (p['unit'] ?? p['subtitle'] ?? '1 Pack') as String,
+          'price': priceNum.round(),
+          'priceStr': '₹${priceNum.round()}',
+          'mrpStr': '₹${mrpNum.round()}',
+          'tag': badge.isNotEmpty ? badge : (disc > 0 ? '$disc% OFF' : null),
+          'isOrganic': isOrg,
+          'isFast': true,
+          'discountPercent': disc,
+          'image': p['image'] as String,
+          'category': (p['category'] ?? '') as String,
+          'sub': (p['sub'] ?? '') as String,
+          'rating': (p['rating'] ?? 4.7).toString(),
+          'reviews': (p['reviews'] ?? '120').toString(),
+          'raw': p,
+        };
+      }).toList();
+    }
+    return [];
+  }
 
   @override
   void initState() {
@@ -145,13 +127,56 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   }) {
     final activeFilter = filterTag ?? _selectedFilter;
     final activeSort = sortOption ?? _selectedSort;
-    final query = (queryText ?? _searchCtrl.text).trim().toLowerCase();
+    String norm(String s) => s.toLowerCase()
+        .replaceAll('é', 'e')
+        .replaceAll('è', 'e')
+        .replaceAll('ê', 'e')
+        .replaceAll('ë', 'e')
+        .replaceAll("'", "")
+        .replaceAll('"', '')
+        .replaceAll('-', ' ')
+        .replaceAll(RegExp(r'(\d+)(kg|g|l|ml|pc|pcs)'), r'$1 $2');
 
-    // 1. Text Search Filter
+    final qClean = norm(queryText ?? _searchCtrl.text);
+    final tokens = qClean.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
+
+    // 1. Text Search Filter across all 607 products
     List<Map<String, dynamic>> results = _allProducts.where((p) {
-      if (query.isEmpty) return true;
-      final name = (p['name'] as String).toLowerCase();
-      return name.contains(query);
+      if (tokens.isEmpty) return true;
+      final name = norm(p['name'] as String? ?? '');
+      final brand = norm(p['brand'] as String? ?? '');
+      final weight = norm(p['weight'] as String? ?? '');
+      final cat = norm(p['category'] as String? ?? '');
+      final sub = norm(p['sub'] as String? ?? '');
+      final raw = p['raw'] as Map<String, dynamic>? ?? {};
+      final slug = norm(raw['categorySlug'] as String? ?? raw['folder'] as String? ?? '');
+      final tag = norm(p['tag'] as String? ?? '');
+
+      String synonyms = '';
+      if (slug.contains('vegetables') || cat.contains('veg')) {
+        synonyms += ' vegetable vegetables veggie veggies sabzi greens ';
+      }
+      if (slug.contains('bread') || cat.contains('bakery') || name.contains('bread') || name.contains('pav')) {
+        synonyms += ' bread bakery pav bun toast rusk ';
+      }
+      if (slug.contains('milk') || cat.contains('milk')) {
+        synonyms += ' milk dairy doodh ';
+      }
+      if (slug.contains('curd') || cat.contains('curd') || name.contains('dahi') || name.contains('yogurt')) {
+        synonyms += ' curd yogurt dahi yoghurt probiotics ';
+      }
+      if (slug.contains('flakes') || cat.contains('cereal') || name.contains('corn') || name.contains('chocos')) {
+        synonyms += ' flakes cereal cereals breakfast cornflakes chocos muesli granola ';
+      }
+      if (slug.contains('poha') || cat.contains('grain') || name.contains('dalia') || name.contains('poha')) {
+        synonyms += ' poha daliya dalia grains staples atta dal pulses rice ';
+      }
+      if (slug.contains('vermicelli') || name.contains('seviyan') || name.contains('upma') || cat.contains('vermicelli')) {
+        synonyms += ' vermicelli seviyan sevai semiya upma noodles pasta ';
+      }
+
+      final fullText = '$name $brand $weight $cat $sub $slug $tag $synonyms';
+      return tokens.every((token) => fullText.contains(token));
     }).toList();
 
     // 2. Tag & Attribute Filter
@@ -867,7 +892,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                               itemCount: filteredProducts.length,
                               itemBuilder: (context, index) {
                                 final item = filteredProducts[index];
-                                final qty = _cartQuantities[item['id']] ?? 0;
+                                final currentQty = context.watch<CartProvider>().getQuantity(item['id']);
 
                                 return AnimationConfiguration.staggeredGrid(
                                   position: index,
@@ -876,7 +901,25 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                   child: SlideAnimation(
                                     verticalOffset: 50.0,
                                     child: FadeInAnimation(
-                                      child: Container(
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (_) => ProductDetailsScreen(
+                                                productId: item['id'] as String,
+                                                productName: item['name'] as String,
+                                                price: item['priceStr'] as String,
+                                                mrp: item['mrpStr'] as String,
+                                                unitDetails: item['weight'] as String,
+                                                imageUrl: item['image'] as String,
+                                                categoryTag: (item['category'] ?? '').toString(),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        borderRadius: BorderRadius.circular(16),
+                                        child: Container(
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: Colors.white,
@@ -912,7 +955,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                            fallbackIconColor:
                                                AppColors.primary,
                                          ),
-                                        if (item.containsKey('tag'))
+                                        if (item.containsKey('tag') && item['tag'] != null)
                                           Positioned(
                                             top: 6,
                                             left: 6,
@@ -997,10 +1040,15 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                         ),
                                         InkWell(
                                           onTap: () {
-                                            setState(() {
-                                              _cartQuantities[item['id']] =
-                                                  qty + 1;
-                                            });
+                                            final cart = Provider.of<CartProvider>(context, listen: false);
+                                            cart.updateQuantityById(
+                                              id: item['id'] as String,
+                                              name: item['name'] as String,
+                                              subtitle: item['weight'] as String,
+                                              price: (item['price'] as num).toDouble(),
+                                              image: item['image'] as String,
+                                              delta: 1,
+                                            );
                                           },
                                           borderRadius:
                                               BorderRadius.circular(18),
@@ -1008,15 +1056,15 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                                             width: 34,
                                             height: 34,
                                             decoration: BoxDecoration(
-                                              color: qty > 0
+                                              color: currentQty > 0
                                                   ? AppColors.primary
                                                   : const Color(0xFFF3F3F6),
                                               shape: BoxShape.circle,
                                             ),
                                             child: Center(
-                                              child: qty > 0
+                                              child: currentQty > 0
                                                   ? Text(
-                                                      '$qty',
+                                                      '$currentQty',
                                                       style: GoogleFonts.inter(
                                                         fontSize: 13,
                                                         fontWeight:
@@ -1039,7 +1087,8 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                               ),
                             ),
                           ),
-                        );
+                        ),
+                      );
                               },
                             ),
                           ),

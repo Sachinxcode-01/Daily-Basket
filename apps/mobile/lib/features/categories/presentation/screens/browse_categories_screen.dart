@@ -20,63 +20,77 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
 
   final List<Map<String, dynamic>> _featuredCategories = [
     {
-      'title': 'Fresh Fruits',
-      'subtitle': 'Farm to table everyday',
-      'slug': 'fruits-vegetables',
+      'title': 'All Products',
+      'subtitle': 'Full catalog of 607 grocery essentials',
+      'slug': 'all',
       'imageUrl':
-          'https://images.unsplash.com/photo-1619566636858-adf3ef46400b?w=700&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1542838132-92c53300491e?w=700&auto=format&fit=crop&q=80',
     },
     {
-      'title': 'Organic Vegetables',
-      'subtitle': 'Locally sourced produce',
-      'slug': 'fruits-vegetables',
+      'title': 'Fresh Vegetables',
+      'subtitle': '154 farm fresh veggies & greens',
+      'slug': 'fresh-vegetables',
       'imageUrl':
-          'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=700&auto=format&fit=crop&q=80',
+          'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
     },
   ];
 
   final List<Map<String, dynamic>> _allCategories = [
     {
-      'title': 'Dairy & Eggs',
-      'itemCount': '120+ items',
-      'slug': 'dairy-breakfast',
+      'title': 'All Products',
+      'itemCount': '607 items',
+      'slug': 'all',
       'imageUrl':
-          'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&auto=format&fit=crop&q=80',
+          'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80',
     },
     {
-      'title': 'Bakery',
-      'itemCount': '85+ items',
-      'slug': 'bakery-breads',
+      'title': 'Bread, Pav & Bakery',
+      'itemCount': '248 items',
+      'slug': 'bread-pav',
       'imageUrl':
-          'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80',
+          'assets/products/bread-pav/007ea008-b857-4dd5-9005-fb6c4d98601b.png',
     },
     {
-      'title': 'Snacks',
-      'itemCount': '300+ items',
-      'slug': 'snacks-munchies',
+      'title': 'Fresh Vegetables',
+      'itemCount': '154 items',
+      'slug': 'fresh-vegetables',
       'imageUrl':
-          'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=600&auto=format&fit=crop&q=80',
+          'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
     },
     {
-      'title': 'Personal Care',
-      'itemCount': '150+ items',
-      'slug': 'personal-care',
+      'title': 'Curd & Yogurt',
+      'itemCount': '78 items',
+      'slug': 'curd-yogurt',
       'imageUrl':
-          'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=600&auto=format&fit=crop&q=80',
+          'assets/products/curd-yogurt/01278ea4-9aef-4263-8ea8-6a3eab2bd076.png',
     },
     {
-      'title': 'Beverages',
-      'itemCount': '210+ items',
-      'slug': 'cold-drinks-juices',
+      'title': 'Flakes & Cereals',
+      'itemCount': '53 items',
+      'slug': 'flakes-kids-cereals',
       'imageUrl':
-          'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=600&auto=format&fit=crop&q=80',
+          'assets/products/flakes-kids-cereals/01e92a08-b40b-4d6f-aca7-8537cd382447.png',
     },
     {
-      'title': 'Home Essentials',
-      'itemCount': '95+ items',
-      'slug': 'cleaning-essentials',
+      'title': 'Fresh Milk',
+      'itemCount': '41 items',
+      'slug': 'milk',
       'imageUrl':
-          'https://images.unsplash.com/photo-1583947215259-38e31be8751f?w=600&auto=format&fit=crop&q=80',
+          'assets/products/milk/1ded64a0-9f20-4a1d-8211-156f221b377b.png',
+    },
+    {
+      'title': 'Poha, Daliya & Grains',
+      'itemCount': '17 items',
+      'slug': 'poha-daliya-grains',
+      'imageUrl':
+          'assets/products/poha-daliya-grains/1092_1643384330629.png',
+    },
+    {
+      'title': 'Vermicelli & Sevai',
+      'itemCount': '16 items',
+      'slug': 'vermicelli',
+      'imageUrl':
+          'assets/products/vermicelli/3da21b8f-16e5-4727-9899-c5ef3e1db668.png',
     },
   ];
 

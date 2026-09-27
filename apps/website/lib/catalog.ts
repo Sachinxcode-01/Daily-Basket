@@ -41,9 +41,18 @@ export const CATEGORY_DISPLAY_MAP: Record<string, { name: string; slug: string }
   'grocery': { name: 'Grocery & Staples', slug: 'grocery' },
 };
 
-export const ALL_WEBSITE_PRODUCTS: WebsiteProduct[] = Object.entries(
-  masterCatalogJson as Record<string, any[]>,
-).flatMap(([catKey, items]) => {
+const CANONICAL_CATEGORIES = [
+  'bread-pav',
+  'fresh-vegetables',
+  'curd-yogurt',
+  'flakes-kids-cereals',
+  'milk',
+  'poha-daliya-grains',
+  'vermicelli',
+];
+
+export const ALL_WEBSITE_PRODUCTS: WebsiteProduct[] = CANONICAL_CATEGORIES.flatMap((catKey) => {
+  const items = (masterCatalogJson as Record<string, any[]>)[catKey] || [];
   const meta = CATEGORY_DISPLAY_MAP[catKey] || {
     name: catKey.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
     slug: catKey,
@@ -90,7 +99,17 @@ export function getProductById(id: string): WebsiteProduct | undefined {
 }
 
 export function searchProducts(query: string, categoryFilter?: string): WebsiteProduct[] {
-  const q = query.trim().toLowerCase();
+  const norm = (s: string) =>
+    (s || '')
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/['"’-]/g, ' ')
+      .replace(/(\d+)(kg|g|l|ml|pc|pcs)/g, '$1 $2');
+
+  const qClean = norm(query);
+  const tokens = qClean.split(/\s+/).filter(Boolean);
+
   return ALL_WEBSITE_PRODUCTS.filter((p) => {
     const matchesCategory =
       !categoryFilter ||
@@ -99,13 +118,40 @@ export function searchProducts(query: string, categoryFilter?: string): WebsiteP
       p.categorySlug.toLowerCase() === categoryFilter.toLowerCase();
 
     if (!matchesCategory) return false;
-    if (!q) return true;
+    if (tokens.length === 0) return true;
 
-    return (
-      p.name.toLowerCase().includes(q) ||
-      p.brand.toLowerCase().includes(q) ||
-      p.unitName.toLowerCase().includes(q) ||
-      p.category.toLowerCase().includes(q)
-    );
+    const name = norm(p.name);
+    const brand = norm(p.brand);
+    const unit = norm(p.unitName);
+    const cat = norm(p.category);
+    const slug = norm(p.categorySlug);
+    const tag = norm(p.tag || '');
+
+    let synonyms = '';
+    if (slug.includes('vegetables') || cat.includes('veg')) {
+      synonyms += ' vegetable vegetables veggie veggies sabzi greens ';
+    }
+    if (slug.includes('bread') || cat.includes('bakery') || name.includes('bread') || name.includes('pav')) {
+      synonyms += ' bread bakery pav bun toast rusk ';
+    }
+    if (slug.includes('milk') || cat.includes('milk')) {
+      synonyms += ' milk dairy doodh ';
+    }
+    if (slug.includes('curd') || cat.includes('curd') || name.includes('dahi') || name.includes('yogurt')) {
+      synonyms += ' curd yogurt dahi yoghurt probiotics ';
+    }
+    if (slug.includes('flakes') || cat.includes('cereal') || name.includes('corn') || name.includes('chocos')) {
+      synonyms += ' flakes cereal cereals breakfast cornflakes chocos muesli granola ';
+    }
+    if (slug.includes('poha') || cat.includes('grain') || name.includes('dalia') || name.includes('poha')) {
+      synonyms += ' poha daliya dalia grains staples atta dal pulses rice ';
+    }
+    if (slug.includes('vermicelli') || name.includes('seviyan') || name.includes('upma') || cat.includes('vermicelli')) {
+      synonyms += ' vermicelli seviyan sevai semiya upma noodles pasta ';
+    }
+
+    const fullText = `${name} ${brand} ${unit} ${cat} ${slug} ${tag} ${synonyms}`;
+    return tokens.every((token) => fullText.includes(token));
   });
 }
+

@@ -91,9 +91,91 @@ class CategoriesProvider extends ChangeNotifier {
     );
   }
 
+  List<Map<String, dynamic>> getAllCatalogProductsList() {
+    return _allMockProducts['all'] ?? [];
+  }
+
+  Map<String, dynamic>? getProductById(String id) {
+    final all = _allMockProducts['all'] ?? [];
+    for (final p in all) {
+      if (p['id'] == id) return p;
+    }
+    return null;
+  }
+
+  List<Map<String, dynamic>> searchAllProducts(
+    String query, {
+    String filterTag = 'All',
+    String sortOption = 'Relevance',
+  }) {
+    final all = _allMockProducts['all'] ?? [];
+    final q = query.trim().toLowerCase();
+
+    List<Map<String, dynamic>> results = all.where((p) {
+      if (q.isEmpty) return true;
+      final name = (p['name'] ?? '').toString().toLowerCase();
+      final brand = (p['brand'] ?? '').toString().toLowerCase();
+      final sub = (p['sub'] ?? '').toString().toLowerCase();
+      final cat = (p['category'] ?? '').toString().toLowerCase();
+      final unit = (p['unit'] ?? p['subtitle'] ?? '').toString().toLowerCase();
+      return name.contains(q) || brand.contains(q) || sub.contains(q) || cat.contains(q) || unit.contains(q);
+    }).toList();
+
+    if (filterTag != 'All') {
+      results = results.where((p) {
+        switch (filterTag) {
+          case 'Organic':
+            final b = (p['badge'] ?? '').toString().toLowerCase();
+            final c = (p['category'] ?? '').toString().toLowerCase();
+            final n = (p['name'] ?? '').toString().toLowerCase();
+            return b.contains('organic') || c.contains('organic') || n.contains('organic');
+          case 'Under ₹50':
+            final price = (p['price'] as num?)?.toDouble() ?? 0.0;
+            return price <= 50.0;
+          case 'Best Discount':
+            final price = (p['price'] as num?)?.toDouble() ?? 0.0;
+            final mrp = (p['mrp'] as num?)?.toDouble() ?? price;
+            return mrp > price && ((mrp - price) / mrp) >= 0.15;
+          case '10-Min Fast':
+            return p['inStock'] == true;
+          default:
+            return true;
+        }
+      }).toList();
+    }
+
+    switch (sortOption) {
+      case 'Price: Low to High':
+        results.sort((a, b) => (a['price'] as num).compareTo(b['price'] as num));
+        break;
+      case 'Price: High to Low':
+        results.sort((a, b) => (b['price'] as num).compareTo(a['price'] as num));
+        break;
+      case 'Best Discount':
+        results.sort((a, b) {
+          final pA = (a['price'] as num).toDouble();
+          final mrpA = (a['mrp'] as num?)?.toDouble() ?? pA;
+          final discA = mrpA > pA ? (mrpA - pA) / mrpA : 0.0;
+
+          final pB = (b['price'] as num).toDouble();
+          final mrpB = (b['mrp'] as num?)?.toDouble() ?? pB;
+          final discB = mrpB > pB ? (mrpB - pB) / mrpB : 0.0;
+          return discB.compareTo(discA);
+        });
+        break;
+      default:
+        break;
+    }
+
+    return results;
+  }
+
   List<Map<String, dynamic>> getProductsForCategory(String categorySlug) {
-    final cat = findBySlugOrId(categorySlug);
-    List<Map<String, dynamic>> products = _allMockProducts[categorySlug] ?? _allMockProducts[cat.slug] ?? _allMockProducts['fresh-fruits-vegetables']!;
+    List<Map<String, dynamic>> products = _allMockProducts[categorySlug] ?? [];
+    if (products.isEmpty) {
+      final cat = findBySlugOrId(categorySlug);
+      products = _allMockProducts[cat.slug] ?? _allMockProducts['all'] ?? _allMockProducts['fresh-fruits-vegetables']!;
+    }
 
     if (_selectedSubcategory != 'All') {
       products = products.where((p) => p['sub'] == _selectedSubcategory).toList();
@@ -141,6 +223,102 @@ class CategoriesProvider extends ChangeNotifier {
   }
 
   static final List<CategoryItem> _defaultCategories = [
+    CategoryItem(
+      id: 'cat-all-products',
+      name: 'All Products',
+      slug: 'all',
+      description: 'Explore our full grocery catalog of 600+ farm fresh items delivered in 10 minutes',
+      iconName: 'storefront',
+      imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80',
+      bannerImage: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&q=80',
+      sortOrder: 0,
+      isFeatured: true,
+      subcategories: ['All', 'Bread & Pav', 'Fresh Vegetables', 'Curd & Yogurt', 'Milk', 'Flakes & Cereals', 'Poha & Grains', 'Vermicelli'],
+    ),
+    CategoryItem(
+      id: 'cat-bread-pav',
+      name: 'Bread, Pav & Bakery',
+      slug: 'bread-pav',
+      description: 'Sandwich breads, artisan sourdough, pav, burger buns & morning bakery essentials',
+      iconName: 'bakery_dining',
+      imageUrl: 'assets/products/bread-pav/007ea008-b857-4dd5-9005-fb6c4d98601b.png',
+      bannerImage: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&q=80',
+      sortOrder: 1,
+      isFeatured: true,
+      subcategories: ['All', 'Brown Bread', 'White Bread', 'Multigrain', 'Pav & Buns', 'Rusk & Toast'],
+    ),
+    CategoryItem(
+      id: 'cat-fresh-vegetables',
+      name: 'Fresh Vegetables',
+      slug: 'fresh-vegetables',
+      description: 'Farm-fresh vegetables, crisp leafy greens, exotic herbs & root veggies',
+      iconName: 'eco',
+      imageUrl: 'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+      bannerImage: 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=1200&q=80',
+      sortOrder: 2,
+      isFeatured: true,
+      subcategories: ['All', 'Fresh Vegetables', 'Exotics & Premium', 'Organic Produce', 'Leafy Greens'],
+    ),
+    CategoryItem(
+      id: 'cat-curd-yogurt',
+      name: 'Curd & Yogurt',
+      slug: 'curd-yogurt',
+      description: 'Fresh set dahi, probiotic curd cups, Greek yogurts and flavored desserts',
+      iconName: 'icecream',
+      imageUrl: 'assets/products/curd-yogurt/01278ea4-9aef-4263-8ea8-6a3eab2bd076.png',
+      bannerImage: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=1200&q=80',
+      sortOrder: 3,
+      isFeatured: true,
+      subcategories: ['All', 'Plain Curd', 'Greek Yogurt', 'Flavoured Yogurt', 'Probiotic'],
+    ),
+    CategoryItem(
+      id: 'cat-milk',
+      name: 'Fresh Milk',
+      slug: 'milk',
+      description: 'Pasteurized cow milk, A2 buffalo milk, toned, full cream and probiotic dairy drinks',
+      iconName: 'local_drink',
+      imageUrl: 'assets/products/milk/1ded64a0-9f20-4a1d-8211-156f221b377b.png',
+      bannerImage: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=1200&q=80',
+      sortOrder: 4,
+      isFeatured: true,
+      subcategories: ['All', 'Cow Milk', 'Buffalo Milk', 'Toned Milk', 'Full Cream', 'Probiotic Drinks'],
+    ),
+    CategoryItem(
+      id: 'cat-flakes-kids-cereals',
+      name: 'Flakes & Cereals',
+      slug: 'flakes-kids-cereals',
+      description: 'Crunchy corn flakes, choco fills, oats, granola and kids morning breakfast bowls',
+      iconName: 'breakfast_dining',
+      imageUrl: 'assets/products/flakes-kids-cereals/01e92a08-b40b-4d6f-aca7-8537cd382447.png',
+      bannerImage: 'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=1200&q=80',
+      sortOrder: 5,
+      isFeatured: true,
+      subcategories: ['All', 'Corn Flakes', 'Choco Fills', 'Muesli', 'Oats', 'Kids Cereals'],
+    ),
+    CategoryItem(
+      id: 'cat-poha-daliya-grains',
+      name: 'Poha, Daliya & Grains',
+      slug: 'poha-daliya-grains',
+      description: 'Thick poha, roasted wheat dalia, sabudana, millets and healthy whole grains',
+      iconName: 'grain',
+      imageUrl: 'assets/products/poha-daliya-grains/1092_1643384330629.png',
+      bannerImage: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=1200&q=80',
+      sortOrder: 6,
+      isFeatured: true,
+      subcategories: ['All', 'Poha', 'Dalia', 'Sabudana', 'Breakfast Grains'],
+    ),
+    CategoryItem(
+      id: 'cat-vermicelli',
+      name: 'Vermicelli & Sevai',
+      slug: 'vermicelli',
+      description: 'Roasted wheat seviyan, traditional rice sevai, upma mixes & dessert vermicelli',
+      iconName: 'ramen_dining',
+      imageUrl: 'assets/products/vermicelli/3da21b8f-16e5-4727-9899-c5ef3e1db668.png',
+      bannerImage: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?w=1200&q=80',
+      sortOrder: 7,
+      isFeatured: true,
+      subcategories: ['All', 'Roasted Vermicelli', 'Plain Vermicelli', 'Sevai', 'Wheat Vermicelli'],
+    ),
     CategoryItem(
       id: 'cat-fresh-fruits-veg',
       name: 'Fresh Fruits & Vegetables',

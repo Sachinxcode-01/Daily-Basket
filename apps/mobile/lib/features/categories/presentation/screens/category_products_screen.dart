@@ -213,7 +213,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
                                 border: Border.all(color: Colors.white.withValues(alpha: 0.25)),
                               ),
                               child: Text(
-                                '${products.isNotEmpty ? products.length * 25 : 325} Products',
+                                '${products.length} Products',
                                 style: GoogleFonts.inter(
                                   color: Colors.white,
                                   fontSize: 10,
