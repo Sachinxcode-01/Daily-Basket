@@ -135,11 +135,9 @@ jobs:
           fi
 
       - name: Rollout Status & Automated Rollback Protection
-        env:
-          KUBE_CONFIG: ${{ secrets.KUBECONFIG }}
         run: |
-          if [ -n "$KUBE_CONFIG" ]; then
+          if [ -f ~/.kube/config ]; then
             kubectl rollout status deployment/daily-basket-api -n daily-basket --timeout=120s || (kubectl rollout undo deployment/daily-basket-api -n daily-basket && exit 1)
           else
-            echo "KUBECONFIG not configured. Rollout status check skipped."
+            echo "Kubernetes config not present. Rollout status check skipped."
           fi
