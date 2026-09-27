@@ -3,39 +3,42 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy root and service package files
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY services/api/package.json services/api/
-COPY packages/ ./packages/
+RUN apk add --no-libc-compat --no-cache python3 make g++
 
-# Install dependencies
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+# Copy package files from services/api
+COPY services/api/package*.json ./
+COPY services/api/prisma ./prisma/
+
+# Install dependencies using standalone package-lock.json
+RUN npm ci
 
 # Copy NestJS API source code
-COPY services/api/ ./services/api/
+COPY services/api/ ./
 
 # Generate Prisma Client & Build NestJS app
-WORKDIR /app/services/api
-RUN npx prisma generate
+RUN npm run prisma:generate
 RUN npm run build
+RUN npm prune --production
 
 # Production Runner Stage
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 ENV NODE_ENV=production
+ENV PORT=4000
 
 # Security: Add non-root user
-RUN addgroup -g 1001 -S nodejs && adduser -S nestjs -u 1001
+RUN addgroup -g 1001 -S nodejs && adduser -S nestjs -u 1001 -G nodejs
 
 # Copy built application and node_modules from builder
-COPY --from=builder /app/services/api/dist ./dist
-COPY --from=builder /app/services/api/node_modules ./node_modules
-COPY --from=builder /app/services/api/package.json ./
-COPY --from=builder /app/services/api/prisma ./prisma
+COPY --chown=nestjs:nodejs --from=builder /app/package*.json ./
+COPY --chown=nestjs:nodejs --from=builder /app/node_modules ./node_modules
+COPY --chown=nestjs:nodejs --from=builder /app/dist ./dist
+COPY --chown=nestjs:nodejs --from=builder /app/prisma ./prisma
 
 USER nestjs
 
 EXPOSE 4000
 
 CMD ["node", "dist/main"]
+

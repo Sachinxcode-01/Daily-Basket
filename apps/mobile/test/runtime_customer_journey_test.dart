@@ -75,7 +75,7 @@ void main() {
       // Drain buttons delay + cursor blink timer
       await tester.pump(const Duration(milliseconds: 1000));
       // Final settle — let all animations complete
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pump(const Duration(milliseconds: 500));
     });
 
     testWidgets('2. Customer Home Screen Test', (WidgetTester tester) async {
