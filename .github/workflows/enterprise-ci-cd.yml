@@ -125,13 +125,21 @@ jobs:
             mkdir -p ~/.kube
             echo "$KUBE_CONFIG" > ~/.kube/config
             chmod 600 ~/.kube/config
+            kubectl apply -f infrastructure/k8s/configmap.yaml
+            kubectl apply -f infrastructure/k8s/deployment.yaml
+            kubectl apply -f infrastructure/k8s/service.yaml
+            kubectl apply -f infrastructure/k8s/ingress.yaml
+            kubectl apply -f infrastructure/k8s/hpa.yaml
+          else
+            echo "KUBECONFIG secret not configured. Skipping Kubernetes deployment."
           fi
-          kubectl apply -f infrastructure/k8s/configmap.yaml
-          kubectl apply -f infrastructure/k8s/deployment.yaml
-          kubectl apply -f infrastructure/k8s/service.yaml
-          kubectl apply -f infrastructure/k8s/ingress.yaml
-          kubectl apply -f infrastructure/k8s/hpa.yaml
 
       - name: Rollout Status & Automated Rollback Protection
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBECONFIG }}
         run: |
-          kubectl rollout status deployment/daily-basket-api -n daily-basket --timeout=120s || (kubectl rollout undo deployment/daily-basket-api -n daily-basket && exit 1)
+          if [ -n "$KUBE_CONFIG" ]; then
+            kubectl rollout status deployment/daily-basket-api -n daily-basket --timeout=120s || (kubectl rollout undo deployment/daily-basket-api -n daily-basket && exit 1)
+          else
+            echo "KUBECONFIG not configured. Rollout status check skipped."
+          fi
