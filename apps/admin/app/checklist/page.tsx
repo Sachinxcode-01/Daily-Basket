@@ -13,7 +13,8 @@ export default function LaunchChecklistPage() {
     { title: 'Dark Store Warehouses & Inventory Seeded', done: true },
     { title: 'Delivery Partner Geofencing & Zone Bounds Set', done: true },
     { title: 'Domain SSL Certificate & DNS Verification', done: false },
-    { title: 'Push Notification Firebase Service Account JSON', done: false },
+    { title: 'Push Notification Firebase Service Account JSON', done: true },
+
   ];
 
   return (

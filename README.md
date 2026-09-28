@@ -4,6 +4,8 @@
 
 <p align="center">
   <a href="https://github.com/Sachinxcode-01/Daily-Basket/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-22c55e.svg?style=for-the-badge" alt="MIT License" /></a>
+  <a href="https://firebase.google.com"><img src="https://img.shields.io/badge/Firebase-Admin%20%26%20Auth-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase Auth" /></a>
+  <a href="https://developers.google.com/identity"><img src="https://img.shields.io/badge/Google-OAuth%202.0%20SSO-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google OAuth" /></a>
   <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.19.x-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" /></a>
   <a href="https://nestjs.com"><img src="https://img.shields.io/badge/NestJS-10.3-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" /></a>
   <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" /></a>
@@ -12,6 +14,7 @@
   <a href="https://github.com/Sachinxcode-01/Daily-Basket/actions"><img src="https://img.shields.io/badge/CI%2FCD-Passing-22c55e?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI/CD Status" /></a>
   <img src="https://img.shields.io/badge/Production-Ready-006b23?style=for-the-badge" alt="Production Ready" />
 </p>
+
 
 <br/>
 

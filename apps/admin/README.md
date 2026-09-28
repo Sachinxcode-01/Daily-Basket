@@ -1,6 +1,16 @@
 # 🏢 Daily Basket — Dark Store Admin Dashboard (`apps/admin`)
 
-The **Daily Basket Admin Dashboard** is a high-performance web portal built for Dark Store managers, inventory controllers, and operations leads. It provides real-time fulfillment management, inventory control, and revenue analytics.
+![Next.js 14](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React 18](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Real-time](https://img.shields.io/badge/WebSockets-Socket.IO-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-FCM%20Verified-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+
+---
+
+## 📌 Overview
+
+The **Daily Basket Admin Dashboard** is a high-performance operations portal built for Dark Store managers, fulfillment pickers, and operations leads. It provides real-time fulfillment management, inventory control, rider fleet dispatch, and business KPIs.
 
 ---
 
@@ -8,8 +18,9 @@ The **Daily Basket Admin Dashboard** is a high-performance web portal built for 
 
 ```
 apps/admin/app/
-├── page.tsx                        # Dashboard Overview (Today's Revenue, Active Orders, KPIs)
-├── orders/                         # Real-Time Fulfillment Queue (`NEW` → `CONFIRMED` → `PACKING` → `DISPATCHED`)
+├── page.tsx                        # Dashboard Overview (Revenue, Active Orders, KPIs)
+├── checklist/                      # Go-Live Production Readiness & Firebase Health
+├── orders/                         # Real-Time Fulfillment Queue (CONFIRMED → PACKING → DISPATCHED)
 ├── inventory/                      # Stock Manager (Stock Quantity, Low-stock alerts, SKU Search)
 ├── products/
 │   └── editor/                     # Product Catalog Editor (Price, MRP, Category, Tags, Images)
@@ -26,9 +37,10 @@ apps/admin/app/
 
 ## ⚡ Key Operational Features
 
-1. **Fulfillment Stream**: Real-time order cards updated via Socket.IO WebSocket events. Dark store packers update order status with one-tap buttons (`ACCEPT` → `PACK` → `DISPATCH`).
-2. **Inventory Stock Management**: Quick adjust stock quantity, receive low-stock alerts, and manage product availability per hub.
-3. **Driver Allocation**: Assign available online riders to packed orders for immediate 10-minute doorstep dispatch.
+1. **📦 Fulfillment Stream**: Real-time order cards updated via Socket.IO WebSocket events. Dark store packers update order status with one-tap buttons (`ACCEPT` → `PACK` → `DISPATCH`).
+2. **📊 Inventory Stock Management**: Instant adjustments to stock quantity, low-stock threshold triggers, and multi-hub availability toggles.
+3. **🛵 Driver Allocation & Fleet Tracking**: Monitor active riders, assign dispatched orders, and verify doorstep delivery status.
+4. **🚀 Go-Live Verification Suite**: Built-in verification checklist confirming database, payment gateways, and Firebase Service Account configuration.
 
 ---
 
@@ -38,4 +50,5 @@ apps/admin/app/
 # From workspace root
 pnpm --filter admin dev
 ```
+
 Open `http://localhost:3001` in your browser.

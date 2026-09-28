@@ -35,10 +35,17 @@ export class AuthController {
   }
 
   @Post('google-login')
-  @ApiOperation({ summary: 'Google OAuth 2.0 single sign-on authentication' })
+  @ApiOperation({ summary: 'Google OAuth 2.0 & Firebase single sign-on authentication' })
   async googleOAuthLogin(@Body() body: GoogleOAuthDto) {
     return this.authService.googleOAuthLogin(body);
   }
+
+  @Get('google/status')
+  @ApiOperation({ summary: 'Check Google & Firebase Authentication credentials health and configuration' })
+  async getGoogleAuthStatus() {
+    return this.authService.getGoogleAuthStatus();
+  }
+
 
   @Post('register-email')
   @ApiOperation({ summary: 'Create new customer account via Email & Password with policy check' })

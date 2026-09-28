@@ -7,6 +7,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { EmailModule } from '../email/email.module';
 import { PasswordPolicyService } from './password-policy.service';
 import { TotpService } from './totp.service';
+import { FirebaseAuthService } from './firebase-auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
@@ -24,8 +25,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     PrismaService,
     PasswordPolicyService,
     TotpService,
+    FirebaseAuthService,
     JwtStrategy,
   ],
-  exports: [AuthService, PasswordPolicyService, TotpService],
+  exports: [AuthService, PasswordPolicyService, TotpService, FirebaseAuthService],
 })
 export class AuthModule {}
+

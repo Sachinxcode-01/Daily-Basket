@@ -76,7 +76,8 @@ class AdminLaunchChecklistScreen extends StatelessWidget {
             _buildCheckitem('Dark Store Warehouses & Inventory Seeded', true),
             _buildCheckitem('Delivery Partner Geofencing & Zone Bounds Set', true),
             _buildCheckitem('Domain SSL Certificate & DNS Verification', false),
-            _buildCheckitem('Push Notification Firebase Service Account JSON', false),
+            _buildCheckitem('Push Notification Firebase Service Account JSON', true),
+
           ],
         ),
       ),

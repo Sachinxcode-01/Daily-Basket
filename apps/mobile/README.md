@@ -1,5 +1,15 @@
 # 📱 Daily Basket — Customer Mobile Application (`apps/mobile`)
 
+![Flutter](https://img.shields.io/badge/Flutter-3.19.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![Dart](https://img.shields.io/badge/Dart-3.3-0175C2?style=for-the-badge&logo=dart&logoColor=white)
+![Google Maps](https://img.shields.io/badge/Google%20Maps-Live%20Telemetry-4285F4?style=for-the-badge&logo=googlemaps&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20FCM-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![Design System](https://img.shields.io/badge/Design%20System-Google%20Stitch-006823?style=for-the-badge)
+
+---
+
+## 📌 Overview
+
 The **Daily Basket Mobile App** is a production-grade, cross-platform Flutter application built with Clean Architecture, Material Design 3, and the Provider pattern. Designed to deliver groceries in 10 minutes, it provides a fast, smooth, and intuitive user experience anchored to the **Google Stitch Design Source of Truth**.
 
 ---
@@ -44,37 +54,25 @@ apps/mobile/lib/
 
 ## ✨ Implemented Screen Features (35+ Screens)
 
-1. **Authentication Suite**:
-   - `phone_login_screen.dart`: Phone OTP request with 6-digit PIN input.
-   - `verify_otp_screen.dart`: OTP verification countdown & auto-submit.
-   - `google_auth_button.dart`: Single-tap Google OAuth integration.
+1. **🔐 Authentication Suite**:
+   - `welcome_screen.dart`: Animated entry sequence with staggered typewriter motion and Google OAuth button.
+   - `login_screen.dart`: Email/Password & Google SSO login with lockout protection.
+   - `register_screen.dart`: Customer registration with single-tap Google SSO account linking.
+   - `otp_screen.dart`: Phone OTP request with 6-digit PIN input and 60s cooldown timer.
    - `mfa_selection_screen.dart`: TOTP vs Email MFA selector.
    - `enable_biometrics_screen.dart`: Fingerprint / FaceID setup.
-   - `account_locked_screen.dart`: Lockout timer after failed attempts.
-2. **Shopping & Feed**:
+   - `account_locked_screen.dart`: Automated lockout timer after 5 consecutive failed attempts.
+
+2. **🛍️ Shopping & Feed**:
    - `home_screen.dart`: Sticky 10-minute ETA header badge, address bar, flash deals grid.
    - `cart_screen.dart`: Interactive cart drawer with free delivery progress meter.
    - `checkout_screen.dart`: Address selection, slot booking, Razorpay payment intent (UPI/Card/COD).
-3. **Tracking & Delivery**:
+
+3. **🗺️ Tracking & Delivery**:
    - `live_tracking_screen.dart`: Animated step-by-step timeline, Socket.IO WebSocket GPS telemetry, driver card.
-4. **AI Capabilities**:
-   - `ai_chat_assistant_screen.dart`: Natural language grocery assistant & recipe builder.
-   - `visual_freshness_scanner_screen.dart`: Camera photo upload for produce quality inspection.
-   - `voice_search_overlay.dart`: Speech recognition voice input for instant search.
 
----
-
-## 🧪 Testing & Code Quality
-
-The mobile codebase adheres to strict quality guidelines:
-
-```bash
-# Run static analysis (0 Errors, 0 Warnings required)
-flutter analyze
-
-# Execute unit and widget test suites
-flutter test
-```
+4. **🤖 AI Capabilities**:
+   - Multi-provider AI assistant with voice input and visual grocery scanner.
 
 ---
 
@@ -82,10 +80,6 @@ flutter test
 
 ```bash
 cd apps/mobile
-
-# Fetch Flutter dependencies
 flutter pub get
-
-# Launch on connected simulator or device
 flutter run
 ```

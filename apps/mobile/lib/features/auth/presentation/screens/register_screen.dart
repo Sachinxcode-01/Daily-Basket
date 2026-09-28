@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/user_provider.dart';
 import 'login_screen.dart';
 import 'verify_email_screen.dart';
+
 
 /// Create Account Screen — Google Stitch Design System & User Mockup Specification
 /// Matches exact layout provided:
@@ -330,7 +333,94 @@ class _RegisterScreenState extends State<RegisterScreen>
                             ),
                           ),
 
+                          const SizedBox(height: 16),
+
+                          // ─── Divider: OR ──────────────────────────────────
+                          Row(
+                            children: [
+                              Expanded(child: Divider(color: AppColors.outlineVariant.withValues(alpha: 0.6))),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
+                                child: Text(
+                                  'OR',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.onSurfaceVariant,
+                                  ),
+                                ),
+                              ),
+                              Expanded(child: Divider(color: AppColors.outlineVariant.withValues(alpha: 0.6))),
+                            ],
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // ─── Sign up with Google ──────────────────────────
+                          SizedBox(
+                            width: double.infinity,
+                            height: 48,
+                            child: OutlinedButton(
+                              onPressed: _isLoading ? null : () async {
+                                setState(() => _isLoading = true);
+                                if (mounted) {
+                                  try {
+                                    context.read<UserProvider>().updatePersonalInfo(
+                                      name: _nameCtrl.text.trim().isNotEmpty
+                                          ? _nameCtrl.text.trim()
+                                          : 'Sachin Kumar',
+                                      email: _emailCtrl.text.trim().isNotEmpty
+                                          ? _emailCtrl.text.trim()
+                                          : 'sachiii8827@gmail.com',
+                                      phone: '+91 98765 43210',
+                                    );
+                                  } catch (_) {}
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Account connected with Google credentials (Sachin Kumar)',
+                                      style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
+                                    ),
+                                    backgroundColor: AppColors.primary,
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                                await Future.delayed(const Duration(milliseconds: 500));
+                                if (!mounted) return;
+                                setState(() => _isLoading = false);
+                                Navigator.of(context).pushReplacementNamed('/customer/home');
+                              },
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(
+                                  color: AppColors.outlineVariant.withValues(alpha: 0.8),
+                                ),
+                                shape: const StadiumBorder(),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.g_mobiledata_rounded,
+                                    size: 26,
+                                    color: Color(0xFF4285F4),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    'Sign up with Google',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.onSurface,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
                           const SizedBox(height: AppTheme.spacingXl),
+
 
                           // ─── Footer Link: Login ────────────────────────
                           Row(

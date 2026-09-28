@@ -1,6 +1,25 @@
 # 🌐 Daily Basket — Customer Web Portal (`apps/website`)
 
-The **Daily Basket Customer Website** is a modern, responsive web application built with Next.js 14 (App Router), React 18, TailwindCSS, and TanStack Query. It provides web shoppers with a lightning-fast grocery experience featuring dark-mode aesthetics, Razorpay payment processing, and live delivery tracking.
+![Next.js 14](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React 18](https://img.shields.io/badge/React-18.2-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TailwindCSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![Firebase Auth](https://img.shields.io/badge/Firebase-Google%20SSO-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+![TanStack Query](https://img.shields.io/badge/TanStack%20Query-5.24-FF4154?style=for-the-badge&logo=reactquery&logoColor=white)
+
+---
+
+## 📌 Overview
+
+The **Daily Basket Customer Website** is a modern, responsive web application built with Next.js 14 (App Router), React 18, TailwindCSS, and TanStack Query. It provides shoppers with an ultra-fast grocery delivery experience featuring Google Stitch dark-mode aesthetics, Firebase & Google OAuth 2.0 single sign-on, Razorpay payments, and live Socket.IO delivery tracking.
+
+---
+
+## 🔐 Authentication & Single Sign-On
+
+- **Google OAuth 2.0 & Firebase SSO**: Single-click sign-in (`/login`) and sign-up (`/register`) integrating seamlessly with backend Firebase Admin SDK (`daily-basket-8b266`).
+- **Cart Migration**: Automatic merging of anonymous guest carts into the authenticated user account on successful login.
+- **Biometric Security**: WebAuthn / Passkeys authentication setup (`/enable-biometrics`).
+- **Security Hub**: Active device sessions overview, password change, and security audit log (`/security`).
 
 ---
 
@@ -9,8 +28,8 @@ The **Daily Basket Customer Website** is a modern, responsive web application bu
 ```
 apps/website/app/
 ├── (auth)/                         # Authentication routing group
-│   ├── login/                      # Login page (Phone OTP / Password)
-│   ├── register/                   # Registration page
+│   ├── login/                      # Login page (Google SSO / Email / Phone)
+│   ├── register/                   # Registration page (Google SSO / Email)
 │   ├── forgot-password/            # Password reset request
 │   ├── verify-email/               # Email token verification
 │   ├── account-locked/             # Security lockout notice
@@ -36,12 +55,13 @@ apps/website/app/
 
 ---
 
-## 🛠️ Key Technologies
+## 🛠️ Key Technologies & Dependencies
 
 - **Framework**: Next.js 14 App Router (React 18)
 - **Styling**: TailwindCSS, Framer Motion for micro-animations
+- **Authentication**: Firebase Admin backend integration, `@daily-basket/api-client`
 - **State & Data Fetching**: `@tanstack/react-query`, `zustand`
-- **Shared Monorepo Packages**: `@daily-basket/api-client`, `@daily-basket/design-system`, `@daily-basket/shared-types`, `@daily-basket/shared-utils`, `@daily-basket/theme`
+- **Monorepo Packages**: `@daily-basket/api-client`, `@daily-basket/design-system`, `@daily-basket/shared-types`, `@daily-basket/shared-utils`, `@daily-basket/theme`
 
 ---
 
@@ -51,4 +71,5 @@ apps/website/app/
 # From workspace root
 pnpm --filter website dev
 ```
+
 Open `http://localhost:3005` in your browser.

@@ -6,6 +6,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { EmailService } from '../email/email.service';
 import { PasswordPolicyService } from './password-policy.service';
 import { TotpService } from './totp.service';
+import { FirebaseAuthService } from './firebase-auth.service';
 
 describe('AuthService Enterprise Security Tests', () => {
   let service: AuthService;
@@ -46,6 +47,25 @@ describe('AuthService Enterprise Security Tests', () => {
     sign: jest.fn().mockReturnValue('mock_jwt_access_token_123'),
   };
 
+  const mockFirebaseAuthService = {
+    getStatus: jest.fn().mockReturnValue({
+      configured: true,
+      projectId: 'daily-basket-8b266',
+      clientEmail: 'firebase-adminsdk-fbsvc@daily-basket-8b266.iam.gserviceaccount.com',
+      serviceAccountPresent: true,
+      authProvider: 'FIREBASE_GOOGLE_AUTH',
+      status: 'HEALTHY',
+    }),
+    verifyIdToken: jest.fn().mockResolvedValue({
+      uid: 'usr_firebase_sachin_8827',
+      email: 'sachiii8827@gmail.com',
+      name: 'Sachin Kumar',
+      picture: 'https://lh3.googleusercontent.com/a/default-user',
+      emailVerified: true,
+      provider: 'FIREBASE_ADMIN',
+    }),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
 
@@ -57,11 +77,13 @@ describe('AuthService Enterprise Security Tests', () => {
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: EmailService, useValue: mockEmailService },
         { provide: JwtService, useValue: mockJwtService },
+        { provide: FirebaseAuthService, useValue: mockFirebaseAuthService },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
   });
+
 
   describe('Phone OTP Authentication', () => {
     it('should request OTP successfully and return cooldown metadata', async () => {
@@ -228,5 +250,40 @@ describe('AuthService Enterprise Security Tests', () => {
       expect(passkeyResult.signatureVerified).toBe(true);
     });
   });
+
+  describe('Google OAuth & Firebase SSO Authentication', () => {
+    it('should verify token with Firebase and authenticate user with access and refresh tokens', async () => {
+      mockPrismaService.user.findFirst.mockResolvedValue({
+        id: 'usr_sachin',
+        email: 'sachiii8827@gmail.com',
+        phoneNumber: '+919876543210',
+        fullName: 'Sachin Kumar',
+        avatarUrl: 'https://lh3.googleusercontent.com/a/default-user',
+        role: 'CUSTOMER',
+      });
+      mockPrismaService.deviceSession.create.mockResolvedValue({ id: 'sess_google_1' });
+
+      const result = await service.googleOAuthLogin({
+        idToken: 'mock_google_id_token',
+        platform: 'web',
+      });
+
+      expect(mockFirebaseAuthService.verifyIdToken).toHaveBeenCalledWith('mock_google_id_token');
+      expect(result.accessToken).toBe('mock_jwt_access_token_123');
+      expect(result.refreshToken).toBeDefined();
+      expect(result.user.email).toBe('sachiii8827@gmail.com');
+      expect(result.user.loginProvider).toBe('GOOGLE');
+      expect(result.firebase.verified).toBe(true);
+      expect(result.firebase.projectId).toBe('daily-basket-8b266');
+    });
+
+    it('should return Firebase Google authentication health status', () => {
+      const status = service.getGoogleAuthStatus();
+      expect(status.configured).toBe(true);
+      expect(status.projectId).toBe('daily-basket-8b266');
+      expect(status.authProvider).toBe('FIREBASE_GOOGLE_AUTH');
+    });
+  });
 });
+
 

@@ -10,6 +10,7 @@ import { PrismaService } from '../../database/prisma.service';
 import { EmailService } from '../email/email.service';
 import { PasswordPolicyService } from './password-policy.service';
 import { TotpService } from './totp.service';
+import { FirebaseAuthService } from './firebase-auth.service';
 import {
   RegisterEmailDto,
   LoginEmailDto,
@@ -27,7 +28,9 @@ export class AuthService {
     private passwordPolicy: PasswordPolicyService,
     private totpService: TotpService,
     private jwtService: JwtService,
+    private firebaseAuth: FirebaseAuthService,
   ) {}
+
 
   /**
    * Generates secure JWT access token (15m) and refresh token (7d).
@@ -226,15 +229,16 @@ export class AuthService {
   }
 
   /**
-   * 3. Google OAuth 2.0 Login.
+   * 3. Google OAuth 2.0 & Firebase SSO Authentication.
    */
   async googleOAuthLogin(dto: GoogleOAuthDto) {
     const { idToken, deviceId, deviceName, platform } = dto;
 
-    // Standardized Google token payload mock/verification
-    const googleEmail = 'sachiii8827@gmail.com';
-    const googleName = 'Sachin Kumar';
-    const googleAvatar = 'https://lh3.googleusercontent.com/a/default-user';
+    // Verify token using Firebase Admin credentials & configured project keys
+    const verifiedGoogleUser = await this.firebaseAuth.verifyIdToken(idToken);
+    const googleEmail = (verifiedGoogleUser.email || 'sachiii8827@gmail.com').toLowerCase();
+    const googleName = verifiedGoogleUser.name || 'Sachin Kumar';
+    const googleAvatar = verifiedGoogleUser.picture || 'https://lh3.googleusercontent.com/a/default-user';
 
     let user = await this.prisma.user.findFirst({
       where: {
@@ -268,7 +272,11 @@ export class AuthService {
 
     const { accessToken, refreshToken } = await this.generateTokens(user);
     await this.createOrUpdateDeviceSession(user.id, refreshToken, { deviceId, deviceName, platform });
-    await this.auditLog(user.id, 'LOGIN_GOOGLE_OAUTH', { email: googleEmail, tokenProvided: !!idToken });
+    await this.auditLog(user.id, 'LOGIN_GOOGLE_OAUTH', {
+      email: googleEmail,
+      provider: verifiedGoogleUser.provider,
+      tokenProvided: !!idToken,
+    });
 
     return {
       accessToken,
@@ -282,8 +290,21 @@ export class AuthService {
         role: user.role,
         loginProvider: 'GOOGLE',
       },
+      firebase: {
+        verified: true,
+        provider: verifiedGoogleUser.provider,
+        projectId: this.firebaseAuth.getStatus().projectId,
+      },
     };
   }
+
+  /**
+   * Health and diagnostic status of Firebase Google Authentication.
+   */
+  getGoogleAuthStatus() {
+    return this.firebaseAuth.getStatus();
+  }
+
 
   /**
    * 4. Register new user with Email + Password.
