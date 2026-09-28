@@ -1,22 +1,17 @@
-<p align="center">
-  <img src="assets/banner.png" alt="Daily Basket — Enterprise 10-Minute Grocery Delivery Platform" width="100%" />
-</p>
+# 🛒 Daily Basket — Enterprise 10-Minute Grocery Delivery Platform
 
-<p align="center">
-  <a href="https://github.com/Sachinxcode-01/Daily-Basket/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-22c55e.svg?style=for-the-badge" alt="MIT License" /></a>
-  <a href="https://firebase.google.com"><img src="https://img.shields.io/badge/Firebase-Admin%20%26%20Auth-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" alt="Firebase Auth" /></a>
-  <a href="https://developers.google.com/identity"><img src="https://img.shields.io/badge/Google-OAuth%202.0%20SSO-4285F4?style=for-the-badge&logo=google&logoColor=white" alt="Google OAuth" /></a>
-  <a href="https://flutter.dev"><img src="https://img.shields.io/badge/Flutter-3.19.x-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter" /></a>
-  <a href="https://nestjs.com"><img src="https://img.shields.io/badge/NestJS-10.3-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" /></a>
-  <a href="https://nextjs.org"><img src="https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js" /></a>
-  <a href="https://prisma.io"><img src="https://img.shields.io/badge/Prisma-5.10-2D3748?style=for-the-badge&logo=prisma&logoColor=white" alt="Prisma" /></a>
-  <a href="https://redis.io"><img src="https://img.shields.io/badge/Redis-7.2-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis" /></a>
-  <a href="https://github.com/Sachinxcode-01/Daily-Basket/actions"><img src="https://img.shields.io/badge/CI%2FCD-Passing-22c55e?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI/CD Status" /></a>
-  <img src="https://img.shields.io/badge/Production-Ready-006b23?style=for-the-badge" alt="Production Ready" />
-</p>
+![Daily Basket Banner](assets/banner.png)
 
-
-<br/>
+[![License: MIT](https://img.shields.io/badge/License-MIT-22c55e.svg?style=for-the-badge)](https://github.com/Sachinxcode-01/Daily-Basket/blob/main/LICENSE)
+[![Firebase Auth](https://img.shields.io/badge/Firebase-Admin%20%26%20Auth-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)](https://firebase.google.com)
+[![Google OAuth](https://img.shields.io/badge/Google-OAuth%202.0%20SSO-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://developers.google.com/identity)
+[![Flutter](https://img.shields.io/badge/Flutter-3.19.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![NestJS](https://img.shields.io/badge/NestJS-10.3-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com)
+[![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![Prisma](https://img.shields.io/badge/Prisma-5.10-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://prisma.io)
+[![Redis](https://img.shields.io/badge/Redis-7.2-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
+[![CI/CD Status](https://img.shields.io/badge/CI%2FCD-Passing-22c55e?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/Sachinxcode-01/Daily-Basket/actions)
+![Production Ready](https://img.shields.io/badge/Production-Ready-006b23?style=for-the-badge)
 
 > **Daily Basket** is an enterprise-grade, hyper-local 10-minute quick-commerce platform delivering fresh groceries, vegetables, dairy, and household essentials. Built as a clean-architecture monorepo, it powers a cross-platform Flutter customer app, three Next.js 14 web portals (Customer, Store Admin, Delivery Partner PWA), and a NestJS microservices backend with real-time WebSockets, Redis caching, BullMQ job queues, and multi-provider AI engine.
 
@@ -24,30 +19,30 @@
 
 ## 📋 Table of Contents
 
-- [Platform Overview](#-platform-overview)
-- [Single Source of Truth (Google Stitch)](#-single-source-of-truth-google-stitch)
-- [System Architecture](#-system-architecture)
-- [Monorepo Directory Structure](#-monorepo-directory-structure)
-- [Feature Matrix](#-feature-matrix)
-  - [Customer Mobile App](#1-customer-mobile-app-appsmobile)
-  - [Customer Web Portal](#2-customer-web-portal-appswebsite)
-  - [Store Admin Dashboard](#3-store-admin-dashboard-appsadmin)
-  - [Delivery Partner PWA](#4-delivery-partner-pwa-appsdelivery)
-  - [Backend Services](#5-backend-microservices-servicesapi)
-- [Tech Stack](#-tech-stack)
-- [Quick Start & Local Setup](#-quick-start--local-setup)
-- [API Directory Overview](#-api-directory-overview)
-- [AI Engine Architecture](#-ai-engine-architecture)
-- [Security & Compliance](#-security--compliance)
-- [Testing & Quality Assurance](#-testing--quality-assurance)
-- [DevOps & CI/CD Pipeline](#-devops--cicd-pipeline)
-- [Enterprise Documentation Hub](#-enterprise-documentation-hub)
-- [Roadmap](#-roadmap)
-- [License & Author](#-license--author)
+- [Platform Overview](#platform-overview)
+- [Single Source of Truth (Google Stitch)](#single-source-of-truth-google-stitch)
+- [System Architecture](#system-architecture)
+- [Monorepo Directory Structure](#monorepo-directory-structure)
+- [Feature Matrix](#feature-matrix)
+  - [Customer Mobile App](#customer-mobile-app)
+  - [Customer Web Portal](#customer-web-portal)
+  - [Store Admin Dashboard](#store-admin-dashboard)
+  - [Delivery Partner PWA](#delivery-partner-pwa)
+  - [Backend Services](#backend-services)
+- [Tech Stack](#tech-stack)
+- [Quick Start & Local Setup](#quick-start--local-setup)
+- [API Directory Overview](#api-directory-overview)
+- [AI Engine Architecture](#ai-engine-architecture)
+- [Security & Compliance](#security--compliance)
+- [Testing & Quality Assurance](#testing--quality-assurance)
+- [DevOps & CI/CD Pipeline](#devops--cicd-pipeline)
+- [Enterprise Documentation Hub](#enterprise-documentation-hub)
+- [Roadmap](#roadmap)
+- [License & Author](#license--author)
 
 ---
 
-## 📱 Platform Overview
+## Platform Overview
 
 Daily Basket seamlessly integrates local Kirana dark store hubs with real-time customer ordering, automated rider dispatch, and doorstep OTP verification.
 
@@ -61,7 +56,7 @@ Daily Basket seamlessly integrates local Kirana dark store hubs with real-time c
 
 ---
 
-## 🎨 Single Source of Truth (Google Stitch)
+## Single Source of Truth (Google Stitch)
 
 All user interface components, layouts, typography hierarchies, design tokens, color palettes, micro-animations, and visual flows are strictly anchored to the **Google Stitch Design Project**.
 
@@ -71,7 +66,7 @@ All user interface components, layouts, typography hierarchies, design tokens, c
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ```mermaid
 graph TD
@@ -130,9 +125,9 @@ graph TD
 
 ---
 
-## 📂 Monorepo Directory Structure
+## Monorepo Directory Structure
 
-```
+```text
 daily-basket/
 ├── .agents/                        # Workspace rules & customization configs
 ├── apps/
@@ -168,22 +163,19 @@ daily-basket/
 ├── services/
 │   └── api/                        # ⚙️ NestJS API Gateway & Microservices Backend
 │       ├── prisma/                 # Database schema definitions & migrations
-│       └── src/                    # NestJS modules (auth, products, orders, payments, delivery, AI)
-├── CHANGELOG.md                    # Keep a Changelog version history
-├── CONTRIBUTING.md                 # Developer contribution guidelines
-├── CODE_OF_CONDUCT.md              # Contributor code of conduct
-├── LICENSE                         # MIT License
-├── ROADMAP.md                      # Feature & milestone roadmap
-├── SECURITY.md                     # Security vulnerability disclosure policy
-└── SUPPORT.md                      # Technical support & community channels
+│       ├── src/                    # Domain modules, controllers & services
+│       └── firebase-service-account.json # Firebase Admin credentials
+├── pnpm-workspace.yaml             # Monorepo workspace configuration
+└── package.json                    # Workspace scripts & tooling
 ```
 
 ---
 
-## ✨ Feature Matrix
+## Feature Matrix
 
-### 1. Customer Mobile App (`apps/mobile`)
-- **Authentication**: Phone OTP verification, Email/Password login, Google OAuth, TOTP MFA, Biometric login support.
+### Customer Mobile App
+
+- **Authentication**: Phone OTP verification, Email/Password login, Google OAuth SSO, TOTP MFA, Biometric login support.
 - **Home Feed**: Live delivery ETA timer badge, delivery address selector, dynamic categories, flash deals carousel.
 - **Smart Catalog & Search**: Instant debounced catalog search with trending keywords, brand alias matching, and category filtering.
 - **Cart & Checkout**: Interactive cart drawer with free delivery progress meter, instant coupon validation (`DAILY100`), Razorpay payment gateway (UPI, Card, NetBanking, COD).
@@ -191,40 +183,48 @@ daily-basket/
 - **Wallet & Loyalty**: Digital Daily Basket Wallet balance, transaction ledger, instant refill, and Daily Basket Plus VIP perks.
 - **AI Voice & Visual Search**: Voice search interface and camera image recognition powered by backend multi-provider AI.
 
-### 2. Customer Web Portal (`apps/website`)
+### Customer Web Portal
+
 - **Responsive Web Portal**: Built using Next.js 14 App Router, React 18, and TailwindCSS.
 - **Dark Mode Aesthetic**: Google Stitch compliant dark-mode design system with rich micro-interactions.
+- **Google & Firebase SSO**: Single-click sign-in and sign-up with automatic anonymous guest cart merging.
 - **Order Management**: Order placement, address management, coupon redemption, active delivery map, and delivery feedback rating.
 - **Account Security Hub**: Active session device management, password reset, 2FA toggle, and security audit activity log.
 
-### 3. Store Admin Dashboard (`apps/admin`)
+### Store Admin Dashboard
+
 - **Fulfillment Queue**: Real-time order dispatch stream (`NEW` → `CONFIRMED` → `PACKING` → `READY_FOR_PICKUP` → `DISPATCHED`).
 - **Inventory Control**: Live stock adjustments, low-stock threshold alerts, SKU search, and catalog editor.
 - **Store KPIs**: Real-time revenue analytics, average packing time, driver dispatch efficiency, and customer satisfaction metrics.
+- **Go-Live Checklist**: Pre-launch verification for database, payment gateways, and Firebase credentials.
 
-### 4. Delivery Partner PWA (`apps/delivery`)
+### Delivery Partner PWA
+
 - **Duty Controller**: One-tap `ONLINE`/`OFFLINE` toggle with automated GPS telemetry broadcast.
 - **Active Orders Queue**: Dark store pickup location, customer drop-off instructions, item packing manifest.
 - **Doorstep Verification**: Customer OTP PIN verification before marking orders as `DELIVERED`.
 - **Earnings Ledger**: Daily base pay, surge incentives, tip breakdown, and performance stats.
 
-### 5. Backend Microservices (`services/api`)
+### Backend Services
+
 - **NestJS Clean Architecture**: Decoupled controllers, domain services, custom guards, logging interceptors, and exception filters.
+- **Firebase Admin SDK**: Cryptographic token verification for Google OAuth tokens using project credentials (`daily-basket-8b266`).
 - **Database & Cache**: PostgreSQL 16 managed by Prisma ORM 5 paired with Redis 7 caching and session storage.
 - **Queues & Realtime**: BullMQ job processing for notifications and email triggers alongside Socket.IO event gateways.
 - **Multi-Provider AI Engine**: Primary Gemini model with automatic fallback to Grok, OpenRouter, and local models.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Domain | Technology | Details |
 | :--- | :--- | :--- |
 | **Mobile App** | Flutter 3.19 / Dart 3.3 | Provider pattern, Clean Architecture, Material 3 |
 | **Web Applications** | Next.js 14 / React 18 | App Router, TailwindCSS, TanStack Query, Framer Motion |
-| **Backend API** | NestJS 10 / Node.js 20 | TypeScript 5.3, `@nestjs/swagger`, `@nestjs/throttler` |
+| **Backend API** | NestJS 10 / Node.js 20 | TypeScript 5.4, `@nestjs/swagger`, `@nestjs/throttler` |
+| **Authentication & Push** | Firebase Admin / Google OAuth / JWT | Firebase Service Account, token verification, JWT rotation |
 | **Database & ORM** | PostgreSQL 16 / Prisma 5 | Parameterized queries, UUID primary keys, spatial coordinates |
-| **Caching & Messaging** | Redis 7.2 / BullMQ 5 | Session caching, Pub/Sub events, async queue processing |
+| **Caching & Messaging** | Redis 7.2 / BullMQ 6 | Session caching, Pub/Sub events, async queue processing |
 | **Real-time Engine** | Socket.IO 4 | Dual-way WebSocket telemetry for live tracking & support chat |
 | **Payment Gateway** | Razorpay SDK | Razorpay Order intent, HMAC SHA-256 webhook signature verification |
 | **AI Integration** | Google Gemini / Grok / OpenRouter | Automated fallback manager, security sanitization, AI tool calling |
@@ -232,15 +232,17 @@ daily-basket/
 
 ---
 
-## ⚡ Quick Start & Local Setup
+## Quick Start & Local Setup
 
 ### Prerequisites
+
 - Node.js >= 18.18.0
 - pnpm >= 8.15.0
 - Flutter SDK >= 3.19.0
 - Docker & Docker Compose
 
 ### 1. Clone & Install Dependencies
+
 ```bash
 git clone https://github.com/Sachinxcode-01/Daily-Basket.git
 cd Daily-Basket
@@ -248,11 +250,15 @@ pnpm install
 ```
 
 ### 2. Configure Environment Variables
+
 Copy template `.env` file to API service:
+
 ```bash
 cp .env.production.example services/api/.env
 ```
+
 Ensure database credentials match local or container settings:
+
 ```env
 PORT=4000
 NODE_ENV=development
@@ -262,14 +268,18 @@ REDIS_PORT=6379
 JWT_SECRET="super-secret-jwt-key"
 RAZORPAY_KEY_ID="rzp_test_sample"
 RAZORPAY_KEY_SECRET="sample_secret"
+FIREBASE_PROJECT_ID="daily-basket-8b266"
+FIREBASE_SERVICE_ACCOUNT_PATH="./firebase-service-account.json"
 ```
 
 ### 3. Start Infrastructure (PostgreSQL + Redis)
+
 ```bash
 docker compose -f infrastructure/docker-compose.yml up -d
 ```
 
 ### 4. Initialize Database
+
 ```bash
 cd services/api
 npx prisma db push
@@ -277,10 +287,12 @@ npx prisma generate
 ```
 
 ### 5. Run Web & API Applications
+
 ```bash
 # From root directory — runs API, Website, Admin, and Delivery applications concurrently
 pnpm dev
 ```
+
 - **API Gateway**: `http://localhost:4000/api/v1`
 - **Swagger Documentation**: `http://localhost:4000/api/docs`
 - **Customer Web**: `http://localhost:3005`
@@ -288,6 +300,7 @@ pnpm dev
 - **Delivery PWA**: `http://localhost:3002`
 
 ### 6. Run Flutter Mobile App
+
 ```bash
 cd apps/mobile
 flutter pub get
@@ -296,7 +309,7 @@ flutter run
 
 ---
 
-## 🔌 API Directory Overview
+## API Directory Overview
 
 Below is a summary of primary API routes. For full details, see [`docs/API.md`](docs/API.md) or access Swagger UI at `/api/docs`.
 
@@ -304,7 +317,8 @@ Below is a summary of primary API routes. For full details, see [`docs/API.md`](
 | :--- | :--- | :--- | :--- | :--- |
 | **Auth** | `POST` | `/api/v1/auth/login-otp` | Request 6-digit phone verification OTP | Public |
 | **Auth** | `POST` | `/api/v1/auth/verify-otp` | Verify OTP & receive JWT token pair | Public |
-| **Auth** | `POST` | `/api/v1/auth/google` | Authenticate using Google OAuth token | Public |
+| **Auth** | `POST` | `/api/v1/auth/google-login` | Authenticate using Google OAuth / Firebase token | Public |
+| **Auth** | `GET` | `/api/v1/auth/google/status` | Firebase & Google credentials health diagnostic | Public |
 | **Products** | `GET` | `/api/v1/products/home-feed` | Fetch home page flash deals & categories | Public |
 | **Products** | `GET` | `/api/v1/products/search?query=` | Debounced full-text catalog search | Public |
 | **Orders** | `POST` | `/api/v1/orders` | Create new 10-minute grocery order | Customer |
@@ -315,7 +329,7 @@ Below is a summary of primary API routes. For full details, see [`docs/API.md`](
 
 ---
 
-## 🤖 AI Engine Architecture
+## AI Engine Architecture
 
 Daily Basket integrates a multi-provider LLM engine capable of processing natural language customer support, recipe recommendations, voice search, and package image freshness analysis.
 
@@ -340,9 +354,10 @@ See [`docs/AI.md`](docs/AI.md) for full provider failover and tool registration 
 
 ---
 
-## 🔒 Security & Compliance
+## Security & Compliance
 
 - **Authentication & JWT Rotation**: Short-lived JWT access tokens paired with secure HTTP-only refresh tokens.
+- **Firebase Cryptographic Verification**: Server-side token validation against Google public keys for Firebase users.
 - **Role-Based Access Control (RBAC)**: Enforced across controllers using `@Roles()` decorator and `RolesGuard`.
 - **Payment Security**: Strict HMAC SHA-256 signature validation on Razorpay payments and webhooks.
 - **Throttling & Helmet**: NestJS Throttler protects endpoints from brute force and DDoS attacks.
@@ -351,7 +366,7 @@ See [`docs/AI.md`](docs/AI.md) for full provider failover and tool registration 
 
 ---
 
-## 🧪 Testing & Quality Assurance
+## Testing & Quality Assurance
 
 - **Flutter Static Analysis**: `flutter analyze` — **0 Errors, 0 Warnings**.
 - **Flutter Unit & Widget Tests**: `flutter test` — Complete coverage for providers, services, and core UI widgets.
@@ -360,7 +375,7 @@ See [`docs/AI.md`](docs/AI.md) for full provider failover and tool registration 
 
 ---
 
-## 🚀 DevOps & CI/CD Pipeline
+## DevOps & CI/CD Pipeline
 
 The GitHub Actions automated pipeline validates all pull requests and deployment commits:
 
@@ -380,7 +395,7 @@ See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) and [`docs/DEVOPS.md`](docs/DEVOP
 
 ---
 
-## 📚 Enterprise Documentation Hub
+## Enterprise Documentation Hub
 
 Every document in the Daily Basket repository is fully detailed and maintained:
 
@@ -423,9 +438,9 @@ Every document in the Daily Basket repository is fully detailed and maintained:
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
-- [x] **v1.0.0 (Current Release)**
+- [x] **v1.0.0 (Initial Release)**
   - Flutter Mobile App (35+ screens, Material 3, Clean Architecture)
   - Next.js Customer Web Portal (31 pages, TailwindCSS, Dark mode)
   - Next.js Admin Dashboard (Real-time dispatch queue, KPIs)
@@ -434,27 +449,22 @@ Every document in the Daily Basket repository is fully detailed and maintained:
   - Redis 7 Caching, BullMQ queues, Socket.IO WebSockets
   - Multi-Provider AI Fallback Engine (Gemini, Grok, OpenRouter, Local)
   - Razorpay Payment Gateway integration with HMAC SHA-256 verification
-- [ ] **v1.1.0 (Upcoming)**
-  - FCM Push Notification service integration
-  - Multi-language localization (Kannada, Hindi, English)
+- [x] **v1.1.0 (Current Release)**
+  - Firebase Admin SDK Integration (`daily-basket-8b266`)
+  - Google OAuth 2.0 & Firebase SSO Token Verification
+  - Web & Mobile Google Single Sign-On / Registration Parity
+  - Comprehensive Documentation Refresh with Badges & Enterprise Diagrams
 - [ ] **v2.0.0 (Planned)**
   - Multi-dark store automated dispatcher hub
   - Predictive AI inventory demand forecasting
 
 ---
 
-## 📜 License & Author
+## License & Author
 
 Distributed under the **MIT License** — see [`LICENSE`](LICENSE) for details.
 
-<br/>
+Built with ❤️ by **Sachin** | [@Sachinxcode-01](https://github.com/Sachinxcode-01)
 
-<p align="center">
-  Built with ❤️ by <strong>Sachin</strong> &nbsp;|&nbsp;
-  <a href="https://github.com/Sachinxcode-01">@Sachinxcode-01</a>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Made%20in-India%20🇮🇳-FF9933?style=flat" />
-  <img src="https://img.shields.io/badge/Built%20for-Gadag%20%26%20Beyond-006b23?style=flat" />
-</p>
+![Made in India](https://img.shields.io/badge/Made%20in-India%20🇮🇳-FF9933?style=flat)
+![Built for Quick Commerce](https://img.shields.io/badge/Built%20for-Gadag%20%26%20Beyond-006b23?style=flat)

@@ -11,22 +11,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🔐 Firebase & Google OAuth 2.0 SSO Engine & Documentation Refresh
 
-#### ⚙️ Backend API & Authentication Service (`services/api`)
+#### ⚙️ Backend API & Authentication Services
 
 - **Firebase Admin SDK Integration**: Added `FirebaseAuthService` loaded with official service account credentials (`daily-basket-8b266`).
 - **Cryptographic Token Verification**: Implemented server-side token validation against Firebase public keys and Google certificates for `POST /api/v1/auth/google-login`.
 - **Diagnostic Endpoint**: Added `GET /api/v1/auth/google/status` for real-time health checks on Firebase service account configurations.
 - **Enterprise Test Suite**: Added dedicated Jest unit test coverage for Google OAuth and Firebase credentials validation.
 
-#### 🌐 Customer Web Portal (`apps/website`)
+#### 🌐 Customer Web Portal Updates
 
 - **Sign-Up Parity**: Added "Sign up with Google" to `/register` with animated Google logo, guest cart merging, and session persistence.
 
-#### 📱 Customer Mobile App (`apps/mobile`)
+#### 📱 Customer Mobile App Updates
 
 - **Registration Integration**: Added single-tap "Sign up with Google" on `RegisterScreen` with provider state linking.
 
-#### 📚 Documentation & Developer Experience
+#### 📚 Enterprise Documentation Refresh
 
 - **Documentation Overhaul**: Modernized markdown documentation across all applications (`apps/website`, `apps/mobile`, `apps/admin`, `apps/delivery`, `apps/daily_basket_admin`, `docs/AUTHENTICATION.md`, `README.md`) with official shields and professional icons.
 
@@ -36,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### 🚀 Initial Enterprise Release
 
-#### 📱 Customer Mobile App (`apps/mobile`)
+#### 📱 Customer Mobile App Initial Release
 
 - **Clean Architecture & Provider Pattern**: Production Flutter 3.19 codebase with Material Design 3 theme matching Google Stitch design source of truth.
 - **Authentication Suite**: Phone OTP verification, Email/Password login, Google OAuth integration, TOTP MFA option, Biometric authentication enable screen.
@@ -47,25 +47,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Wallet & Loyalty**: Digital Daily Basket Wallet balance ledger, transaction history, instant refill, and Daily Basket Plus VIP perks page.
 - **AI Voice & Vision Search**: Built-in microphone voice search and camera package freshness scanner powered by NestJS AI service.
 
-#### 🌐 Customer Web Portal (`apps/website`)
+#### 🌐 Customer Web Portal Initial Release
 
 - **Next.js 14 App Router**: Responsive web application with server-side rendering, React 18, and TailwindCSS dark theme styling.
 - **Account & Security Hub**: Active device session management, password policy rules, 2FA toggle, and security audit log.
 - **Full Catalog Explorer**: Dynamic product filtering, wishlist management, address selector, and Razorpay checkout flow.
 
-#### 🏢 Store Admin Dashboard (`apps/admin`)
+#### 🏢 Store Admin Dashboard Initial Release
 
 - **Real-Time Fulfillment Queue**: Dark Store order dispatch stream (`NEW` → `CONFIRMED` → `PACKING` → `READY_FOR_PICKUP` → `DISPATCHED`).
 - **Inventory Control**: Live stock adjustments, low-stock threshold warnings, SKU catalog editor, and customer insights.
 - **Revenue Analytics**: Real-time sales KPIs, average dispatch latency metrics, and dark store performance indicators.
 
-#### 🛵 Delivery Partner PWA (`apps/delivery`)
+#### 🛵 Delivery Partner PWA Initial Release
 
 - **Rider Duty Controller**: One-tap `ONLINE`/`OFFLINE` toggle with continuous background location broadcast.
 - **Active Orders Manifest**: Store pickup details, dropoff coordinates, items manifest, turn-by-turn navigation trigger.
 - **Doorstep Verification**: Customer OTP verification (`4821`) before completing order deliveries.
 
-#### ⚙️ NestJS API Gateway & Microservices (`services/api`)
+#### ⚙️ NestJS API Gateway & Microservices Initial Release
 
 - **Auth & Security**: JWT access/refresh token rotation, bcrypt password hashing, NestJS Throttler rate-limiting (100 req/min), Helmet headers, custom `RolesGuard` for RBAC.
 - **Database Architecture**: PostgreSQL 16 managed via Prisma ORM 5 with parameterized queries, composite indexes, and UUID primary keys.

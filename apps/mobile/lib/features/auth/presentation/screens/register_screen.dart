@@ -361,36 +361,43 @@ class _RegisterScreenState extends State<RegisterScreen>
                             width: double.infinity,
                             height: 48,
                             child: OutlinedButton(
-                              onPressed: _isLoading ? null : () async {
-                                setState(() => _isLoading = true);
-                                if (mounted) {
-                                  try {
-                                    context.read<UserProvider>().updatePersonalInfo(
-                                      name: _nameCtrl.text.trim().isNotEmpty
-                                          ? _nameCtrl.text.trim()
-                                          : 'Sachin Kumar',
-                                      email: _emailCtrl.text.trim().isNotEmpty
-                                          ? _emailCtrl.text.trim()
-                                          : 'sachiii8827@gmail.com',
-                                      phone: '+91 98765 43210',
-                                    );
-                                  } catch (_) {}
-                                }
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'Account connected with Google credentials (Sachin Kumar)',
-                                      style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
-                                    ),
-                                    backgroundColor: AppColors.primary,
-                                    duration: const Duration(seconds: 1),
-                                  ),
-                                );
-                                await Future.delayed(const Duration(milliseconds: 500));
-                                if (!mounted) return;
-                                setState(() => _isLoading = false);
-                                Navigator.of(context).pushReplacementNamed('/customer/home');
-                              },
+                              onPressed: _isLoading
+                                  ? null
+                                  : () async {
+                                      final navigator = Navigator.of(context);
+                                      final messenger = ScaffoldMessenger.of(context);
+                                      final userProvider = context.read<UserProvider>();
+
+                                      setState(() => _isLoading = true);
+                                      try {
+                                        userProvider.updatePersonalInfo(
+                                          name: _nameCtrl.text.trim().isNotEmpty
+                                              ? _nameCtrl.text.trim()
+                                              : 'Sachin Kumar',
+                                          email: _emailCtrl.text.trim().isNotEmpty
+                                              ? _emailCtrl.text.trim()
+                                              : 'sachiii8827@gmail.com',
+                                          phone: '+91 98765 43210',
+                                        );
+                                      } catch (_) {}
+
+                                      messenger.showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            'Account connected with Google credentials (Sachin Kumar)',
+                                            style: GoogleFonts.inter(fontSize: 13, color: Colors.white),
+                                          ),
+                                          backgroundColor: AppColors.primary,
+                                          duration: const Duration(seconds: 1),
+                                        ),
+                                      );
+
+                                      await Future.delayed(const Duration(milliseconds: 500));
+                                      if (!mounted) return;
+                                      setState(() => _isLoading = false);
+                                      navigator.pushReplacementNamed('/customer/home');
+                                    },
+
                               style: OutlinedButton.styleFrom(
                                 side: BorderSide(
                                   color: AppColors.outlineVariant.withValues(alpha: 0.8),
