@@ -34,5 +34,5 @@ databases:
   - name: daily-basket-db
     databaseName: daily_basket
     user: daily_basket_user
-    plan: free
+    plan: starter
     region: oregon
