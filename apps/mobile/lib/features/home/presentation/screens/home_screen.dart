@@ -30,79 +30,874 @@ class _Product {
   final String id, name, brand, unit, price, mrp, imageUrl, category;
   final double rating;
   final int reviews;
-  const _Product({required this.id, required this.name, required this.brand, required this.unit, required this.price, required this.mrp, required this.rating, required this.reviews, required this.imageUrl, required this.category});
+  final String discountPercentage;
+
+  const _Product({
+    required this.id,
+    required this.name,
+    required this.brand,
+    required this.unit,
+    required this.price,
+    required this.mrp,
+    required this.rating,
+    required this.reviews,
+    required this.imageUrl,
+    required this.category,
+    this.discountPercentage = '',
+  });
+
+  String get computedDiscount {
+    if (discountPercentage.isNotEmpty) return discountPercentage;
+    final p = double.tryParse(price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
+    final m = double.tryParse(mrp.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 0;
+    if (m > p && m > 0) {
+      final pct = (((m - p) / m) * 100).round();
+      if (pct > 0) return '$pct% OFF';
+    }
+    return '';
+  }
 }
 
-const _catalog = <_Product>[
-  _Product(id:'mlk1',name:'Full Cream Milk',brand:'Amul',unit:'1 L Pouch',price:r'₹64',mrp:r'₹68',rating:4.7,reviews:8420,imageUrl:'http://localhost:4000/assets/products/milk/imgi_10.png',category:'Dairy'),
-  _Product(id:'mlk2',name:'Toned Milk',brand:'Mother Dairy',unit:'500 ml Pouch',price:r'₹30',mrp:r'₹32',rating:4.6,reviews:6210,imageUrl:'http://localhost:4000/assets/products/milk/imgi_11.png',category:'Dairy'),
-  _Product(id:'mlk3',name:'Double Toned Milk',brand:'Nandini',unit:'1 L Pouch',price:r'₹54',mrp:r'₹58',rating:4.5,reviews:3120,imageUrl:'http://localhost:4000/assets/products/milk/imgi_12.png',category:'Dairy'),
-  _Product(id:'mlk4',name:'Organic Cow Milk',brand:'Akshayakalpa',unit:'500 ml',price:r'₹46',mrp:r'₹50',rating:4.8,reviews:2890,imageUrl:'http://localhost:4000/assets/products/milk/imgi_13.png',category:'Dairy'),
-  _Product(id:'crd1',name:'Set Curd',brand:'Amul',unit:'400 g Cup',price:r'₹42',mrp:r'₹45',rating:4.6,reviews:5340,imageUrl:'http://localhost:4000/assets/products/curd-yogurt/curd-1.png',category:'Dairy'),
-  _Product(id:'crd2',name:'Mishti Doi',brand:'Mother Dairy',unit:'100 g Cup',price:r'₹20',mrp:r'₹22',rating:4.5,reviews:2100,imageUrl:'http://localhost:4000/assets/products/curd-yogurt/curd-2.png',category:'Dairy'),
-  _Product(id:'lsi1',name:'Sweet Lassi',brand:'Amul',unit:'200 ml Bottle',price:r'₹25',mrp:r'₹28',rating:4.7,reviews:4120,imageUrl:'http://localhost:4000/assets/products/curd-yogurt/curd-3.png',category:'Dairy'),
-  _Product(id:'lsi2',name:'Fresh Paneer Block',brand:'Amul',unit:'200 g Pack',price:r'₹92',mrp:r'₹95',rating:4.8,reviews:7820,imageUrl:'http://localhost:4000/assets/products/paneer-tofu/1200_1657599895699.png',category:'Dairy'),
-
-  // --- Fresh Vegetables ---
-  _Product(id:'veg1',name:'Fresh Hybrid Tomatoes',brand:'Farm Fresh',unit:'500 g',price:r'₹24',mrp:r'₹28',rating:4.8,reviews:9850,imageUrl:'http://localhost:4000/assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',category:'Vegetables'),
-  _Product(id:'veg2',name:'New Crop Potatoes',brand:'Farm Fresh',unit:'1 kg',price:r'₹32',mrp:r'₹35',rating:4.7,reviews:14200,imageUrl:'http://localhost:4000/assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',category:'Vegetables'),
-  _Product(id:'veg3',name:'Fresh Nashik Red Onions',brand:'Farm Fresh',unit:'1 kg',price:r'₹38',mrp:r'₹42',rating:4.8,reviews:18900,imageUrl:'http://localhost:4000/assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',category:'Vegetables'),
-  _Product(id:'veg4',name:'Green Capsicum (Shimla Mirch)',brand:'Farm Fresh',unit:'250 g',price:r'₹36',mrp:r'₹40',rating:4.6,reviews:6400,imageUrl:'http://localhost:4000/assets/products/fresh-vegetables/079cdbf5-0e6e-4de4-ad0a-447e56ae8016.png',category:'Vegetables'),
-  _Product(id:'veg5',name:'Hydroponic Baby Spinach (Palak)',brand:'Farm Fresh',unit:'250 g',price:r'₹22',mrp:r'₹25',rating:4.9,reviews:5120,imageUrl:'http://localhost:4000/assets/products/fresh-vegetables/083c2cf1-36a0-4328-98a1-fbe6e0ec1d0a.png',category:'Vegetables'),
-
-
-  _Product(id:'tea1',name:'Dust Tea',brand:'Red Label',unit:'500 g Pack',price:r'₹198',mrp:r'₹210',rating:4.8,reviews:12400,imageUrl:'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=400',category:'Beverages'),
-  _Product(id:'tea2',name:'Natural Care Tea',brand:'Taj Mahal',unit:'250 g Pack',price:r'₹138',mrp:r'₹150',rating:4.7,reviews:9800,imageUrl:'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=400',category:'Beverages'),
-  _Product(id:'tea3',name:'Masala Tea Powder',brand:'Wagh Bakri',unit:'250 g Pack',price:r'₹115',mrp:r'₹125',rating:4.6,reviews:7300,imageUrl:'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=400',category:'Beverages'),
-  _Product(id:'tea4',name:'Green Tea Bags',brand:'Tata Gold',unit:'100 g Pack',price:r'₹89',mrp:r'₹99',rating:4.5,reviews:5210,imageUrl:'https://images.unsplash.com/photo-1564890369478-c89ca3d9cde4?w=400',category:'Beverages'),
-  _Product(id:'tea5',name:'Assam Premium Tea',brand:'Society Tea',unit:'250 g Pack',price:r'₹130',mrp:r'₹145',rating:4.6,reviews:4890,imageUrl:'https://images.unsplash.com/photo-1597318181409-cf64d0b5d8a2?w=400',category:'Beverages'),
-  _Product(id:'chc1',name:'Dairy Milk Silk',brand:'Cadbury',unit:'150 g Bar',price:r'₹155',mrp:r'₹170',rating:4.8,reviews:15600,imageUrl:'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400',category:'Confectionery'),
-  _Product(id:'chc2',name:'KitKat 4 Finger',brand:'Nestle',unit:'41.5 g Bar',price:r'₹30',mrp:r'₹35',rating:4.7,reviews:11200,imageUrl:'https://images.unsplash.com/photo-1526081347589-7fa3cb41d55b?w=400',category:'Confectionery'),
-  _Product(id:'chc3',name:'5 Star Bar',brand:'Cadbury',unit:'42 g Bar',price:r'₹30',mrp:r'₹35',rating:4.6,reviews:9300,imageUrl:'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400',category:'Confectionery'),
-  _Product(id:'chc4',name:'Dark Temptation',brand:'Cadbury',unit:'72 g Bar',price:r'₹55',mrp:r'₹60',rating:4.7,reviews:7100,imageUrl:'https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=400',category:'Confectionery'),
-  _Product(id:'chc5',name:'Munch Bar',brand:'Nestle',unit:'10g x 12',price:r'₹80',mrp:r'₹90',rating:4.5,reviews:8900,imageUrl:'https://images.unsplash.com/photo-1526081347589-7fa3cb41d55b?w=400',category:'Confectionery'),
-  _Product(id:'shp1',name:'Anti-Dandruff Shampoo',brand:'Head Shoulders',unit:'340 ml',price:r'₹265',mrp:r'₹295',rating:4.5,reviews:18900,imageUrl:'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400',category:'Personal Care'),
-  _Product(id:'shp2',name:'Damage Repair Shampoo',brand:'Dove',unit:'340 ml',price:r'₹272',mrp:r'₹295',rating:4.6,reviews:14300,imageUrl:'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400',category:'Personal Care'),
-  _Product(id:'shp3',name:'Kesh Kanti Shampoo',brand:'Patanjali',unit:'200 ml',price:r'₹85',mrp:r'₹95',rating:4.4,reviews:11200,imageUrl:'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400',category:'Personal Care'),
-  _Product(id:'shp4',name:'Long Strong Shampoo',brand:'Pantene',unit:'340 ml',price:r'₹260',mrp:r'₹285',rating:4.5,reviews:12400,imageUrl:'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400',category:'Personal Care'),
-  _Product(id:'shp5',name:'Sunsilk Thick Long',brand:'Sunsilk',unit:'320 ml',price:r'₹218',mrp:r'₹240',rating:4.4,reviews:9800,imageUrl:'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=400',category:'Personal Care'),
-  _Product(id:'sop1',name:'Dettol Original Soap',brand:'Dettol',unit:'75g x 4 Pack',price:r'₹115',mrp:r'₹128',rating:4.7,reviews:21000,imageUrl:'https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?w=400',category:'Personal Care'),
-  _Product(id:'sop2',name:'Lifebuoy Total Bar',brand:'Lifebuoy',unit:'100g x 3 Pack',price:r'₹92',mrp:r'₹105',rating:4.5,reviews:16800,imageUrl:'https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?w=400',category:'Personal Care'),
-  _Product(id:'sop3',name:'Dove Cream Beauty Bar',brand:'Dove',unit:'100 g Bar',price:r'₹54',mrp:r'₹60',rating:4.7,reviews:18400,imageUrl:'https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?w=400',category:'Personal Care'),
-  _Product(id:'sop4',name:'Medimix Ayurvedic Bar',brand:'Medimix',unit:'125g x 3',price:r'₹105',mrp:r'₹120',rating:4.6,reviews:11300,imageUrl:'https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?w=400',category:'Personal Care'),
-  _Product(id:'sop5',name:'Lux Soft Touch Bar',brand:'Lux',unit:'100g x 4 Pack',price:r'₹108',mrp:r'₹120',rating:4.4,reviews:13200,imageUrl:'https://images.unsplash.com/photo-1584305574647-0cc949a2bb9f?w=400',category:'Personal Care'),
-  _Product(id:'wsh1',name:'Surf Excel Easy Wash',brand:'Surf Excel',unit:'1 kg Pack',price:r'₹155',mrp:r'₹172',rating:4.6,reviews:24500,imageUrl:'https://images.unsplash.com/photo-1585421514738-01798e348b17?w=400',category:'Household'),
-  _Product(id:'wsh2',name:'Ariel Complete',brand:'Ariel',unit:'1 kg Pack',price:r'₹165',mrp:r'₹185',rating:4.7,reviews:19800,imageUrl:'https://images.unsplash.com/photo-1585421514738-01798e348b17?w=400',category:'Household'),
-  _Product(id:'wsh3',name:'Rin Advance',brand:'Rin',unit:'1 kg Pack',price:r'₹115',mrp:r'₹128',rating:4.4,reviews:14200,imageUrl:'https://images.unsplash.com/photo-1585421514738-01798e348b17?w=400',category:'Household'),
-  _Product(id:'wsh4',name:'Nirma Washing Powder',brand:'Nirma',unit:'1 kg Pack',price:r'₹68',mrp:r'₹75',rating:4.3,reviews:18700,imageUrl:'https://images.unsplash.com/photo-1585421514738-01798e348b17?w=400',category:'Household'),
-  _Product(id:'wsh5',name:'Tide Ultra Clean',brand:'Tide',unit:'1 kg Pack',price:r'₹148',mrp:r'₹165',rating:4.5,reviews:12900,imageUrl:'https://images.unsplash.com/photo-1585421514738-01798e348b17?w=400',category:'Household'),
-  _Product(id:'att1',name:'Chakki Fresh Atta',brand:'Aashirvaad',unit:'5 kg Bag',price:r'₹242',mrp:r'₹265',rating:4.7,reviews:28900,imageUrl:'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400',category:'Staples'),
-  _Product(id:'att2',name:'Whole Wheat Atta',brand:'Pillsbury',unit:'5 kg Bag',price:r'₹228',mrp:r'₹250',rating:4.6,reviews:16700,imageUrl:'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400',category:'Staples'),
-  _Product(id:'att3',name:'Organic Sharbati Atta',brand:'Organic Tattva',unit:'5 kg Bag',price:r'₹295',mrp:r'₹325',rating:4.5,reviews:8200,imageUrl:'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?w=400',category:'Staples'),
-  _Product(id:'dal1',name:'Toor Dal',brand:'Tata Sampann',unit:'1 kg Pack',price:r'₹145',mrp:r'₹160',rating:4.6,reviews:14300,imageUrl:'https://images.unsplash.com/photo-1546548970-71785318a17b?w=400',category:'Staples'),
-  _Product(id:'dal2',name:'Moong Dal',brand:'Fortune',unit:'1 kg Pack',price:r'₹138',mrp:r'₹150',rating:4.5,reviews:9800,imageUrl:'https://images.unsplash.com/photo-1546548970-71785318a17b?w=400',category:'Staples'),
-  _Product(id:'dal3',name:'Masoor Dal',brand:'Tata Sampann',unit:'1 kg Pack',price:r'₹118',mrp:r'₹130',rating:4.5,reviews:8700,imageUrl:'https://images.unsplash.com/photo-1546548970-71785318a17b?w=400',category:'Staples'),
-  _Product(id:'dal4',name:'Chana Dal',brand:'Rajdhani',unit:'1 kg Pack',price:r'₹108',mrp:r'₹120',rating:4.4,reviews:7200,imageUrl:'https://images.unsplash.com/photo-1546548970-71785318a17b?w=400',category:'Staples'),
-  _Product(id:'oil1',name:'Parachute Coconut Oil',brand:'Parachute',unit:'500 ml Jar',price:r'₹188',mrp:r'₹210',rating:4.8,reviews:32400,imageUrl:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400',category:'Oil'),
-  _Product(id:'oil2',name:'Pure Coconut Oil',brand:'Nihar',unit:'500 ml Bottle',price:r'₹178',mrp:r'₹198',rating:4.6,reviews:18700,imageUrl:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400',category:'Oil'),
-  _Product(id:'oil3',name:'Virgin Coconut Oil',brand:'KLF Nirmal',unit:'500 ml',price:r'₹215',mrp:r'₹240',rating:4.7,reviews:11200,imageUrl:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400',category:'Oil'),
-  _Product(id:'oil4',name:'Coldpressed Coconut Oil',brand:'Coco Soul',unit:'250 ml',price:r'₹195',mrp:r'₹220',rating:4.6,reviews:7800,imageUrl:'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400',category:'Oil'),
-  _Product(id:'msl1',name:'Garam Masala',brand:'MDH',unit:'100 g Pack',price:r'₹78',mrp:r'₹88',rating:4.7,reviews:22400,imageUrl:'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400',category:'Spices'),
-  _Product(id:'msl2',name:'Turmeric Powder',brand:'Everest',unit:'200 g Pack',price:r'₹62',mrp:r'₹72',rating:4.6,reviews:18900,imageUrl:'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400',category:'Spices'),
-  _Product(id:'msl3',name:'Red Chilli Powder',brand:'Catch',unit:'200 g Pack',price:r'₹68',mrp:r'₹78',rating:4.5,reviews:14700,imageUrl:'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400',category:'Spices'),
-  _Product(id:'msl4',name:'Coriander Powder',brand:'Suhana',unit:'200 g Pack',price:r'₹65',mrp:r'₹75',rating:4.4,reviews:11200,imageUrl:'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400',category:'Spices'),
-  _Product(id:'msl5',name:'Kitchen King Masala',brand:'MDH',unit:'100 g Pack',price:r'₹90',mrp:r'₹100',rating:4.7,reviews:16800,imageUrl:'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400',category:'Spices'),
-  _Product(id:'msl6',name:'Chicken Masala',brand:'Everest',unit:'50 g Pack',price:r'₹45',mrp:r'₹52',rating:4.6,reviews:9800,imageUrl:'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=400',category:'Spices'),
-  _Product(id:'stn1',name:'HB Pencils 10 pcs',brand:'Apsara',unit:'10 Pencils',price:r'₹38',mrp:r'₹45',rating:4.5,reviews:8900,imageUrl:'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=400',category:'Stationery'),
-  _Product(id:'stn2',name:'Nataraj HB Pencils',brand:'Nataraj',unit:'10 Pencils',price:r'₹32',mrp:r'₹40',rating:4.4,reviews:7400,imageUrl:'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=400',category:'Stationery'),
-  _Product(id:'stn3',name:'Colour Pencils 24',brand:'Camlin',unit:'24 pcs Tin',price:r'₹125',mrp:r'₹140',rating:4.7,reviews:11800,imageUrl:'https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400',category:'Stationery'),
-  _Product(id:'stn4',name:'Sketch Pens 12 Shades',brand:'Maped',unit:'12 pcs Set',price:r'₹85',mrp:r'₹95',rating:4.5,reviews:8700,imageUrl:'https://images.unsplash.com/photo-1607344645866-009c320b63e0?w=400',category:'Stationery'),
-  _Product(id:'stn5',name:'A4 Notebook 200 Pages',brand:'Classmate',unit:'200 Pages',price:r'₹75',mrp:r'₹85',rating:4.6,reviews:14200,imageUrl:'https://images.unsplash.com/photo-1587614382346-4ec70e388b28?w=400',category:'Stationery'),
-  _Product(id:'stn6',name:'Geometry Box Set',brand:'Staedtler',unit:'1 Set',price:r'₹145',mrp:r'₹165',rating:4.7,reviews:9200,imageUrl:'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=400',category:'Stationery'),
-  _Product(id:'stn7',name:'Long Eraser 6 pcs',brand:'Faber-Castell',unit:'6 pcs Pack',price:r'₹56',mrp:r'₹65',rating:4.6,reviews:6200,imageUrl:'https://images.unsplash.com/photo-1583485088034-697b5bc54ccd?w=400',category:'Stationery'),
+// ─── 1. Daily Selling Products (Essential Morning Staples) ────────────────────
+const _dailySelling = <_Product>[
+  _Product(
+    id: 'ds_ban1',
+    name: 'Fresh Robusta Bananas (Kela)',
+    brand: 'Farm Fresh',
+    unit: '500 g (3-4 pcs)',
+    price: r'₹38',
+    mrp: r'₹45',
+    rating: 4.8,
+    reviews: 1420,
+    imageUrl: 'assets/products/fresh-vegetables/2483b1e4-6b95-4777-82ba-9ea62a37f40d.png',
+    category: 'Vegetables',
+    discountPercentage: '16% OFF',
+  ),
+  _Product(
+    id: 'ds_mlk1',
+    name: 'Amul Taaza Homogenised Toned Milk',
+    brand: 'Amul',
+    unit: '1 L Pouch',
+    price: r'₹54',
+    mrp: r'₹58',
+    rating: 4.9,
+    reviews: 8420,
+    imageUrl: 'assets/products/milk/1ded64a0-9f20-4a1d-8211-156f221b377b.png',
+    category: 'Milk',
+    discountPercentage: '7% OFF',
+  ),
+  _Product(
+    id: 'ds_veg1',
+    name: 'Fresh Hybrid Tomatoes (Tamatar)',
+    brand: 'Farm Fresh',
+    unit: '500 g',
+    price: r'₹24',
+    mrp: r'₹28',
+    rating: 4.8,
+    reviews: 9850,
+    imageUrl: 'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+    category: 'Vegetables',
+    discountPercentage: '14% OFF',
+  ),
+  _Product(
+    id: 'ds_brd1',
+    name: 'Harvest Gold 100% Whole Wheat Bread',
+    brand: 'Harvest Gold',
+    unit: '400 g Pack',
+    price: r'₹45',
+    mrp: r'₹50',
+    rating: 4.7,
+    reviews: 6300,
+    imageUrl: 'assets/products/bread-pav/007ea008-b857-4dd5-9005-fb6c4d98601b.png',
+    category: 'Bread & Bakery',
+    discountPercentage: '10% OFF',
+  ),
+  _Product(
+    id: 'ds_crd1',
+    name: 'Amul Masti Dahi Set Curd',
+    brand: 'Amul',
+    unit: '400 g Cup',
+    price: r'₹35',
+    mrp: r'₹40',
+    rating: 4.8,
+    reviews: 5400,
+    imageUrl: 'assets/products/curd-yogurt/01278ea4-9aef-4263-8ea8-6a3eab2bd076.png',
+    category: 'Curd & Yogurt',
+    discountPercentage: '12% OFF',
+  ),
+  _Product(
+    id: 'ds_poh1',
+    name: 'Tata Sampann Thick Poha (Flattened Rice)',
+    brand: 'Tata Sampann',
+    unit: '500 g Pack',
+    price: r'₹48',
+    mrp: r'₹58',
+    rating: 4.7,
+    reviews: 4200,
+    imageUrl: 'assets/products/poha-daliya-grains/1092_1643384330629.png',
+    category: 'Poha & Grains',
+    discountPercentage: '17% OFF',
+  ),
+  _Product(
+    id: 'ds_vrm1',
+    name: 'MTR Roasted Vermicelli (Seviyan)',
+    brand: 'MTR',
+    unit: '400 g Pack',
+    price: r'₹42',
+    mrp: r'₹50',
+    rating: 4.6,
+    reviews: 3200,
+    imageUrl: 'assets/products/vermicelli/3da21b8f-16e5-4727-9899-c5ef3e1db668.png',
+    category: 'Vermicelli',
+    discountPercentage: '16% OFF',
+  ),
+  _Product(
+    id: 'ds_cer1',
+    name: 'Kellogg\'s Crunchy Corn Flakes',
+    brand: 'Kellogg\'s',
+    unit: '475 g Box',
+    price: r'₹165',
+    mrp: r'₹195',
+    rating: 4.8,
+    reviews: 5100,
+    imageUrl: 'assets/products/flakes-kids-cereals/01e92a08-b40b-4d6f-aca7-8537cd382447.png',
+    category: 'Cereals',
+    discountPercentage: '15% OFF',
+  ),
 ];
 
-const _kCats = ['All','Dairy','Beverages','Confectionery','Personal Care','Household','Staples','Oil','Spices','Stationery'];
+// ─── 2. High Selling Products (Top Volume Bestsellers) ────────────────────────
+const _highSelling = <_Product>[
+  _Product(
+    id: 'hs_oni1',
+    name: 'Fresh Nashik Red Onions (Pyaz)',
+    brand: 'Farm Fresh',
+    unit: '1 kg',
+    price: r'₹38',
+    mrp: r'₹48',
+    rating: 4.8,
+    reviews: 18900,
+    imageUrl: 'assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',
+    category: 'Vegetables',
+    discountPercentage: '21% OFF',
+  ),
+  _Product(
+    id: 'hs_mlk1',
+    name: 'Nandini Pure Cow Milk',
+    brand: 'Nandini',
+    unit: '500 ml Pouch',
+    price: r'₹26',
+    mrp: r'₹28',
+    rating: 4.7,
+    reviews: 6100,
+    imageUrl: 'assets/products/milk/20c80cb9-33fb-4d4f-bdde-91ffa4490e57.png',
+    category: 'Milk',
+    discountPercentage: '7% OFF',
+  ),
+  _Product(
+    id: 'hs_pot1',
+    name: 'Jyoti Premium Potatoes (Aloo)',
+    brand: 'Farm Fresh',
+    unit: '1 kg',
+    price: r'₹32',
+    mrp: r'₹40',
+    rating: 4.7,
+    reviews: 14200,
+    imageUrl: 'assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',
+    category: 'Vegetables',
+    discountPercentage: '20% OFF',
+  ),
+  _Product(
+    id: 'hs_pav1',
+    name: 'Fresh Soft Ladi Pav (Bakery Made)',
+    brand: 'Bakery Fresh',
+    unit: '6 pcs Pack',
+    price: r'₹22',
+    mrp: r'₹25',
+    rating: 4.8,
+    reviews: 8900,
+    imageUrl: 'assets/products/bread-pav/036bad6d-4fbc-4c42-a18a-4bf33a3dfb6b.png',
+    category: 'Bread & Bakery',
+    discountPercentage: '12% OFF',
+  ),
+  _Product(
+    id: 'hs_yog1',
+    name: 'Epigamia Greek Yogurt Natural',
+    brand: 'Epigamia',
+    unit: '100 g Cup',
+    price: r'₹50',
+    mrp: r'₹60',
+    rating: 4.7,
+    reviews: 4300,
+    imageUrl: 'assets/products/curd-yogurt/04dbb266-d965-4447-ba2c-655f725b47f5.png',
+    category: 'Curd & Yogurt',
+    discountPercentage: '17% OFF',
+  ),
+  _Product(
+    id: 'hs_dal1',
+    name: 'Fortune Roasted Wheat Dalia',
+    brand: 'Fortune',
+    unit: '500 g Pack',
+    price: r'₹38',
+    mrp: r'₹45',
+    rating: 4.6,
+    reviews: 3800,
+    imageUrl: 'assets/products/poha-daliya-grains/1140_1643384951835.png',
+    category: 'Poha & Grains',
+    discountPercentage: '15% OFF',
+  ),
+  _Product(
+    id: 'hs_vrm1',
+    name: 'Bambino Roasted Seviyan Vermicelli',
+    brand: 'Bambino',
+    unit: '400 g Pack',
+    price: r'₹39',
+    mrp: r'₹48',
+    rating: 4.6,
+    reviews: 4900,
+    imageUrl: 'assets/products/vermicelli/4bf7f974-20b4-48b8-9367-f60997e8b940.png',
+    category: 'Vermicelli',
+    discountPercentage: '19% OFF',
+  ),
+  _Product(
+    id: 'hs_chc1',
+    name: 'Kellogg\'s Choco Fills Cereal',
+    brand: 'Kellogg\'s',
+    unit: '250 g Box',
+    price: r'₹125',
+    mrp: r'₹145',
+    rating: 4.8,
+    reviews: 7200,
+    imageUrl: 'assets/products/flakes-kids-cereals/09a1e487-9781-4ade-ab0e-73327c96691e.png',
+    category: 'Cereals',
+    discountPercentage: '14% OFF',
+  ),
+];
+
+// ─── 3. Recommended For You (Smart Personalization) ───────────────────────────
+const _recommended = <_Product>[
+  _Product(
+    id: 'rc_ban1',
+    name: 'Fresh Yelakki Sweet Bananas',
+    brand: 'Farm Fresh',
+    unit: '500 g',
+    price: r'₹44',
+    mrp: r'₹55',
+    rating: 4.9,
+    reviews: 3100,
+    imageUrl: 'assets/products/fresh-vegetables/2483b1e4-6b95-4777-82ba-9ea62a37f40d.png',
+    category: 'Vegetables',
+    discountPercentage: '20% OFF',
+  ),
+  _Product(
+    id: 'rc_mlk1',
+    name: 'Akshayakalpa Organic Cow Milk',
+    brand: 'Akshayakalpa',
+    unit: '500 ml Bottle',
+    price: r'₹46',
+    mrp: r'₹52',
+    rating: 4.8,
+    reviews: 3890,
+    imageUrl: 'assets/products/milk/22a31d80-a56a-4241-82ef-8de00a46c9c4.png',
+    category: 'Milk',
+    discountPercentage: '12% OFF',
+  ),
+  _Product(
+    id: 'rc_spn1',
+    name: 'Fresh Hydroponic Baby Spinach (Palak)',
+    brand: 'Farm Fresh',
+    unit: '250 g Bunch',
+    price: r'₹22',
+    mrp: r'₹30',
+    rating: 4.8,
+    reviews: 5120,
+    imageUrl: 'assets/products/fresh-vegetables/083c2cf1-36a0-4328-98a1-fbe6e0ec1d0a.png',
+    category: 'Vegetables',
+    discountPercentage: '26% OFF',
+  ),
+  _Product(
+    id: 'rc_brd1',
+    name: 'English Oven 100% Brown Bread',
+    brand: 'English Oven',
+    unit: '400 g Pack',
+    price: r'₹48',
+    mrp: r'₹55',
+    rating: 4.7,
+    reviews: 5200,
+    imageUrl: 'assets/products/bread-pav/076a5684-8206-48cc-b730-e1c7fe05e5df.png',
+    category: 'Bread & Bakery',
+    discountPercentage: '13% OFF',
+  ),
+  _Product(
+    id: 'rc_crd1',
+    name: 'Mother Dairy Classic Dahi Tub',
+    brand: 'Mother Dairy',
+    unit: '400 g Tub',
+    price: r'₹38',
+    mrp: r'₹42',
+    rating: 4.6,
+    reviews: 4100,
+    imageUrl: 'assets/products/curd-yogurt/057e0c66-77e1-4d90-ab5f-f2afe3aa69d9.png',
+    category: 'Curd & Yogurt',
+    discountPercentage: '10% OFF',
+  ),
+  _Product(
+    id: 'rc_sab1',
+    name: 'Pro Nature Organic Sabudana (Tapioca)',
+    brand: 'Pro Nature',
+    unit: '500 g Pack',
+    price: r'₹72',
+    mrp: r'₹85',
+    rating: 4.7,
+    reviews: 2800,
+    imageUrl: 'assets/products/poha-daliya-grains/1184_1661407202472.png',
+    category: 'Poha & Grains',
+    discountPercentage: '15% OFF',
+  ),
+  _Product(
+    id: 'rc_vrm1',
+    name: 'Two Brothers Khapli Wheat Vermicelli',
+    brand: 'Two Brothers',
+    unit: '500 g Pack',
+    price: r'₹160',
+    mrp: r'₹190',
+    rating: 4.7,
+    reviews: 1900,
+    imageUrl: 'assets/products/vermicelli/536f1cfb8d75475ba5ff33db6d8c975f.png',
+    category: 'Vermicelli',
+    discountPercentage: '16% OFF',
+  ),
+  _Product(
+    id: 'rc_cer1',
+    name: 'Nestle Koko Krunch Choco Cereal',
+    brand: 'Nestle',
+    unit: '350 g Box',
+    price: r'₹170',
+    mrp: r'₹199',
+    rating: 4.7,
+    reviews: 4300,
+    imageUrl: 'assets/products/flakes-kids-cereals/0c447ba4-a230-4b31-92e7-03007bebf0bc.png',
+    category: 'Cereals',
+    discountPercentage: '15% OFF',
+  ),
+];
+
+// ─── 4. Top Buying Products (High Customer Repeat Carts) ─────────────────────
+const _topBuying = <_Product>[
+  _Product(
+    id: 'tb_tom1',
+    name: 'Country Fresh Hybrid Tomatoes',
+    brand: 'Farm Fresh',
+    unit: '1 kg Pack',
+    price: r'₹45',
+    mrp: r'₹55',
+    rating: 4.8,
+    reviews: 11400,
+    imageUrl: 'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+    category: 'Vegetables',
+    discountPercentage: '18% OFF',
+  ),
+  _Product(
+    id: 'tb_mlk1',
+    name: 'Amul Gold Full Cream Milk',
+    brand: 'Amul',
+    unit: '1 L Pouch',
+    price: r'₹66',
+    mrp: r'₹70',
+    rating: 4.9,
+    reviews: 15400,
+    imageUrl: 'assets/products/milk/2cf3020b-eae8-4909-b3b0-fe96c7e4e177.png',
+    category: 'Milk',
+    discountPercentage: '6% OFF',
+  ),
+  _Product(
+    id: 'tb_cap1',
+    name: 'Fresh Green Capsicum (Shimla Mirch)',
+    brand: 'Farm Fresh',
+    unit: '250 g',
+    price: r'₹34',
+    mrp: r'₹42',
+    rating: 4.7,
+    reviews: 6400,
+    imageUrl: 'assets/products/fresh-vegetables/079cdbf5-0e6e-4de4-ad0a-447e56ae8016.png',
+    category: 'Vegetables',
+    discountPercentage: '19% OFF',
+  ),
+  _Product(
+    id: 'tb_brd1',
+    name: 'Modern Multigrain Sandwich Bread',
+    brand: 'Modern',
+    unit: '400 g Pack',
+    price: r'₹52',
+    mrp: r'₹60',
+    rating: 4.6,
+    reviews: 4700,
+    imageUrl: 'assets/products/bread-pav/0780817d-4d79-4e2f-abe4-5a5725df31b0.png',
+    category: 'Bread & Bakery',
+    discountPercentage: '13% OFF',
+  ),
+  _Product(
+    id: 'tb_crd1',
+    name: 'Milky Mist Farm Curd Pouch',
+    brand: 'Milky Mist',
+    unit: '450 g Pouch',
+    price: r'₹36',
+    mrp: r'₹40',
+    rating: 4.7,
+    reviews: 3900,
+    imageUrl: 'assets/products/curd-yogurt/0bcb96d2-7515-41eb-b1d1-7dd218a5a26d.png',
+    category: 'Curd & Yogurt',
+    discountPercentage: '10% OFF',
+  ),
+  _Product(
+    id: 'tb_poh1',
+    name: 'Daily Basket High Fiber Diet Poha',
+    brand: 'Daily Basket',
+    unit: '500 g Pack',
+    price: r'₹52',
+    mrp: r'₹65',
+    rating: 4.6,
+    reviews: 3100,
+    imageUrl: 'assets/products/poha-daliya-grains/1295_1643445863467.png',
+    category: 'Poha & Grains',
+    discountPercentage: '20% OFF',
+  ),
+  _Product(
+    id: 'tb_vrm1',
+    name: 'Tata Sampann Roasted Seviyan Vermicelli',
+    brand: 'Tata Sampann',
+    unit: '400 g Pack',
+    price: r'₹45',
+    mrp: r'₹55',
+    rating: 4.6,
+    reviews: 2600,
+    imageUrl: 'assets/products/vermicelli/64ca266c-db61-4087-b9f5-2019f2704a3e.png',
+    category: 'Vermicelli',
+    discountPercentage: '18% OFF',
+  ),
+  _Product(
+    id: 'tb_cer1',
+    name: 'Quaker Rolled 100% Whole Oats',
+    brand: 'Quaker',
+    unit: '400 g Pouch',
+    price: r'₹98',
+    mrp: r'₹115',
+    rating: 4.7,
+    reviews: 6200,
+    imageUrl: 'assets/products/flakes-kids-cereals/141e68a9-f36a-422f-8746-a9a49359401b.png',
+    category: 'Cereals',
+    discountPercentage: '15% OFF',
+  ),
+];
+
+// ─── 5. Full Kirana Essentials Catalog (Grid Feed) ───────────────────────────
+const _catalog = <_Product>[
+  // Vegetables & Fruits
+  _Product(
+    id: 'cat_ban1',
+    name: 'Fresh Robusta Bananas',
+    brand: 'Farm Fresh',
+    unit: '500 g (3-4 pcs)',
+    price: r'₹38',
+    mrp: r'₹45',
+    rating: 4.8,
+    reviews: 1420,
+    imageUrl: 'assets/products/fresh-vegetables/2483b1e4-6b95-4777-82ba-9ea62a37f40d.png',
+    category: 'Vegetables',
+    discountPercentage: '16% OFF',
+  ),
+  _Product(
+    id: 'cat_tom1',
+    name: 'Fresh Hybrid Tomatoes',
+    brand: 'Farm Fresh',
+    unit: '500 g',
+    price: r'₹24',
+    mrp: r'₹28',
+    rating: 4.8,
+    reviews: 9850,
+    imageUrl: 'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+    category: 'Vegetables',
+    discountPercentage: '14% OFF',
+  ),
+  _Product(
+    id: 'cat_pot1',
+    name: 'New Crop Potatoes (Aloo)',
+    brand: 'Farm Fresh',
+    unit: '1 kg',
+    price: r'₹32',
+    mrp: r'₹35',
+    rating: 4.7,
+    reviews: 14200,
+    imageUrl: 'assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',
+    category: 'Vegetables',
+    discountPercentage: '9% OFF',
+  ),
+  _Product(
+    id: 'cat_oni1',
+    name: 'Fresh Nashik Red Onions',
+    brand: 'Farm Fresh',
+    unit: '1 kg',
+    price: r'₹38',
+    mrp: r'₹48',
+    rating: 4.8,
+    reviews: 18900,
+    imageUrl: 'assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',
+    category: 'Vegetables',
+    discountPercentage: '21% OFF',
+  ),
+  _Product(
+    id: 'cat_cap1',
+    name: 'Green Capsicum (Shimla Mirch)',
+    brand: 'Farm Fresh',
+    unit: '250 g',
+    price: r'₹36',
+    mrp: r'₹40',
+    rating: 4.6,
+    reviews: 6400,
+    imageUrl: 'assets/products/fresh-vegetables/079cdbf5-0e6e-4de4-ad0a-447e56ae8016.png',
+    category: 'Vegetables',
+    discountPercentage: '10% OFF',
+  ),
+  _Product(
+    id: 'cat_spn1',
+    name: 'Hydroponic Baby Spinach (Palak)',
+    brand: 'Farm Fresh',
+    unit: '250 g',
+    price: r'₹22',
+    mrp: r'₹30',
+    rating: 4.9,
+    reviews: 5120,
+    imageUrl: 'assets/products/fresh-vegetables/083c2cf1-36a0-4328-98a1-fbe6e0ec1d0a.png',
+    category: 'Vegetables',
+    discountPercentage: '26% OFF',
+  ),
+
+  // Fresh Milk
+  _Product(
+    id: 'cat_mlk1',
+    name: 'Amul Gold Full Cream Milk',
+    brand: 'Amul',
+    unit: '1 L Pouch',
+    price: r'₹66',
+    mrp: r'₹70',
+    rating: 4.9,
+    reviews: 15400,
+    imageUrl: 'assets/products/milk/2cf3020b-eae8-4909-b3b0-fe96c7e4e177.png',
+    category: 'Milk',
+    discountPercentage: '6% OFF',
+  ),
+  _Product(
+    id: 'cat_mlk2',
+    name: 'Amul Taaza Toned Milk',
+    brand: 'Amul',
+    unit: '1 L Pouch',
+    price: r'₹54',
+    mrp: r'₹58',
+    rating: 4.7,
+    reviews: 8420,
+    imageUrl: 'assets/products/milk/1ded64a0-9f20-4a1d-8211-156f221b377b.png',
+    category: 'Milk',
+    discountPercentage: '7% OFF',
+  ),
+  _Product(
+    id: 'cat_mlk3',
+    name: 'Nandini Pure Cow Milk',
+    brand: 'Nandini',
+    unit: '500 ml Pouch',
+    price: r'₹26',
+    mrp: r'₹28',
+    rating: 4.6,
+    reviews: 6100,
+    imageUrl: 'assets/products/milk/20c80cb9-33fb-4d4f-bdde-91ffa4490e57.png',
+    category: 'Milk',
+    discountPercentage: '7% OFF',
+  ),
+  _Product(
+    id: 'cat_mlk4',
+    name: 'Akshayakalpa Organic Cow Milk',
+    brand: 'Akshayakalpa',
+    unit: '500 ml Bottle',
+    price: r'₹46',
+    mrp: r'₹52',
+    rating: 4.8,
+    reviews: 3890,
+    imageUrl: 'assets/products/milk/22a31d80-a56a-4241-82ef-8de00a46c9c4.png',
+    category: 'Milk',
+    discountPercentage: '12% OFF',
+  ),
+
+  // Bread & Bakery
+  _Product(
+    id: 'cat_brd1',
+    name: 'Harvest Gold 100% Whole Wheat Bread',
+    brand: 'Harvest Gold',
+    unit: '400 g Pack',
+    price: r'₹45',
+    mrp: r'₹50',
+    rating: 4.7,
+    reviews: 6300,
+    imageUrl: 'assets/products/bread-pav/007ea008-b857-4dd5-9005-fb6c4d98601b.png',
+    category: 'Bread & Bakery',
+    discountPercentage: '10% OFF',
+  ),
+  _Product(
+    id: 'cat_brd2',
+    name: 'Fresh Soft Ladi Pav',
+    brand: 'Bakery Fresh',
+    unit: '6 pcs Pack',
+    price: r'₹22',
+    mrp: r'₹25',
+    rating: 4.8,
+    reviews: 8900,
+    imageUrl: 'assets/products/bread-pav/036bad6d-4fbc-4c42-a18a-4bf33a3dfb6b.png',
+    category: 'Bread & Bakery',
+    discountPercentage: '12% OFF',
+  ),
+  _Product(
+    id: 'cat_brd3',
+    name: 'English Oven Brown Bread',
+    brand: 'English Oven',
+    unit: '400 g Pack',
+    price: r'₹48',
+    mrp: r'₹55',
+    rating: 4.7,
+    reviews: 5200,
+    imageUrl: 'assets/products/bread-pav/076a5684-8206-48cc-b730-e1c7fe05e5df.png',
+    category: 'Bread & Bakery',
+    discountPercentage: '13% OFF',
+  ),
+  _Product(
+    id: 'cat_brd4',
+    name: 'Modern Multigrain Bread',
+    brand: 'Modern',
+    unit: '400 g Pack',
+    price: r'₹52',
+    mrp: r'₹60',
+    rating: 4.6,
+    reviews: 4700,
+    imageUrl: 'assets/products/bread-pav/0780817d-4d79-4e2f-abe4-5a5725df31b0.png',
+    category: 'Bread & Bakery',
+    discountPercentage: '13% OFF',
+  ),
+
+  // Curd & Yogurt
+  _Product(
+    id: 'cat_crd1',
+    name: 'Amul Masti Dahi Set Curd',
+    brand: 'Amul',
+    unit: '400 g Cup',
+    price: r'₹35',
+    mrp: r'₹40',
+    rating: 4.8,
+    reviews: 5400,
+    imageUrl: 'assets/products/curd-yogurt/01278ea4-9aef-4263-8ea8-6a3eab2bd076.png',
+    category: 'Curd & Yogurt',
+    discountPercentage: '12% OFF',
+  ),
+  _Product(
+    id: 'cat_crd2',
+    name: 'Epigamia Greek Yogurt Natural',
+    brand: 'Epigamia',
+    unit: '100 g Cup',
+    price: r'₹50',
+    mrp: r'₹60',
+    rating: 4.7,
+    reviews: 4300,
+    imageUrl: 'assets/products/curd-yogurt/04dbb266-d965-4447-ba2c-655f725b47f5.png',
+    category: 'Curd & Yogurt',
+    discountPercentage: '17% OFF',
+  ),
+  _Product(
+    id: 'cat_crd3',
+    name: 'Mother Dairy Classic Dahi Tub',
+    brand: 'Mother Dairy',
+    unit: '400 g Tub',
+    price: r'₹38',
+    mrp: r'₹42',
+    rating: 4.6,
+    reviews: 4100,
+    imageUrl: 'assets/products/curd-yogurt/057e0c66-77e1-4d90-ab5f-f2afe3aa69d9.png',
+    category: 'Curd & Yogurt',
+    discountPercentage: '10% OFF',
+  ),
+  _Product(
+    id: 'cat_crd4',
+    name: 'Milky Mist Farm Curd Pouch',
+    brand: 'Milky Mist',
+    unit: '450 g Pouch',
+    price: r'₹36',
+    mrp: r'₹40',
+    rating: 4.7,
+    reviews: 3900,
+    imageUrl: 'assets/products/curd-yogurt/0bcb96d2-7515-41eb-b1d1-7dd218a5a26d.png',
+    category: 'Curd & Yogurt',
+    discountPercentage: '10% OFF',
+  ),
+
+  // Flakes & Cereals
+  _Product(
+    id: 'cat_cer1',
+    name: 'Kellogg\'s Crunchy Corn Flakes',
+    brand: 'Kellogg\'s',
+    unit: '475 g Box',
+    price: r'₹165',
+    mrp: r'₹195',
+    rating: 4.8,
+    reviews: 5100,
+    imageUrl: 'assets/products/flakes-kids-cereals/01e92a08-b40b-4d6f-aca7-8537cd382447.png',
+    category: 'Cereals',
+    discountPercentage: '15% OFF',
+  ),
+  _Product(
+    id: 'cat_cer2',
+    name: 'Kellogg\'s Choco Fills Cereal',
+    brand: 'Kellogg\'s',
+    unit: '250 g Box',
+    price: r'₹125',
+    mrp: r'₹145',
+    rating: 4.8,
+    reviews: 7200,
+    imageUrl: 'assets/products/flakes-kids-cereals/09a1e487-9781-4ade-ab0e-73327c96691e.png',
+    category: 'Cereals',
+    discountPercentage: '14% OFF',
+  ),
+  _Product(
+    id: 'cat_cer3',
+    name: 'Nestle Koko Krunch Choco Cereal',
+    brand: 'Nestle',
+    unit: '350 g Box',
+    price: r'₹170',
+    mrp: r'₹199',
+    rating: 4.7,
+    reviews: 4300,
+    imageUrl: 'assets/products/flakes-kids-cereals/0c447ba4-a230-4b31-92e7-03007bebf0bc.png',
+    category: 'Cereals',
+    discountPercentage: '15% OFF',
+  ),
+  _Product(
+    id: 'cat_cer4',
+    name: 'Quaker Rolled 100% Whole Oats',
+    brand: 'Quaker',
+    unit: '400 g Pouch',
+    price: r'₹98',
+    mrp: r'₹115',
+    rating: 4.7,
+    reviews: 6200,
+    imageUrl: 'assets/products/flakes-kids-cereals/141e68a9-f36a-422f-8746-a9a49359401b.png',
+    category: 'Cereals',
+    discountPercentage: '15% OFF',
+  ),
+
+  // Poha & Grains
+  _Product(
+    id: 'cat_poh1',
+    name: 'Tata Sampann Thick Poha',
+    brand: 'Tata Sampann',
+    unit: '500 g Pack',
+    price: r'₹48',
+    mrp: r'₹58',
+    rating: 4.7,
+    reviews: 4200,
+    imageUrl: 'assets/products/poha-daliya-grains/1092_1643384330629.png',
+    category: 'Poha & Grains',
+    discountPercentage: '17% OFF',
+  ),
+  _Product(
+    id: 'cat_poh2',
+    name: 'Fortune Roasted Wheat Dalia',
+    brand: 'Fortune',
+    unit: '500 g Pack',
+    price: r'₹38',
+    mrp: r'₹45',
+    rating: 4.6,
+    reviews: 3800,
+    imageUrl: 'assets/products/poha-daliya-grains/1140_1643384951835.png',
+    category: 'Poha & Grains',
+    discountPercentage: '15% OFF',
+  ),
+  _Product(
+    id: 'cat_poh3',
+    name: 'Pro Nature Organic Sabudana',
+    brand: 'Pro Nature',
+    unit: '500 g Pack',
+    price: r'₹72',
+    mrp: r'₹85',
+    rating: 4.7,
+    reviews: 2800,
+    imageUrl: 'assets/products/poha-daliya-grains/1184_1661407202472.png',
+    category: 'Poha & Grains',
+    discountPercentage: '15% OFF',
+  ),
+  _Product(
+    id: 'cat_poh4',
+    name: 'Daily Basket High Fiber Diet Poha',
+    brand: 'Daily Basket',
+    unit: '500 g Pack',
+    price: r'₹52',
+    mrp: r'₹65',
+    rating: 4.6,
+    reviews: 3100,
+    imageUrl: 'assets/products/poha-daliya-grains/1295_1643445863467.png',
+    category: 'Poha & Grains',
+    discountPercentage: '20% OFF',
+  ),
+
+  // Vermicelli
+  _Product(
+    id: 'cat_vrm1',
+    name: 'MTR Roasted Vermicelli (Seviyan)',
+    brand: 'MTR',
+    unit: '400 g Pack',
+    price: r'₹42',
+    mrp: r'₹50',
+    rating: 4.6,
+    reviews: 3200,
+    imageUrl: 'assets/products/vermicelli/3da21b8f-16e5-4727-9899-c5ef3e1db668.png',
+    category: 'Vermicelli',
+    discountPercentage: '16% OFF',
+  ),
+  _Product(
+    id: 'cat_vrm2',
+    name: 'Bambino Roasted Seviyan Vermicelli',
+    brand: 'Bambino',
+    unit: '400 g Pack',
+    price: r'₹39',
+    mrp: r'₹48',
+    rating: 4.6,
+    reviews: 4900,
+    imageUrl: 'assets/products/vermicelli/4bf7f974-20b4-48b8-9367-f60997e8b940.png',
+    category: 'Vermicelli',
+    discountPercentage: '19% OFF',
+  ),
+  _Product(
+    id: 'cat_vrm3',
+    name: 'Two Brothers Khapli Wheat Vermicelli',
+    brand: 'Two Brothers',
+    unit: '500 g Pack',
+    price: r'₹160',
+    mrp: r'₹190',
+    rating: 4.7,
+    reviews: 1900,
+    imageUrl: 'assets/products/vermicelli/536f1cfb8d75475ba5ff33db6d8c975f.png',
+    category: 'Vermicelli',
+    discountPercentage: '16% OFF',
+  ),
+  _Product(
+    id: 'cat_vrm4',
+    name: 'Tata Sampann Roasted Seviyan',
+    brand: 'Tata Sampann',
+    unit: '400 g Pack',
+    price: r'₹45',
+    mrp: r'₹55',
+    rating: 4.6,
+    reviews: 2600,
+    imageUrl: 'assets/products/vermicelli/64ca266c-db61-4087-b9f5-2019f2704a3e.png',
+    category: 'Vermicelli',
+    discountPercentage: '18% OFF',
+  ),
+];
+
+const _kCats = ['All', 'Vegetables', 'Milk', 'Bread & Bakery', 'Curd & Yogurt', 'Cereals', 'Poha & Grains', 'Vermicelli'];
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -213,6 +1008,48 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         ),
       );
 
+  Widget _buildHorizontalProductSection(
+    String title,
+    List<_Product> products,
+    CartProvider? cartProvider, {
+    VoidCallback? onSeeAll,
+  }) =>
+      Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _sectionHeader(title, onAll: onSeeAll),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 310,
+            child: AnimationLimiter(
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: products.length,
+                separatorBuilder: (_, __) => const SizedBox(width: 14),
+                itemBuilder: (_, i) => AnimationConfiguration.staggeredList(
+                  position: i,
+                  duration: const Duration(milliseconds: 375),
+                  child: SlideAnimation(
+                    horizontalOffset: 50.0,
+                    child: FadeInAnimation(
+                      child: SizedBox(
+                        width: 170,
+                        child: _buildCard(products[i], cartProvider),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      );
+
   Widget _buildFeed(CartProvider? cartProvider) => SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
@@ -239,34 +1076,47 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 _sectionHeader('Categories', onAll: () => setState(() => _navIndex = 1)),
                 const SizedBox(height: 12),
                 _buildCategoryChips(),
-                const SizedBox(height: 24),
-                _sectionHeader('Best Sellers', onAll: () {}),
-                const SizedBox(height: 12),
               ]),
             ),
-            SizedBox(
-              height: 310,
-              child: AnimationLimiter(
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: 4,
-                  separatorBuilder: (_, __) => const SizedBox(width: 14),
-                  itemBuilder: (_, i) => AnimationConfiguration.staggeredList(
-                    position: i,
-                    duration: const Duration(milliseconds: 375),
-                    child: SlideAnimation(
-                      horizontalOffset: 50.0,
-                      child: FadeInAnimation(
-                        child: SizedBox(width: 170, child: _buildCard(_catalog[i], cartProvider)),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
             const SizedBox(height: 24),
+
+            // ─── 1. Daily Selling Section ──────────────────────────────────────
+            _buildHorizontalProductSection(
+              'Daily Selling',
+              _dailySelling,
+              cartProvider,
+              onSeeAll: () => Navigator.pushNamed(context, '/categories'),
+            ),
+            const SizedBox(height: 28),
+
+            // ─── 2. High Selling Section ───────────────────────────────────────
+            _buildHorizontalProductSection(
+              'High Selling',
+              _highSelling,
+              cartProvider,
+              onSeeAll: () => Navigator.pushNamed(context, '/categories'),
+            ),
+            const SizedBox(height: 28),
+
+            // ─── 3. Recommended Section ────────────────────────────────────────
+            _buildHorizontalProductSection(
+              'Recommended For You',
+              _recommended,
+              cartProvider,
+              onSeeAll: () => Navigator.pushNamed(context, '/categories'),
+            ),
+            const SizedBox(height: 28),
+
+            // ─── 4. Top Buying Section ─────────────────────────────────────────
+            _buildHorizontalProductSection(
+              'Top Buying',
+              _topBuying,
+              cartProvider,
+              onSeeAll: () => Navigator.pushNamed(context, '/categories'),
+            ),
+            const SizedBox(height: 28),
+
+            // ─── 5. Kirana Essentials (Grid) ───────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -283,7 +1133,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, childAspectRatio: 0.54,
+                    crossAxisCount: 2, childAspectRatio: 0.53,
                     crossAxisSpacing: 14, mainAxisSpacing: 14,
                   ),
                   itemCount: _filtered.length,
@@ -587,14 +1437,13 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   Widget _buildCategoryChips() {
     const chips = [
-      ('Fruits', 'cat-1', '🍌'),
-      ('Vegetables', 'cat-1', '🥦'),
-      ('Dairy', 'cat-2', '🥛'),
-      ('Bakery', 'cat-5', '🥐'),
-      ('Beverages', 'cat-3', '☕'),
-      ('Household', 'cat-6', '🧺'),
-      ('Spices', 'cat-1', '🌶️'),
-      ('Stationery', 'cat-4', '✏️'),
+      ('Vegetables', 'fresh-vegetables', '🥦'),
+      ('Milk', 'milk', '🥛'),
+      ('Bread & Pav', 'bread-pav', '🍞'),
+      ('Curd & Yogurt', 'curd-yogurt', '🥣'),
+      ('Cereals', 'flakes-kids-cereals', '🥣'),
+      ('Poha & Grains', 'poha-daliya-grains', '🌾'),
+      ('Vermicelli', 'vermicelli', '🍜'),
     ];
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
@@ -647,24 +1496,21 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   IconData _getCategoryIcon(String category) {
     switch (category) {
-      case 'Dairy':
-        return Icons.egg_alt_rounded;
-      case 'Beverages':
+      case 'Milk':
         return Icons.local_drink_rounded;
-      case 'Confectionery':
-        return Icons.cookie_rounded;
-      case 'Personal Care':
-        return Icons.clean_hands_rounded;
-      case 'Household':
-        return Icons.soap_rounded;
-      case 'Staples':
+      case 'Vegetables':
+      case 'Fruits':
+        return Icons.eco_rounded;
+      case 'Bread & Bakery':
+        return Icons.bakery_dining_rounded;
+      case 'Curd & Yogurt':
+        return Icons.egg_alt_rounded;
+      case 'Cereals':
+        return Icons.breakfast_dining_rounded;
+      case 'Poha & Grains':
         return Icons.grain_rounded;
-      case 'Oil':
-        return Icons.oil_barrel_rounded;
-      case 'Spices':
-        return Icons.local_fire_department_rounded;
-      case 'Stationery':
-        return Icons.edit_rounded;
+      case 'Vermicelli':
+        return Icons.ramen_dining_rounded;
       default:
         return Icons.shopping_basket_rounded;
     }
@@ -672,6 +1518,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   Widget _buildCard(_Product p, [CartProvider? cartProvider]) {
     final qty = _getItemQty(p.id, cartProvider);
+    final disc = p.computedDiscount;
     return AppPressable(
       scaleFactor: 0.98,
       onTap: () {
@@ -692,13 +1539,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           arguments: {
             'productId': p.id,
             'categoryTag': p.category.toUpperCase(),
+            'brand': p.brand,
             'productName': p.name,
             'price': p.price,
             'mrp': p.mrp,
-            'discountPercentage': '20% OFF',
+            'discountPercentage': disc.isNotEmpty ? disc : '15% OFF',
             'unitDetails': p.unit,
-            'deliveryTime': '8 mins',
+            'deliveryTime': '10 mins',
             'imageUrl': p.imageUrl,
+            'description': 'Farm fresh and premium quality ${p.name}. Delivered in 10 minutes directly to your doorstep with guaranteed freshness.',
           },
         );
       },
@@ -715,20 +1564,52 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 child: AspectRatio(
-                  aspectRatio: 1.3,
-                  child: AppNetworkImage(
-                    imageUrl: p.imageUrl,
-                    fit: BoxFit.cover,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                    fallbackIcon: _getCategoryIcon(p.category),
-                    fallbackBgColor: const Color(0xFFF3F3F6),
-                    fallbackIconColor: const Color(0xFF006B23),
+                  aspectRatio: 1.25,
+                  child: Container(
+                    color: const Color(0xFFF9F9FC),
+                    padding: const EdgeInsets.all(8),
+                    child: AppNetworkImage(
+                      imageUrl: p.imageUrl,
+                      fit: BoxFit.contain,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                      fallbackIcon: _getCategoryIcon(p.category),
+                      fallbackBgColor: const Color(0xFFF3F3F6),
+                      fallbackIconColor: const Color(0xFF006B23),
+                    ),
                   ),
                 ),
               ),
+              if (disc.isNotEmpty)
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFBA1A1A),
+                      borderRadius: BorderRadius.circular(4),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.15),
+                          blurRadius: 4,
+                          offset: const Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      disc,
+                      style: GoogleFonts.inter(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ),
+                ),
               Positioned(
-                top: 2,
-                right: 2,
+                top: 4,
+                right: 4,
                 child: FavoriteButton(
                   productId: p.id,
                   productDetails: {
@@ -736,8 +1617,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     'name': p.name,
                     'brand': p.brand,
                     'weight': p.unit,
-                    'price': double.tryParse(p.price.replaceAll('₹', '')) ?? 50.0,
-                    'mrp': double.tryParse(p.mrp.replaceAll('₹', '')) ?? 60.0,
+                    'price': double.tryParse(p.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 50.0,
+                    'mrp': double.tryParse(p.mrp.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 60.0,
                     'category': p.category,
                     'imageUrl': p.imageUrl,
                   },
@@ -764,11 +1645,29 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   Flexible(child: Text('(${_fmt(p.reviews)})', style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C)), overflow: TextOverflow.ellipsis)),
                 ]),
                 const Spacer(),
-                Row(children: [
-                  Text(p.price, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF006B23))),
-                  const SizedBox(width: 5),
-                  Text(p.mrp, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C), decoration: TextDecoration.lineThrough)),
-                ]),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                  textBaseline: TextBaseline.alphabetic,
+                  children: [
+                    Text(p.price, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF006B23))),
+                    const SizedBox(width: 5),
+                    Text(p.mrp, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C), decoration: TextDecoration.lineThrough)),
+                    if (disc.isNotEmpty) ...[
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          disc,
+                          style: GoogleFonts.inter(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFFBA1A1A),
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
                 const SizedBox(height: 7),
                 qty == 0
                     ? AppPressable(

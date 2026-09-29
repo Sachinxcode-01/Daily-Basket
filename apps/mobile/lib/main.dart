@@ -142,12 +142,17 @@ class DailyBasketApp extends StatelessWidget {
           final args = settings.arguments as Map<String, dynamic>?;
           return MaterialPageRoute(
             builder: (context) => ProductDetailsScreen(
-              productId: args?['productId'] ?? 'prod_avocado',
-              productName: args?['productName'] ?? 'Organic Hass Avocados',
-              price: args?['price'] ?? '₹120',
-              mrp: args?['mrp'] ?? '₹150',
-              unitDetails: args?['unitDetails'] ?? '2 units (Approx. 400g)',
-              imageUrl: args?['imageUrl'] ?? 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=800&q=80',
+              productId: args?['productId'] ?? 'prod_veg_001',
+              categoryTag: args?['categoryTag'] ?? 'FRESH VEGETABLES',
+              brand: args?['brand'],
+              productName: args?['productName'] ?? 'Fresh Country Tomatoes (Tamatar)',
+              price: args?['price'] ?? '₹24',
+              mrp: args?['mrp'] ?? '₹35',
+              discountPercentage: args?['discountPercentage'] ?? '31% OFF',
+              unitDetails: args?['unitDetails'] ?? '500 g',
+              deliveryTime: args?['deliveryTime'] ?? '10 mins',
+              imageUrl: args?['imageUrl'] ?? 'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+              description: args?['description'],
             ),
           );
         }

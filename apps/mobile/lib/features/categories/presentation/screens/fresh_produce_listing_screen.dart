@@ -366,7 +366,7 @@ class _FreshProduceListingScreenState extends State<FreshProduceListingScreen> {
                           physics: const NeverScrollableScrollPhysics(),
                           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 2,
-                            childAspectRatio: 0.65,
+                            childAspectRatio: 0.54,
                             crossAxisSpacing: 12,
                             mainAxisSpacing: 14,
                           ),
@@ -382,6 +382,8 @@ class _FreshProduceListingScreenState extends State<FreshProduceListingScreen> {
                             final unitText = (p['unit'] ?? p['subtitle'] ?? '500g').toString();
                             final productName = p['name'] as String;
                             final imageUrl = p['image'] as String;
+                            final discPercent = (mrpDouble != null && mrpDouble > priceDouble) ? (((mrpDouble - priceDouble) / mrpDouble) * 100).round() : 0;
+                            final badgeLabel = p['badge'] as String? ?? (discPercent > 0 ? '$discPercent% OFF' : null);
 
                             return InkWell(
                               onTap: () {
@@ -390,10 +392,14 @@ class _FreshProduceListingScreenState extends State<FreshProduceListingScreen> {
                                   MaterialPageRoute(
                                     builder: (context) => ProductDetailsScreen(
                                       productId: productId,
+                                      categoryTag: (p['category'] ?? 'FRESH PRODUCE').toString().toUpperCase(),
+                                      brand: p['brand'] as String?,
                                       productName: productName,
                                       price: '₹${priceDouble.round()}',
                                       mrp: mrpDouble != null ? '₹${mrpDouble.round()}' : '₹${priceDouble.round()}',
+                                      discountPercentage: badgeLabel ?? '',
                                       unitDetails: unitText,
+                                      deliveryTime: '10 mins',
                                       imageUrl: imageUrl,
                                     ),
                                   ),
@@ -614,18 +620,25 @@ class _FreshProduceListingScreenState extends State<FreshProduceListingScreen> {
                                     ),
 
                                     // Top Row: Discount / Category Badge (Left) & Favorite Button (Right)
-                                    if (p['badge'] != null && inStock)
+                                    if (badgeLabel != null && inStock)
                                       Positioned(
                                         top: 4,
                                         left: 4,
                                         child: Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                                           decoration: BoxDecoration(
-                                            color: p['badgeColor'] ?? AppColors.error,
-                                            borderRadius: BorderRadius.circular(100),
+                                            color: p['badgeColor'] ?? const Color(0xFFBA1A1A),
+                                            borderRadius: BorderRadius.circular(6),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(alpha: 0.12),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 1),
+                                              ),
+                                            ],
                                           ),
                                           child: Text(
-                                            p['badge'] as String,
+                                            badgeLabel,
                                             style: GoogleFonts.inter(
                                               fontSize: 9,
                                               fontWeight: FontWeight.w700,

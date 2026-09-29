@@ -51,8 +51,15 @@ class AppNetworkImage extends StatelessWidget {
       return fallbackWidget();
     }
 
-    String resolvedUrl = imageUrl;
-    if (resolvedUrl.startsWith('/products/')) {
+    String resolvedUrl = imageUrl.trim();
+    if (resolvedUrl.contains('localhost:4000/assets/')) {
+      resolvedUrl = resolvedUrl.substring(resolvedUrl.indexOf('assets/'));
+    } else if (resolvedUrl.contains('localhost:4000/')) {
+      resolvedUrl = 'assets/${resolvedUrl.substring(resolvedUrl.indexOf('localhost:4000/') + 15)}';
+    }
+    if (resolvedUrl.startsWith('/assets/')) {
+      resolvedUrl = resolvedUrl.substring(1);
+    } else if (resolvedUrl.startsWith('/products/')) {
       resolvedUrl = 'assets$resolvedUrl';
     } else if (resolvedUrl.startsWith('products/')) {
       resolvedUrl = 'assets/$resolvedUrl';

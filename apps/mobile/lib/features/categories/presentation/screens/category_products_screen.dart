@@ -188,22 +188,36 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
                                 ),
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: AppColors.error,
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: AppTheme.level1,
-                              ),
-                              child: Text(
-                                'UP TO 40% OFF',
-                                style: GoogleFonts.inter(
-                                  color: AppColors.onError,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
+                            Builder(
+                              builder: (context) {
+                                final maxDiscount = products.fold<int>(0, (prev, p) {
+                                  final pr = (p['price'] as num?)?.toDouble() ?? 0.0;
+                                  final mr = (p['mrp'] as num?)?.toDouble() ?? pr;
+                                  if (mr > pr) {
+                                    final d = (((mr - pr) / mr) * 100).round();
+                                    return d > prev ? d : prev;
+                                  }
+                                  return prev;
+                                });
+                                final offerText = maxDiscount > 0 ? 'UP TO $maxDiscount% OFF' : 'BEST VALUE';
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.error,
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: AppTheme.level1,
+                                  ),
+                                  child: Text(
+                                    offerText,
+                                    style: GoogleFonts.inter(
+                                      color: AppColors.onError,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -467,7 +481,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
                     child: SliverGrid(
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
-                        childAspectRatio: 0.65,
+                        childAspectRatio: 0.53,
                         crossAxisSpacing: 12,
                         mainAxisSpacing: 16,
                       ),
@@ -484,6 +498,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
                           final rating = (p['rating'] ?? 4.8).toString();
                           final reviews = (p['reviews'] ?? '1.2k').toString();
                           final currentQty = cartProvider.getQuantity(id);
+                          final discountPercent = mrpNum > priceNum ? (((mrpNum - priceNum) / mrpNum) * 100).round() : 0;
 
                           return AnimationConfiguration.staggeredGrid(
                             position: index,
@@ -498,10 +513,14 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
                                       MaterialPageRoute(
                                         builder: (_) => ProductDetailsScreen(
                                           productId: id,
+                                          categoryTag: (p['category'] ?? p['sub'] ?? category.name).toString().toUpperCase(),
+                                          brand: brand,
                                           productName: name,
                                           price: '₹${priceNum.toStringAsFixed(0)}',
                                           mrp: '₹${mrpNum.toStringAsFixed(0)}',
+                                          discountPercentage: discountPercent > 0 ? '$discountPercent% OFF' : '',
                                           unitDetails: subtitle,
+                                          deliveryTime: '10 mins',
                                           imageUrl: image,
                                         ),
                                       ),
@@ -563,21 +582,30 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
                                                         ),
                                                       ),
                                                     ),
-                                                  Container(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                                    decoration: BoxDecoration(
-                                                      color: AppColors.error,
-                                                      borderRadius: BorderRadius.circular(4),
-                                                    ),
-                                                    child: Text(
-                                                      '-${(((mrpNum - priceNum) / mrpNum) * 100).toStringAsFixed(0)}%',
-                                                      style: GoogleFonts.inter(
-                                                        color: AppColors.onError,
-                                                        fontSize: 8,
-                                                        fontWeight: FontWeight.bold,
+                                                  if (discountPercent > 0)
+                                                    Container(
+                                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2.5),
+                                                      decoration: BoxDecoration(
+                                                        color: const Color(0xFFBA1A1A),
+                                                        borderRadius: BorderRadius.circular(4),
+                                                        boxShadow: [
+                                                          BoxShadow(
+                                                            color: Colors.black.withValues(alpha: 0.12),
+                                                            blurRadius: 4,
+                                                            offset: const Offset(0, 1),
+                                                         ),
+                                                        ],
+                                                      ),
+                                                      child: Text(
+                                                        '$discountPercent% OFF',
+                                                        style: GoogleFonts.inter(
+                                                          color: Colors.white,
+                                                          fontSize: 9,
+                                                          fontWeight: FontWeight.w700,
+                                                          letterSpacing: 0.2,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
                                                 ],
                                               ),
                                             ),
@@ -666,18 +694,35 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
                                                       crossAxisAlignment: CrossAxisAlignment.start,
                                                       mainAxisSize: MainAxisSize.min,
                                                       children: [
-                                                        Text(
-                                                          '₹${mrpNum.toStringAsFixed(0)}',
-                                                          style: GoogleFonts.inter(
-                                                            color: AppColors.outline,
-                                                            fontSize: 10,
-                                                            decoration: TextDecoration.lineThrough,
+                                                        if (mrpNum > priceNum)
+                                                          Row(
+                                                            mainAxisSize: MainAxisSize.min,
+                                                            children: [
+                                                              Text(
+                                                                '₹${mrpNum.toStringAsFixed(0)}',
+                                                                style: GoogleFonts.inter(
+                                                                  color: AppColors.outline,
+                                                                  fontSize: 10,
+                                                                  decoration: TextDecoration.lineThrough,
+                                                                ),
+                                                              ),
+                                                              if (discountPercent > 0) ...[
+                                                                const SizedBox(width: 4),
+                                                                Text(
+                                                                  '$discountPercent%',
+                                                                  style: GoogleFonts.inter(
+                                                                    color: const Color(0xFFBA1A1A),
+                                                                    fontSize: 9.5,
+                                                                    fontWeight: FontWeight.w700,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ],
                                                           ),
-                                                        ),
                                                         Text(
                                                           '₹${priceNum.toStringAsFixed(0)}',
                                                           style: GoogleFonts.outfit(
-                                                            color: AppColors.onSurface,
+                                                            color: const Color(0xFF006B23),
                                                             fontWeight: FontWeight.bold,
                                                             fontSize: 16,
                                                           ),
