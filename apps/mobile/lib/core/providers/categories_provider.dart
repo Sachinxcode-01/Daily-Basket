@@ -56,6 +56,9 @@ class CategoriesProvider extends ChangeNotifier {
   String _selectedSubcategory = 'All';
   String _searchQuery = '';
   String _sortOption = 'popular';
+  String _dietaryFilter = 'All';
+  String _priceFilter = 'All';
+  bool _inStockOnly = false;
 
   List<CategoryItem> get categories => _categories.isEmpty ? _defaultCategories : _categories;
   List<CategoryItem> get featuredCategories => categories.where((c) => c.isFeatured).toList();
@@ -64,6 +67,15 @@ class CategoriesProvider extends ChangeNotifier {
   String get selectedSubcategory => _selectedSubcategory;
   String get searchQuery => _searchQuery;
   String get sortOption => _sortOption;
+  String get dietaryFilter => _dietaryFilter;
+  String get priceFilter => _priceFilter;
+  bool get inStockOnly => _inStockOnly;
+
+  int get activeFilterCount =>
+      (_dietaryFilter != 'All' ? 1 : 0) +
+      (_priceFilter != 'All' ? 1 : 0) +
+      (_sortOption != 'popular' ? 1 : 0) +
+      (_inStockOnly ? 1 : 0);
 
   CategoriesProvider() {
     _categories = _defaultCategories;
@@ -81,6 +93,29 @@ class CategoriesProvider extends ChangeNotifier {
 
   void setSortOption(String sort) {
     _sortOption = sort;
+    notifyListeners();
+  }
+
+  void setDietaryFilter(String diet) {
+    _dietaryFilter = diet;
+    notifyListeners();
+  }
+
+  void setPriceFilter(String price) {
+    _priceFilter = price;
+    notifyListeners();
+  }
+
+  void setInStockOnly(bool only) {
+    _inStockOnly = only;
+    notifyListeners();
+  }
+
+  void resetFilters() {
+    _dietaryFilter = 'All';
+    _priceFilter = 'All';
+    _sortOption = 'popular';
+    _inStockOnly = false;
     notifyListeners();
   }
 
@@ -186,10 +221,52 @@ class CategoriesProvider extends ChangeNotifier {
       products = products.where((p) => p['name'].toString().toLowerCase().contains(q)).toList();
     }
 
+    if (_inStockOnly) {
+      products = products.where((p) => p['inStock'] == true).toList();
+    }
+
+    if (_dietaryFilter != 'All') {
+      products = products.where((p) {
+        final name = (p['name'] ?? '').toString().toLowerCase();
+        final badge = (p['badge'] ?? '').toString().toLowerCase();
+        final cat = (p['category'] ?? '').toString().toLowerCase();
+        switch (_dietaryFilter) {
+          case 'Organic':
+            return badge.contains('organic') || cat.contains('organic') || name.contains('organic');
+          case 'Vegan':
+            return !cat.contains('dairy') && !cat.contains('milk') && !name.contains('curd') && !name.contains('butter');
+          case 'Gluten-Free':
+            return !name.contains('bread') && !name.contains('wheat') && !name.contains('vermicelli');
+          case 'High-Protein':
+            return cat.contains('milk') || cat.contains('curd') || name.contains('egg') || name.contains('oats');
+          default:
+            return true;
+        }
+      }).toList();
+    }
+
+    if (_priceFilter != 'All') {
+      products = products.where((p) {
+        final pr = (p['price'] as num?)?.toDouble() ?? 0.0;
+        switch (_priceFilter) {
+          case 'under_50':
+            return pr < 50.0;
+          case '50_150':
+            return pr >= 50.0 && pr <= 150.0;
+          case 'above_150':
+            return pr > 150.0;
+          default:
+            return true;
+        }
+      }).toList();
+    }
+
     if (_sortOption == 'price_low_high') {
       products.sort((a, b) => (a['price'] as num).compareTo(b['price'] as num));
     } else if (_sortOption == 'price_high_low') {
       products.sort((a, b) => (b['price'] as num).compareTo(a['price'] as num));
+    } else if (_sortOption == 'rating') {
+      products.sort((a, b) => ((b['rating'] ?? 4.5) as num).compareTo((a['rating'] ?? 4.5) as num));
     }
 
     return products;

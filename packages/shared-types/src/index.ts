@@ -174,3 +174,53 @@ export interface WalletTransaction {
   description: string;
   createdAt: Date;
 }
+
+export interface ProductBundleItem {
+  productId: string;
+  productName: string;
+  variantId?: string;
+  unitName: string;
+  price: number;
+  mrp: number;
+  imageUrl?: string;
+}
+
+export interface ProductBundle {
+  id: string;
+  title: string;
+  description?: string;
+  badge?: string;
+  items: ProductBundleItem[];
+  bundlePrice: number;
+  originalPrice: number;
+  savings: number;
+  savingsPercent: number;
+}
+
+export interface ProductSubstitute {
+  id: string;
+  variantId?: string;
+  name: string;
+  brand: string;
+  price: number;
+  mrp: number;
+  unitName: string;
+  imageUrl: string;
+  rating?: number;
+  inStock: boolean;
+  matchScore: number; // e.g. 95 (for 95% match)
+  similarityReason: string; // e.g. 'Same category & pack size', 'Popular alternative'
+}
+
+export type DietaryTag = 'all' | 'organic' | 'vegan' | 'gluten_free' | 'sugar_free' | 'high_protein';
+export type SortOption = 'featured' | 'price_asc' | 'price_desc' | 'rating' | 'discount';
+export type PriceRangeBracket = 'all' | 'under_50' | '50_150' | '150_300' | 'above_300';
+
+export interface ProductFilterOptions {
+  dietary?: DietaryTag;
+  sortBy?: SortOption;
+  priceBracket?: PriceRangeBracket;
+  brand?: string;
+  inStockOnly?: boolean;
+}
+

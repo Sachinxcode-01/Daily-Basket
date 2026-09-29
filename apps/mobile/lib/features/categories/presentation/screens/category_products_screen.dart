@@ -848,76 +848,281 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
   void _showFilterBottomSheet(BuildContext context, CategoriesProvider provider) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: AppColors.surfaceContainerLowest,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Filter & Sort',
-                    style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return DraggableScrollableSheet(
+              initialChildSize: 0.75,
+              maxChildSize: 0.90,
+              minChildSize: 0.50,
+              expand: false,
+              builder: (context, scrollController) {
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                  child: ListView(
+                    controller: scrollController,
+                    children: [
+                      Center(
+                        child: Container(
+                          width: 40,
+                          height: 4,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade300,
+                            borderRadius: BorderRadius.circular(2),
+                          ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              const Icon(Icons.tune_rounded, color: AppColors.primary, size: 22),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Filter & Sort',
+                                style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close_rounded),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                      const Divider(),
+                      const SizedBox(height: 12),
+
+                      // 1. Sort By
+                      Text('Sort By', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildModalChip(
+                            label: 'Popularity',
+                            selected: provider.sortOption == 'popular',
+                            onTap: () {
+                              provider.setSortOption('popular');
+                              setModalState(() {});
+                            },
+                          ),
+                          _buildModalChip(
+                            label: 'Price: Low → High',
+                            selected: provider.sortOption == 'price_low_high',
+                            onTap: () {
+                              provider.setSortOption('price_low_high');
+                              setModalState(() {});
+                            },
+                          ),
+                          _buildModalChip(
+                            label: 'Price: High → Low',
+                            selected: provider.sortOption == 'price_high_low',
+                            onTap: () {
+                              provider.setSortOption('price_high_low');
+                              setModalState(() {});
+                            },
+                          ),
+                          _buildModalChip(
+                            label: 'Rating (4★+)',
+                            selected: provider.sortOption == 'rating',
+                            onTap: () {
+                              provider.setSortOption('rating');
+                              setModalState(() {});
+                            },
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // 2. Dietary & Lifestyle
+                      Text('Dietary & Lifestyle', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildModalChip(
+                            label: 'All Diets',
+                            selected: provider.dietaryFilter == 'All',
+                            onTap: () {
+                              provider.setDietaryFilter('All');
+                              setModalState(() {});
+                            },
+                          ),
+                          _buildModalChip(
+                            label: '🌿 Organic',
+                            selected: provider.dietaryFilter == 'Organic',
+                            onTap: () {
+                              provider.setDietaryFilter('Organic');
+                              setModalState(() {});
+                            },
+                          ),
+                          _buildModalChip(
+                            label: '🌱 Vegan',
+                            selected: provider.dietaryFilter == 'Vegan',
+                            onTap: () {
+                              provider.setDietaryFilter('Vegan');
+                              setModalState(() {});
+                            },
+                          ),
+                          _buildModalChip(
+                            label: '🌾 Gluten-Free',
+                            selected: provider.dietaryFilter == 'Gluten-Free',
+                            onTap: () {
+                              provider.setDietaryFilter('Gluten-Free');
+                              setModalState(() {});
+                            },
+                          ),
+                          _buildModalChip(
+                            label: '💪 High-Protein',
+                            selected: provider.dietaryFilter == 'High-Protein',
+                            onTap: () {
+                              provider.setDietaryFilter('High-Protein');
+                              setModalState(() {});
+                            },
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // 3. Price Bracket
+                      Text('Price Range', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w700)),
+                      const SizedBox(height: 8),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
+                        children: [
+                          _buildModalChip(
+                            label: 'Any Price',
+                            selected: provider.priceFilter == 'All',
+                            onTap: () {
+                              provider.setPriceFilter('All');
+                              setModalState(() {});
+                            },
+                          ),
+                          _buildModalChip(
+                            label: 'Under ₹50',
+                            selected: provider.priceFilter == 'under_50',
+                            onTap: () {
+                              provider.setPriceFilter('under_50');
+                              setModalState(() {});
+                            },
+                          ),
+                          _buildModalChip(
+                            label: '₹50 – ₹150',
+                            selected: provider.priceFilter == '50_150',
+                            onTap: () {
+                              provider.setPriceFilter('50_150');
+                              setModalState(() {});
+                            },
+                          ),
+                          _buildModalChip(
+                            label: 'Above ₹150',
+                            selected: provider.priceFilter == 'above_150',
+                            onTap: () {
+                              provider.setPriceFilter('above_150');
+                              setModalState(() {});
+                            },
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 18),
+
+                      // 4. In Stock Toggle
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: Text('In-Stock Items Only', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
+                        subtitle: Text('Exclude items currently sold out', style: GoogleFonts.inter(fontSize: 12, color: AppColors.outline)),
+                        value: provider.inStockOnly,
+                        activeThumbColor: AppColors.primary,
+                        activeTrackColor: AppColors.primary.withValues(alpha: 0.4),
+                        onChanged: (val) {
+                          provider.setInStockOnly(val);
+                          setModalState(() {});
+                        },
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // Footer Actions
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () {
+                                provider.resetFilters();
+                                Navigator.pop(context);
+                              },
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: Text('Reset', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            flex: 2,
+                            child: ElevatedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              ),
+                              child: Text('Apply Filters', style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
-              ),
-              const Divider(),
-              const SizedBox(height: 10),
-              Text('Sort By', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
-              const SizedBox(height: 8),
-              RadioGroup<String>(
-                groupValue: provider.sortOption,
-                onChanged: (val) {
-                  if (val != null) {
-                    provider.setSortOption(val);
-                    Navigator.pop(context);
-                  }
-                },
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    ListTile(
-                      title: const Text('Popularity'),
-                      leading: const Radio<String>(value: 'popular'),
-                      onTap: () {
-                        provider.setSortOption('popular');
-                        Navigator.pop(context);
-                      },
-                    ),
-                    ListTile(
-                      title: const Text('Price: Low to High'),
-                      leading: const Radio<String>(value: 'price_low_high'),
-                      onTap: () {
-                        provider.setSortOption('price_low_high');
-                        Navigator.pop(context);
-                      },
-                    ),
-                    ListTile(
-                      title: const Text('Price: High to Low'),
-                      leading: const Radio<String>(value: 'price_high_low'),
-                      onTap: () {
-                        provider.setSortOption('price_high_low');
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+                );
+              },
+            );
+          },
         );
       },
     );
   }
+
+  Widget _buildModalChip({required String label, required bool selected, required VoidCallback onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : Colors.white,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: selected ? AppColors.primary : const Color(0xFFE2E8F0),
+            width: selected ? 1.5 : 1.0,
+          ),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.inter(
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.bold : FontWeight.w500,
+            color: selected ? Colors.white : AppColors.onSurface,
+          ),
+        ),
+      ),
+    );
+  }
 }
+

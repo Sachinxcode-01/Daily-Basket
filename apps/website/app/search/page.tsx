@@ -14,16 +14,29 @@ import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../store/useCart';
 import { BarcodeScanner } from '../../components/BarcodeScanner';
-import { searchProducts, normalizeImagePath } from '../../lib/catalog';
+import {
+  searchProducts,
+  normalizeImagePath,
+  WebsiteProduct,
+  AdvancedFilterState,
+  INITIAL_FILTER_STATE,
+  filterAndSortWebsiteProducts,
+} from '../../lib/catalog';
+import { AdvancedFilterModal } from '../../components/AdvancedFilterModal';
 
 interface SearchItem {
   id: string;
   variantId: string;
   name: string;
+  brand: string;
   weight: string;
   price: number;
   mrp: number;
+  discount: number;
+  rating?: number;
   isOrganic: boolean;
+  categorySlug: string;
+  inStock: boolean;
   image: string;
 }
 
@@ -31,14 +44,23 @@ function mapItem(p: any): SearchItem {
   const variant =
     (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
   const rawImage = (Array.isArray(p?.images) && p.images[0]) || p.image || null;
+  const price = variant?.price ?? p?.price ?? 0;
+  const mrp = variant?.mrp ?? p?.mrp ?? price;
+  const discount = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
+
   return {
     id: p?.id,
     variantId: variant?.id ?? p?.variantId ?? '',
     name: p?.name ?? '',
+    brand: p?.brand ?? 'Daily Basket Select',
     weight: variant?.unitName ?? p?.unitName ?? '',
-    price: variant?.price ?? p?.price ?? 0,
-    mrp: variant?.mrp ?? p?.mrp ?? variant?.price ?? p?.price ?? 0,
+    price,
+    mrp,
+    discount,
+    rating: p?.rating ?? 4.5,
     isOrganic: Boolean(p?.isOrganic),
+    categorySlug: p?.categorySlug ?? '',
+    inStock: p?.inStock ?? true,
     image: normalizeImagePath(rawImage),
   };
 }
@@ -47,8 +69,10 @@ export default function SearchPage() {
   const router = useRouter();
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeQuickChip, setActiveQuickChip] = useState('All');
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterState>(INITIAL_FILTER_STATE);
   const [scanNotice, setScanNotice] = useState<string | null>(null);
   const { activeItems, addItem, updateItem } = useCart();
 
@@ -71,7 +95,13 @@ export default function SearchPage() {
     setQuery(c);
   };
 
-  const filters = ['All', 'Organic', 'On Sale', 'Under ₹50'];
+  const quickChips = [
+    { label: 'All', dietary: 'all' as const },
+    { label: 'Organic 🌿', dietary: 'organic' as const },
+    { label: 'Vegan 🌱', dietary: 'vegan' as const },
+    { label: 'Under ₹50', priceBracket: 'under_50' as const },
+    { label: 'In-Stock ⚡', inStockOnly: true },
+  ];
 
   // Debounce the query so we don't hit the API on every keystroke.
   useEffect(() => {
@@ -90,24 +120,52 @@ export default function SearchPage() {
     queryFn: () => apiClient.getProducts(undefined, debouncedQuery || undefined),
   });
 
-  const results = useMemo(() => {
-    let source: any[] = [];
+  const baseResults: WebsiteProduct[] = useMemo(() => {
     if (Array.isArray(apiProducts) && apiProducts.length > 0) {
-      source = apiProducts.map(mapItem);
-    } else {
-      source = searchProducts(debouncedQuery).map(mapItem);
+      return apiProducts.map((p) => {
+        const item = mapItem(p);
+        return {
+          id: item.id,
+          variantId: item.variantId,
+          name: item.name,
+          brand: item.brand,
+          unitName: item.weight,
+          price: item.price,
+          mrp: item.mrp,
+          discount: item.discount,
+          rating: item.rating,
+          category: (p as any).category?.name || 'Groceries',
+          categorySlug: (p as any).category?.slug || (p as any).categoryId || 'groceries',
+          image: item.image,
+          images: [item.image],
+          isOrganic: item.isOrganic,
+          description: p.description || '',
+          inStock: item.inStock,
+        };
+      });
     }
-    switch (activeFilter) {
-      case 'Organic':
-        return source.filter((p) => p.isOrganic);
-      case 'On Sale':
-        return source.filter((p) => p.mrp > p.price);
-      case 'Under ₹50':
-        return source.filter((p) => p.price < 50);
-      default:
-        return source;
-    }
-  }, [apiProducts, debouncedQuery, activeFilter]);
+    return searchProducts(debouncedQuery);
+  }, [apiProducts, debouncedQuery]);
+
+  const results: SearchItem[] = useMemo(() => {
+    const filtered = filterAndSortWebsiteProducts(baseResults, advancedFilters);
+    return filtered.map(mapItem);
+  }, [baseResults, advancedFilters]);
+
+  const availableBrands = useMemo(() => {
+    const brands = new Set<string>();
+    baseResults.forEach((p) => {
+      if (p.brand) brands.add(p.brand);
+    });
+    return Array.from(brands).slice(0, 8);
+  }, [baseResults]);
+
+  const activeFilterCount =
+    (advancedFilters.dietary !== 'all' ? 1 : 0) +
+    (advancedFilters.priceBracket !== 'all' ? 1 : 0) +
+    (advancedFilters.sortBy !== 'featured' ? 1 : 0) +
+    (advancedFilters.inStockOnly ? 1 : 0) +
+    (advancedFilters.brand && advancedFilters.brand !== 'All' ? 1 : 0);
 
   const addToCart = (item: SearchItem) => {
     if (!item.variantId) return;
@@ -124,6 +182,24 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 font-sans pb-24 text-white">
+      {/* Advanced Filter Modal */}
+      <AdvancedFilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        filters={advancedFilters}
+        onFilterChange={(newFilters) => {
+          setAdvancedFilters(newFilters);
+          // Sync quick chip
+          if (newFilters.dietary === 'all' && newFilters.priceBracket === 'all' && !newFilters.inStockOnly) {
+            setActiveQuickChip('All');
+          } else {
+            setActiveQuickChip('');
+          }
+        }}
+        availableBrands={availableBrands}
+        totalMatches={results.length}
+      />
+
       {/* Sticky Search Header */}
       <header className="sticky top-0 z-40 bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 px-4 sm:px-8 py-3">
         <div className="max-w-7xl mx-auto flex items-center gap-3">
@@ -149,26 +225,58 @@ export default function SearchPage() {
             </button>
           </div>
 
-          <button className="p-2.5 bg-slate-700 text-slate-200 rounded-xl hover:bg-slate-600 transition">
+          <button
+            onClick={() => setIsFilterModalOpen(true)}
+            className={`relative p-2.5 rounded-xl border transition flex items-center justify-center ${
+              activeFilterCount > 0
+                ? 'bg-teal-500/20 border-teal-500 text-teal-300 shadow-sm shadow-teal-500/30'
+                : 'bg-slate-700 border-transparent text-slate-200 hover:bg-slate-600'
+            }`}
+            title="Filter & Sort"
+          >
             <SlidersHorizontal className="w-5 h-5" />
+            {activeFilterCount > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-teal-500 text-slate-950 rounded-full text-[10px] font-extrabold flex items-center justify-center shadow">
+                {activeFilterCount}
+              </span>
+            )}
           </button>
         </div>
 
         {/* Filter Chips Bar */}
         <div className="max-w-7xl mx-auto flex items-center gap-2 mt-3 overflow-x-auto scrollbar-none pb-1">
-          {filters.map((f) => (
-            <button
-              key={f}
-              onClick={() => setActiveFilter(f)}
-              className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
-                activeFilter === f
-                  ? 'bg-teal-500 text-slate-950 font-bold shadow-md shadow-teal-500/20'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-              }`}
-            >
-              {f}
-            </button>
-          ))}
+          {quickChips.map((chip) => {
+            const isSelected =
+              activeQuickChip === chip.label ||
+              (chip.dietary && advancedFilters.dietary === chip.dietary) ||
+              (chip.priceBracket && advancedFilters.priceBracket === chip.priceBracket) ||
+              (chip.inStockOnly && advancedFilters.inStockOnly);
+
+            return (
+              <button
+                key={chip.label}
+                onClick={() => {
+                  setActiveQuickChip(chip.label);
+                  if (chip.label === 'All') {
+                    setAdvancedFilters(INITIAL_FILTER_STATE);
+                  } else if (chip.dietary) {
+                    setAdvancedFilters((prev) => ({ ...prev, dietary: chip.dietary! }));
+                  } else if (chip.priceBracket) {
+                    setAdvancedFilters((prev) => ({ ...prev, priceBracket: chip.priceBracket! }));
+                  } else if (chip.inStockOnly) {
+                    setAdvancedFilters((prev) => ({ ...prev, inStockOnly: !prev.inStockOnly }));
+                  }
+                }}
+                className={`px-4 py-1.5 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+                  isSelected
+                    ? 'bg-teal-500 text-slate-950 font-bold shadow-md shadow-teal-500/20'
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                }`}
+              >
+                {chip.label}
+              </button>
+            );
+          })}
         </div>
       </header>
 

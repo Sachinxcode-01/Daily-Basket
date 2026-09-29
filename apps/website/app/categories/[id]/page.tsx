@@ -2,12 +2,19 @@
 
 import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Search, ShoppingBag, Heart, Star, Sparkles } from 'lucide-react';
+import { ArrowLeft, Search, ShoppingBag, Heart, Star, Sparkles, SlidersHorizontal } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../../store/useCart';
-import { ALL_WEBSITE_PRODUCTS } from '../../../lib/catalog';
+import {
+  ALL_WEBSITE_PRODUCTS,
+  AdvancedFilterState,
+  INITIAL_FILTER_STATE,
+  filterAndSortWebsiteProducts,
+  WebsiteProduct,
+} from '../../../lib/catalog';
+import { AdvancedFilterModal } from '../../../components/AdvancedFilterModal';
 
 interface CardProduct {
   id: string;
@@ -28,27 +35,13 @@ function normalizeImagePath(raw?: string): string {
   return raw;
 }
 
-function mapProduct(p: any): CardProduct {
-  const variant =
-    (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
-  const rawImage = Array.isArray(p?.images) && p.images[0] ? p.images[0] : null;
-  return {
-    id: p?.id,
-    variantId: variant?.id ?? '',
-    name: p?.name ?? '',
-    subtitle: variant?.unitName ?? p?.brand ?? '',
-    price: variant?.price ?? 0,
-    mrp: variant?.mrp ?? variant?.price ?? 0,
-    imageUrl: normalizeImagePath(rawImage),
-    rating: typeof p?.rating === 'number' && p.rating > 0 ? p.rating : undefined,
-  };
-}
-
 export default function CategoryDetailPage({ params }: { params: { id: string } }) {
   const categoryId = params.id;
   const { addItem, itemCount } = useCart();
 
   const [search, setSearch] = useState('');
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [filters, setFilters] = useState<AdvancedFilterState>(INITIAL_FILTER_STATE);
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
@@ -75,19 +68,48 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
     category?.imageUrl ||
     'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=1200&q=80';
 
-  const products = useMemo(() => {
+  const rawProducts: WebsiteProduct[] = useMemo(() => {
     if (Array.isArray(apiProducts) && apiProducts.length > 0) {
-      return apiProducts.map(mapProduct);
+      return apiProducts.map((p: any) => {
+        const variant =
+          (Array.isArray(p?.variants) && (p.variants.find((v: any) => v?.isAvailable) ?? p.variants[0])) || null;
+        const rawImage = Array.isArray(p?.images) && p.images[0] ? p.images[0] : null;
+        return {
+          id: p?.id,
+          variantId: variant?.id ?? '',
+          name: p?.name ?? '',
+          brand: p?.brand || 'Daily Basket Select',
+          unitName: variant?.unitName ?? p?.brand ?? '',
+          price: variant?.price ?? 0,
+          mrp: variant?.mrp ?? variant?.price ?? 0,
+          discount: 0,
+          rating: typeof p?.rating === 'number' && p.rating > 0 ? p.rating : undefined,
+          category: categoryName,
+          categorySlug: categoryId,
+          image: normalizeImagePath(rawImage),
+          images: [normalizeImagePath(rawImage)],
+          isOrganic: Boolean(p?.isOrganic),
+          description: p?.description || '',
+          inStock: variant?.isAvailable ?? true,
+        };
+      });
     }
     const catLower = categoryId.toLowerCase();
-    const fallback = ALL_WEBSITE_PRODUCTS.filter(
+    return ALL_WEBSITE_PRODUCTS.filter(
       (p) =>
         p.categorySlug.toLowerCase() === catLower ||
         p.category.toLowerCase().replace(/[^a-z0-9]+/g, '-') === catLower ||
         p.category.toLowerCase().includes(catLower) ||
         catLower.includes(p.categorySlug.toLowerCase()),
     );
-    return fallback.map((p) => ({
+  }, [apiProducts, categoryId, categoryName]);
+
+  const filteredProducts = useMemo(() => {
+    let list = rawProducts;
+    if (search.trim()) {
+      list = list.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
+    }
+    return filterAndSortWebsiteProducts(list, filters).map((p) => ({
       id: p.id,
       variantId: p.variantId,
       name: p.name,
@@ -97,14 +119,25 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
       imageUrl: p.image,
       rating: p.rating,
     }));
-  }, [apiProducts, categoryId]);
+  }, [rawProducts, search, filters]);
 
-  const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase()),
-  );
+  const activeFilterCount =
+    (filters.dietary !== 'all' ? 1 : 0) +
+    (filters.priceBracket !== 'all' ? 1 : 0) +
+    (filters.sortBy !== 'featured' ? 1 : 0) +
+    (filters.inStockOnly ? 1 : 0);
 
   return (
     <div className="min-h-screen bg-slate-900 font-sans pb-24 text-white">
+      {/* Advanced Filter Modal */}
+      <AdvancedFilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        filters={filters}
+        onFilterChange={setFilters}
+        totalMatches={filteredProducts.length}
+      />
+
       {/* Header */}
       <header className="sticky top-0 z-40 bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 px-4 sm:px-8 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -144,17 +177,38 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
           </div>
         </div>
 
-        {/* Search */}
-        <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-6">
-          <div className="relative w-full md:w-64">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-400" />
-            <input
-              type="text"
-              placeholder={`Search in ${categoryName}...`}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-teal-500"
-            />
+        {/* Search & Filter Bar */}
+        <div className="flex items-center justify-between gap-3 mb-6">
+          <div className="text-xs text-slate-400 font-medium">
+            Showing <span className="font-bold text-white">{filteredProducts.length}</span> items
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="relative w-48 sm:w-64">
+              <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder={`Search in ${categoryName}...`}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-teal-500"
+              />
+            </div>
+            <button
+              onClick={() => setIsFilterModalOpen(true)}
+              className={`relative p-2 rounded-xl border transition flex items-center justify-center ${
+                activeFilterCount > 0
+                  ? 'bg-teal-500/20 border-teal-500 text-teal-300'
+                  : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+              }`}
+              title="Filter & Sort"
+            >
+              <SlidersHorizontal className="w-4 h-4" />
+              {activeFilterCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-teal-500 text-slate-950 rounded-full text-[9px] font-extrabold flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
+              )}
+            </button>
           </div>
         </div>
 

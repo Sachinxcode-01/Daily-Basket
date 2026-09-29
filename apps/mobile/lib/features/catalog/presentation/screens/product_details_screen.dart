@@ -48,6 +48,49 @@ class ProductDetailsScreen extends StatefulWidget {
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _selectedImageIndex = 0;
   late String _selectedWeight;
+  bool _notifyMeRegistered = false;
+  bool _comboAdded = false;
+  String? _substituteAddedId;
+
+  bool get _isProductInStock {
+    final catProd = _catalogProduct;
+    if (catProd != null && catProd.containsKey('inStock')) {
+      return catProd['inStock'] == true;
+    }
+    return true;
+  }
+
+  List<Map<String, dynamic>> get _comboCompanions {
+    final all = kAllCatalogProducts['all'] ?? [];
+    final currentCat = (_catalogProduct?['category'] ?? _catalogProduct?['sub'] ?? widget.categoryTag).toString().toLowerCase();
+
+    final matches = all.where((p) {
+      if (p['id'] == widget.productId) return false;
+      final cat = (p['category'] ?? p['sub'] ?? '').toString().toLowerCase();
+      if (currentCat.contains('milk')) {
+        return cat.contains('bread') || cat.contains('cereal');
+      }
+      if (currentCat.contains('bread')) {
+        return cat.contains('milk') || cat.contains('butter');
+      }
+      return cat != currentCat;
+    }).take(2).toList();
+
+    return matches.isNotEmpty ? matches : all.where((p) => p['id'] != widget.productId).take(2).toList();
+  }
+
+  List<Map<String, dynamic>> get _smartSubstitutes {
+    final all = kAllCatalogProducts['all'] ?? [];
+    final currentCat = (_catalogProduct?['category'] ?? _catalogProduct?['sub'] ?? widget.categoryTag).toString().toLowerCase();
+
+    final matches = all.where((p) {
+      if (p['id'] == widget.productId) return false;
+      final cat = (p['category'] ?? p['sub'] ?? '').toString().toLowerCase();
+      return cat == currentCat || p['image'].toString().contains('fresh-vegetables');
+    }).take(3).toList();
+
+    return matches.isNotEmpty ? matches : all.where((p) => p['id'] != widget.productId).take(3).toList();
+  }
 
   Map<String, dynamic>? get _catalogProduct {
     final all = kAllCatalogProducts['all'] ?? [];
@@ -602,6 +645,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
                 const SizedBox(height: 24),
 
+                // Out of stock & Smart Substitutes (Feature 4)
+                if (!_isProductInStock) ...[
+                  _buildSmartSubstitutes(cartProvider),
+                  const SizedBox(height: 24),
+                ],
+
+                // Frequently Bought Together & Smart Bundles (Feature 2)
+                if (_comboCompanions.isNotEmpty) ...[
+                  _buildFrequentlyBoughtTogether(cartProvider, unitPrice),
+                  const SizedBox(height: 24),
+                ],
+
                 // 7. Specifications Section
                 Text(
                   'Product Details',
@@ -827,74 +882,60 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                         ],
                       ),
-                      const Spacer(),
-                      if (currentQty == 0)
-                        AppPressable(
-                          child: SizedBox(
-                            height: 48,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                cartProvider?.updateQuantityById(
-                                  id: widget.productId,
-                                  name: widget.productName,
-                                  subtitle: _selectedWeight,
-                                  price: unitPrice,
-                                  image: widget.imageUrl,
-                                  delta: 1,
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 28),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                              child: Text(
-                                'Add to Cart - ${widget.price}',
-                                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                        )
-                      else
-                        Container(
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                      if (!_isProductInStock)
+                        Expanded(
                           child: Row(
                             children: [
-                              AppPressable(
-                                onTap: () {
-                                  cartProvider?.updateQuantityById(
-                                    id: widget.productId,
-                                    name: widget.productName,
-                                    subtitle: _selectedWeight,
-                                    price: unitPrice,
-                                    image: widget.imageUrl,
-                                    delta: -1,
-                                  );
-                                },
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                  child: Icon(Icons.remove_rounded, color: Colors.white, size: 20),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 180),
-                                  transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                              Expanded(
+                                child: Container(
+                                  height: 48,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: Colors.amber.shade100,
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.amber.shade300),
+                                  ),
                                   child: Text(
-                                    '$currentQty',
-                                    key: ValueKey<int>(currentQty),
-                                    style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                    'Sold Out in Store',
+                                    style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.amber.shade900),
                                   ),
                                 ),
                               ),
-                              AppPressable(
-                                onTap: () {
+                              const SizedBox(width: 8),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  setState(() => _notifyMeRegistered = !_notifyMeRegistered);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        _notifyMeRegistered ? '✓ Alert registered! We will notify you when restocked.' : 'Alert cancelled.',
+                                        style: GoogleFonts.inter(color: Colors.white),
+                                      ),
+                                      backgroundColor: AppColors.primary,
+                                      duration: const Duration(seconds: 2),
+                                    ),
+                                  );
+                                },
+                                icon: Icon(_notifyMeRegistered ? Icons.notifications_active_rounded : Icons.notifications_none_rounded, size: 18),
+                                label: Text(_notifyMeRegistered ? 'Alert Set' : 'Notify Me'),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      else ...[
+                        const Spacer(),
+                        if (currentQty == 0)
+                          AppPressable(
+                            child: SizedBox(
+                              height: 48,
+                              child: ElevatedButton(
+                                onPressed: () {
                                   cartProvider?.updateQuantityById(
                                     id: widget.productId,
                                     name: widget.productName,
@@ -904,20 +945,370 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     delta: 1,
                                   );
                                 },
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                  child: Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(horizontal: 28),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                                child: Text(
+                                  'Add to Cart - ${widget.price}',
+                                  style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold),
                                 ),
                               ),
-                            ],
+                            ),
+                          )
+                        else
+                          Container(
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                AppPressable(
+                                  onTap: () {
+                                    cartProvider?.updateQuantityById(
+                                      id: widget.productId,
+                                      name: widget.productName,
+                                      subtitle: _selectedWeight,
+                                      price: unitPrice,
+                                      image: widget.imageUrl,
+                                      delta: -1,
+                                    );
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    child: Icon(Icons.remove_rounded, color: Colors.white, size: 20),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 180),
+                                    transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                                    child: Text(
+                                      '$currentQty',
+                                      key: ValueKey<int>(currentQty),
+                                      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                                AppPressable(
+                                  onTap: () {
+                                    cartProvider?.updateQuantityById(
+                                      id: widget.productId,
+                                      name: widget.productName,
+                                      subtitle: _selectedWeight,
+                                      price: unitPrice,
+                                      image: widget.imageUrl,
+                                      delta: 1,
+                                    );
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                    child: Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+                      ],
                     ],
                   ),
                 ),
               ),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  // ─── Feature 4: Smart Out-of-Stock Substitutes ─────────────────────────────
+  Widget _buildSmartSubstitutes(CartProvider? cartProvider) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade50,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.amber.shade300, width: 1.5),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(color: Colors.amber.shade200, shape: BoxShape.circle),
+                child: Icon(Icons.warning_amber_rounded, color: Colors.amber.shade900, size: 20),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Currently Sold Out',
+                      style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.amber.shade900),
+                    ),
+                    Text(
+                      'Restock in progress. Try these direct 10-min delivery alternatives:',
+                      style: GoogleFonts.inter(fontSize: 11, color: Colors.amber.shade800),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ..._smartSubstitutes.map((sub) {
+            final subId = sub['id'].toString();
+            final subName = sub['name'].toString();
+            final subPrice = (sub['price'] as num?)?.toDouble() ?? 30.0;
+            final subImg = sub['image'].toString();
+            final subUnit = (sub['unit'] ?? sub['subtitle'] ?? '1 Pack').toString();
+            final isAdded = _substituteAddedId == subId;
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+              ),
+              child: Row(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: AppNetworkImage(
+                      imageUrl: subImg,
+                      width: 44,
+                      height: 44,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                              decoration: BoxDecoration(color: AppColors.primaryContainer, borderRadius: BorderRadius.circular(4)),
+                              child: Text('95% Match', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(subName, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        Text(subUnit, style: GoogleFonts.inter(fontSize: 10, color: AppColors.onSurfaceVariant)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('₹${subPrice.round()}', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onSurface)),
+                      const SizedBox(height: 4),
+                      SizedBox(
+                        height: 28,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            cartProvider?.updateQuantityById(
+                              id: subId,
+                              name: subName,
+                              subtitle: subUnit,
+                              price: subPrice,
+                              image: subImg,
+                              delta: 1,
+                            );
+                            setState(() => _substituteAddedId = subId);
+                            Future.delayed(const Duration(seconds: 2), () {
+                              if (mounted) setState(() => _substituteAddedId = null);
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 10),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          child: Text(isAdded ? '✓ Added' : '+ Add', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+    );
+  }
+
+  // ─── Feature 2: Frequently Bought Together ─────────────────────────────────
+  Widget _buildFrequentlyBoughtTogether(CartProvider? cartProvider, double unitPrice) {
+    final companions = _comboCompanions;
+    if (companions.isEmpty) return const SizedBox.shrink();
+
+    double comboOriginalTotal = unitPrice;
+    for (final c in companions) {
+      comboOriginalTotal += (c['price'] as num?)?.toDouble() ?? 30.0;
+    }
+    const discountPercent = 12;
+    final comboDiscounted = (comboOriginalTotal * (1 - discountPercent / 100)).roundToDouble();
+    final savings = comboOriginalTotal - comboDiscounted;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE8F5E9),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFA5D6A7)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                child: const Icon(Icons.layers_rounded, color: Colors.white, size: 16),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Frequently Bought Together',
+                      style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                    ),
+                    Text(
+                      'Morning essentials bundle with 12% combo discount',
+                      style: GoogleFonts.inter(fontSize: 11, color: AppColors.onSurfaceVariant),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(12)),
+                child: Text('SAVE 12%', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // Product thumbnails row
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildBundleThumb(widget.imageUrl, widget.productName, widget.price),
+                ...companions.map((c) => Row(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 6),
+                      child: Text('+', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                    ),
+                    _buildBundleThumb(
+                      c['image'].toString(),
+                      c['name'].toString(),
+                      '₹${(c['price'] as num).round()}',
+                    ),
+                  ],
+                )),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          const Divider(),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text('₹${comboDiscounted.round()}', style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface)),
+                      const SizedBox(width: 6),
+                      Text('₹${comboOriginalTotal.round()}', style: GoogleFonts.inter(fontSize: 12, decoration: TextDecoration.lineThrough, color: AppColors.outline)),
+                    ],
+                  ),
+                  Text('Save ₹${savings.round()} instantly', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                ],
+              ),
+              ElevatedButton.icon(
+                onPressed: () {
+                  // Add main product
+                  cartProvider?.updateQuantityById(
+                    id: widget.productId,
+                    name: widget.productName,
+                    subtitle: _selectedWeight,
+                    price: unitPrice,
+                    image: widget.imageUrl,
+                    delta: 1,
+                  );
+                  // Add companions
+                  for (final c in companions) {
+                    cartProvider?.updateQuantityById(
+                      id: c['id'].toString(),
+                      name: c['name'].toString(),
+                      subtitle: (c['unit'] ?? c['subtitle'] ?? '1 Pack').toString(),
+                      price: (c['price'] as num?)?.toDouble() ?? 30.0,
+                      image: c['image'].toString(),
+                      delta: 1,
+                    );
+                  }
+                  setState(() => _comboAdded = true);
+                  Future.delayed(const Duration(seconds: 2), () {
+                    if (mounted) setState(() => _comboAdded = false);
+                  });
+                },
+                icon: Icon(_comboAdded ? Icons.check_rounded : Icons.shopping_basket_rounded, size: 16),
+                label: Text(_comboAdded ? 'Combo Added!' : 'Add Combo (${companions.length + 1})'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBundleThumb(String img, String name, String price) {
+    return Container(
+      width: 76,
+      padding: const EdgeInsets.all(6),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+      ),
+      child: Column(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(6),
+            child: AppNetworkImage(imageUrl: img, width: 44, height: 44, fit: BoxFit.contain),
+          ),
+          const SizedBox(height: 4),
+          Text(name, style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+          Text(price, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary)),
         ],
       ),
     );

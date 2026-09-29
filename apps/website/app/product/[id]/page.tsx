@@ -6,12 +6,18 @@ import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowLeft, Search, Heart, Share2, ChevronDown, Sparkles, Send, Leaf,
-  Star, Clock, Minus, Plus, Loader2, ShieldCheck,
+  Star, Clock, Minus, Plus, Loader2, ShieldCheck, Bell, AlertTriangle,
+  PackageCheck, CheckCircle2, Layers,
 } from 'lucide-react';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../../store/useCart';
-import { getProductById, normalizeImagePath } from '../../../lib/catalog';
+import {
+  getProductById,
+  normalizeImagePath,
+  getProductBundle,
+  getProductSubstitutes,
+} from '../../../lib/catalog';
 
 const PLACEHOLDER = 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80';
 
@@ -28,6 +34,9 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
   const [detailsOpen, setDetailsOpen] = useState(true);
   const [nutritionOpen, setNutritionOpen] = useState(false);
   const [added, setAdded] = useState(false);
+  const [bundleAdded, setBundleAdded] = useState(false);
+  const [notifyMeSet, setNotifyMeSet] = useState(false);
+  const [substituteAddedId, setSubstituteAddedId] = useState<string | null>(null);
 
   // AI Chef conversation state
   const [chefLog, setChefLog] = useState<ChefMsg[]>([]);
@@ -82,6 +91,9 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
     () => variants.find((v) => v.id === selectedVariantId) ?? variants.find((v) => v.isAvailable) ?? variants[0] ?? null,
     [variants, selectedVariantId],
   );
+  const isAvailable = Boolean(selectedVariant ? selectedVariant.isAvailable !== false : p?.inStock !== false);
+  const bundle = useMemo(() => getProductBundle(productId), [productId]);
+  const substitutes = useMemo(() => getProductSubstitutes(productId), [productId]);
   const price = selectedVariant?.price ?? 0;
   const mrp = selectedVariant?.mrp ?? price;
   const discount = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
@@ -262,6 +274,191 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
             </div>
           )}
 
+          {/* Out of Stock Alert & Smart Substitutes Section (Feature 4) */}
+          {!isAvailable && (
+            <div className="border-2 border-amber-300 bg-amber-50/80 rounded-2xl p-5 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                <div className="flex items-center gap-2.5 text-amber-900">
+                  <div className="w-8 h-8 rounded-full bg-amber-200 text-amber-900 flex items-center justify-center flex-shrink-0">
+                    <AlertTriangle className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm" style={{ fontFamily: 'Outfit' }}>Currently Sold Out in your Dark Store</h3>
+                    <p className="text-xs text-amber-700">Fresh morning restock scheduled. Set an alert or pick a substitute below.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setNotifyMeSet(!notifyMeSet)}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 border transition shadow-xs ${
+                    notifyMeSet
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-600/20'
+                      : 'bg-white text-amber-900 border-amber-300 hover:bg-amber-100'
+                  }`}
+                >
+                  <Bell className="w-3.5 h-3.5" />
+                  {notifyMeSet ? '✓ Alert Set' : 'Notify When Back'}
+                </button>
+              </div>
+
+              {/* Recommended Substitutes */}
+              {substitutes.length > 0 && (
+                <div className="mt-4 pt-4 border-t border-amber-200/80">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-xs font-extrabold uppercase tracking-wider text-[#006b23] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5" /> Direct Substitutes (In-Stock for 10-Min Delivery)
+                    </span>
+                    <span className="text-[11px] text-amber-800 font-semibold">{substitutes.length} choices available</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    {substitutes.map((sub) => (
+                      <div
+                        key={sub.id}
+                        className="bg-white border border-[#e2e2e5] hover:border-[#006b23] rounded-xl p-3 flex flex-col justify-between shadow-xs transition"
+                      >
+                        <div className="flex gap-2.5 items-start mb-2">
+                          <img
+                            src={sub.imageUrl}
+                            alt={sub.name}
+                            className="w-12 h-12 object-contain rounded-lg border border-[#eeeef0] bg-[#fafafa]"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-1">
+                              <span className="text-[10px] bg-emerald-100 text-[#006b23] font-extrabold px-1.5 py-0.5 rounded">
+                                {sub.matchScore}% Match
+                              </span>
+                            </div>
+                            <h4 className="text-xs font-bold text-[#1a1c1e] truncate mt-0.5" title={sub.name}>
+                              {sub.name}
+                            </h4>
+                            <p className="text-[11px] text-[#3f4a3d]">{sub.unitName}</p>
+                          </div>
+                        </div>
+
+                        <p className="text-[10px] text-[#3f4a3d] bg-slate-50 border border-slate-100 rounded-md p-1.5 line-clamp-1 mb-2">
+                          💡 {sub.similarityReason}
+                        </p>
+
+                        <div className="flex items-center justify-between pt-2 border-t border-[#eeeef0]">
+                          <div>
+                            <span className="font-bold text-xs text-[#1a1c1e]">{formatCurrency(sub.price)}</span>
+                            {sub.mrp > sub.price && (
+                              <span className="text-[10px] text-[#3f4a3d] line-through ml-1">{formatCurrency(sub.mrp)}</span>
+                            )}
+                          </div>
+                          <button
+                            onClick={() => {
+                              addItem.mutate({
+                                variantId: sub.variantId || `var_${sub.id}`,
+                                productName: sub.name,
+                                unitName: sub.unitName,
+                                price: sub.price,
+                                quantity: 1,
+                              });
+                              setSubstituteAddedId(sub.id);
+                              setTimeout(() => setSubstituteAddedId(null), 2500);
+                            }}
+                            className="bg-[#006b23] hover:bg-[#078730] text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-xs transition"
+                          >
+                            {substituteAddedId === sub.id ? '✓ Added' : '+ Add Substitute'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Frequently Bought Together & Smart Bundles (Feature 2) */}
+          {bundle && bundle.items.length > 1 && (
+            <div className="border border-emerald-300/80 bg-gradient-to-br from-emerald-50/70 to-teal-50/40 rounded-2xl p-5 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-[#006b23] text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <Layers className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-[#1a1c1e]" style={{ fontFamily: 'Outfit' }}>
+                      {bundle.title}
+                    </h3>
+                    <p className="text-xs text-[#3f4a3d]">{bundle.description}</p>
+                  </div>
+                </div>
+                <span className="self-start sm:self-auto bg-[#006b23] text-white text-[11px] font-extrabold px-3 py-1 rounded-full shadow-xs">
+                  {bundle.badge}
+                </span>
+              </div>
+
+              {/* Products Row with + and = */}
+              <div className="flex items-center gap-2 overflow-x-auto py-2 scrollbar-none">
+                {bundle.items.map((item, idx) => (
+                  <React.Fragment key={item.productId}>
+                    {idx > 0 && <span className="text-[#006b23] font-extrabold text-xl px-1">+</span>}
+                    <div className="bg-white border border-[#e2e2e5] rounded-xl p-3 flex flex-col items-center min-w-[110px] w-28 text-center shadow-xs">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.productName}
+                        className="w-14 h-14 object-contain mb-1.5 rounded-lg"
+                      />
+                      <span className="text-xs font-bold text-[#1a1c1e] line-clamp-1" title={item.productName}>
+                        {item.productName}
+                      </span>
+                      <span className="text-[10px] text-[#3f4a3d]">{item.unitName}</span>
+                      <span className="text-xs font-extrabold text-[#006b23] mt-1">{formatCurrency(item.price)}</span>
+                    </div>
+                  </React.Fragment>
+                ))}
+              </div>
+
+              {/* Price & Action */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-3 border-t border-emerald-200/80 mt-2">
+                <div>
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-bold text-[#1a1c1e]" style={{ fontFamily: 'Outfit' }}>
+                      {formatCurrency(bundle.bundlePrice)}
+                    </span>
+                    <span className="text-sm text-[#3f4a3d] line-through">{formatCurrency(bundle.originalPrice)}</span>
+                    <span className="text-xs font-extrabold text-[#006b23] bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded-md">
+                      Save {formatCurrency(bundle.savings)} ({bundle.savingsPercent}%)
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#3f4a3d]">Combo discount applied on all {bundle.items.length} items</p>
+                </div>
+
+                <button
+                  onClick={() => {
+                    bundle.items.forEach((item) => {
+                      addItem.mutate({
+                        variantId: item.variantId || `var_${item.productId}`,
+                        productName: item.productName,
+                        unitName: item.unitName,
+                        price: item.price,
+                        quantity: 1,
+                      });
+                    });
+                    setBundleAdded(true);
+                    setTimeout(() => setBundleAdded(false), 2500);
+                  }}
+                  className="w-full sm:w-auto bg-[#006b23] hover:bg-[#078730] text-white font-bold text-xs md:text-sm px-6 py-3 rounded-xl shadow-md transition flex items-center justify-center gap-2 active:scale-95"
+                >
+                  {bundleAdded ? (
+                    <>
+                      <CheckCircle2 className="w-4 h-4 text-emerald-200" />
+                      <span>✓ Bundle Added to Cart!</span>
+                    </>
+                  ) : (
+                    <>
+                      <PackageCheck className="w-4 h-4" />
+                      <span>Add Combo ({bundle.items.length} items)</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* AI Chef (working) */}
           <div className="border-t border-[#e2e2e5] pt-5">
             <div className="bg-gradient-to-br from-[#dce5dd]/40 to-emerald-50 border border-[#dce5dd] rounded-2xl p-4">
@@ -357,24 +554,41 @@ export default function ProductDetailsPage({ params }: { params: { id?: string }
       {/* Bottom Action Bar */}
       <div className="fixed bottom-0 left-0 w-full bg-white border-t border-[#e2e2e5] p-4 z-40">
         <div className="max-w-5xl mx-auto flex gap-4 items-center">
-          <div className="flex items-center justify-between bg-[#eeeef0] rounded-xl px-1 h-14 w-32 border border-[#e2e2e5]">
-            <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 flex items-center justify-center hover:bg-[#e2e2e5] rounded-lg transition"><Minus className="w-5 h-5" /></button>
-            <span className="font-semibold text-lg w-8 text-center">{quantity}</span>
-            <button onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 flex items-center justify-center hover:bg-[#e2e2e5] rounded-lg transition"><Plus className="w-5 h-5" /></button>
-          </div>
-          <button
-            disabled={!selectedVariant || addItem.isPending}
-            onClick={() => {
-              if (!selectedVariant) return;
-              addItem.mutate(
-                { variantId: selectedVariant.id, productName: p.name, unitName: selectedVariant.unitName, price: selectedVariant.price, quantity },
-                { onSuccess: () => { setAdded(true); setTimeout(() => setAdded(false), 2000); } },
-              );
-            }}
-            className="flex-1 bg-[#006b23] hover:bg-[#078730] disabled:opacity-50 text-white font-semibold text-base md:text-lg rounded-xl h-14 flex items-center justify-center shadow-md active:scale-95 transition"
-          >
-            {addItem.isPending ? 'Adding…' : added ? '✓ Added to Cart' : `Add to Cart · ${formatCurrency(price * quantity)}`}
-          </button>
+          {isAvailable ? (
+            <>
+              <div className="flex items-center justify-between bg-[#eeeef0] rounded-xl px-1 h-14 w-32 border border-[#e2e2e5]">
+                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 flex items-center justify-center hover:bg-[#e2e2e5] rounded-lg transition"><Minus className="w-5 h-5" /></button>
+                <span className="font-semibold text-lg w-8 text-center">{quantity}</span>
+                <button onClick={() => setQuantity(quantity + 1)} className="w-10 h-10 flex items-center justify-center hover:bg-[#e2e2e5] rounded-lg transition"><Plus className="w-5 h-5" /></button>
+              </div>
+              <button
+                disabled={!selectedVariant || addItem.isPending}
+                onClick={() => {
+                  if (!selectedVariant) return;
+                  addItem.mutate(
+                    { variantId: selectedVariant.id, productName: p.name, unitName: selectedVariant.unitName, price: selectedVariant.price, quantity },
+                    { onSuccess: () => { setAdded(true); setTimeout(() => setAdded(false), 2000); } },
+                  );
+                }}
+                className="flex-1 bg-[#006b23] hover:bg-[#078730] disabled:opacity-50 text-white font-semibold text-base md:text-lg rounded-xl h-14 flex items-center justify-center shadow-md active:scale-95 transition"
+              >
+                {addItem.isPending ? 'Adding…' : added ? '✓ Added to Cart' : `Add to Cart · ${formatCurrency(price * quantity)}`}
+              </button>
+            </>
+          ) : (
+            <div className="flex-1 flex gap-3 items-center">
+              <div className="flex-1 bg-amber-100 text-amber-900 border border-amber-300 rounded-xl h-14 flex items-center justify-center font-bold text-sm px-4">
+                Currently Out of Stock
+              </div>
+              <button
+                onClick={() => setNotifyMeSet(!notifyMeSet)}
+                className="bg-[#006b23] hover:bg-[#078730] text-white font-bold text-sm rounded-xl h-14 px-6 flex items-center justify-center gap-2 shadow-md transition"
+              >
+                <Bell className="w-4 h-4" />
+                {notifyMeSet ? '✓ Alert Registered' : 'Notify When Back'}
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
