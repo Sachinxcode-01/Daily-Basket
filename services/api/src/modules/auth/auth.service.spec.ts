@@ -1,3 +1,12 @@
+jest.mock('firebase-admin/app', () => ({
+  initializeApp: jest.fn(),
+  getApps: jest.fn(() => []),
+  cert: jest.fn(),
+}));
+jest.mock('firebase-admin/auth', () => ({
+  getAuth: jest.fn(),
+}));
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';

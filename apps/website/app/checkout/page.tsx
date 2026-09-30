@@ -60,7 +60,11 @@ function CheckoutInner() {
 
   const DEFAULT_CHECKOUT_ADDRESS = {
     id: 'addr_default_koramangala',
+    userId: 'usr_default',
+    label: 'HOME' as const,
     name: 'Home',
+    houseNo: 'Flat 402',
+    street: 'Green Glen Apartments, 100ft Road',
     addressLine: 'Flat 402, Green Glen Apartments, 100ft Road',
     city: 'Bengaluru',
     pincode: '560034',
@@ -159,9 +163,9 @@ function CheckoutInner() {
             </div>
             {address ? (
               <>
-                <p className="text-white font-bold text-sm">{address.label} — {address.city}</p>
+                <p className="text-white font-bold text-sm">{(address.label || address.name || 'Home')} — {address.city}</p>
                 <p className="text-slate-400 text-xs mt-1">
-                  {address.houseNo}, {address.street}, {address.city} - {address.pincode}
+                  {address.houseNo ? `${address.houseNo}, ${address.street}, ${address.city} - ${address.pincode}` : (address.addressLine || address.city)}
                 </p>
               </>
             ) : (

@@ -4,8 +4,11 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY apps/website/package.json apps/website/
 COPY packages/ ./packages/
+COPY apps/website/package.json ./apps/website/package.json
+COPY apps/admin/package.json ./apps/admin/package.json
+COPY apps/delivery/package.json ./apps/delivery/package.json
+COPY services/api/package.json ./services/api/package.json
 
 RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
