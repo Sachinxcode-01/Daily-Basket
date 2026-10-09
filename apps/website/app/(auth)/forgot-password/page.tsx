@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
             Forgot Password
           </h2>
           <p className="text-slate-600 text-sm sm:text-base font-inter leading-relaxed mb-6">
-            Enter the email address associated with your account and we've send you a link to reset your password.
+            Enter the email address associated with your account and we will send you a link to reset your password.
           </p>
 
           {/* Error Banner */}
@@ -90,7 +90,7 @@ export default function ForgotPasswordPage() {
 
               <Link
                 href="/login"
-                className="w-full py-4 bg-[#006823] hover:bg-[#00531a] active:scale-[0.98] text-white font-bold text-base rounded-full shadow-md shadow-[#006823]/20 flex items-center justify-center gap-2 transition-all duration-200 block"
+                className="w-full py-4 bg-[#006823] hover:bg-[#00531a] active:scale-[0.98] text-white font-bold text-base rounded-full shadow-md shadow-[#006823]/20 flex items-center justify-center gap-2 transition-all duration-200"
               >
                 Return to Login
               </Link>

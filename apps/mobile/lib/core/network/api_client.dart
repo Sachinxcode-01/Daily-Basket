@@ -85,16 +85,25 @@ class ApiClient {
   }
 
   Map<String, dynamic> _parseResponse(http.Response response) {
+    final isOk = response.statusCode >= 200 && response.statusCode < 300;
     try {
       final decoded = jsonDecode(response.body);
       if (decoded is Map<String, dynamic>) {
+        if (!decoded.containsKey('success')) {
+          decoded['success'] = isOk;
+        }
+        if (!isOk && !decoded.containsKey('error') && decoded.containsKey('message')) {
+          final msg = decoded['message'];
+          decoded['error'] = msg is List ? msg.join(', ') : msg.toString();
+        }
         return decoded;
       }
-      return {'success': response.statusCode >= 200 && response.statusCode < 300, 'data': decoded};
+      return {'success': isOk, 'data': decoded};
     } catch (_) {
       return {
-        'success': response.statusCode >= 200 && response.statusCode < 300,
+        'success': isOk,
         'statusCode': response.statusCode,
+        'error': isOk ? null : 'Server returned status ${response.statusCode}',
         'body': response.body,
       };
     }

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/user_provider.dart';
+import '../../../../core/providers/auth_provider.dart';
 import 'login_screen.dart';
 import 'verify_email_screen.dart';
 
@@ -80,8 +81,8 @@ class _RegisterScreenState extends State<RegisterScreen>
       setState(() => _errorMsg = 'Please enter a valid email address');
       return;
     }
-    if (pass.length < 6) {
-      setState(() => _errorMsg = 'Password must be at least 6 characters');
+    if (pass.length < 8) {
+      setState(() => _errorMsg = 'Password must be at least 8 characters');
       return;
     }
     if (pass != confirm) {
@@ -90,15 +91,33 @@ class _RegisterScreenState extends State<RegisterScreen>
     }
 
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 800));
 
-    if (mounted) {
+    final auth = context.read<AuthProvider>();
+    final res = await auth.registerEmail(
+      name: name,
+      email: email,
+      password: pass,
+    );
+
+    if (!mounted) return;
+
+    if (res['success'] == true) {
+      context.read<UserProvider>().updatePersonalInfo(
+            name: name,
+            email: email,
+            phone: '+91 98765 43210',
+          );
       setState(() => _isLoading = false);
       Navigator.of(context).push(
         MaterialPageRoute(
           builder: (_) => VerifyEmailScreen(email: email),
         ),
       );
+    } else {
+      setState(() {
+        _isLoading = false;
+        _errorMsg = res['error'] ?? res['message'] ?? 'Registration failed.';
+      });
     }
   }
 

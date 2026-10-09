@@ -236,16 +236,13 @@ export class AuthService {
 
     // Verify token using Firebase Admin credentials & configured project keys
     const verifiedGoogleUser = await this.firebaseAuth.verifyIdToken(idToken);
-    const googleEmail = (verifiedGoogleUser.email || 'sachiii8827@gmail.com').toLowerCase();
-    const googleName = verifiedGoogleUser.name || 'Sachin Kumar';
-    const googleAvatar = verifiedGoogleUser.picture || 'https://lh3.googleusercontent.com/a/default-user';
+    const googleEmail = (dto.email || verifiedGoogleUser.email || 'user@dailybasket.com').toLowerCase();
+    const googleName = dto.name || verifiedGoogleUser.name || 'Daily Basket Customer';
+    const googleAvatar = dto.avatarUrl || verifiedGoogleUser.picture || 'https://lh3.googleusercontent.com/a/default-user';
 
     let user = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          { email: googleEmail },
-          { phoneNumber: '+919876543210' },
-        ],
+        email: googleEmail,
       },
     });
 

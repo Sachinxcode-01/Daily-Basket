@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/auth_provider.dart';
 
 /// Reset Password Screen — Exact User Mockup Specification
 /// Matches:
@@ -14,7 +16,8 @@ import '../../../../core/theme/app_theme.dart';
 /// - Primary dark green pill button: "Reset Password"
 /// - Bottom footer container with "Daily Basket", Policy links, and Copyright notice
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({super.key});
+  final String? token;
+  const ResetPasswordScreen({super.key, this.token});
 
   @override
   State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
@@ -22,6 +25,7 @@ class ResetPasswordScreen extends StatefulWidget {
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen>
     with SingleTickerProviderStateMixin {
+  final _tokenCtrl = TextEditingController();
   final _newPassCtrl = TextEditingController();
   final _confirmPassCtrl = TextEditingController();
   bool _obscureNewPass = true;
@@ -34,6 +38,9 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
   @override
   void initState() {
     super.initState();
+    if (widget.token != null) {
+      _tokenCtrl.text = widget.token!;
+    }
     _spinCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 10),
@@ -42,6 +49,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
 
   @override
   void dispose() {
+    _tokenCtrl.dispose();
     _spinCtrl.dispose();
     _newPassCtrl.dispose();
     _confirmPassCtrl.dispose();
@@ -49,6 +57,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
   }
 
   void _handleResetPassword() async {
+    final token = _tokenCtrl.text.trim();
     final newPass = _newPassCtrl.text;
     final confirmPass = _confirmPassCtrl.text;
 
@@ -66,11 +75,22 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen>
       _errorMsg = null;
     });
 
-    await Future.delayed(const Duration(milliseconds: 800));
+    final auth = context.read<AuthProvider>();
+    final res = await auth.resetPassword(
+      token: token.isNotEmpty ? token : 'demo_reset_token',
+      newPass: newPass,
+    );
 
-    if (mounted) {
+    if (!mounted) return;
+
+    if (res['success'] == true) {
       setState(() => _isLoading = false);
-      Navigator.of(context).pushReplacementNamed('/success');
+      Navigator.of(context).pushReplacementNamed('/customer/home');
+    } else {
+      setState(() {
+        _isLoading = false;
+        _errorMsg = res['error'] ?? res['message'] ?? 'Password reset failed.';
+      });
     }
   }
 

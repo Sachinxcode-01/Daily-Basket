@@ -86,10 +86,13 @@ export class ApiClient {
     });
   }
 
-  public async googleOAuthLogin(idToken: string): Promise<{ token: string; accessToken: string; user: any }> {
+  public async googleOAuthLogin(
+    payload: string | { idToken: string; email?: string; name?: string; avatarUrl?: string },
+  ): Promise<{ token: string; accessToken: string; user: any }> {
+    const body = typeof payload === 'string' ? { idToken: payload } : payload;
     return this.fetcher('/api/v1/auth/google-login', {
       method: 'POST',
-      body: JSON.stringify({ idToken }),
+      body: JSON.stringify(body),
     });
   }
 

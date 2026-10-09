@@ -90,12 +90,14 @@ import 'features/onboarding/presentation/screens/location_permission_onboarding_
 import 'features/onboarding/presentation/screens/notification_permission_onboarding_screen.dart';
 import 'features/settings/presentation/screens/app_permissions_settings_screen.dart';
 import 'core/providers/checkout_provider.dart';
+import 'core/providers/auth_provider.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => CouponProvider()),

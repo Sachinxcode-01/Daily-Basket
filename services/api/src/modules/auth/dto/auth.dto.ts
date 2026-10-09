@@ -160,6 +160,21 @@ export class GoogleOAuthDto {
   @IsNotEmpty()
   idToken!: string;
 
+  @ApiPropertyOptional({ example: 'user@gmail.com' })
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @ApiPropertyOptional({ example: 'Alex Morgan' })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiPropertyOptional({ example: 'https://lh3.googleusercontent.com/...' })
+  @IsOptional()
+  @IsString()
+  avatarUrl?: string;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

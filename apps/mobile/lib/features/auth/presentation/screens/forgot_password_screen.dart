@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/auth_provider.dart';
 
 /// Forgot Password Screen — Exact User Mockup Specification
 /// Matches:
@@ -56,12 +58,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       _errorMsg = null;
     });
 
-    await Future.delayed(const Duration(milliseconds: 800));
+    final auth = context.read<AuthProvider>();
+    final res = await auth.forgotPassword(email);
 
-    if (mounted) {
+    if (!mounted) return;
+
+    if (res['success'] == true) {
       setState(() {
         _isLoading = false;
         _isSent = true;
+      });
+    } else {
+      setState(() {
+        _isLoading = false;
+        _errorMsg = res['error'] ?? res['message'] ?? 'Unable to send reset instructions.';
       });
     }
   }
