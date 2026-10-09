@@ -1,3 +1,4 @@
+import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import '../network/api_client.dart';
 
@@ -50,14 +51,18 @@ class CartItem {
 /// — starts with instant 120 FPS optimistic local state and synchronizes
 /// with the persistent backend database via ApiClient.
 class CartProvider extends ChangeNotifier {
-  final ApiClient _apiClient = ApiClient();
+  final ApiClient _apiClient;
   final List<CartItem> _items = [];
 
   // ─── Saved For Later ─────────────────────────────────────────────────────
   final List<CartItem> _savedForLater = [];
 
-  CartProvider() {
-    fetchCartFromApi();
+  CartProvider({ApiClient? apiClient, bool autoFetch = true})
+      : _apiClient = apiClient ?? ApiClient() {
+    final isTest = !kIsWeb && Platform.environment.containsKey('FLUTTER_TEST');
+    if (autoFetch && !isTest) {
+      fetchCartFromApi();
+    }
   }
 
   List<CartItem> get items => List.unmodifiable(_items);

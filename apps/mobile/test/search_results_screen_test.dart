@@ -34,7 +34,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pumpAndSettle();
 
       expect(find.byType(SearchResultsScreen), findsOneWidget);
       expect(find.text('All'), findsWidgets);
@@ -49,7 +49,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(createTestWidget());
-      await tester.pump(const Duration(milliseconds: 200));
+      await tester.pumpAndSettle();
 
       // Tap tune / filter icon in AppBar
       final filterIcon = find.byIcon(Icons.tune_rounded);
@@ -78,6 +78,7 @@ void main() {
 
       // Bottom sheet closed, screen successfully reflects filter state
       expect(find.byType(SearchResultsScreen), findsOneWidget);
+      await tester.pumpAndSettle();
     });
   });
 }

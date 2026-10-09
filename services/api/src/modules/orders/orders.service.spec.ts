@@ -15,6 +15,27 @@ describe('OrdersService Unit Tests', () => {
       findUnique: jest.fn(),
       update: jest.fn(),
     },
+    user: {
+      findUnique: jest.fn().mockResolvedValue({ id: 'user_101', fullName: 'Test User' }),
+      findFirst: jest.fn().mockResolvedValue({ id: 'user_101', fullName: 'Test User' }),
+      create: jest.fn().mockResolvedValue({ id: 'user_101', fullName: 'Test User' }),
+    },
+    store: {
+      findFirst: jest.fn().mockResolvedValue({ id: 'store_101', name: 'Dark Store' }),
+      create: jest.fn().mockResolvedValue({ id: 'store_101', name: 'Dark Store' }),
+    },
+    address: {
+      findUnique: jest.fn().mockResolvedValue({ id: 'addr_101', street: '100ft Road' }),
+      findFirst: jest.fn().mockResolvedValue({ id: 'addr_101', street: '100ft Road' }),
+      create: jest.fn().mockResolvedValue({ id: 'addr_101', street: '100ft Road' }),
+    },
+    productVariant: {
+      findFirst: jest.fn().mockResolvedValue({ id: 'var_01', price: 54 }),
+    },
+    category: {
+      findFirst: jest.fn().mockResolvedValue({ id: 'cat_01', name: 'Vegetables' }),
+      create: jest.fn().mockResolvedValue({ id: 'cat_01', name: 'Vegetables' }),
+    },
   };
 
   const mockRedisService = {

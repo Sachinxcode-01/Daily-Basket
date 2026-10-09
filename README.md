@@ -8,12 +8,14 @@
 [![Flutter](https://img.shields.io/badge/Flutter-3.19.x-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
 [![NestJS](https://img.shields.io/badge/NestJS-10.3-E0234E?style=for-the-badge&logo=nestjs&logoColor=white)](https://nestjs.com)
 [![Next.js](https://img.shields.io/badge/Next.js-14.2-black?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org)
 [![Prisma](https://img.shields.io/badge/Prisma-5.10-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://prisma.io)
 [![Redis](https://img.shields.io/badge/Redis-7.2-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
+[![Socket.IO](https://img.shields.io/badge/Socket.IO-4.8-black?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io)
 [![CI/CD Status](https://img.shields.io/badge/CI%2FCD-Passing-22c55e?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/Sachinxcode-01/Daily-Basket/actions)
 ![Production Ready](https://img.shields.io/badge/Production-Ready-006b23?style=for-the-badge)
 
-> **Daily Basket** is an enterprise-grade, hyper-local 10-minute quick-commerce platform delivering fresh groceries, vegetables, dairy, and household essentials. Built as a clean-architecture monorepo, it powers a cross-platform Flutter customer app, three Next.js 14 web portals (Customer, Store Admin, Delivery Partner PWA), and a NestJS microservices backend with real-time WebSockets, Redis caching, BullMQ job queues, and multi-provider AI engine.
+> **Daily Basket** is an enterprise-grade, hyper-local 10-minute quick-commerce platform delivering fresh groceries, vegetables, dairy, and household essentials. Built as a clean-architecture monorepo, it powers cross-platform Flutter customer and store admin mobile apps, three Next.js 14 web portals (Customer Storefront, Dark Store Admin, Delivery Partner PWA), and a 44-module NestJS microservices backend with real-time WebSockets, Redis caching, BullMQ job queues, end-to-end database persistence, and multi-provider AI engine.
 
 ---
 
@@ -26,9 +28,10 @@
 - [Feature Matrix](#feature-matrix)
   - [Customer Mobile App](#customer-mobile-app)
   - [Customer Web Portal](#customer-web-portal)
-  - [Store Admin Dashboard](#store-admin-dashboard)
+  - [Store Admin Web Dashboard](#store-admin-web-dashboard)
+  - [Store Admin Mobile App](#store-admin-mobile-app)
   - [Delivery Partner PWA](#delivery-partner-pwa)
-  - [Backend Services](#backend-services)
+  - [Backend Microservices & Database](#backend-microservices--database)
 - [Tech Stack](#tech-stack)
 - [Quick Start & Local Setup](#quick-start--local-setup)
 - [API Directory Overview](#api-directory-overview)
@@ -44,15 +47,16 @@
 
 ## Platform Overview
 
-Daily Basket seamlessly integrates local Kirana dark store hubs with real-time customer ordering, automated rider dispatch, and doorstep OTP verification.
+Daily Basket seamlessly integrates local Kirana dark store hubs with real-time customer ordering, automated rider dispatch, live fleet map telemetry, and doorstep OTP verification.
 
 | Application | Platform | Key Capabilities | Directory |
 | :--- | :--- | :--- | :--- |
-| **📱 Customer App** | Flutter 3.19 (Android / iOS) | 10-min delivery, live GPS tracking, phone OTP, Razorpay, Wallet, AI assistant | [`apps/mobile`](apps/mobile) |
-| **🌐 Customer Website** | Next.js 14 (React 18 + Tailwind) | Flash deals, full catalog explorer, dark theme, Razorpay checkout, live map | [`apps/website`](apps/website) |
-| **🏢 Store Admin** | Next.js 14 (Zustand + Motion) | Real-time fulfillment queue (`CONFIRMED` → `DELIVERED`), stock management, KPIs | [`apps/admin`](apps/admin) |
-| **🛵 Delivery Partner** | Next.js 14 PWA | Duty switch (`ONLINE`/`OFFLINE`), turn-by-turn map navigation, doorstep OTP verification | [`apps/delivery`](apps/delivery) |
-| **⚙️ Backend API** | NestJS 10 + Prisma + Redis | JWT rotation, RBAC, WebSockets, BullMQ queues, multi-provider AI fallback | [`services/api`](services/api) |
+| **📱 Customer App** | Flutter 3.19 (Android / iOS) | 10-min delivery, live GPS tracking, phone OTP, Google OAuth SSO, address CRUD, 1-click reorder, Razorpay, Wallet, AI assistant | [`apps/mobile`](apps/mobile) |
+| **🌐 Customer Website** | Next.js 14 (React 18 + Tailwind) | Flash deals, full catalog explorer, dark theme, address CRUD, 1-click reorder, Razorpay checkout, live tracking map | [`apps/website`](apps/website) |
+| **🏢 Store Admin Web** | Next.js 14 (Zustand + Lucide) | Real-time fulfillment queue (`NEW` → `CONFIRMED` → `PACKING` → `DISPATCHED`), live rider assignment modal, fleet GPS map, KPIs | [`apps/admin`](apps/admin) |
+| **📱 Store Admin App** | Flutter 3.19 (Android / iOS) | Mobile store manager companion for on-the-go order status inspection and inventory management | [`apps/daily_basket_admin`](apps/daily_basket_admin) |
+| **🛵 Delivery Partner** | Next.js 14 PWA | Duty switch (`ONLINE`/`OFFLINE`), turn-by-turn map navigation, live telemetry broadcast, doorstep OTP verification | [`apps/delivery`](apps/delivery) |
+| **⚙️ Backend API** | NestJS 10 + Prisma + Redis | 44 domain modules, JWT rotation, RBAC, WebSockets, BullMQ queues, multi-provider AI fallback, PostgreSQL persistence | [`services/api`](services/api) |
 
 ---
 
@@ -62,6 +66,7 @@ All user interface components, layouts, typography hierarchies, design tokens, c
 
 - Visual consistency is maintained across Flutter, Next.js web applications, and shared UI component packages.
 - Shared design tokens are distributed via `@daily-basket/design-system` and `@daily-basket/theme`.
+- Zero duplicate design tokens across apps: re-exports adhere to approved Stitch layouts, spacing, and atomic styling.
 - Detailed UI guidelines are available in [`docs/GOOGLE_STITCH.md`](docs/GOOGLE_STITCH.md) and [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md).
 
 ---
@@ -71,9 +76,10 @@ All user interface components, layouts, typography hierarchies, design tokens, c
 ```mermaid
 graph TD
     subgraph Client Applications
-        Mobile["📱 Flutter Mobile App\n(Android / iOS)"]
+        Mobile["📱 Flutter Customer App\n(Android / iOS)"]
+        AdminMobile["📱 Flutter Admin App\n(Store Manager Mobile)"]
         Web["🌐 Next.js Customer Web\n(Tailwind + React Query)"]
-        Admin["🏢 Next.js Admin Dashboard\n(Real-time Order Queue)"]
+        Admin["🏢 Next.js Admin Dashboard\n(Real-time Order Queue & Fleet Map)"]
         Rider["🛵 Delivery Partner PWA\n(GPS + OTP Verification)"]
     end
 
@@ -84,10 +90,12 @@ graph TD
 
     subgraph Core Backend Microservices
         AuthModule["🔐 Auth & Security Module\n(OTP, JWT, OAuth, MFA, Audit Logs)"]
+        UsersModule["👤 Users & Address Module\n(Address CRUD, Defaults, Geocoding)"]
         CatalogModule["📦 Catalog & Search Module\n(Categories, Brand Aliases, Keywords)"]
-        OrdersModule["🛒 Orders & Quick-Buy Service\n(Cart, Subtotal, Fulfillment Queue)"]
+        CartModule["🛍️ Cart Persistence Module\n(Cart Sync, Guest Merging)"]
+        OrdersModule["🛒 Orders & Quick-Buy Service\n(Cart, Pricing, Reorder, Fulfillment Queue)"]
         PaymentsModule["💳 Payments Service\n(Razorpay, HMAC Verification, Wallet)"]
-        DeliveryModule["📍 Delivery Telemetry Service\n(GPS Tracking, Rider Assignment)"]
+        DeliveryModule["📍 Delivery & Fleet Service\n(GPS Tracking, Rider Assignment, Telemetry)"]
         AiEngine["🤖 Multi-Provider AI Engine\n(Gemini, Grok, OpenRouter, Local AI)"]
     end
 
@@ -95,10 +103,11 @@ graph TD
         PostgresDB[("🐘 PostgreSQL 16\n(Prisma ORM Models)")]
         RedisCache[("⚡ Redis 7\n(Session Store & Pub/Sub)")]
         BullMQWorkers["📩 BullMQ Queue Workers\n(Async Notification & Jobs)"]
-        SocketServer["⚡ Socket.IO Gateways\n(Live Telemetry & Support Chat)"]
+        SocketServer["⚡ Socket.IO Gateways\n(Live Telemetry & Fleet Tracking)"]
     end
 
     Mobile -->|HTTPS / WSS| NGINX
+    AdminMobile -->|HTTPS| NGINX
     Web -->|HTTPS / WSS| NGINX
     Admin -->|HTTPS / WSS| NGINX
     Rider -->|HTTPS / WSS| NGINX
@@ -106,14 +115,18 @@ graph TD
     NGINX --> NestGateway
 
     NestGateway --> AuthModule
+    NestGateway --> UsersModule
     NestGateway --> CatalogModule
+    NestGateway --> CartModule
     NestGateway --> OrdersModule
     NestGateway --> PaymentsModule
     NestGateway --> DeliveryModule
     NestGateway --> AiEngine
 
     AuthModule --> PostgresDB
+    UsersModule --> PostgresDB
     CatalogModule --> PostgresDB
+    CartModule --> PostgresDB
     OrdersModule --> PostgresDB
     PaymentsModule --> PostgresDB
     DeliveryModule --> PostgresDB
@@ -131,11 +144,11 @@ graph TD
 daily-basket/
 ├── .agents/                        # Workspace rules & customization configs
 ├── apps/
-│   ├── admin/                      # 🏢 Next.js Dark Store Admin Dashboard
-│   ├── daily_basket_admin/         # 🏢 Flutter Admin App
-│   ├── delivery/                   # 🛵 Next.js Delivery Partner PWA
-│   ├── mobile/                     # 📱 Flutter Customer Mobile App (Clean Architecture)
-│   └── website/                    # 🌐 Next.js Customer Web Portal (App Router)
+│   ├── admin/                      # 🏢 Next.js Dark Store Admin Dashboard (Fulfillment Queue & Fleet Map)
+│   ├── daily_basket_admin/         # 🏢 Flutter Admin Mobile App (Store Manager Companion)
+│   ├── delivery/                   # 🛵 Next.js Delivery Partner PWA (Turn-by-turn navigation & OTP)
+│   ├── mobile/                     # 📱 Flutter Customer Mobile App (Clean Architecture, Material 3)
+│   └── website/                    # 🌐 Next.js Customer Web Portal (App Router, Tailwind CSS)
 ├── assets/                         # Graphic banners, logos, and UI screenshot assets
 ├── docs/                           # 📘 Enterprise Documentation Hub
 │   ├── features/                   # Feature specification guides (Products, Inventory, Payments, Notifications)
@@ -161,9 +174,9 @@ daily-basket/
 │   └── theme/                      # Daily Basket branding and color palette definitions
 ├── scripts/                        # Database seeding, backup & setup automation scripts
 ├── services/
-│   └── api/                        # ⚙️ NestJS API Gateway & Microservices Backend
+│   └── api/                        # ⚙️ NestJS API Gateway & Microservices Backend (44 modules)
 │       ├── prisma/                 # Database schema definitions & migrations
-│       ├── src/                    # Domain modules, controllers & services
+│       ├── src/                    # Domain modules, controllers, guards & services
 │       └── firebase-service-account.json # Firebase Admin credentials
 ├── pnpm-workspace.yaml             # Monorepo workspace configuration
 └── package.json                    # Workspace scripts & tooling
@@ -175,43 +188,56 @@ daily-basket/
 
 ### Customer Mobile App
 
-- **Authentication**: Phone OTP verification, Email/Password login, Google OAuth SSO, TOTP MFA, Biometric login support.
-- **Home Feed**: Live delivery ETA timer badge, delivery address selector, dynamic categories, flash deals carousel.
-- **Smart Catalog & Search**: Instant debounced catalog search with trending keywords, brand alias matching, and category filtering.
-- **Cart & Checkout**: Interactive cart drawer with free delivery progress meter, instant coupon validation (`DAILY100`), Razorpay payment gateway (UPI, Card, NetBanking, COD).
-- **Live GPS Order Tracking**: Animated step-by-step order progress timeline, driver contact trigger, and live GPS map routing via Socket.IO.
-- **Wallet & Loyalty**: Digital Daily Basket Wallet balance, transaction ledger, instant refill, and Daily Basket Plus VIP perks.
-- **AI Voice & Visual Search**: Voice search interface and camera image recognition powered by backend multi-provider AI.
+- **High-Performance Architecture**: 60–120 FPS high refresh-rate animation pipeline built on Flutter Clean Architecture and Provider state management.
+- **Authentication**: Phone OTP verification, Email/Password login, Google OAuth 2.0 / Firebase SSO, TOTP MFA, and secure token caching with Biometrics.
+- **Home Feed**: Live delivery ETA timer badge (10-minute guarantee), dynamic category feed, Kirana flash deals carousel, and store availability indicator.
+- **Smart Catalog & Search**: Debounced instant catalog search with trending queries, brand alias matching, and category filtering.
+- **Cart & Database Sync**: Real-time cart synchronization with backend database, free delivery progress meter, and instant coupon validation (`DAILY100`).
+- **End-to-End Address Management**: Add, edit, delete, and set default delivery addresses (Home, Work, Other) backed by Prisma PostgreSQL database with coordinates and floor details.
+- **Live GPS Order Tracking**: Animated step-by-step order progress timeline (`CONFIRMED` → `PACKING` → `OUT_FOR_DELIVERY` → `DELIVERED`), interactive Google Maps live telemetry with rider vehicle icon, and driver contact trigger.
+- **Order History & 1-Click Reorder**: Complete order history fetched from Prisma database, interactive order details, GST breakdown, and 1-click reorder flow adding items straight back to cart.
+- **Razorpay Payments**: Seamless Razorpay checkout (UPI, Credit/Debit Cards, NetBanking, COD) with cryptographic HMAC SHA-256 verification.
+- **Daily Basket Wallet**: In-app digital wallet balance, instant checkout, transaction ledger, and Daily Basket Plus VIP perks.
+- **AI Voice & Visual Search**: Voice search interface and camera image recognition powered by backend multi-provider AI engine.
 
 ### Customer Web Portal
 
-- **Responsive Web Portal**: Built using Next.js 14 App Router, React 18, and TailwindCSS.
-- **Dark Mode Aesthetic**: Google Stitch compliant dark-mode design system with rich micro-interactions.
-- **Google & Firebase SSO**: Single-click sign-in and sign-up with automatic anonymous guest cart merging.
-- **Order Management**: Order placement, address management, coupon redemption, active delivery map, and delivery feedback rating.
+- **Responsive Web Experience**: Built on Next.js 14 App Router, React 18, and TailwindCSS with Google Stitch dark-mode design system.
+- **Google & Firebase SSO**: Single-click sign-in and sign-up with automatic anonymous guest cart merging upon authentication.
+- **Address CRUD Management**: Comprehensive address management (`/profile`, `/add-address`) with full Prisma database persistence, edit and delete actions, and default selection.
+- **Order History & 1-Click Reorder**: Detailed order history, real-time live order tracking map, and instant 1-click reorder into cart.
+- **Checkout & Razorpay**: Multi-step checkout with coupon code application, wallet balance toggle, and secure payment processing.
 - **Account Security Hub**: Active session device management, password reset, 2FA toggle, and security audit activity log.
 
-### Store Admin Dashboard
+### Store Admin Web Dashboard
 
-- **Fulfillment Queue**: Real-time order dispatch stream (`NEW` → `CONFIRMED` → `PACKING` → `READY_FOR_PICKUP` → `DISPATCHED`).
+- **Real-Time Fulfillment Queue**: Live dispatch stream tracking order states (`NEW` → `CONFIRMED` → `PACKING` → `READY_FOR_PICKUP` → `DISPATCHED` → `DELIVERED`).
+- **Live Dispatch & Fleet Map**: Rider assignment modal with instant partner selection and real-time live map tracking of delivery riders and active orders.
 - **Inventory Control**: Live stock adjustments, low-stock threshold alerts, SKU search, and catalog editor.
 - **Store KPIs**: Real-time revenue analytics, average packing time, driver dispatch efficiency, and customer satisfaction metrics.
 - **Go-Live Checklist**: Pre-launch verification for database, payment gateways, and Firebase credentials.
 
+### Store Admin Mobile App
+
+- **On-the-Go Store Operations**: Flutter companion app (`apps/daily_basket_admin`) for dark store managers.
+- **Mobile Fulfillment**: Inspect store metrics, pending packing orders, and inventory availability on mobile devices.
+
 ### Delivery Partner PWA
 
-- **Duty Controller**: One-tap `ONLINE`/`OFFLINE` toggle with automated GPS telemetry broadcast.
-- **Active Orders Queue**: Dark store pickup location, customer drop-off instructions, item packing manifest.
-- **Doorstep Verification**: Customer OTP PIN verification before marking orders as `DELIVERED`.
+- **Duty Controller**: One-tap `ONLINE`/`OFFLINE` toggle with automated GPS telemetry broadcast via Socket.IO.
+- **Active Orders Queue**: Dark store pickup location, customer drop-off instructions, and item packing manifest.
+- **Doorstep Verification**: Customer OTP PIN verification required before marking orders as `DELIVERED`.
 - **Earnings Ledger**: Daily base pay, surge incentives, tip breakdown, and performance stats.
 
-### Backend Services
+### Backend Microservices & Database
 
-- **NestJS Clean Architecture**: Decoupled controllers, domain services, custom guards, logging interceptors, and exception filters.
+- **NestJS Clean Architecture**: 44 domain modules with decoupled controllers, services, custom guards, logging interceptors, and exception filters.
+- **Database Persistence**: PostgreSQL 16 managed by Prisma ORM 5 with strict relational integrity, UUID primary keys, and spatial coordinates.
+- **Address & User Management**: Full CRUD endpoints for user delivery addresses (`/api/v1/addresses`) with default address tracking.
+- **Cart & Order Persistence**: Persistent server-side cart with anonymous-to-user merging and transactional order placement with inventory reservation.
 - **Firebase Admin SDK**: Cryptographic token verification for Google OAuth tokens using project credentials (`daily-basket-8b266`).
-- **Database & Cache**: PostgreSQL 16 managed by Prisma ORM 5 paired with Redis 7 caching and session storage.
-- **Queues & Realtime**: BullMQ job processing for notifications and email triggers alongside Socket.IO event gateways.
-- **Multi-Provider AI Engine**: Primary Gemini model with automatic fallback to Grok, OpenRouter, and local models.
+- **Queues & Real-time**: BullMQ job processing for notifications and email triggers alongside Socket.IO live telemetry gateways.
+- **Multi-Provider AI Engine**: Primary Google Gemini 1.5 Flash with automated failover to xAI Grok, OpenRouter, and local Ollama models.
 
 ---
 
@@ -219,13 +245,14 @@ daily-basket/
 
 | Domain | Technology | Details |
 | :--- | :--- | :--- |
-| **Mobile App** | Flutter 3.19 / Dart 3.3 | Provider pattern, Clean Architecture, Material 3 |
+| **Mobile App (Customer)** | Flutter 3.19 / Dart 3.3 | Provider pattern, Clean Architecture, Material 3, Google Maps |
+| **Mobile App (Admin)** | Flutter 3.19 / Dart 3.3 | Dark store operations companion, Provider pattern |
 | **Web Applications** | Next.js 14 / React 18 | App Router, TailwindCSS, TanStack Query, Framer Motion |
-| **Backend API** | NestJS 10 / Node.js 20 | TypeScript 5.4, `@nestjs/swagger`, `@nestjs/throttler` |
-| **Authentication & Push** | Firebase Admin / Google OAuth / JWT | Firebase Service Account, token verification, JWT rotation |
+| **Backend API** | NestJS 10 / Node.js 20 | TypeScript 5.4, `@nestjs/swagger`, `@nestjs/throttler`, 44 modules |
+| **Authentication & Push** | Firebase Admin / Google OAuth / JWT | Firebase Service Account, token verification, JWT rotation, OTP |
 | **Database & ORM** | PostgreSQL 16 / Prisma 5 | Parameterized queries, UUID primary keys, spatial coordinates |
 | **Caching & Messaging** | Redis 7.2 / BullMQ 6 | Session caching, Pub/Sub events, async queue processing |
-| **Real-time Engine** | Socket.IO 4 | Dual-way WebSocket telemetry for live tracking & support chat |
+| **Real-time Engine** | Socket.IO 4.8 | Dual-way WebSocket telemetry for live tracking & support chat |
 | **Payment Gateway** | Razorpay SDK | Razorpay Order intent, HMAC SHA-256 webhook signature verification |
 | **AI Integration** | Google Gemini / Grok / OpenRouter | Automated fallback manager, security sanitization, AI tool calling |
 | **DevOps & Infra** | Docker / NGINX / K8s | Multi-stage Docker build, reverse proxy, GitHub Actions CI/CD |
@@ -251,13 +278,13 @@ pnpm install
 
 ### 2. Configure Environment Variables
 
-Copy template `.env` file to API service:
+Copy the template `.env` file to API service:
 
 ```bash
 cp .env.production.example services/api/.env
 ```
 
-Ensure database credentials match local or container settings:
+Ensure environment configurations are set:
 
 ```env
 PORT=4000
@@ -275,15 +302,22 @@ FIREBASE_SERVICE_ACCOUNT_PATH="./firebase-service-account.json"
 ### 3. Start Infrastructure (PostgreSQL + Redis)
 
 ```bash
+# Using root workspace script
+pnpm docker:up
+
+# Or directly via docker compose:
 docker compose -f infrastructure/docker-compose.yml up -d
 ```
 
 ### 4. Initialize Database
 
 ```bash
-cd services/api
-npx prisma db push
-npx prisma generate
+# Generate Prisma Client and apply migrations
+pnpm prisma:generate
+pnpm prisma:migrate
+
+# Seed product catalog, categories, and dark store inventory
+pnpm seed
 ```
 
 ### 5. Run Web & API Applications
@@ -291,18 +325,35 @@ npx prisma generate
 ```bash
 # From root directory — runs API, Website, Admin, and Delivery applications concurrently
 pnpm dev
+
+# Or run individual applications as needed:
+pnpm dev:api       # Starts NestJS API on port 4000
+pnpm dev:website   # Starts Customer Website on port 3005
+pnpm dev:admin     # Starts Admin Dashboard on port 3001
 ```
 
-- **API Gateway**: `http://localhost:4000/api/v1`
-- **Swagger Documentation**: `http://localhost:4000/api/docs`
-- **Customer Web**: `http://localhost:3005`
-- **Admin Dashboard**: `http://localhost:3001`
-- **Delivery PWA**: `http://localhost:3002`
+| Application | URL | Description |
+| :--- | :--- | :--- |
+| **API Gateway** | `http://localhost:4000/api/v1` | Core REST API Gateway |
+| **Swagger Docs** | `http://localhost:4000/api/docs` | Interactive OpenAPI / Swagger UI |
+| **Customer Web** | `http://localhost:3005` | Next.js Customer Web Storefront |
+| **Store Admin** | `http://localhost:3001` | Dark Store Order Fulfillment Dashboard |
+| **Delivery PWA** | `http://localhost:3002` | Delivery Partner Navigation & Dispatch PWA |
 
-### 6. Run Flutter Mobile App
+### 6. Run Flutter Mobile Apps
+
+**Customer Mobile App:**
 
 ```bash
 cd apps/mobile
+flutter pub get
+flutter run
+```
+
+**Admin Mobile Companion App:**
+
+```bash
+cd apps/daily_basket_admin
 flutter pub get
 flutter run
 ```
@@ -311,7 +362,7 @@ flutter run
 
 ## API Directory Overview
 
-Below is a summary of primary API routes. For full details, see [`docs/API.md`](docs/API.md) or access Swagger UI at `/api/docs`.
+Below is a summary of the primary API endpoints. For full details, see [`docs/API.md`](docs/API.md) or access Swagger UI at `/api/docs`.
 
 | Module | Method | Endpoint Route | Description | Auth / Role |
 | :--- | :--- | :--- | :--- | :--- |
@@ -319,13 +370,29 @@ Below is a summary of primary API routes. For full details, see [`docs/API.md`](
 | **Auth** | `POST` | `/api/v1/auth/verify-otp` | Verify OTP & receive JWT token pair | Public |
 | **Auth** | `POST` | `/api/v1/auth/google-login` | Authenticate using Google OAuth / Firebase token | Public |
 | **Auth** | `GET` | `/api/v1/auth/google/status` | Firebase & Google credentials health diagnostic | Public |
-| **Products** | `GET` | `/api/v1/products/home-feed` | Fetch home page flash deals & categories | Public |
+| **Users** | `GET` | `/api/v1/profile` | Retrieve customer profile information | Optional JWT |
+| **Users** | `PUT` | `/api/v1/profile` | Update customer profile details | Optional JWT |
+| **Addresses** | `GET` | `/api/v1/addresses` | Fetch saved delivery addresses for authenticated user | Optional JWT |
+| **Addresses** | `POST` | `/api/v1/addresses` | Create new delivery address (with lat/lng coordinates) | Optional JWT |
+| **Addresses** | `PUT` | `/api/v1/addresses/:id` | Update existing delivery address | Optional JWT |
+| **Addresses** | `DELETE` | `/api/v1/addresses/:id` | Delete delivery address | Optional JWT |
+| **Cart** | `GET` | `/api/v1/cart` | Get current user's active cart items and subtotal | Optional JWT |
+| **Cart** | `POST` | `/api/v1/cart/items` | Add or update item quantity in cart | Optional JWT |
+| **Cart** | `DELETE` | `/api/v1/cart/items/:id` | Remove specific item from cart | Optional JWT |
+| **Products** | `GET` | `/api/v1/products/home-feed` | Fetch home page flash deals, categories & banner items | Public |
 | **Products** | `GET` | `/api/v1/products/search?query=` | Debounced full-text catalog search | Public |
-| **Orders** | `POST` | `/api/v1/orders` | Create new 10-minute grocery order | Customer |
-| **Payments** | `POST` | `/api/v1/payments/initiate` | Create Razorpay payment order intent | Customer |
-| **Payments** | `POST` | `/api/v1/payments/verify` | Verify Razorpay HMAC SHA-256 signature | Customer |
+| **Orders** | `POST` | `/api/v1/orders/calculate` | Calculate pricing, delivery fees, taxes, discounts | Optional JWT |
+| **Orders** | `POST` | `/api/v1/orders` | Create new 10-minute grocery order with inventory lock | Optional JWT |
+| **Orders** | `GET` | `/api/v1/orders` | Fetch user order history | Optional JWT |
+| **Orders** | `GET` | `/api/v1/orders/:id` | Get single order details with itemized invoice | Optional JWT |
+| **Orders** | `GET` | `/api/v1/orders/:id/tracking` | Fetch live GPS tracking status, ETA & rider position | Optional JWT |
+| **Orders** | `POST` | `/api/v1/orders/:id/assign-rider` | Assign delivery rider and broadcast WebSocket update | Admin / Manager |
+| **Orders** | `POST` | `/api/v1/orders/:id/start-delivery` | Mark order `OUT_FOR_DELIVERY` and initiate GPS stream | Rider / Admin |
+| **Orders** | `POST` | `/api/v1/orders/:id/complete-delivery` | Doorstep OTP verification & complete delivery | Rider / Admin |
+| **Payments** | `POST` | `/api/v1/payments/initiate` | Create Razorpay payment order intent | Optional JWT |
+| **Payments** | `POST` | `/api/v1/payments/verify` | Verify Razorpay HMAC SHA-256 signature | Optional JWT |
 | **Delivery** | `GET` | `/api/v1/delivery/track/:id` | Fetch real-time GPS telemetry & ETA | Customer |
-| **Analytics** | `GET` | `/api/v1/analytics/:storeId` | Dark Store revenue & packing KPIs | Admin / Store Manager |
+| **Analytics** | `GET` | `/api/v1/analytics/:storeId` | Dark Store revenue, packing time & dispatch KPIs | Admin / Store Manager |
 
 ---
 
@@ -335,8 +402,8 @@ Daily Basket integrates a multi-provider LLM engine capable of processing natura
 
 ```mermaid
 graph LR
-    Client["Client Request\n(Text / Voice / Image)"] --> Security["AiSecurityService\n(Prompt Sanitization)"]
-    Security --> ProviderMgr["ProviderManager\n(Health & Routing)"]
+    Client["Client Request\n(Text / Voice / Image)"] --> Security["AiSecurityService\n(Prompt Sanitization & Guardrails)"]
+    Security --> ProviderMgr["ProviderManager\n(Health & Routing Engine)"]
 
     ProviderMgr -->|Primary| Gemini["Google Gemini 1.5 Flash"]
     ProviderMgr -->|Fallback 1| Grok["xAI Grok Provider"]
@@ -347,7 +414,7 @@ graph LR
     FallbackMgr --> Grok
 
     ProviderMgr --> ToolReg["AiToolsRegistry\n(Function Calling)"]
-    ToolReg --> Execute["Execute Store Actions\n(Check Inventory / Track Order)"]
+    ToolReg --> Execute["Execute Store Actions\n(Check Stock / Track Order / Apply Coupon)"]
 ```
 
 See [`docs/AI.md`](docs/AI.md) for full provider failover and tool registration details.
@@ -361,16 +428,17 @@ See [`docs/AI.md`](docs/AI.md) for full provider failover and tool registration 
 - **Role-Based Access Control (RBAC)**: Enforced across controllers using `@Roles()` decorator and `RolesGuard`.
 - **Payment Security**: Strict HMAC SHA-256 signature validation on Razorpay payments and webhooks.
 - **Throttling & Helmet**: NestJS Throttler protects endpoints from brute force and DDoS attacks.
-- **Database Safety**: Prisma ORM enforces parameterized SQL queries, eliminating SQL injection.
+- **Database Safety**: Prisma ORM enforces parameterized SQL queries, eliminating SQL injection vulnerabilities.
 - **Detailed Security Specs**: See [`docs/SECURITY_ARCHITECTURE.md`](docs/SECURITY_ARCHITECTURE.md) and [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md).
 
 ---
 
 ## Testing & Quality Assurance
 
-- **Flutter Static Analysis**: `flutter analyze` — **0 Errors, 0 Warnings**.
-- **Flutter Unit & Widget Tests**: `flutter test` — Complete coverage for providers, services, and core UI widgets.
-- **NestJS Unit Tests**: `pnpm --filter api test` — Jest test suites covering authentication, product catalog, cart calculation, and AI fallback managers.
+- **Flutter Static Analysis**: `flutter analyze` — **0 Errors, 0 Warnings** across customer and admin mobile apps.
+- **Flutter Unit & Widget Tests**: `flutter test` — Comprehensive test suites covering providers, services, and core UI widgets.
+- **NestJS Unit Tests**: `pnpm --filter api test` — Jest test suites covering authentication, product catalog, cart calculation, address management, and AI fallback managers.
+- **Type Checking & Linting**: `pnpm --recursive run lint` & `tsc --noEmit` across all apps and shared packages.
 - **Comprehensive Guide**: See [`docs/TESTING.md`](docs/TESTING.md).
 
 ---
@@ -384,8 +452,9 @@ Pipeline Workflow:
   1. Lint & Typecheck:
      - Next.js apps (website, admin, delivery): ESLint + tsc --noEmit
      - NestJS API service: ESLint + tsc
+     - Shared packages: tsc --noEmit
   2. Automated Test Execution:
-     - Flutter Customer App: flutter analyze + flutter test
+     - Flutter Customer & Admin Apps: flutter analyze + flutter test
      - NestJS API Service: pnpm test (Jest)
   3. Container Build & Push:
      - Multi-stage Docker build for NGINX, API, Website, Admin, and Delivery apps
@@ -415,7 +484,7 @@ Every document in the Daily Basket repository is fully detailed and maintained:
 | **Frontend Architecture** | [`docs/FRONTEND.md`](docs/FRONTEND.md) | Next.js App Router, SSR/ISR, Zustand, & packages |
 | **Mobile Architecture** | [`docs/MOBILE.md`](docs/MOBILE.md) | Flutter Clean Architecture, Provider state, & native features |
 | **Customer Web App** | [`docs/WEBSITE.md`](docs/WEBSITE.md) | Next.js Customer Web portal technical breakdown |
-| **Admin Dashboard** | [`docs/ADMIN_APP.md`](docs/ADMIN_APP.md) | Dark Store Admin Dashboard fulfillment queue |
+| **Admin Dashboard** | [`docs/ADMIN_APP.md`](docs/ADMIN_APP.md) | Dark Store Admin Dashboard fulfillment queue & fleet map |
 | **Delivery PWA** | [`docs/DELIVERY_APP.md`](docs/DELIVERY_APP.md) | Rider PWA, GPS tracking, & doorstep OTP logic |
 | **Auth & Security** | [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md) | Phone OTP, JWT rotation, TOTP MFA, & OAuth |
 | **Security Architecture** | [`docs/SECURITY_ARCHITECTURE.md`](docs/SECURITY_ARCHITECTURE.md) | Security safeguards, RBAC, Helmet, & auditing |
@@ -440,7 +509,7 @@ Every document in the Daily Basket repository is fully detailed and maintained:
 
 ## Roadmap
 
-- [x] **v1.0.0 (Initial Release)**
+- [x] **v1.0.0 (Core Foundation)**
   - Flutter Mobile App (35+ screens, Material 3, Clean Architecture)
   - Next.js Customer Web Portal (31 pages, TailwindCSS, Dark mode)
   - Next.js Admin Dashboard (Real-time dispatch queue, KPIs)
@@ -449,14 +518,22 @@ Every document in the Daily Basket repository is fully detailed and maintained:
   - Redis 7 Caching, BullMQ queues, Socket.IO WebSockets
   - Multi-Provider AI Fallback Engine (Gemini, Grok, OpenRouter, Local)
   - Razorpay Payment Gateway integration with HMAC SHA-256 verification
-- [x] **v1.1.0 (Current Release)**
+- [x] **v1.1.0 (Auth & Ecosystem Parity)**
   - Firebase Admin SDK Integration (`daily-basket-8b266`)
   - Google OAuth 2.0 & Firebase SSO Token Verification
   - Web & Mobile Google Single Sign-On / Registration Parity
   - Comprehensive Documentation Refresh with Badges & Enterprise Diagrams
+- [x] **v1.2.0 (End-to-End Persistence & Live Telemetry)**
+  - End-to-end database persistence for orders, cart sync, and order history
+  - Full Address CRUD management with coordinates and defaults (Flutter & Next.js Web)
+  - 1-Click Reorder workflow directly adding items back to cart
+  - Admin live dispatching modal with rider assignment and fleet live map tracking
+  - Flutter Store Admin companion application (`apps/daily_basket_admin`)
+  - High refresh-rate 60–120 FPS authentication workflow
 - [ ] **v2.0.0 (Planned)**
-  - Multi-dark store automated dispatcher hub
-  - Predictive AI inventory demand forecasting
+  - Automated multi-dark store clustering and intelligent cross-store routing
+  - Predictive AI inventory demand forecasting and kirana restocking alerts
+  - Drone delivery integration and hyper-local geofenced auto-dispatch
 
 ---
 
