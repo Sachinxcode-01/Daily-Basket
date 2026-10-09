@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import '../network/api_client.dart';
 
 class CartItem {
   final String id;
@@ -46,12 +47,18 @@ class CartItem {
 }
 
 /// Centralized state provider for customer Cart / Basket management
-/// — starts EMPTY. Items are added via product and home screens.
+/// — starts with instant 120 FPS optimistic local state and synchronizes
+/// with the persistent backend database via ApiClient.
 class CartProvider extends ChangeNotifier {
+  final ApiClient _apiClient = ApiClient();
   final List<CartItem> _items = [];
 
   // ─── Saved For Later ─────────────────────────────────────────────────────
   final List<CartItem> _savedForLater = [];
+
+  CartProvider() {
+    fetchCartFromApi();
+  }
 
   List<CartItem> get items => List.unmodifiable(_items);
   List<CartItem> get savedForLater => List.unmodifiable(_savedForLater);
@@ -63,6 +70,31 @@ class CartProvider extends ChangeNotifier {
   int get totalCount => _items.fold(0, (sum, item) => sum + item.qty);
   bool get isEmpty => _items.isEmpty;
 
+  /// Fetch remote persistent cart and merge on app start
+  Future<void> fetchCartFromApi() async {
+    try {
+      final res = await _apiClient.get('/cart');
+      if (res['success'] == true && res['activeItems'] is List) {
+        final activeItems = res['activeItems'] as List;
+        if (activeItems.isNotEmpty && _items.isEmpty) {
+          for (final raw in activeItems) {
+            _items.add(CartItem(
+              id: raw['variantId'] ?? raw['id'] ?? 'item_${DateTime.now().millisecondsSinceEpoch}',
+              name: raw['productName'] ?? 'Item',
+              subtitle: raw['unitName'] ?? '1 pack',
+              price: (raw['price'] as num?)?.toDouble() ?? 50.0,
+              qty: (raw['quantity'] as num?)?.toInt() ?? 1,
+              image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300',
+            ));
+          }
+          notifyListeners();
+        }
+      }
+    } catch (e) {
+      debugPrint('CartProvider fetchCart error (ignorable offline): $e');
+    }
+  }
+
   int getQuantity(String id) {
     final index = _items.indexWhere((item) => item.id == id);
     if (index != -1) { return _items[index].qty; }
@@ -71,13 +103,17 @@ class CartProvider extends ChangeNotifier {
 
   void updateQuantity(int index, int delta) {
     if (index < 0 || index >= _items.length) { return; }
-    final newQty = _items[index].qty + delta;
+    final target = _items[index];
+    final newQty = target.qty + delta;
     if (newQty <= 0) {
       _items.removeAt(index);
     } else {
-      _items[index] = _items[index].copyWith(qty: newQty);
+      _items[index] = target.copyWith(qty: newQty);
     }
     notifyListeners();
+
+    // Background sync to backend
+    _syncUpdateQuantity(target.id, newQty);
   }
 
   void updateQuantityById({
@@ -106,23 +142,28 @@ class CartProvider extends ChangeNotifier {
   void addItem(CartItem newItem) {
     final index = _items.indexWhere((item) => item.id == newItem.id);
     if (index != -1) {
-      _items[index] = _items[index].copyWith(qty: _items[index].qty + newItem.qty);
+      final updatedQty = _items[index].qty + newItem.qty;
+      _items[index] = _items[index].copyWith(qty: updatedQty);
+      _syncUpdateQuantity(newItem.id, updatedQty);
     } else {
       _items.add(newItem);
+      _syncAddItem(newItem);
     }
     notifyListeners();
   }
 
   void removeItem(int index) {
     if (index >= 0 && index < _items.length) {
-      _items.removeAt(index);
+      final removed = _items.removeAt(index);
       notifyListeners();
+      _syncUpdateQuantity(removed.id, 0);
     }
   }
 
   void removeItemById(String id) {
     _items.removeWhere((item) => item.id == id);
     notifyListeners();
+    _syncUpdateQuantity(id, 0);
   }
 
   /// Move item from cart to Saved For Later list
@@ -165,5 +206,38 @@ class CartProvider extends ChangeNotifier {
   void clearCart() {
     _items.clear();
     notifyListeners();
+    _syncClearCart();
+  }
+
+  // ─── Private Async Synchronization ───────────────────────────────────────
+  void _syncAddItem(CartItem item) {
+    _apiClient.post('/cart/add', {
+      'variantId': item.id,
+      'productName': item.name,
+      'unitName': item.subtitle,
+      'price': item.price,
+      'quantity': item.qty,
+    }).then((_) {}).catchError((e) {
+      debugPrint('Sync cart add error (offline fallback): $e');
+    });
+  }
+
+  void _syncUpdateQuantity(String id, int quantity) {
+    if (quantity <= 0) {
+      _apiClient.delete('/cart/item/$id').then((_) {}).catchError((e) {
+        debugPrint('Sync cart delete error: $e');
+      });
+    } else {
+      _apiClient.patch('/cart/item/$id', {'quantity': quantity}).then((_) {}).catchError((e) {
+        debugPrint('Sync cart patch error: $e');
+      });
+    }
+  }
+
+  void _syncClearCart() {
+    _apiClient.delete('/cart/clear').then((_) {}).catchError((e) {
+      debugPrint('Sync cart clear error: $e');
+    });
   }
 }
+

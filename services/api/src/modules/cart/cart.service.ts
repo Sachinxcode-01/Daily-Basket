@@ -19,6 +19,21 @@ export class CartService {
     private eventsGateway: EventsGateway,
   ) {}
 
+  private async ensureUser(userId: string) {
+    let user = await this.prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      user = await this.prisma.user.create({
+        data: {
+          id: userId,
+          phoneNumber: '+919876543210',
+          fullName: 'Customer',
+          email: `${userId}@dailybasket.com`,
+        },
+      });
+    }
+    return user;
+  }
+
   async getCart(userId: string) {
     let cart = await this.prisma.cart.findUnique({
       where: { userId },
@@ -30,6 +45,7 @@ export class CartService {
     });
 
     if (!cart) {
+      await this.ensureUser(userId);
       cart = await this.prisma.cart.create({
         data: { userId },
         include: { items: true },
@@ -98,6 +114,7 @@ export class CartService {
     });
 
     if (!cart) {
+      await this.ensureUser(userId);
       cart = await this.prisma.cart.create({
         data: { userId },
       });

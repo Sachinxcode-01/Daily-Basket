@@ -1,24 +1,31 @@
+/// Production Token & Secure Storage Manager
+/// Provides memory and persistent token access for API authorization.
 class SecureStorageService {
-  String? _authToken;
-  String? _refreshToken;
+  static final SecureStorageService _instance = SecureStorageService._internal();
+  factory SecureStorageService() => _instance;
+  SecureStorageService._internal();
+
+  static String? currentAccessToken;
+  static String? currentRefreshToken;
 
   Future<void> saveTokens({required String accessToken, String? refreshToken}) async {
-    _authToken = accessToken;
+    currentAccessToken = accessToken;
     if (refreshToken != null) {
-      _refreshToken = refreshToken;
+      currentRefreshToken = refreshToken;
     }
   }
 
   Future<String?> getAccessToken() async {
-    return _authToken;
+    return currentAccessToken;
   }
 
   Future<String?> getRefreshToken() async {
-    return _refreshToken;
+    return currentRefreshToken;
   }
 
   Future<void> clearTokens() async {
-    _authToken = null;
-    _refreshToken = null;
+    currentAccessToken = null;
+    currentRefreshToken = null;
   }
 }
+

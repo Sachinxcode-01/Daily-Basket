@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import '../storage/secure_storage_service.dart';
 
 /// Production Enterprise ApiClient for Daily Basket Flutter Application
 /// Manages standard HTTP requests, auth headers, timeout guards, and environment URLs.
@@ -21,11 +22,14 @@ class ApiClient {
       : baseUrl = baseUrl ?? defaultBaseUrl,
         _httpClient = client ?? http.Client();
 
-  Map<String, String> _headers([String? token]) => {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        if (token != null) 'Authorization': 'Bearer $token',
-      };
+  Map<String, String> _headers([String? token]) {
+    final effectiveToken = token ?? SecureStorageService.currentAccessToken;
+    return {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      if (effectiveToken != null && effectiveToken.isNotEmpty) 'Authorization': 'Bearer $effectiveToken',
+    };
+  }
 
   Uri _resolveUri(String endpoint) {
     if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {

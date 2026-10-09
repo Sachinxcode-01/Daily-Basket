@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../core/widgets/staggered_animation_wrappers.dart';
 import 'order_details_screen.dart';
 import '../../../tracking/presentation/screens/tracking_screen.dart';
@@ -15,16 +16,19 @@ class OrderHistoryScreen extends StatefulWidget {
 class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   int _selectedFilterIndex = 0;
   final List<String> _filters = ['All', 'Ongoing', 'Past'];
+  final ApiClient _apiClient = ApiClient();
+  bool _isLoading = true;
 
-  final List<Map<String, dynamic>> _orders = [
+  final List<Map<String, dynamic>> _defaultOrders = [
     {
       'id': '#DB-8829410',
+      'rawId': '8829410',
       'status': 'Delivered',
       'statusColor': const Color(0xFF006B23),
       'statusBg': const Color(0xFFE8F5E9),
       'date': 'Oct 24, 2023 • 10:30 AM',
       'title': 'Artisan Sourdough ...',
-      'price': '\$42.50',
+      'price': '₹42.50',
       'extraCount': 2,
       'isOngoing': false,
       'isCancelled': false,
@@ -35,12 +39,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     },
     {
       'id': '#DB-8910245',
+      'rawId': '8910245',
       'status': 'Processing',
       'statusColor': const Color(0xFFE65100),
       'statusBg': const Color(0xFFFFF3E0),
       'date': 'Today • 02:15 PM',
       'title': 'Organic Milk,...',
-      'price': '\$18.90',
+      'price': '₹18.90',
       'extraCount': 0,
       'isOngoing': true,
       'isCancelled': false,
@@ -51,12 +56,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     },
     {
       'id': '#DB-8812300',
+      'rawId': '8812300',
       'status': 'Cancelled',
       'statusColor': const Color(0xFFBA1A1A),
       'statusBg': const Color(0xFFFFDAD6),
       'date': 'Oct 20, 2023 • 09:45 AM',
       'title': 'Dark Chocolate 70% Cocoa',
-      'price': '\$5.50',
+      'price': '₹5.50',
       'extraCount': 0,
       'isOngoing': false,
       'isCancelled': true,
@@ -66,12 +72,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
     },
     {
       'id': '#DB-8799201',
+      'rawId': '8799201',
       'status': 'Delivered',
       'statusColor': const Color(0xFF006B23),
       'statusBg': const Color(0xFFE8F5E9),
       'date': 'Oct 15, 2023 • 05:20 PM',
       'title': 'Fresh Avocados + 6...',
-      'price': '\$67.25',
+      'price': '₹67.25',
       'extraCount': 5,
       'isOngoing': false,
       'isCancelled': false,
@@ -81,6 +88,115 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       ],
     },
   ];
+
+  List<Map<String, dynamic>> _orders = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchOrders();
+  }
+
+  Future<void> _fetchOrders() async {
+    try {
+      final res = await _apiClient.get('/orders');
+      if (res['success'] == true) {
+        final dynamic rawList = res['data'] ?? (res['orders'] ?? (res['items'] ?? res));
+        if (rawList is List && rawList.isNotEmpty) {
+          final mapped = rawList.map<Map<String, dynamic>>((item) {
+            final id = item['id']?.toString() ?? '#DB-0000000';
+            final statusStr = (item['status']?.toString() ?? 'PLACED').toUpperCase();
+            final isDelivered = statusStr == 'DELIVERED';
+            final isCancelled = statusStr == 'CANCELLED';
+            final isOngoing = !isDelivered && !isCancelled;
+
+            Color statusColor;
+            Color statusBg;
+            String statusLabel;
+
+            if (isDelivered) {
+              statusLabel = 'Delivered';
+              statusColor = const Color(0xFF006B23);
+              statusBg = const Color(0xFFE8F5E9);
+            } else if (isCancelled) {
+              statusLabel = 'Cancelled';
+              statusColor = const Color(0xFFBA1A1A);
+              statusBg = const Color(0xFFFFDAD6);
+            } else {
+              statusLabel = statusStr == 'OUT_FOR_DELIVERY'
+                  ? 'Out for Delivery'
+                  : statusStr == 'READY_FOR_PICKUP'
+                      ? 'Packing'
+                      : statusStr == 'CONFIRMED'
+                          ? 'Confirmed'
+                          : 'Processing';
+              statusColor = const Color(0xFFE65100);
+              statusBg = const Color(0xFFFFF3E0);
+            }
+
+            final items = item['items'] as List<dynamic>? ?? [];
+            final totalAmount = (item['totalAmount'] as num?)?.toDouble() ?? 0.0;
+            final createdAt = item['createdAt']?.toString() ?? '';
+            String displayDate = 'Recently';
+            if (createdAt.isNotEmpty) {
+              try {
+                final dt = DateTime.parse(createdAt);
+                final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                final hour = dt.hour > 12 ? dt.hour - 12 : (dt.hour == 0 ? 12 : dt.hour);
+                final ampm = dt.hour >= 12 ? 'PM' : 'AM';
+                final min = dt.minute.toString().padLeft(2, '0');
+                displayDate = '${months[dt.month - 1]} ${dt.day}, ${dt.year} • $hour:$min $ampm';
+              } catch (_) {}
+            }
+
+            String title = 'Grocery Essentials';
+            if (items.isNotEmpty) {
+              final firstItem = items.first;
+              final name = firstItem['productName'] ?? firstItem['name'] ?? 'Item';
+              title = items.length > 1 ? '$name + ${items.length - 1} more' : name.toString();
+            }
+
+            return {
+              'id': id.startsWith('#') ? id : '#DB-${id.length > 7 ? id.substring(id.length - 7).toUpperCase() : id.toUpperCase()}',
+              'rawId': id,
+              'status': statusLabel,
+              'statusColor': statusColor,
+              'statusBg': statusBg,
+              'date': displayDate,
+              'title': title,
+              'price': '₹${totalAmount.toStringAsFixed(2)}',
+              'extraCount': items.length > 2 ? items.length - 2 : 0,
+              'isOngoing': isOngoing,
+              'isCancelled': isCancelled,
+              'thumbnails': [
+                'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200&q=80',
+                'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&q=80',
+              ],
+            };
+          }).toList();
+
+          if (mounted) {
+            setState(() {
+              _orders = mapped;
+              _isLoading = false;
+            });
+            return;
+          }
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching orders: $e');
+    }
+
+    if (mounted) {
+      setState(() {
+        if (_orders.isEmpty) {
+          _orders = _defaultOrders;
+        }
+        _isLoading = false;
+      });
+    }
+  }
 
   List<Map<String, dynamic>> get _filteredOrders {
     if (_selectedFilterIndex == 1) {
@@ -112,6 +228,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -177,24 +294,77 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
 
           const SizedBox(height: 16),
 
-          // ─── 2. Orders List ───────────────────────────────────────────────
+          // ─── 2. Orders List with Refresh & Live Loading ───────────────────
           Expanded(
-            child: AnimatedListWrapper(
-              child: ListView.separated(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: _filteredOrders.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 16),
-                itemBuilder: (context, index) {
-                  final order = _filteredOrders[index];
-                  final isOngoing = order['isOngoing'] as bool;
-                  final isCancelled = order['isCancelled'] as bool;
-                  final thumbnails = order['thumbnails'] as List<String>;
-                  final extraCount = order['extraCount'] as int;
+            child: _isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF006B23),
+                    ),
+                  )
+                : _filteredOrders.isEmpty
+                    ? Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(32.0),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(20),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFE8F5E9),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.receipt_long_outlined,
+                                  size: 48,
+                                  color: Color(0xFF006B23),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'No orders found',
+                                style: GoogleFonts.outfit(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF1A1C1E),
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Your placed orders will appear here in real-time.',
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  color: const Color(0xFF6E7A6C),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : RefreshIndicator(
+                        color: const Color(0xFF006B23),
+                        onRefresh: _fetchOrders,
+                        child: AnimatedListWrapper(
+                          child: ListView.separated(
+                            physics: const AlwaysScrollableScrollPhysics(
+                              parent: BouncingScrollPhysics(),
+                            ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: _filteredOrders.length,
+                            separatorBuilder: (_, __) => const SizedBox(height: 16),
+                            itemBuilder: (context, index) {
+                              final order = _filteredOrders[index];
+                              final isOngoing = order['isOngoing'] as bool;
+                              final isCancelled = order['isCancelled'] as bool;
+                              final thumbnails = order['thumbnails'] as List<String>;
+                              final extraCount = order['extraCount'] as int;
 
-                  return AnimatedCardWrapper(
-                    position: index,
-                    child: Container(
+                              return AnimatedCardWrapper(
+                                position: index,
+                                child: Container(
+
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -381,7 +551,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                   width: double.infinity,
                                   height: 44,
                                   child: OutlinedButton(
-                                    onPressed: () => _goToDetails(order['id'] as String),
+                                    onPressed: () => _goToDetails(order['rawId'] ?? order['id']),
                                     style: OutlinedButton.styleFrom(
                                       foregroundColor: const Color(0xFF1A1C1E),
                                       side: const BorderSide(color: Color(0xFFBECAB9)),
@@ -405,7 +575,7 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
                                       child: SizedBox(
                                         height: 44,
                                         child: OutlinedButton(
-                                          onPressed: () => _goToDetails(order['id'] as String),
+                                          onPressed: () => _goToDetails(order['rawId'] ?? order['id']),
                                           style: OutlinedButton.styleFrom(
                                             foregroundColor: const Color(0xFF1A1C1E),
                                             side: const BorderSide(color: Color(0xFFBECAB9)),
@@ -462,8 +632,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
             ),
           ),
         ),
-      ],
-    ),
-  );
- }
+      ),
+    ],
+  ),
+);
 }
+}
+
