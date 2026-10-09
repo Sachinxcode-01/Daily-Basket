@@ -48,7 +48,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
 
   void _goToTracking() {
     Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const OrderTrackingScreen()),
+      MaterialPageRoute(builder: (_) => OrderTrackingScreen(orderId: widget.orderId)),
     );
   }
 

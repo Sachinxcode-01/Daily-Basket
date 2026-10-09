@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import '../../../../core/network/api_client.dart';
 
 enum LocationPermissionState { granted, denied, prompt }
@@ -35,7 +33,7 @@ class AddressProvider extends ChangeNotifier {
   LocationPermissionState _permissionState = LocationPermissionState.prompt;
   String _fetchingProgressText = 'Detecting GPS Location...';
   bool _isLoading = false;
-  final String _baseUrl = ApiClient.defaultBaseUrl;
+  final ApiClient _apiClient = ApiClient();
 
   final List<Map<String, dynamic>> _addresses = [
     {
@@ -101,31 +99,28 @@ class AddressProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final response = await http
-          .get(Uri.parse('$_baseUrl/addresses'))
-          .timeout(const Duration(seconds: 3));
+      final res = await _apiClient.get('/addresses');
 
-      if (response.statusCode == 200) {
-        final body = jsonDecode(response.body);
-        if (body['success'] == true && body['data'] is List) {
-          final List<dynamic> list = body['data'];
-          if (list.isNotEmpty) {
-            _addresses.clear();
-            for (var item in list) {
-              _addresses.add({
-                'id': item['id']?.toString() ?? 'addr_${DateTime.now().millisecondsSinceEpoch}',
-                'label': item['label'] ?? 'Home',
-                'houseFlat': item['houseNo'] ?? item['houseFlat'] ?? '',
-                'streetArea': item['street'] ?? item['streetArea'] ?? '',
-                'pincode': item['pincode'] ?? '560038',
-                'city': item['city'] ?? 'Bengaluru',
-                'landmark': item['landmark'] ?? '',
-                'addressText': '${item['houseNo'] ?? ''}, ${item['street'] ?? ''}, ${item['city'] ?? 'Bengaluru'} - ${item['pincode'] ?? ''}',
-                'isDefault': item['isDefault'] ?? false,
-                'type': (item['label'] ?? 'HOME').toString().toUpperCase(),
-                'inRange': true,
-              });
-            }
+      if (res['success'] == true && res['data'] is List) {
+        final List<dynamic> list = res['data'];
+        if (list.isNotEmpty) {
+          _addresses.clear();
+          for (var item in list) {
+            _addresses.add({
+              'id': item['id']?.toString() ?? 'addr_${DateTime.now().millisecondsSinceEpoch}',
+              'label': item['label'] ?? 'Home',
+              'fullName': 'Rahul Sharma',
+              'phone': '+91 98765 43210',
+              'houseFlat': item['houseNo'] ?? item['houseFlat'] ?? '',
+              'streetArea': item['street'] ?? item['streetArea'] ?? '',
+              'pincode': item['pincode'] ?? '560038',
+              'city': item['city'] ?? 'Bengaluru',
+              'landmark': item['landmark'] ?? '',
+              'addressText': '${item['houseNo'] ?? ''}, ${item['street'] ?? ''}, ${item['city'] ?? 'Bengaluru'} - ${item['pincode'] ?? ''}',
+              'isDefault': item['isDefault'] ?? false,
+              'type': (item['label'] ?? 'HOME').toString().toUpperCase(),
+              'inRange': true,
+            });
           }
         }
       }
@@ -206,10 +201,9 @@ class AddressProvider extends ChangeNotifier {
 
     // Async sync with NestJS API in background
     try {
-      await http.post(
-        Uri.parse('$_baseUrl/addresses'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
+      final res = await _apiClient.post(
+        '/addresses',
+        {
           'label': newAddress['label'] ?? 'Home',
           'houseNo': newAddress['houseFlat'] ?? '',
           'street': newAddress['streetArea'] ?? '',
@@ -219,8 +213,11 @@ class AddressProvider extends ChangeNotifier {
           'latitude': 12.9716,
           'longitude': 77.5946,
           'isDefault': isDefault,
-        }),
-      ).timeout(const Duration(seconds: 3));
+        },
+      );
+      if (res['success'] == true && res['data'] != null && res['data']['id'] != null) {
+        _addresses[0]['id'] = res['data']['id'].toString();
+      }
     } catch (_) {}
 
     return true;
@@ -245,11 +242,10 @@ class AddressProvider extends ChangeNotifier {
 
     // Async sync with NestJS API
     try {
-      await http.put(
-        Uri.parse('$_baseUrl/addresses/$id'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(updatedData),
-      ).timeout(const Duration(seconds: 3));
+      await _apiClient.put(
+        '/addresses/$id',
+        updatedData,
+      );
     } catch (_) {}
 
     return true;
@@ -271,7 +267,7 @@ class AddressProvider extends ChangeNotifier {
 
     if (idToDelete != null) {
       try {
-        await http.delete(Uri.parse('$_baseUrl/addresses/$idToDelete')).timeout(const Duration(seconds: 3));
+        await _apiClient.delete('/addresses/$idToDelete');
       } catch (_) {}
     }
   }

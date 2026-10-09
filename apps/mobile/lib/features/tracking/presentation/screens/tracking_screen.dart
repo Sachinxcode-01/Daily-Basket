@@ -20,7 +20,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => TrackingProvider(),
+      create: (_) => TrackingProvider(orderId: widget.orderId),
       child: Consumer<TrackingProvider>(
         builder: (context, tracking, child) {
           final isDelivered = tracking.status == DeliveryOrderStatus.delivered;

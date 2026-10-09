@@ -1,4 +1,5 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
+import { PrismaService } from '../../database/prisma.service';
 
 export interface UserProfileDto {
   id?: string;
@@ -39,12 +40,13 @@ export interface NotificationSettingsDto {
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
   private profileStore: Map<string, any> = new Map();
   private addressStore: Map<string, UserAddressDto[]> = new Map();
   private settingsStore: Map<string, NotificationSettingsDto> = new Map();
   private termsConsentStore: Map<string, any> = new Map();
 
-  constructor() {
+  constructor(private readonly prisma: PrismaService) {
     // Seed default mock demo profile
     const demoId = 'usr_default';
     this.profileStore.set(demoId, {
@@ -101,12 +103,90 @@ export class UsersService {
     });
   }
 
+  private async ensureUser(userId: string) {
+    try {
+      let user = await this.prisma.user.findUnique({ where: { id: userId } });
+      if (!user) {
+        const isDemo = userId === 'usr_default';
+        user = await this.prisma.user.upsert({
+          where: { id: userId },
+          update: {},
+          create: {
+            id: userId,
+            phoneNumber: isDemo ? '+919876543210' : `+91${Date.now().toString().slice(-10)}`,
+            fullName: isDemo ? 'Alex Johnson' : 'Customer',
+            email: isDemo ? 'alex.johnson@dailybasket.com' : undefined,
+            isVerified: true,
+          },
+        });
+      }
+      return user;
+    } catch (err: any) {
+      this.logger.warn(`Could not ensure user ${userId} in database: ${err?.message}`);
+      return null;
+    }
+  }
+
   async getProfile(userId = 'usr_default') {
+    try {
+      const user = await this.prisma.user.findUnique({
+        where: { id: userId },
+      });
+      if (user) {
+        return {
+          success: true,
+          data: {
+            id: user.id,
+            fullName: user.fullName,
+            email: user.email || 'customer@dailybasket.com',
+            phoneNumber: user.phoneNumber,
+            avatarUrl: user.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
+            dob: '1995-08-15',
+            gender: 'Male',
+            language: 'English',
+            isVerified: user.isVerified,
+            profileCompletion: 100,
+          },
+        };
+      }
+    } catch (err: any) {
+      this.logger.warn(`Database getProfile fallback for ${userId}: ${err?.message}`);
+    }
+
     const profile = this.profileStore.get(userId) || this.profileStore.get('usr_default');
     return { success: true, data: profile };
   }
 
   async updateProfile(userId = 'usr_default', dto: Partial<UserProfileDto>) {
+    try {
+      await this.ensureUser(userId);
+      const updated = await this.prisma.user.update({
+        where: { id: userId },
+        data: {
+          fullName: dto.fullName,
+          email: dto.email,
+          phoneNumber: dto.phoneNumber,
+          avatarUrl: dto.avatarUrl,
+        },
+      });
+      const resData = {
+        id: updated.id,
+        fullName: updated.fullName,
+        email: updated.email,
+        phoneNumber: updated.phoneNumber,
+        avatarUrl: updated.avatarUrl,
+        dob: dto.dob ?? '1995-08-15',
+        gender: dto.gender ?? 'Male',
+        language: dto.language ?? 'English',
+        isVerified: updated.isVerified,
+        updatedAt: updated.updatedAt.toISOString(),
+      };
+      this.profileStore.set(userId, resData);
+      return { success: true, data: resData, message: 'Profile updated successfully' };
+    } catch (err: any) {
+      this.logger.warn(`Database updateProfile fallback for ${userId}: ${err?.message}`);
+    }
+
     const existing = (await this.getProfile(userId)).data;
     const updated = {
       ...existing,
@@ -118,11 +198,86 @@ export class UsersService {
   }
 
   async getAddresses(userId = 'usr_default') {
+    try {
+      await this.ensureUser(userId);
+      const dbAddrs = await this.prisma.address.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' },
+      });
+      if (dbAddrs && dbAddrs.length > 0) {
+        const formatted = dbAddrs.map((a) => ({
+          id: a.id,
+          label: a.label,
+          houseNo: a.houseNo,
+          street: a.street,
+          landmark: a.landmark || '',
+          city: a.city,
+          pincode: a.pincode,
+          latitude: a.latitude,
+          longitude: a.longitude,
+          isDefault: a.isDefault,
+        }));
+        this.addressStore.set(userId, formatted);
+        return { success: true, data: formatted };
+      }
+    } catch (err: any) {
+      this.logger.warn(`Database getAddresses fallback for ${userId}: ${err?.message}`);
+    }
+
     const addrs = this.addressStore.get(userId) || this.addressStore.get('usr_default') || [];
     return { success: true, data: addrs };
   }
 
   async createAddress(userId = 'usr_default', dto: UserAddressDto) {
+    try {
+      await this.ensureUser(userId);
+      const isDefault = dto.isDefault ?? true;
+      if (isDefault) {
+        await this.prisma.address.updateMany({
+          where: { userId },
+          data: { isDefault: false },
+        });
+      }
+      const created = await this.prisma.address.create({
+        data: {
+          userId,
+          label: dto.label || 'HOME',
+          houseNo: dto.houseNo || '',
+          street: dto.street || '',
+          landmark: dto.landmark || null,
+          city: dto.city || 'Bengaluru',
+          pincode: dto.pincode || '560038',
+          latitude: Number(dto.latitude) || 12.9716,
+          longitude: Number(dto.longitude) || 77.5946,
+          isDefault,
+        },
+      });
+
+      const formatted: UserAddressDto = {
+        id: created.id,
+        label: created.label,
+        houseNo: created.houseNo,
+        street: created.street,
+        landmark: created.landmark || undefined,
+        city: created.city,
+        pincode: created.pincode,
+        latitude: created.latitude,
+        longitude: created.longitude,
+        isDefault: created.isDefault,
+      };
+
+      const addrs = this.addressStore.get(userId) || [];
+      if (formatted.isDefault) {
+        addrs.forEach((a) => (a.isDefault = false));
+      }
+      addrs.unshift(formatted);
+      this.addressStore.set(userId, addrs);
+
+      return { success: true, data: formatted, message: 'Address created successfully' };
+    } catch (err: any) {
+      this.logger.warn(`Database createAddress fallback for ${userId}: ${err?.message}`);
+    }
+
     const addrs = this.addressStore.get(userId) || [];
     const newAddr = {
       ...dto,
@@ -138,6 +293,56 @@ export class UsersService {
   }
 
   async updateAddress(userId = 'usr_default', id: string, dto: Partial<UserAddressDto>) {
+    try {
+      if (dto.isDefault) {
+        await this.prisma.address.updateMany({
+          where: { userId },
+          data: { isDefault: false },
+        });
+      }
+      const updated = await this.prisma.address.update({
+        where: { id },
+        data: {
+          label: dto.label,
+          houseNo: dto.houseNo,
+          street: dto.street,
+          landmark: dto.landmark,
+          city: dto.city,
+          pincode: dto.pincode,
+          latitude: dto.latitude != null ? Number(dto.latitude) : undefined,
+          longitude: dto.longitude != null ? Number(dto.longitude) : undefined,
+          isDefault: dto.isDefault,
+        },
+      });
+
+      const formatted: UserAddressDto = {
+        id: updated.id,
+        label: updated.label,
+        houseNo: updated.houseNo,
+        street: updated.street,
+        landmark: updated.landmark || undefined,
+        city: updated.city,
+        pincode: updated.pincode,
+        latitude: updated.latitude,
+        longitude: updated.longitude,
+        isDefault: updated.isDefault,
+      };
+
+      const addrs = this.addressStore.get(userId) || [];
+      const idx = addrs.findIndex((a) => a.id === id);
+      if (idx !== -1) {
+        if (formatted.isDefault) {
+          addrs.forEach((a) => (a.isDefault = false));
+        }
+        addrs[idx] = { ...addrs[idx], ...formatted };
+        this.addressStore.set(userId, addrs);
+      }
+
+      return { success: true, data: formatted, message: 'Address updated successfully' };
+    } catch (err: any) {
+      this.logger.warn(`Database updateAddress fallback for ${id}: ${err?.message}`);
+    }
+
     const addrs = this.addressStore.get(userId) || [];
     const idx = addrs.findIndex((a) => a.id === id);
     if (idx === -1) throw new NotFoundException('Address not found');
@@ -151,6 +356,14 @@ export class UsersService {
   }
 
   async deleteAddress(userId = 'usr_default', id: string) {
+    try {
+      await this.prisma.address.delete({
+        where: { id },
+      });
+    } catch (err: any) {
+      this.logger.warn(`Database deleteAddress fallback for ${id}: ${err?.message}`);
+    }
+
     const addrs = this.addressStore.get(userId) || [];
     const filtered = addrs.filter((a) => a.id !== id);
     this.addressStore.set(userId, filtered);

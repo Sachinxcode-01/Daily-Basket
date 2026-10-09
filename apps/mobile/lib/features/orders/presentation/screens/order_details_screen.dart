@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/network/api_client.dart';
 import '../../../../core/providers/cart_provider.dart';
+import '../../../tracking/presentation/screens/tracking_screen.dart';
 
 /// Order Details Screen — Google Stitch Design System Exact Replica
-class OrderDetailsScreen extends StatelessWidget {
+class OrderDetailsScreen extends StatefulWidget {
   final String orderId;
 
   const OrderDetailsScreen({
@@ -13,7 +15,98 @@ class OrderDetailsScreen extends StatelessWidget {
   });
 
   @override
+  State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
+}
+
+class _OrderDetailsScreenState extends State<OrderDetailsScreen> {
+  final ApiClient _apiClient = ApiClient();
+  bool _isLoading = true;
+  Map<String, dynamic>? _remoteOrder;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDetails();
+  }
+
+  Future<void> _fetchDetails() async {
+    final cleanId = widget.orderId.replaceAll('#', '').replaceAll('DB-', '');
+    try {
+      final res = await _apiClient.get('/orders/$cleanId');
+      if (res['success'] == true) {
+        final orderData = res['data'] is Map<String, dynamic>
+            ? res['data'] as Map<String, dynamic>
+            : res['order'] is Map<String, dynamic>
+                ? res['order'] as Map<String, dynamic>
+                : null;
+        if (orderData != null && mounted) {
+          setState(() {
+            _remoteOrder = orderData;
+            _isLoading = false;
+          });
+          return;
+        }
+      }
+    } catch (_) {}
+
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final orderId = widget.orderId;
+    final status = (_remoteOrder?['status'] ?? 'PROCESSING').toString().toUpperCase();
+    final isDelivered = status == 'DELIVERED';
+    final isOutForDelivery = status == 'OUT_FOR_DELIVERY';
+    final isPacked = status == 'READY_FOR_PICKUP' || isOutForDelivery || isDelivered;
+    final isConfirmed = status == 'CONFIRMED' || status == 'PROCESSING' || isPacked;
+
+    final addressObj = _remoteOrder?['address'] as Map<String, dynamic>?;
+    final addressText = addressObj != null
+        ? '${addressObj['houseNo'] ?? ''}, ${addressObj['street'] ?? ''}\n${addressObj['city'] ?? ''} ${addressObj['pincode'] ?? ''}'.trim()
+        : 'Flat 402, Green Valley Apartments\n100ft Road, Indiranagar, Bengaluru 560038';
+
+    final remoteItems = _remoteOrder?['items'] as List<dynamic>? ?? [];
+    final rawTotal = (_remoteOrder?['totalAmount'] as num?)?.toDouble();
+    final rawSubtotal = (_remoteOrder?['subtotal'] as num?)?.toDouble();
+    final rawDeliveryFee = (_remoteOrder?['deliveryFee'] as num?)?.toDouble();
+    final rawTaxes = (_remoteOrder?['taxAmount'] as num?)?.toDouble() ??
+        (_remoteOrder?['taxes'] as num?)?.toDouble();
+
+    final deliveryFee = rawDeliveryFee ?? 0.0;
+
+    final double subtotal;
+    if (rawSubtotal != null) {
+      subtotal = rawSubtotal;
+    } else if (remoteItems.isNotEmpty) {
+      subtotal = remoteItems.fold<double>(0.0, (sum, item) {
+        final qty = (item['quantity'] as num?)?.toInt() ?? 1;
+        final price = (item['price'] as num?)?.toDouble() ?? 0.0;
+        return sum + (price * qty);
+      });
+    } else if (rawTotal != null) {
+      final remaining = rawTotal - deliveryFee - (rawTaxes ?? 0.0);
+      subtotal = remaining > 0 ? remaining : rawTotal;
+    } else {
+      subtotal = 260.0;
+    }
+
+    final double taxes;
+    if (rawTaxes != null) {
+      taxes = rawTaxes;
+    } else if (rawTotal != null) {
+      final diff = rawTotal - (subtotal + deliveryFee);
+      taxes = diff > 0 ? diff : 0.0;
+    } else {
+      taxes = 0.0;
+    }
+
+    final totalAmount = rawTotal ?? (subtotal + deliveryFee + taxes);
+    final paymentMethod = _remoteOrder?['paymentMethod']?.toString() ?? 'UPI';
+    final riderObj = _remoteOrder?['deliveryPartner'] as Map<String, dynamic>?;
+    final riderName = riderObj?['name'] ?? 'Robert Fox';
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
       appBar: AppBar(
@@ -38,6 +131,12 @@ class OrderDetailsScreen extends StatelessWidget {
             onPressed: () => Navigator.of(context).pushNamed('/help'),
           ),
         ],
+        bottom: _isLoading
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(2),
+                child: LinearProgressIndicator(color: Color(0xFF006B23), minHeight: 2),
+              )
+            : null,
       ),
       body: Stack(
         children: [
@@ -82,33 +181,33 @@ class OrderDetailsScreen extends StatelessWidget {
                       _buildStepRow(
                         icon: Icons.check_rounded,
                         title: 'Order Placed',
-                        subtitle: 'Oct 24, 2023 • 09:15 AM',
+                        subtitle: 'Received & Confirmed',
                         isCompleted: true,
-                        isCurrent: false,
+                        isCurrent: !isConfirmed,
                         showLine: true,
                       ),
                       _buildStepRow(
                         icon: Icons.check_rounded,
                         title: 'Packed',
-                        subtitle: 'Oct 24, 2023 • 09:30 AM',
-                        isCompleted: true,
-                        isCurrent: false,
+                        subtitle: isPacked ? 'Ready for pickup' : 'Being prepared in dark store',
+                        isCompleted: isPacked,
+                        isCurrent: isConfirmed && !isPacked,
                         showLine: true,
                       ),
                       _buildStepRow(
                         icon: Icons.directions_bike_rounded,
                         title: 'Out for Delivery',
-                        subtitle: 'Oct 24, 2023 • 09:45 AM',
-                        isCompleted: true,
-                        isCurrent: true,
+                        subtitle: isOutForDelivery ? 'On the way • 10 mins' : 'Dispatches soon',
+                        isCompleted: isOutForDelivery || isDelivered,
+                        isCurrent: isOutForDelivery,
                         showLine: true,
                       ),
                       _buildStepRow(
                         icon: Icons.home_outlined,
                         title: 'Delivered',
-                        subtitle: 'Estimated by 10:05 AM',
-                        isCompleted: false,
-                        isCurrent: false,
+                        subtitle: isDelivered ? 'Delivered successfully' : 'Estimated in 10 mins',
+                        isCompleted: isDelivered,
+                        isCurrent: isDelivered,
                         showLine: false,
                       ),
                     ],
@@ -136,57 +235,92 @@ class OrderDetailsScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Map View Banner Box
-                      SizedBox(
-                        height: 120,
-                        width: double.infinity,
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(20)),
-                          child: Stack(
-                            children: [
-                              Container(
-                                color: const Color(0xFFE5ECE5),
-                                child: CustomPaint(
-                                  painter: _MiniMapPainter(),
-                                  child: const SizedBox.expand(),
-                                ),
-                              ),
-                              Positioned(
-                                bottom: 12,
-                                left: 12,
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(9999),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black
-                                            .withValues(alpha: 0.1),
-                                        blurRadius: 4,
-                                      ),
-                                    ],
+                      // Map View Banner Box (tappable to open live tracking)
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => OrderTrackingScreen(orderId: widget.orderId),
+                            ),
+                          );
+                        },
+                        child: SizedBox(
+                          height: 120,
+                          width: double.infinity,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(20)),
+                            child: Stack(
+                              children: [
+                                Container(
+                                  color: const Color(0xFFE5ECE5),
+                                  child: CustomPaint(
+                                    painter: _MiniMapPainter(),
+                                    child: const SizedBox.expand(),
                                   ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Icons.location_on_outlined,
-                                          color: Color(0xFF006B23), size: 14),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        'Home • 2.4 km away',
-                                        style: GoogleFonts.inter(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w600,
-                                          color: const Color(0xFF1A1C1E),
+                                ),
+                                Positioned(
+                                  top: 12,
+                                  right: 12,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF006B23),
+                                      borderRadius: BorderRadius.circular(9999),
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(Icons.navigation_rounded, color: Colors.white, size: 12),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Track Live',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.white,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                                Positioned(
+                                  bottom: 12,
+                                  left: 12,
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(9999),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black
+                                              .withValues(alpha: 0.1),
+                                          blurRadius: 4,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Icons.location_on_outlined,
+                                            color: Color(0xFF006B23), size: 14),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Home • 2.4 km away',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: const Color(0xFF1A1C1E),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -220,7 +354,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Apt 4B, Green Valley Heights\nOak Street, Silicon Valley, CA 94043',
+                              addressText,
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 height: 18 / 13,
@@ -263,7 +397,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Robert Fox',
+                                        riderName,
                                         style: GoogleFonts.outfit(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
@@ -336,7 +470,9 @@ class OrderDetailsScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Order Items (3)',
+                        remoteItems.isNotEmpty
+                            ? 'Order Items (${remoteItems.length})'
+                            : 'Order Items (3)',
                         style: GoogleFonts.outfit(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -344,29 +480,53 @@ class OrderDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 14),
-                      _buildOrderItem(
-                        name: 'Organic Hass Avocados',
-                        subtitle: '2 units • \$2.50 each',
-                        price: '\$5.00',
-                        imageUrl:
-                            'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=200&q=80',
-                      ),
-                      const Divider(color: Color(0xFFEEEEF0), height: 20),
-                      _buildOrderItem(
-                        name: 'Fresh Whole Milk',
-                        subtitle: '1 Gallon',
-                        price: '\$4.25',
-                        imageUrl:
-                            'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=200&q=80',
-                      ),
-                      const Divider(color: Color(0xFFEEEEF0), height: 20),
-                      _buildOrderItem(
-                        name: 'Organic Curly Kale',
-                        subtitle: '1 Bundle',
-                        price: '\$3.50',
-                        imageUrl:
-                            'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200&q=80',
-                      ),
+                      if (remoteItems.isNotEmpty)
+                        ...remoteItems.asMap().entries.map((entry) {
+                          final idx = entry.key;
+                          final item = entry.value;
+                          final name = (item['productName'] ?? item['name'] ?? 'Product').toString();
+                          final unit = (item['unitName'] ?? '1 unit').toString();
+                          final qty = (item['quantity'] as num?)?.toInt() ?? 1;
+                          final price = (item['price'] as num?)?.toDouble() ?? 50.0;
+                          return Column(
+                            children: [
+                              if (idx > 0)
+                                const Divider(color: Color(0xFFEEEEF0), height: 20),
+                              _buildOrderItem(
+                                name: name,
+                                subtitle: '$qty x $unit • ₹${price.toStringAsFixed(2)} each',
+                                price: '₹${(price * qty).toStringAsFixed(2)}',
+                                imageUrl:
+                                    'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200&q=80',
+                              ),
+                            ],
+                          );
+                        })
+                      else ...[
+                        _buildOrderItem(
+                          name: 'Organic Hass Avocados',
+                          subtitle: '2 units • ₹80.00 each',
+                          price: '₹160.00',
+                          imageUrl:
+                              'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=200&q=80',
+                        ),
+                        const Divider(color: Color(0xFFEEEEF0), height: 20),
+                        _buildOrderItem(
+                          name: 'Fresh Whole Milk',
+                          subtitle: '1 Litre',
+                          price: '₹65.00',
+                          imageUrl:
+                              'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=200&q=80',
+                        ),
+                        const Divider(color: Color(0xFFEEEEF0), height: 20),
+                        _buildOrderItem(
+                          name: 'Farm Fresh Tomatoes',
+                          subtitle: '500g',
+                          price: '₹35.00',
+                          imageUrl:
+                              'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=200&q=80',
+                        ),
+                      ],
                     ],
                   ),
                 ),
@@ -402,11 +562,11 @@ class OrderDetailsScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 14),
-                      _buildBillRow('Subtotal', '\$12.75'),
+                      _buildBillRow('Subtotal', '₹${subtotal.toStringAsFixed(2)}'),
                       const SizedBox(height: 8),
-                      _buildBillRow('Delivery Fee', '\$2.00'),
+                      _buildBillRow('Delivery Fee', deliveryFee > 0 ? '₹${deliveryFee.toStringAsFixed(2)}' : 'FREE'),
                       const SizedBox(height: 8),
-                      _buildBillRow('Taxes & Charges', '\$1.15'),
+                      _buildBillRow('Taxes & Charges', '₹${taxes.toStringAsFixed(2)}'),
                       const Divider(color: Color(0xFFEEEEF0), height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -420,7 +580,7 @@ class OrderDetailsScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            '\$15.90',
+                            '₹${totalAmount.toStringAsFixed(2)}',
                             style: GoogleFonts.outfit(
                               fontSize: 20,
                               fontWeight: FontWeight.w800,
@@ -446,7 +606,7 @@ class OrderDetailsScreen extends StatelessWidget {
                                 color: Color(0xFF006B23), size: 18),
                             const SizedBox(width: 10),
                             Text(
-                              'Paid via Apple Pay',
+                              'Paid via $paymentMethod',
                               style: GoogleFonts.inter(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -494,32 +654,30 @@ class OrderDetailsScreen extends StatelessWidget {
                       child: ElevatedButton.icon(
                         onPressed: () {
                           try {
-                            context.read<CartProvider>().reorderItems([
-                              CartItem(
-                                id: 'c1',
-                                name: 'Organic Hass Avocados',
-                                subtitle: '2 pcs (approx. 400g)',
-                                price: 180.0,
-                                qty: 1,
-                                image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=200&q=80',
-                              ),
-                              CartItem(
-                                id: 'c2',
-                                name: 'Farm Fresh Milk',
-                                subtitle: '1 Litre',
-                                price: 70.0,
-                                qty: 2,
-                                image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=200&q=80',
-                              ),
-                              CartItem(
-                                id: 'c3',
-                                name: 'Whole Wheat Bread',
-                                subtitle: '400g',
-                                price: 50.0,
-                                qty: 1,
-                                image: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=200&q=80',
-                              ),
-                            ]);
+                            if (remoteItems.isNotEmpty) {
+                              final itemsToReorder = remoteItems.map((item) {
+                                return CartItem(
+                                  id: (item['variantId'] ?? item['id'] ?? 'reorder_${DateTime.now().millisecondsSinceEpoch}').toString(),
+                                  name: (item['productName'] ?? item['name'] ?? 'Item').toString(),
+                                  subtitle: (item['unitName'] ?? '1 pack').toString(),
+                                  price: (item['price'] as num?)?.toDouble() ?? 50.0,
+                                  qty: (item['quantity'] as num?)?.toInt() ?? 1,
+                                  image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300',
+                                );
+                              }).toList();
+                              context.read<CartProvider>().reorderItems(itemsToReorder);
+                            } else {
+                              context.read<CartProvider>().reorderItems([
+                                CartItem(
+                                  id: 'c1',
+                                  name: 'Organic Hass Avocados',
+                                  subtitle: '2 pcs (approx. 400g)',
+                                  price: 80.0,
+                                  qty: 1,
+                                  image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=200&q=80',
+                                ),
+                              ]);
+                            }
                           } catch (_) {}
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(

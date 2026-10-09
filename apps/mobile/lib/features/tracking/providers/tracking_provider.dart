@@ -1,9 +1,15 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../../core/network/api_client.dart';
 
 enum DeliveryOrderStatus { placed, packed, outForDelivery, delivered }
 
 class TrackingProvider extends ChangeNotifier {
+  final String? orderId;
+  final ApiClient _apiClient = ApiClient();
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
   DeliveryOrderStatus _status = DeliveryOrderStatus.outForDelivery;
   int _remainingSeconds = 420; // 7 minutes initial ETA
   final int _initialSeconds = 420;
@@ -68,8 +74,74 @@ class TrackingProvider extends ChangeNotifier {
     return 'Arriving in $mins ${mins == 1 ? "Min" : "Mins"}';
   }
 
-  TrackingProvider() {
+  TrackingProvider({this.orderId}) {
     _startLiveSimulation();
+    if (orderId != null && orderId!.isNotEmpty) {
+      _fetchOrderTracking();
+    }
+  }
+
+  Future<void> _fetchOrderTracking() async {
+    final cleanId = orderId!.replaceAll('#', '').trim();
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final res = await _apiClient.get('/orders/$cleanId/tracking');
+      if (res['success'] == true && res['order'] != null) {
+        final orderData = res['order'];
+        final stepStatus = res['stepStatus'] ?? orderData['status'];
+        if (stepStatus == 'DELIVERED') {
+          _status = DeliveryOrderStatus.delivered;
+        } else if (stepStatus == 'OUT_FOR_DELIVERY') {
+          _status = DeliveryOrderStatus.outForDelivery;
+        } else if (stepStatus == 'PACKING' || stepStatus == 'READY_FOR_PICKUP') {
+          _status = DeliveryOrderStatus.packed;
+        } else {
+          _status = DeliveryOrderStatus.placed;
+        }
+
+        if (res['driverLocation'] is Map) {
+          final lat = res['driverLocation']['lat'];
+          final lng = res['driverLocation']['lng'];
+          if (lat is num && lng is num) {
+            _driverLat = lat.toDouble();
+            _driverLng = lng.toDouble();
+          }
+        }
+
+        if (res['estimatedEtaMins'] is num) {
+          _remainingSeconds = (res['estimatedEtaMins'] as num).toInt() * 60;
+        }
+
+        if (orderData['deliveryPartner'] is Map) {
+          final dp = orderData['deliveryPartner'];
+          driverInfo['name'] = dp['fullName'] ?? driverInfo['name'];
+          driverInfo['phone'] = dp['phoneNumber'] ?? driverInfo['phone'];
+          if (dp['avatarUrl'] != null) {
+            driverInfo['avatarUrl'] = dp['avatarUrl'];
+          }
+        }
+
+        if (orderData['items'] is List && (orderData['items'] as List).isNotEmpty) {
+          orderItems.clear();
+          for (var it in (orderData['items'] as List)) {
+            final variant = it['variant'] ?? {};
+            final product = variant['product'] ?? {};
+            orderItems.add({
+              'name': product['name'] ?? 'Grocery Item',
+              'qty': '${it['quantity'] ?? 1} Pack',
+              'price': '₹${it['totalPrice'] ?? it['price'] ?? 0}',
+              'icon': '🛒',
+            });
+          }
+        }
+      }
+    } catch (_) {
+      // Graceful fallback to default simulation
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
   void _startLiveSimulation() {

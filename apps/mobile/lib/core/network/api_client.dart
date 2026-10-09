@@ -64,6 +64,20 @@ class ApiClient {
     }
   }
 
+  Future<Map<String, dynamic>> put(String endpoint, Map<String, dynamic> body, {String? token, Duration timeout = const Duration(seconds: 15)}) async {
+    try {
+      final response = await _httpClient.put(
+        _resolveUri(endpoint),
+        headers: _headers(token),
+        body: jsonEncode(body),
+      ).timeout(timeout);
+      return _parseResponse(response);
+    } catch (e) {
+      debugPrint('ApiClient PUT $endpoint error: $e');
+      return {'success': false, 'error': e.toString()};
+    }
+  }
+
   Future<Map<String, dynamic>> patch(String endpoint, Map<String, dynamic> body, {String? token, Duration timeout = const Duration(seconds: 15)}) async {
     try {
       final response = await _httpClient.patch(
