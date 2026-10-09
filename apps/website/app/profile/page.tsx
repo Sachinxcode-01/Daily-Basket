@@ -6,18 +6,54 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { User, MapPin, CreditCard, ShoppingBag, Award, ArrowLeft, Zap, ChevronRight } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
+import { User, MapPin, CreditCard, ShoppingBag, Award, ArrowLeft, Zap, ChevronRight, RotateCcw, Trash2, Plus } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import HeaderNavBar from '../../components/navigation/HeaderNavBar';
-import { useCurrentUserId } from '../../store/useCart';
+import { useCurrentUserId, useCart } from '../../store/useCart';
 import { useAuthStore } from '../../store/useAuthStore';
 
 export default function CustomerProfileDashboardPage() {
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const cart = useCart();
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses' | 'wallet'>('profile');
+  const [reorderingId, setReorderingId] = useState<string | null>(null);
   const userId = useCurrentUserId();
   const { user: authUser, isAuthenticated } = useAuthStore();
+
+  const handleReorder = async (e: React.MouseEvent, ord: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setReorderingId(ord.id);
+    try {
+      if (ord.items && Array.isArray(ord.items)) {
+        for (const item of ord.items) {
+          await cart.addItem.mutateAsync({
+            variantId: item.variantId || item.id,
+            productName: item.productName || item.variant?.product?.name || 'Grocery Item',
+            unitName: item.unitName || '1 pack',
+            price: Number(item.price) || 0,
+            quantity: item.quantity || 1,
+          });
+        }
+      }
+      router.push('/cart');
+    } catch {
+      // ignore
+    } finally {
+      setReorderingId(null);
+    }
+  };
+
+  const handleDeleteAddress = async (id: string) => {
+    try {
+      await apiClient.deleteAddress(id, userId);
+      queryClient.invalidateQueries({ queryKey: ['addresses', userId] });
+    } catch {}
+  };
 
   const { data: ordersData, isLoading: ordersLoading } = useQuery({
     queryKey: ['orders', userId],
@@ -182,27 +218,36 @@ export default function CustomerProfileDashboardPage() {
                 ) : (
                   <div className="space-y-4">
                     {orders.map((ord) => (
-                      <Link
+                      <div
                         key={ord.id}
-                        href={`/tracking/${ord.id}`}
-                        className="p-5 rounded-2xl border border-gray-100 hover:border-emerald-200 transition flex items-center justify-between"
+                        className="p-5 rounded-2xl border border-gray-100 hover:border-emerald-200 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                       >
-                        <div>
-                          <div className="font-bold text-gray-900">{ord.orderNumber}</div>
-                          <div className="text-xs text-gray-500">
+                        <Link href={`/tracking/${ord.id}`} className="flex-1 group">
+                          <div className="font-bold text-gray-900 group-hover:text-[#006B23] transition flex items-center gap-2">
+                            <span>{ord.orderNumber}</span>
+                            <ChevronRight className="w-4 h-4 text-gray-400 group-hover:text-[#006B23] transition" />
+                          </div>
+                          <div className="text-xs text-gray-500 mt-1">
                             {new Date(ord.createdAt).toLocaleDateString()} • {ord.items?.length ?? 0} items
                           </div>
-                        </div>
-                        <div className="text-right flex items-center gap-3">
-                          <div>
+                        </Link>
+                        <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-50">
+                          <div className="text-right">
                             <div className="font-bold text-gray-900">{formatCurrency(ord.totalAmount)}</div>
                             <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">
                               {ord.status}
                             </span>
                           </div>
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                          <button
+                            onClick={(e) => handleReorder(e, ord)}
+                            disabled={reorderingId === ord.id}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-[#006B23] text-xs font-bold transition shadow-sm"
+                          >
+                            <RotateCcw className={`w-3.5 h-3.5 ${reorderingId === ord.id ? 'animate-spin' : ''}`} />
+                            <span>{reorderingId === ord.id ? 'Adding...' : 'Reorder'}</span>
+                          </button>
                         </div>
-                      </Link>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -211,33 +256,51 @@ export default function CustomerProfileDashboardPage() {
 
             {activeTab === 'addresses' && (
               <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-xl space-y-6">
-                <h3 className="text-xl font-bold font-outfit text-gray-900 border-b border-gray-100 pb-4">
-                  Saved Delivery Addresses
-                </h3>
+                <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                  <h3 className="text-xl font-bold font-outfit text-gray-900">
+                    Saved Delivery Addresses
+                  </h3>
+                  <Link
+                    href="/add-address?returnTo=/profile"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-[#006B23] hover:bg-[#00531a] px-3.5 py-1.5 rounded-full shadow-sm transition"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Add New</span>
+                  </Link>
+                </div>
                 {addresses.length === 0 ? (
                   <div className="text-center py-10 space-y-3">
                     <MapPin className="w-12 h-12 text-gray-300 mx-auto" />
                     <p className="text-sm text-gray-500">No saved addresses.</p>
-                    <Link href="/add-address" className="inline-block text-sm font-bold text-[#006B23] hover:underline">Add an address →</Link>
+                    <Link href="/add-address?returnTo=/profile" className="inline-block text-sm font-bold text-[#006B23] hover:underline">Add an address →</Link>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     {addresses.map((addr) => (
-                      <div key={addr.id} className="p-5 rounded-2xl border border-gray-100 flex items-start gap-4">
-                        <MapPin className="w-5 h-5 text-[#006B23] mt-0.5" />
-                        <div>
-                          <div className="font-bold text-sm text-gray-900 flex items-center gap-2">
-                            <span>{addr.label}</span>
-                            {addr.isDefault && (
-                              <span className="text-[10px] bg-emerald-100 text-[#006B23] px-2 py-0.5 rounded-full font-bold">
-                                DEFAULT
-                              </span>
-                            )}
+                      <div key={addr.id} className="p-5 rounded-2xl border border-gray-100 flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-4">
+                          <MapPin className="w-5 h-5 text-[#006B23] mt-0.5 shrink-0" />
+                          <div>
+                            <div className="font-bold text-sm text-gray-900 flex items-center gap-2">
+                              <span>{addr.label}</span>
+                              {addr.isDefault && (
+                                <span className="text-[10px] bg-emerald-100 text-[#006B23] px-2 py-0.5 rounded-full font-bold">
+                                  DEFAULT
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                              {addr.houseNo}, {addr.street}, {addr.city} - {addr.pincode}
+                            </p>
                           </div>
-                          <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                            {addr.houseNo}, {addr.street}, {addr.city} - {addr.pincode}
-                          </p>
                         </div>
+                        <button
+                          onClick={() => handleDeleteAddress(addr.id)}
+                          title="Delete Address"
+                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     ))}
                   </div>

@@ -128,6 +128,7 @@ export class UsersService {
   }
 
   async getProfile(userId = 'usr_default') {
+    const stored = this.profileStore.get(userId) || this.profileStore.get('usr_default');
     try {
       const user = await this.prisma.user.findUnique({
         where: { id: userId },
@@ -141,9 +142,9 @@ export class UsersService {
             email: user.email || 'customer@dailybasket.com',
             phoneNumber: user.phoneNumber,
             avatarUrl: user.avatarUrl || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400',
-            dob: '1995-08-15',
-            gender: 'Male',
-            language: 'English',
+            dob: stored?.dob ?? '1995-08-15',
+            gender: stored?.gender ?? 'Male',
+            language: stored?.language ?? 'English',
             isVerified: user.isVerified,
             profileCompletion: 100,
           },
@@ -169,15 +170,16 @@ export class UsersService {
           avatarUrl: dto.avatarUrl,
         },
       });
+      const existing = this.profileStore.get(userId) || this.profileStore.get('usr_default');
       const resData = {
         id: updated.id,
         fullName: updated.fullName,
         email: updated.email,
         phoneNumber: updated.phoneNumber,
         avatarUrl: updated.avatarUrl,
-        dob: dto.dob ?? '1995-08-15',
-        gender: dto.gender ?? 'Male',
-        language: dto.language ?? 'English',
+        dob: dto.dob !== undefined ? dto.dob : (existing?.dob ?? '1995-08-15'),
+        gender: dto.gender !== undefined ? dto.gender : (existing?.gender ?? 'Male'),
+        language: dto.language !== undefined ? dto.language : (existing?.language ?? 'English'),
         isVerified: updated.isVerified,
         updatedAt: updated.updatedAt.toISOString(),
       };
@@ -204,22 +206,20 @@ export class UsersService {
         where: { userId },
         orderBy: { createdAt: 'desc' },
       });
-      if (dbAddrs && dbAddrs.length > 0) {
-        const formatted = dbAddrs.map((a) => ({
-          id: a.id,
-          label: a.label,
-          houseNo: a.houseNo,
-          street: a.street,
-          landmark: a.landmark || '',
-          city: a.city,
-          pincode: a.pincode,
-          latitude: a.latitude,
-          longitude: a.longitude,
-          isDefault: a.isDefault,
-        }));
-        this.addressStore.set(userId, formatted);
-        return { success: true, data: formatted };
-      }
+      const formatted = (dbAddrs || []).map((a) => ({
+        id: a.id,
+        label: a.label,
+        houseNo: a.houseNo,
+        street: a.street,
+        landmark: a.landmark || '',
+        city: a.city,
+        pincode: a.pincode,
+        latitude: a.latitude,
+        longitude: a.longitude,
+        isDefault: a.isDefault,
+      }));
+      this.addressStore.set(userId, formatted);
+      return { success: true, data: formatted };
     } catch (err: any) {
       this.logger.warn(`Database getAddresses fallback for ${userId}: ${err?.message}`);
     }
@@ -229,28 +229,33 @@ export class UsersService {
   }
 
   async createAddress(userId = 'usr_default', dto: UserAddressDto) {
+    const lat = dto.latitude != null && !isNaN(Number(dto.latitude)) ? Number(dto.latitude) : 12.9716;
+    const lng = dto.longitude != null && !isNaN(Number(dto.longitude)) ? Number(dto.longitude) : 77.5946;
+
     try {
       await this.ensureUser(userId);
       const isDefault = dto.isDefault ?? true;
-      if (isDefault) {
-        await this.prisma.address.updateMany({
-          where: { userId },
-          data: { isDefault: false },
+      const created = await this.prisma.$transaction(async (tx) => {
+        if (isDefault) {
+          await tx.address.updateMany({
+            where: { userId },
+            data: { isDefault: false },
+          });
+        }
+        return tx.address.create({
+          data: {
+            userId,
+            label: dto.label || 'HOME',
+            houseNo: dto.houseNo || '',
+            street: dto.street || '',
+            landmark: dto.landmark || null,
+            city: dto.city || 'Bengaluru',
+            pincode: dto.pincode || '560038',
+            latitude: lat,
+            longitude: lng,
+            isDefault,
+          },
         });
-      }
-      const created = await this.prisma.address.create({
-        data: {
-          userId,
-          label: dto.label || 'HOME',
-          houseNo: dto.houseNo || '',
-          street: dto.street || '',
-          landmark: dto.landmark || null,
-          city: dto.city || 'Bengaluru',
-          pincode: dto.pincode || '560038',
-          latitude: Number(dto.latitude) || 12.9716,
-          longitude: Number(dto.longitude) || 77.5946,
-          isDefault,
-        },
       });
 
       const formatted: UserAddressDto = {
@@ -282,6 +287,8 @@ export class UsersService {
     const newAddr = {
       ...dto,
       id: `addr_${Date.now()}`,
+      latitude: lat,
+      longitude: lng,
       isDefault: addrs.length === 0 || dto.isDefault === true,
     };
     if (newAddr.isDefault) {
@@ -294,26 +301,38 @@ export class UsersService {
 
   async updateAddress(userId = 'usr_default', id: string, dto: Partial<UserAddressDto>) {
     try {
-      if (dto.isDefault) {
-        await this.prisma.address.updateMany({
-          where: { userId },
-          data: { isDefault: false },
+      const updated = await this.prisma.$transaction(async (tx) => {
+        if (dto.isDefault) {
+          await tx.address.updateMany({
+            where: { userId },
+            data: { isDefault: false },
+          });
+        }
+        const res = await tx.address.updateMany({
+          where: { id, userId },
+          data: {
+            label: dto.label,
+            houseNo: dto.houseNo,
+            street: dto.street,
+            landmark: dto.landmark,
+            city: dto.city,
+            pincode: dto.pincode,
+            latitude: dto.latitude != null && !isNaN(Number(dto.latitude)) ? Number(dto.latitude) : undefined,
+            longitude: dto.longitude != null && !isNaN(Number(dto.longitude)) ? Number(dto.longitude) : undefined,
+            isDefault: dto.isDefault,
+          },
         });
-      }
-      const updated = await this.prisma.address.update({
-        where: { id },
-        data: {
-          label: dto.label,
-          houseNo: dto.houseNo,
-          street: dto.street,
-          landmark: dto.landmark,
-          city: dto.city,
-          pincode: dto.pincode,
-          latitude: dto.latitude != null ? Number(dto.latitude) : undefined,
-          longitude: dto.longitude != null ? Number(dto.longitude) : undefined,
-          isDefault: dto.isDefault,
-        },
+        if (res.count === 0) {
+          throw new NotFoundException('Address not found');
+        }
+        return tx.address.findFirst({
+          where: { id, userId },
+        });
       });
+
+      if (!updated) {
+        throw new NotFoundException('Address not found');
+      }
 
       const formatted: UserAddressDto = {
         id: updated.id,
@@ -340,6 +359,9 @@ export class UsersService {
 
       return { success: true, data: formatted, message: 'Address updated successfully' };
     } catch (err: any) {
+      if (err instanceof NotFoundException) {
+        throw err;
+      }
       this.logger.warn(`Database updateAddress fallback for ${id}: ${err?.message}`);
     }
 
@@ -357,8 +379,8 @@ export class UsersService {
 
   async deleteAddress(userId = 'usr_default', id: string) {
     try {
-      await this.prisma.address.delete({
-        where: { id },
+      await this.prisma.address.deleteMany({
+        where: { id, userId },
       });
     } catch (err: any) {
       this.logger.warn(`Database deleteAddress fallback for ${id}: ${err?.message}`);

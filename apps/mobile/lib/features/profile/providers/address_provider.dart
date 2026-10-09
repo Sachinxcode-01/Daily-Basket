@@ -34,6 +34,9 @@ class AddressProvider extends ChangeNotifier {
   String _fetchingProgressText = 'Detecting GPS Location...';
   bool _isLoading = false;
   final ApiClient _apiClient = ApiClient();
+  Map<String, dynamic>? currentProfile;
+
+  AddressProvider({this.currentProfile});
 
   final List<Map<String, dynamic>> _addresses = [
     {
@@ -94,7 +97,10 @@ class AddressProvider extends ChangeNotifier {
   }
 
   /// Fetches saved delivery addresses from the NestJS Backend API
-  Future<void> fetchBackendAddresses() async {
+  Future<void> fetchBackendAddresses([Map<String, dynamic>? profile]) async {
+    if (profile != null) {
+      currentProfile = profile;
+    }
     _isLoading = true;
     notifyListeners();
 
@@ -103,25 +109,27 @@ class AddressProvider extends ChangeNotifier {
 
       if (res['success'] == true && res['data'] is List) {
         final List<dynamic> list = res['data'];
-        if (list.isNotEmpty) {
-          _addresses.clear();
-          for (var item in list) {
-            _addresses.add({
-              'id': item['id']?.toString() ?? 'addr_${DateTime.now().millisecondsSinceEpoch}',
-              'label': item['label'] ?? 'Home',
-              'fullName': 'Rahul Sharma',
-              'phone': '+91 98765 43210',
-              'houseFlat': item['houseNo'] ?? item['houseFlat'] ?? '',
-              'streetArea': item['street'] ?? item['streetArea'] ?? '',
-              'pincode': item['pincode'] ?? '560038',
-              'city': item['city'] ?? 'Bengaluru',
-              'landmark': item['landmark'] ?? '',
-              'addressText': '${item['houseNo'] ?? ''}, ${item['street'] ?? ''}, ${item['city'] ?? 'Bengaluru'} - ${item['pincode'] ?? ''}',
-              'isDefault': item['isDefault'] ?? false,
-              'type': (item['label'] ?? 'HOME').toString().toUpperCase(),
-              'inRange': true,
-            });
-          }
+        _addresses.clear();
+        for (var item in list) {
+          final resolvedName = item['fullName'] ?? item['name'] ?? currentProfile?['fullName'] ?? currentProfile?['name'];
+          final resolvedPhone = item['phone'] ?? item['phoneNumber'] ?? currentProfile?['phone'] ?? currentProfile?['phoneNumber'];
+
+          final addressItem = <String, dynamic>{
+            'id': item['id']?.toString() ?? 'addr_${DateTime.now().millisecondsSinceEpoch}',
+            'label': item['label'] ?? 'Home',
+            if (resolvedName != null && resolvedName.toString().isNotEmpty) 'fullName': resolvedName.toString(),
+            if (resolvedPhone != null && resolvedPhone.toString().isNotEmpty) 'phone': resolvedPhone.toString(),
+            'houseFlat': item['houseNo'] ?? item['houseFlat'] ?? '',
+            'streetArea': item['street'] ?? item['streetArea'] ?? '',
+            'pincode': item['pincode'] ?? '560038',
+            'city': item['city'] ?? 'Bengaluru',
+            'landmark': item['landmark'] ?? '',
+            'addressText': '${item['houseNo'] ?? ''}, ${item['street'] ?? ''}, ${item['city'] ?? 'Bengaluru'} - ${item['pincode'] ?? ''}',
+            'isDefault': item['isDefault'] ?? false,
+            'type': (item['label'] ?? 'HOME').toString().toUpperCase(),
+            'inRange': true,
+          };
+          _addresses.add(addressItem);
         }
       }
     } catch (_) {
@@ -240,11 +248,19 @@ class AddressProvider extends ChangeNotifier {
     };
     notifyListeners();
 
+    final apiPayload = Map<String, dynamic>.from(updatedData);
+    if (apiPayload.containsKey('houseFlat')) {
+      apiPayload['houseNo'] = apiPayload['houseFlat'];
+    }
+    if (apiPayload.containsKey('streetArea')) {
+      apiPayload['street'] = apiPayload['streetArea'];
+    }
+
     // Async sync with NestJS API
     try {
       await _apiClient.put(
         '/addresses/$id',
-        updatedData,
+        apiPayload,
       );
     } catch (_) {}
 

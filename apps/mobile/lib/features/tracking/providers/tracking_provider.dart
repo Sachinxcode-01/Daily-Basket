@@ -9,6 +9,8 @@ class TrackingProvider extends ChangeNotifier {
   final ApiClient _apiClient = ApiClient();
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+  bool _isDisposed = false;
+  bool get isDisposed => _isDisposed;
 
   DeliveryOrderStatus _status = DeliveryOrderStatus.outForDelivery;
   int _remainingSeconds = 420; // 7 minutes initial ETA
@@ -140,7 +142,9 @@ class TrackingProvider extends ChangeNotifier {
       // Graceful fallback to default simulation
     } finally {
       _isLoading = false;
-      notifyListeners();
+      if (!_isDisposed) {
+        notifyListeners();
+      }
     }
   }
 
@@ -189,6 +193,7 @@ class TrackingProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    _isDisposed = true;
     _timer?.cancel();
     super.dispose();
   }

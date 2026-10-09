@@ -10,7 +10,7 @@ import { apiClient } from '@daily-basket/api-client';
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const token = searchParams.get('token') || 'demo_reset_token';
+  const token = searchParams?.get('token') || 'demo_reset_token';
 
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

@@ -1,15 +1,40 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { apiClient } from '@daily-basket/api-client';
+import { useCurrentUserId } from '../../store/useCart';
 
 /**
  * Add / Edit Delivery Address Page
  * Google Stitch Screen ID: 2743ef4c5bb54d7294444b23f082597e
  * Source of Truth: Daily Basket Quick-Commerce Suite
  */
-export default function AddDeliveryAddressPage() {
+
+function getSafeReturnTo(raw: string | null | undefined): string {
+  if (!raw || typeof raw !== 'string') {
+    return '/profile';
+  }
+  // Reject absolute URLs, protocol-relative URLs, and backslash bypasses
+  if (!raw.startsWith('/') || raw.startsWith('//') || raw.includes('\\')) {
+    return '/profile';
+  }
+  try {
+    const url = new URL(raw, 'http://localhost');
+    if (url.origin !== 'http://localhost') {
+      return '/profile';
+    }
+    return `${url.pathname}${url.search}${url.hash}`;
+  } catch {
+    return '/profile';
+  }
+}
+
+function AddDeliveryAddressInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnTo = getSafeReturnTo(searchParams?.get('returnTo'));
+  const userId = useCurrentUserId();
 
   const [fullName, setFullName] = useState('Rahul Sharma');
   const [mobile, setMobile] = useState('9876543210');
@@ -19,25 +44,64 @@ export default function AddDeliveryAddressPage() {
   const [area, setArea] = useState('100ft Road, Indiranagar');
   const [landmark, setLandmark] = useState('');
   const [addressType, setAddressType] = useState('home');
+  const [coordinates, setCoordinates] = useState<{ latitude: number; longitude: number } | null>(null);
   const [isLocating, setIsLocating] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   const handleUseCurrentLocation = () => {
     setIsLocating(true);
-    setTimeout(() => {
-      setIsLocating(false);
-      setPincode('560038');
-      setArea('100ft Road, Indiranagar');
-    }, 600);
+    if (typeof navigator !== 'undefined' && 'geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setCoordinates({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          setIsLocating(false);
+          setPincode('560038');
+          setArea('100ft Road, Indiranagar');
+        },
+        () => {
+          setIsLocating(false);
+          setPincode('560038');
+          setArea('100ft Road, Indiranagar');
+        },
+        { enableHighAccuracy: true, timeout: 5000 },
+      );
+    } else {
+      setTimeout(() => {
+        setIsLocating(false);
+        setPincode('560038');
+        setArea('100ft Road, Indiranagar');
+      }, 600);
+    }
   };
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSave = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
     setIsSaving(true);
-    setTimeout(() => {
+    setSaveError(null);
+    try {
+      await apiClient.createAddress(
+        {
+          label: addressType.toUpperCase(),
+          houseNo: house,
+          street: area,
+          landmark: landmark || undefined,
+          city,
+          pincode,
+          ...(coordinates ? { latitude: coordinates.latitude, longitude: coordinates.longitude } : {}),
+          isDefault: true,
+        },
+        userId,
+      );
+      router.push(returnTo);
+    } catch (err: any) {
+      setSaveError(err?.message || 'Failed to save address. Please try again.');
+    } finally {
       setIsSaving(false);
-      router.push('/saved-addresses');
-    }, 500);
+    }
   };
 
   return (
@@ -90,6 +154,16 @@ export default function AddDeliveryAddressPage() {
             </p>
           </div>
         </div>
+
+        {saveError && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-3.5 flex items-start gap-3 text-red-700">
+            <span className="material-symbols-outlined text-red-600 mt-0.5 text-lg">error</span>
+            <div>
+              <p className="text-sm font-semibold">Error Saving Address</p>
+              <p className="text-xs text-red-600/90 mt-0.5">{saveError}</p>
+            </div>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSave} className="space-y-5">
@@ -147,7 +221,10 @@ export default function AddDeliveryAddressPage() {
                   <input
                     type="text"
                     value={pincode}
-                    onChange={(e) => setPincode(e.target.value)}
+                    onChange={(e) => {
+                      setPincode(e.target.value);
+                      setCoordinates(null);
+                    }}
                     maxLength={6}
                     placeholder="560038"
                     className="w-full bg-transparent border-none text-[#1a1c1e] text-sm p-0 focus:ring-0 pr-6"
@@ -180,7 +257,10 @@ export default function AddDeliveryAddressPage() {
                 <input
                   type="text"
                   value={house}
-                  onChange={(e) => setHouse(e.target.value)}
+                  onChange={(e) => {
+                    setHouse(e.target.value);
+                    setCoordinates(null);
+                  }}
                   placeholder="e.g. B-14, Ground Floor"
                   className="w-full bg-transparent border-none text-[#1a1c1e] text-sm p-0 focus:ring-0"
                   required
@@ -194,7 +274,10 @@ export default function AddDeliveryAddressPage() {
                 <input
                   type="text"
                   value={area}
-                  onChange={(e) => setArea(e.target.value)}
+                  onChange={(e) => {
+                    setArea(e.target.value);
+                    setCoordinates(null);
+                  }}
                   placeholder="e.g. 100ft Road, Indiranagar"
                   className="w-full bg-transparent border-none text-[#1a1c1e] text-sm p-0 focus:ring-0"
                   required
@@ -261,5 +344,13 @@ export default function AddDeliveryAddressPage() {
         </button>
       </div>
     </div>
+  );
+}
+
+export default function AddDeliveryAddressPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#f9f9fc]" />}>
+      <AddDeliveryAddressInner />
+    </Suspense>
   );
 }

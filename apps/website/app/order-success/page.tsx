@@ -10,7 +10,7 @@ import { apiClient } from '@daily-basket/api-client';
 
 function OrderSuccessInner() {
   const searchParams = useSearchParams();
-  const orderId = searchParams.get('orderId') || '';
+  const orderId = searchParams?.get('orderId') || '';
 
   const [countdownSeconds, setCountdownSeconds] = useState(600); // 10 minutes
 

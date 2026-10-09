@@ -11,7 +11,7 @@ import { apiClient } from '@daily-basket/api-client';
 function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const emailParam = searchParams.get('email') || 'jane@example.com';
+  const emailParam = searchParams?.get('email') || 'jane@example.com';
 
   const [resendCountdown, setResendCountdown] = useState(0);
   const [isLoading, setIsLoading] = useState(false);

@@ -103,6 +103,62 @@ export default function OrderManagementPage() {
   const [selectedOrderForPrint, setSelectedOrderForPrint] = useState<string | null>(null);
   const [liveToast, setLiveToast] = useState<string | null>(null);
 
+  // Fetch live backend orders on load
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLiveOrders = async () => {
+      try {
+        const liveOrders = await apiClient.listOrders('usr_default');
+        if (isMounted && Array.isArray(liveOrders) && liveOrders.length > 0) {
+          const statusMap: Record<string, number> = {
+            CREATED: 0,
+            CONFIRMED: 1,
+            PACKING: 2,
+            READY_FOR_PICKUP: 2,
+            OUT_FOR_DELIVERY: 3,
+            DELIVERED: 4,
+          };
+          const mapped = liveOrders.map((ord: any) => {
+            const rawAddress = ord.address;
+            const streetAddress = rawAddress?.street
+              ? `${rawAddress.houseNo || ''} ${rawAddress.street}, ${rawAddress.city || ''}`.trim()
+              : typeof rawAddress?.streetAddress === 'string'
+              ? rawAddress.streetAddress
+              : 'Indiranagar, Bengaluru';
+            const phone = rawAddress?.phoneNumber || ord.customer?.phoneNumber || '+91 98765 43210';
+            const orderNumber = ord.orderNumber || ord.id || `DB-${Date.now().toString().slice(-4)}`;
+            const formattedId = orderNumber.startsWith('#') ? orderNumber : `#${orderNumber}`;
+
+            return {
+              id: formattedId,
+              customer: ord.customer?.fullName || rawAddress?.name || 'Customer App User',
+              address: streetAddress,
+              phone,
+              hasMissingRequiredData: false,
+              avatar: ord.customer?.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+              amount: `₹${ord.totalAmount || 0}`,
+              isPriority: true,
+              statusStep: statusMap[ord.status] ?? 0,
+              time: ord.createdAt
+                ? new Date(ord.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : 'Just now',
+              paymentMethod: `Paid via ${ord.paymentMethod || 'UPI'}`,
+              items: Array.isArray(ord.items) && ord.items.length > 0
+                ? ord.items.map((i: any) => `${i.productName || i.variant?.product?.name || 'Grocery Item'} x${i.quantity || 1}`)
+                : ['Organic Basket x1'],
+              isSimulated: false,
+            };
+          });
+          setOrders(mapped);
+        }
+      } catch {}
+    };
+    fetchLiveOrders();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Subscribe to real-time Admin WebSockets
   useEffect(() => {
     const socket = getAdminSocket('admin_dispatch');

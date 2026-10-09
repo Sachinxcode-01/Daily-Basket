@@ -573,13 +573,19 @@ export default function DeliveryManagementPage() {
                     </span>
                   </div>
 
-                  {/* Rider 1: Ramesh Kumar (Schematic Marker) */}
-                  <div className="absolute left-[52%] top-[56%] -translate-x-1/2 -translate-y-1/2 text-center z-20">
+                  {/* Rider 1: Ramesh Kumar (Live Dynamic Telemetry Marker) */}
+                  <div
+                    style={{
+                      left: `${Math.min(85, Math.max(25, 25 + ((liveRiderCoords.lng - 77.58) / 0.08) * 60))}%`,
+                      top: `${Math.min(85, Math.max(25, 25 + ((12.98 - liveRiderCoords.lat) / 0.08) * 50))}%`,
+                    }}
+                    className="absolute -translate-x-1/2 -translate-y-1/2 text-center z-20 transition-all duration-700 ease-out"
+                  >
                     <div className="w-10 h-10 rounded-full bg-[#006837] text-white flex items-center justify-center shadow-xl border-2 border-white ring-4 ring-emerald-400/40">
                       <Bike className="w-5 h-5 text-white" />
                     </div>
                     <span className="text-[10px] font-extrabold text-[#006837] bg-white px-2 py-0.5 rounded-full shadow-md mt-1 inline-block whitespace-nowrap">
-                      Ramesh K. (Schematic Pin)
+                      Ramesh K. (Live GPS ⚡)
                     </span>
                   </div>
 

@@ -175,6 +175,46 @@ export class ApiClient {
     return this.fetcher(`/api/v1/addresses?userId=${encodeURIComponent(userId)}`);
   }
 
+  public async createAddress(addressData: {
+    label: string;
+    houseNo: string;
+    street: string;
+    landmark?: string;
+    city: string;
+    pincode: string;
+    latitude?: number;
+    longitude?: number;
+    isDefault?: boolean;
+  }, userId = 'usr_default'): Promise<any> {
+    return this.fetcher('/api/v1/addresses', {
+      method: 'POST',
+      body: JSON.stringify({ ...addressData, userId }),
+    });
+  }
+
+  public async updateAddress(id: string, addressData: Partial<{
+    label: string;
+    houseNo: string;
+    street: string;
+    landmark?: string;
+    city: string;
+    pincode: string;
+    latitude?: number;
+    longitude?: number;
+    isDefault?: boolean;
+  }>, userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/addresses/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ ...addressData, userId }),
+    });
+  }
+
+  public async deleteAddress(id: string, userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/addresses/${id}?userId=${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Payment Methods (Razorpay)
   public async initiatePayment(orderId: string, amount: number): Promise<{ success: boolean; razorpayOrderId: string; amount: number; currency: string; keyId: string }> {
     return this.fetcher(API_ROUTES.PAYMENTS.INITIATE, {

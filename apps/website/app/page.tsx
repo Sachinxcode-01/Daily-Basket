@@ -80,8 +80,13 @@ export default function HomePage() {
   }, [catalog]);
 
   // Live order banner is shown only when the customer actually has an active order.
-  // TODO(Batch 4): populate from the orders/tracking API + Socket.IO instead of a placeholder.
-  const activeOrder: { orderNumber: string; etaMins: number; riderName: string; distanceText: string; area: string } | null = null;
+  const [activeOrder] = useState<{
+    orderNumber: string;
+    etaMins: number;
+    riderName: string;
+    distanceText: string;
+    area: string;
+  } | null>(null);
 
   const featuredProduct = catalog[0] ?? null;
 

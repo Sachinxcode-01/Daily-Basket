@@ -25,7 +25,7 @@ const PAYMENT_ENUM: Record<PaymentChoice, string> = {
 function CheckoutInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const couponCode = searchParams.get('coupon') || undefined;
+  const couponCode = searchParams?.get('coupon') || undefined;
 
   const { activeItems, userId, clear } = useCart();
   const [selectedPayment, setSelectedPayment] = useState<PaymentChoice>('UPI');
@@ -159,7 +159,7 @@ function CheckoutInner() {
                 <MapPin className="w-4 h-4" />
                 <span>Delivery Address</span>
               </div>
-              <Link href="/add-address" className="text-xs font-bold text-emerald-400 hover:underline">Change</Link>
+              <Link href="/add-address?returnTo=/checkout" className="text-xs font-bold text-emerald-400 hover:underline">Change</Link>
             </div>
             {address ? (
               <>
