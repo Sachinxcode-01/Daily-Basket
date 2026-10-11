@@ -156,5 +156,7 @@ jobs:
         working-directory: apps/mobile
 
       - name: Run Flutter Tests
+        env:
+          FLUTTER_TEST: 'true'
         run: flutter test
         working-directory: apps/mobile

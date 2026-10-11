@@ -96,7 +96,7 @@ jobs:
         run: pnpm --filter api run prisma:generate
 
       - name: Run Unit & Benchmark Tests
-        run: pnpm --filter api run test -- --forceExit --maxWorkers=2
+        run: pnpm --filter api run test
 
   docker-build-and-push:
     name: 🐳 Docker Multi-Stage Build & Image Push

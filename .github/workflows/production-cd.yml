@@ -48,7 +48,7 @@ jobs:
           npx prisma generate
 
       - name: NestJS Unit & Security Tests
-        run: pnpm --filter api run test -- --forceExit --maxWorkers=2
+        run: pnpm --filter api run test
 
       - name: Security Vulnerability Audit
         run: pnpm audit --audit-level high || true
@@ -66,6 +66,8 @@ jobs:
           cache: true
 
       - name: Flutter Static Analysis & Tests
+        env:
+          FLUTTER_TEST: 'true'
         run: |
           cd apps/mobile
           flutter pub get
