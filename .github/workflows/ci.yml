@@ -88,7 +88,7 @@ jobs:
         run: pnpm --filter api run prisma:generate
 
       - name: Run API Unit Tests
-        run: pnpm --filter api run test -- --forceExit --maxWorkers=2
+        run: pnpm --filter api run test
 
   build-verification:
     name: Verify Builds

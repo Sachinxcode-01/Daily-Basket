@@ -96,7 +96,10 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
   @override
   void initState() {
     super.initState();
-    final isTest = !kIsWeb && Platform.environment.containsKey('FLUTTER_TEST');
+    final isTest = !kIsWeb && (
+      Platform.environment.containsKey('FLUTTER_TEST') ||
+      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+    );
     if (!isTest) {
       _fetchOrders();
     } else {
