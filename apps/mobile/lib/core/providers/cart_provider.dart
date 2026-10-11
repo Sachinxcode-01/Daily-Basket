@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import '../network/api_client.dart';
 
 class CartItem {
@@ -59,7 +60,10 @@ class CartProvider extends ChangeNotifier {
 
   CartProvider({ApiClient? apiClient, bool autoFetch = true})
       : _apiClient = apiClient ?? ApiClient() {
-    final isTest = !kIsWeb && Platform.environment.containsKey('FLUTTER_TEST');
+    final isTest = !kIsWeb && (
+      Platform.environment.containsKey('FLUTTER_TEST') ||
+      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+    );
     if (autoFetch && !isTest) {
       fetchCartFromApi();
     }
