@@ -414,22 +414,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ),
                       ],
                       const Divider(height: 24, color: Color(0xFFE2E8F0)),
-                      SwitchListTile(
-                        value: checkoutProvider.useWallet,
-                        onChanged: (val) {
-                          checkoutProvider.toggleWallet(val);
-                          _recalculate();
-                        },
-                        title: Text(
-                          'Use Daily Basket Wallet',
-                          style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                      Material(
+                        color: Colors.transparent,
+                        child: SwitchListTile(
+                          value: checkoutProvider.useWallet,
+                          onChanged: (val) {
+                            checkoutProvider.toggleWallet(val);
+                            _recalculate();
+                          },
+                          title: Text(
+                            'Use Daily Basket Wallet',
+                            style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                          ),
+                          subtitle: Text(
+                            'Available Balance: ₹150.00',
+                            style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+                          ),
+                          activeTrackColor: AppColors.primary,
+                          contentPadding: EdgeInsets.zero,
                         ),
-                        subtitle: Text(
-                          'Available Balance: ₹150.00',
-                          style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
-                        ),
-                        activeTrackColor: AppColors.primary,
-                        contentPadding: EdgeInsets.zero,
                       ),
                     ],
                   ),

@@ -1086,17 +1086,20 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
                       const SizedBox(height: 18),
 
                       // 4. In Stock Toggle
-                      SwitchListTile(
-                        contentPadding: EdgeInsets.zero,
-                        title: Text('In-Stock Items Only', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
-                        subtitle: Text('Exclude items currently sold out', style: GoogleFonts.inter(fontSize: 12, color: AppColors.outline)),
-                        value: provider.inStockOnly,
-                        activeThumbColor: AppColors.primary,
-                        activeTrackColor: AppColors.primary.withValues(alpha: 0.4),
-                        onChanged: (val) {
-                          provider.setInStockOnly(val);
-                          setModalState(() {});
-                        },
+                      Material(
+                        color: Colors.transparent,
+                        child: SwitchListTile(
+                          contentPadding: EdgeInsets.zero,
+                          title: Text('In-Stock Items Only', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600)),
+                          subtitle: Text('Exclude items currently sold out', style: GoogleFonts.inter(fontSize: 12, color: AppColors.outline)),
+                          value: provider.inStockOnly,
+                          activeThumbColor: AppColors.primary,
+                          activeTrackColor: AppColors.primary.withValues(alpha: 0.4),
+                          onChanged: (val) {
+                            provider.setInStockOnly(val);
+                            setModalState(() {});
+                          },
+                        ),
                       ),
 
                       const SizedBox(height: 24),
