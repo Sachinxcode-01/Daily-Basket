@@ -20,6 +20,7 @@ jobs:
   test-and-audit:
     name: Test & Security Audit
     runs-on: ubuntu-latest
+    permissions: write-all
 
     steps:
       - name: Checkout Code
@@ -74,6 +75,36 @@ jobs:
           flutter analyze --no-fatal-infos
           set -o pipefail
           flutter test --reporter=expanded 2>&1 | tee test_log.txt
+
+      - name: Post Flutter Test Log to Commit Comment
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          node -e "
+            const https = require('https');
+            const fs = require('fs');
+            if (fs.existsSync('apps/mobile/test_log.txt')) {
+              const log = fs.readFileSync('apps/mobile/test_log.txt', 'utf8');
+              const lines = log.split('\n');
+              const failed = lines.filter(l => l.includes('FAIL') || l.includes('Error') || l.includes('Exception') || l.includes('Expected') || l.includes('test failed') || l.includes('══'));
+              const msg = failed.length ? failed.slice(-25).join('\n') : lines.slice(-35).join('\n');
+              const payload = JSON.stringify({ body: '### Production CD Flutter Test Log\n\`\`\`\n' + msg + '\n\`\`\`' });
+              const req = https.request({
+                hostname: 'api.github.com',
+                path: '/repos/' + process.env.GITHUB_REPOSITORY + '/commits/' + process.env.GITHUB_SHA + '/comments',
+                method: 'POST',
+                headers: {
+                  'User-Agent': 'NodeJS',
+                  'Authorization': 'token ' + process.env.GH_TOKEN,
+                  'Content-Type': 'application/json',
+                  'Content-Length': Buffer.byteLength(payload)
+                }
+              }, res => console.log('Comment status:', res.statusCode));
+              req.write(payload);
+              req.end();
+            }
+          "
 
   # 2. Build & Containerize Production Microservices
   build-and-push-containers:
