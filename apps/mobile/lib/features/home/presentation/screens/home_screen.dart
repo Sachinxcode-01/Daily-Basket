@@ -1023,7 +1023,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           ),
           const SizedBox(height: 12),
           SizedBox(
-            height: 310,
+            height: 320,
             child: AnimationLimiter(
               child: ListView.separated(
                 scrollDirection: Axis.horizontal,
@@ -1133,7 +1133,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, childAspectRatio: 0.53,
+                    crossAxisCount: 2, childAspectRatio: 0.49,
                     crossAxisSpacing: 14, mainAxisSpacing: 14,
                   ),
                   itemCount: _filtered.length,
@@ -1427,7 +1427,17 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   Widget _sectionHeader(String title, {VoidCallback? onAll}) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title, style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.w700, color: const Color(0xFF1A1C1E))),
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: const Color(0xFF1A1C1E),
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
           if (onAll != null) TextButton(onPressed: onAll, child: Text('See All', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF006B23)))),
         ],
       );
@@ -1564,7 +1574,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
                 child: AspectRatio(
-                  aspectRatio: 1.25,
+                  aspectRatio: 1.30,
                   child: Container(
                     color: const Color(0xFFF9F9FC),
                     padding: const EdgeInsets.all(8),
@@ -1629,14 +1639,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 7, 10, 10),
+              padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(p.brand, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF006B23)), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 2),
-                Text(p.name, style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)), maxLines: 2, overflow: TextOverflow.ellipsis),
+                Text(p.name, style: GoogleFonts.outfit(fontSize: 12.5, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E), height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 1),
                 Text(p.unit, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C))),
-                const SizedBox(height: 4),
+                const SizedBox(height: 3),
                 Row(children: [
                   const Icon(Icons.star_rounded, size: 12, color: Color(0xFFF59E0B)),
                   const SizedBox(width: 2),
@@ -1668,7 +1678,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     ],
                   ],
                 ),
-                const SizedBox(height: 7),
+                const SizedBox(height: 6),
                 qty == 0
                     ? AppPressable(
                         child: SizedBox(
