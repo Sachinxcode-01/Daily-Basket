@@ -176,32 +176,8 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          node -e "
-            const https = require('https');
-            const fs = require('fs');
-            if (fs.existsSync('apps/mobile/test_log.txt')) {
-              const log = fs.readFileSync('apps/mobile/test_log.txt', 'utf8');
-              const lines = log.split('\n');
-              const idx = lines.findIndex(l => l.includes('EXCEPTION') || l.includes('FAIL') || l.includes('TestFailure'));
-              const start = idx >= 0 ? Math.max(0, idx - 1) : Math.max(0, lines.length - 80);
-              const snippet = lines.slice(start, start + 120).join('\n').slice(0, 60000);
-              const payload = JSON.stringify({ body: '### Flutter CI Test Log\n```\n' + snippet + '\n```' });
-              const req = https.request({
-                hostname: 'api.github.com',
-                path: '/repos/' + process.env.GITHUB_REPOSITORY + '/commits/' + process.env.GITHUB_SHA + '/comments',
-                method: 'POST',
-                headers: {
-                  'User-Agent': 'NodeJS',
-                  'Authorization': 'token ' + process.env.GH_TOKEN,
-                  'Content-Type': 'application/json',
-                  'Content-Length': Buffer.byteLength(payload)
-                }
-              }, res => console.log('Comment status:', res.statusCode));
-              req.write(payload);
-              req.end();
-            }
-          "
+          LOG_TITLE: 'Flutter CI Test Log'
+        run: node .github/scripts/post-log.js
 
       - name: Upload Test Log Artifact
         if: always()
