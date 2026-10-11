@@ -59,6 +59,7 @@ void main() {
 
   group('Runtime Customer Journey Verification Suite', () {
     testWidgets('1. App Launch & Splash Screen Test', (WidgetTester tester) async {
+      addTearDown(() async => await tester.pumpWidget(const SizedBox()));
       // Wrap with providers so SplashScreen → WelcomeScreen navigation succeeds
       await tester.pumpWidget(wrapWithProviders(const SplashScreen()));
       // Let splash animations play (1.5s)
@@ -79,18 +80,21 @@ void main() {
     });
 
     testWidgets('2. Customer Home Screen Test', (WidgetTester tester) async {
+      addTearDown(() async => await tester.pumpWidget(const SizedBox()));
       await tester.pumpWidget(wrapWithProviders(const CustomerHomeScreen()));
       await tester.pump(const Duration(milliseconds: 200));
       expect(find.text('Daily Basket'), findsWidgets);
     });
 
     testWidgets('3. Product Details Screen Test', (WidgetTester tester) async {
+      addTearDown(() async => await tester.pumpWidget(const SizedBox()));
       await tester.pumpWidget(wrapWithProviders(const ProductDetailsScreen()));
       await tester.pump(const Duration(milliseconds: 200));
       expect(find.text('Organic Hass Avocados'), findsWidgets);
     });
 
     testWidgets('4. Cart, Checkout & Payment Screens Test', (WidgetTester tester) async {
+      addTearDown(() async => await tester.pumpWidget(const SizedBox()));
       await tester.pumpWidget(wrapWithProviders(const CartScreen()));
       await tester.pump(const Duration(milliseconds: 200));
 
@@ -106,6 +110,7 @@ void main() {
     });
 
     testWidgets('5. Orders, Wallet & Profile Screens Test', (WidgetTester tester) async {
+      addTearDown(() async => await tester.pumpWidget(const SizedBox()));
       await tester.pumpWidget(wrapWithProviders(const OrderHistoryScreen()));
       await tester.pump(const Duration(milliseconds: 200));
 
@@ -115,7 +120,9 @@ void main() {
       await tester.pumpWidget(wrapWithProviders(const ProfileScreen()));
       await tester.pump(const Duration(milliseconds: 200));
     });
+
     testWidgets('6. Favorites Screen Test', (WidgetTester tester) async {
+      addTearDown(() async => await tester.pumpWidget(const SizedBox()));
       await tester.pumpWidget(wrapWithProviders(const FavoritesScreen()));
       await tester.pump(const Duration(milliseconds: 200));
       expect(find.text('My Favorites ❤️'), findsWidgets);

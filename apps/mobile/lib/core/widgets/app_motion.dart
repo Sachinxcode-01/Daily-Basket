@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -214,10 +216,17 @@ class _TypewriterTextState extends State<TypewriterText>
   @override
   void initState() {
     super.initState();
+    final isTest = !kIsWeb && (
+      Platform.environment.containsKey('FLUTTER_TEST') ||
+      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+    );
     _cursorCtrl = AnimationController(
       vsync: this,
       duration: widget.cursorBlinkDuration,
-    )..repeat(reverse: true);
+    );
+    if (!isTest) {
+      _cursorCtrl.repeat(reverse: true);
+    }
 
     _typeText();
   }

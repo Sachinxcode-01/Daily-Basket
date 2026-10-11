@@ -12,4 +12,6 @@ export const envValidationSchema = Joi.object({
   JWT_REFRESH_SECRET: Joi.string().min(16).default('super-secret-daily-basket-refresh-key-2026'),
   AWS_S3_BUCKET: Joi.string().default('daily-basket-assets-dev'),
   AWS_REGION: Joi.string().default('ap-south-1'),
+  GOOGLE_TTS_API_KEY: Joi.string().optional(),
+  GOOGLE_CLOUD_API_KEY: Joi.string().optional(),
 });

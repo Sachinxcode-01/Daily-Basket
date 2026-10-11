@@ -18,4 +18,9 @@ export default () => ({
     bucket: process.env.AWS_S3_BUCKET || 'daily-basket-assets-dev',
     region: process.env.AWS_REGION || 'ap-south-1',
   },
+  google: {
+    ttsApiKey: process.env.GOOGLE_TTS_API_KEY || 'AIzaSyChVTlWQwcHFIVcJqx4XsqGBOpv_doZvuc',
+    cloudApiKey: process.env.GOOGLE_CLOUD_API_KEY || 'AIzaSyChVTlWQwcHFIVcJqx4XsqGBOpv_doZvuc',
+    mapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+  },
 });

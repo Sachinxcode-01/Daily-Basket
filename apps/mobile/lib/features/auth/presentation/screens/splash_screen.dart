@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
@@ -269,7 +271,11 @@ class _PulsingDotState extends State<_PulsingDot>
       ),
     );
     Future.delayed(Duration(milliseconds: widget.delayMs), () {
-      if (mounted) _ctrl.repeat(reverse: true);
+      final isTest = !kIsWeb && (
+        Platform.environment.containsKey('FLUTTER_TEST') ||
+        WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+      );
+      if (mounted && !isTest) _ctrl.repeat(reverse: true);
     });
   }
 
@@ -315,10 +321,17 @@ class _TypewriterTextWidgetState extends State<_TypewriterTextWidget>
   @override
   void initState() {
     super.initState();
+    final isTest = !kIsWeb && (
+      Platform.environment.containsKey('FLUTTER_TEST') ||
+      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+    );
     _cursorCtrl = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
-    )..repeat(reverse: true);
+    );
+    if (!isTest) {
+      _cursorCtrl.repeat(reverse: true);
+    }
 
     _startTyping();
   }

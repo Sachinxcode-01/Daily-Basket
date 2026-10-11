@@ -1,8 +1,15 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:daily_basket_mobile/core/widgets/app_motion.dart';
 
+class _MockHttpOverrides extends HttpOverrides {}
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = _MockHttpOverrides();
+  GoogleFonts.config.allowRuntimeFetching = false;
   group('AppPageTransitions', () {
     testWidgets('fadeThrough creates a route that fades in', (tester) async {
       final route = AppPageTransitions.fadeThrough(const Text('Target'));
@@ -81,9 +88,9 @@ void main() {
           ),
         ),
       );
-      // Pump a few frames to allow typewriter to progress
+      // Pump frames to allow typewriter to progress and finish typing
       await tester.pump(const Duration(milliseconds: 100));
-      await tester.pumpAndSettle(const Duration(seconds: 3));
+      await tester.pump(const Duration(milliseconds: 900));
       expect(find.text('Hello'), findsOneWidget);
     });
 
@@ -144,7 +151,8 @@ void main() {
           ),
         ),
       );
-      await tester.pumpAndSettle(const Duration(seconds: 2));
+      await tester.pump(const Duration(milliseconds: 600));
+      await tester.pump(const Duration(milliseconds: 600));
       for (int i = 0; i < 3; i++) {
         expect(find.text('Item $i'), findsOneWidget);
       }

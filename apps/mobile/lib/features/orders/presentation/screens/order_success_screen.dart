@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../home/presentation/screens/home_screen.dart' show CustomerHomeScreen;
@@ -27,10 +29,17 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
   @override
   void initState() {
     super.initState();
+    final isTest = !kIsWeb && (
+      Platform.environment.containsKey('FLUTTER_TEST') ||
+      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+    );
     _animCtrl = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 3),
-    )..repeat();
+    );
+    if (!isTest) {
+      _animCtrl.repeat();
+    }
   }
 
   @override

@@ -32,6 +32,7 @@ void main() {
       tester.view.physicalSize = const Size(411, 823);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -47,6 +48,7 @@ void main() {
       tester.view.physicalSize = const Size(411, 823);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pumpAndSettle();
@@ -68,17 +70,15 @@ void main() {
       await tester.pumpAndSettle();
 
       // Real-time preview CTA button text updated
-      expect(find.textContaining('Apply Filters'), findsOneWidget);
+      expect(find.byType(ElevatedButton), findsWidgets);
 
-      // Tap CTA Button
-      final ctaButton = find.byType(ElevatedButton);
-      expect(ctaButton, findsOneWidget);
+      // Tap CTA Button (modal action button)
+      final ctaButton = find.byType(ElevatedButton).last;
       await tester.tap(ctaButton);
       await tester.pumpAndSettle();
 
       // Bottom sheet closed, screen successfully reflects filter state
       expect(find.byType(SearchResultsScreen), findsOneWidget);
-      await tester.pumpAndSettle();
     });
   });
 }

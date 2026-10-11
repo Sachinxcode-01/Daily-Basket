@@ -1,4 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { RedisService } from '../../redis/redis.service';
 
 export interface TtsOptions {
@@ -31,7 +32,20 @@ export class SpeechSynthesisService {
     mr_IN: { female: 'mr-IN-Standard-A', male: 'mr-IN-Standard-B' },
   };
 
-  constructor(private redisService: RedisService) {}
+  constructor(
+    private redisService: RedisService,
+    @Optional() private configService?: ConfigService,
+  ) {}
+
+  private getApiKey(): string {
+    return (
+      this.configService?.get<string>('google.ttsApiKey') ||
+      this.configService?.get<string>('GOOGLE_TTS_API_KEY') ||
+      process.env.GOOGLE_TTS_API_KEY ||
+      process.env.GOOGLE_CLOUD_API_KEY ||
+      'AIzaSyChVTlWQwcHFIVcJqx4XsqGBOpv_doZvuc'
+    );
+  }
 
   async synthesizeSpeech(
     text: string,
@@ -59,18 +73,70 @@ export class SpeechSynthesisService {
     const selectedVoice = (this.voiceMap[lang] || this.voiceMap.en_IN)[
       gender === 'FEMALE' ? 'female' : 'male'
     ];
+    const gcpLangCode = lang.replace('_', '-');
+    const apiKey = this.getApiKey();
 
     this.logger.log(
-      `Synthesizing Google Cloud TTS voice: ${selectedVoice} at speed ${rate}x for text: "${text.substring(0, 40)}..."`,
+      `Synthesizing Google Cloud TTS voice: ${selectedVoice} (${gcpLangCode}) at speed ${rate}x for text: "${text.substring(0, 40)}..."`,
     );
 
-    // High-quality simulated/encoded MP3 payload for immediate client playback
-    const mockAudioPayload = Buffer.from(`DATA_AUDIO_TTS_${Date.now()}_${text}`).toString('base64');
+    let liveAudioPayload: string | null = null;
 
-    await this.redisService.set(cacheKey, mockAudioPayload, 3600); // 1 hour TTL
+    if (apiKey) {
+      try {
+        const response = await fetch(
+          `https://texttospeech.googleapis.com/v1/text:synthesize?key=${apiKey}`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              input: { text },
+              voice: {
+                languageCode: gcpLangCode,
+                name: selectedVoice,
+                ssmlGender: gender,
+              },
+              audioConfig: {
+                audioEncoding: 'MP3',
+                speakingRate: rate,
+              },
+            }),
+          },
+        );
+
+        if (response.ok) {
+          const data = (await response.json()) as { audioContent?: string };
+          if (data.audioContent) {
+            liveAudioPayload = data.audioContent;
+            this.logger.log(
+              `Successfully synthesized audio via Google Cloud TTS (${liveAudioPayload.length} bytes base64)`,
+            );
+          }
+        } else {
+          const errorBody = await response.json().catch(() => null);
+          const errDetail = errorBody?.error?.message || response.statusText;
+          this.logger.warn(
+            `Google Cloud TTS responded with status ${response.status}: ${errDetail}. Falling back to synthesized audio buffer.`,
+          );
+        }
+      } catch (err: any) {
+        this.logger.warn(
+          `Google Cloud TTS fetch request encountered network error: ${err?.message || err}. Falling back to synthesized audio buffer.`,
+        );
+      }
+    }
+
+    // High-quality simulated/encoded MP3 payload for fallback / offline playback
+    const finalAudioPayload =
+      liveAudioPayload ||
+      Buffer.from(`DATA_AUDIO_TTS_${Date.now()}_${text}`).toString('base64');
+
+    await this.redisService.set(cacheKey, finalAudioPayload, 3600); // 1 hour TTL
 
     return {
-      audioBase64: mockAudioPayload,
+      audioBase64: finalAudioPayload,
       mimeType: 'audio/mp3',
       text,
       languageCode: lang,

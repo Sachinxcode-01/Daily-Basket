@@ -72,7 +72,7 @@ jobs:
           cd apps/mobile
           flutter pub get
           flutter analyze --no-fatal-infos
-          flutter test
+          flutter test --reporter=expanded
 
   # 2. Build & Containerize Production Microservices
   build-and-push-containers:

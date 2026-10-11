@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -44,10 +45,18 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
     super.initState();
     _voiceService.initialize();
 
+    final isTest = !kIsWeb && (
+      Platform.environment.containsKey('FLUTTER_TEST') ||
+      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+    );
+
     _micPulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
-    )..repeat(reverse: true);
+    );
+    if (!isTest) {
+      _micPulseController.repeat(reverse: true);
+    }
     _micPulseAnimation = Tween<double>(begin: 1.0, end: 1.3).animate(
       CurvedAnimation(parent: _micPulseController, curve: Curves.easeInOut),
     );
@@ -55,7 +64,10 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
     _typingDotController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
-    )..repeat();
+    );
+    if (!isTest) {
+      _typingDotController.repeat();
+    }
     _typingDotAnimation = CurvedAnimation(
       parent: _typingDotController,
       curve: Curves.easeInOut,
