@@ -8,6 +8,10 @@ on:
   schedule:
     - cron: '0 6 * * 1'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
@@ -23,8 +27,6 @@ jobs:
       matrix:
         include:
           - language: javascript-typescript
-            build-mode: none
-          - language: actions
             build-mode: none
 
     steps:

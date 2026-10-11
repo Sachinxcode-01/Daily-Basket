@@ -19,6 +19,8 @@ dependencies:
   # Enterprise AI Chat — Voice & Image
   speech_to_text: ^7.0.0
   image_picker: ^1.0.7
+  flutter_map: ^8.3.2
+  latlong2: ^0.10.1
 
 dev_dependencies:
   flutter_test:

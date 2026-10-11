@@ -9,43 +9,39 @@ on:
       - 'infrastructure/docker/Dockerfile.api'
       - '.github/workflows/cd-api.yml'
 
+concurrency:
+  group: cd-api-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-test-api:
     name: Build, Test & Push API Docker Image
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 9
 
-      - name: Get pnpm store directory
-        id: pnpm-cache
-        run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
         with:
-          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+          node-version: 20
+          cache: 'pnpm'
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
       - name: Generate Prisma Client
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daily_basket?schema=public"
         run: pnpm --filter api run prisma:generate
 
       - name: Run API Unit Tests
-        run: pnpm --filter api run test
+        run: pnpm --filter api run test -- --forceExit --maxWorkers=2
 
       - name: Build NestJS API
         run: pnpm --filter api run build

@@ -7,6 +7,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: production-cd-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   packages: write
@@ -22,7 +26,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v3
+        uses: pnpm/action-setup@v4
         with:
           version: 9
 
@@ -44,10 +48,16 @@ jobs:
           npx prisma generate
 
       - name: NestJS Unit & Security Tests
-        run: pnpm --filter api run test
+        run: pnpm --filter api run test -- --forceExit --maxWorkers=2
 
       - name: Security Vulnerability Audit
         run: pnpm audit --audit-level high || true
+
+      - name: Setup Java SDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
 
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
@@ -67,6 +77,7 @@ jobs:
     name: Containerize & Push Docker Images
     needs: test-and-audit
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
 
     steps:
       - name: Checkout Code
@@ -131,6 +142,7 @@ jobs:
     name: Deploy to Production Kubernetes / Cloud Cluster
     needs: build-and-push-containers
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
 
     steps:
       - name: Checkout Code
@@ -144,4 +156,3 @@ jobs:
       - name: Post-Deployment Health Check Verification
         run: |
           echo "Verifying production health endpoints..."
-          # curl --fail https://api.dailybasket.com/api/v1/health || exit 1
