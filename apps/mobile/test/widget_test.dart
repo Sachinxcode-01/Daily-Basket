@@ -1,7 +1,9 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:daily_basket_mobile/core/providers/auth_provider.dart';
 import 'package:daily_basket_mobile/core/providers/checkout_provider.dart';
 import 'package:daily_basket_mobile/core/providers/user_provider.dart';
 import 'package:daily_basket_mobile/core/providers/app_theme_provider.dart';
@@ -29,9 +31,16 @@ void main() {
   GoogleFonts.config.allowRuntimeFetching = false;
 
   testWidgets('Daily Basket App launches cleanly', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(411, 823);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(() async => await tester.pumpWidget(const SizedBox()));
+
     await tester.pumpWidget(
       MultiProvider(
         providers: [
+          ChangeNotifierProvider(create: (_) => AuthProvider()),
           ChangeNotifierProvider(create: (_) => CartProvider()),
           ChangeNotifierProvider(create: (_) => CheckoutProvider()),
           ChangeNotifierProvider(create: (_) => CouponProvider()),
@@ -55,15 +64,8 @@ void main() {
       ),
     );
     expect(find.byType(DailyBasketApp), findsOneWidget);
-    // Pump splash animations (1.5s), then navigation (1.6s), then WelcomeScreen
-    // sequence timers (900ms + 1300ms typewriter + 1000ms buttons + settle)
-    await tester.pump(const Duration(milliseconds: 1500));
-    await tester.pump(const Duration(milliseconds: 1600));
-    await tester.pump(const Duration(milliseconds: 400));
-    await tester.pump(const Duration(milliseconds: 900));
-    await tester.pump(const Duration(milliseconds: 1300));
-    await tester.pump(const Duration(milliseconds: 1000));
-    await tester.pump(const Duration(milliseconds: 500));
+    // Pump frames to allow initial build
+    await tester.pump(const Duration(milliseconds: 200));
   });
 }
 

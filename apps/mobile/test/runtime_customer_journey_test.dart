@@ -28,6 +28,8 @@ import 'package:daily_basket_mobile/core/providers/visual_search_provider.dart';
 import 'package:daily_basket_mobile/features/catalog/presentation/screens/favorites_screen.dart';
 import 'package:daily_basket_mobile/core/providers/checkout_provider.dart';
 
+import 'package:daily_basket_mobile/core/providers/auth_provider.dart';
+
 class _MockHttpOverrides extends HttpOverrides {}
 
 void main() {
@@ -38,6 +40,7 @@ void main() {
   Widget wrapWithProviders(Widget child) {
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => CheckoutProvider()),
         ChangeNotifierProvider(create: (_) => CouponProvider()),

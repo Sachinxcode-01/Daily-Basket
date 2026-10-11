@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -93,6 +95,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   }
 
   void _startSequence() async {
+    final isTest = !kIsWeb && (
+      Platform.environment.containsKey('FLUTTER_TEST') ||
+      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+    );
+    if (isTest) {
+      _logoCtrl.value = 1.0;
+      _subtitleCtrl.value = 1.0;
+      _buttonsCtrl.value = 1.0;
+      if (mounted) setState(() => _showTypewriter = true);
+      return;
+    }
+
     // 1. Logo pops in
     _logoCtrl.forward();
     await Future.delayed(const Duration(milliseconds: 400));

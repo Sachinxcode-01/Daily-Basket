@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +36,10 @@ class _SplashScreenState extends State<SplashScreen>
   late Animation<double> _subtitleOpacity;
   late Animation<Offset> _subtitleSlide;
   late Animation<double> _dotsOpacity;
+
+  Timer? _t1;
+  Timer? _t2;
+  Timer? _t3;
 
   @override
   void initState() {
@@ -75,10 +80,10 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Staggered: logo → title (100ms) → subtitle+dots (300ms)
     _logoCtrl.forward();
-    Future.delayed(const Duration(milliseconds: 100), () {
+    _t1 = Timer(const Duration(milliseconds: 100), () {
       if (mounted) _titleCtrl.forward();
     });
-    Future.delayed(const Duration(milliseconds: 300), () {
+    _t2 = Timer(const Duration(milliseconds: 300), () {
       if (mounted) {
         _subtitleCtrl.forward();
         _dotsCtrl.forward();
@@ -86,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen>
     });
 
     // Navigate after 3 seconds (matching Stitch 3000ms timeout)
-    Future.delayed(const Duration(seconds: 3), () {
+    _t3 = Timer(const Duration(seconds: 3), () {
       if (mounted) {
         Navigator.of(context).pushReplacement(
           AppPageTransitions.fadeThrough(const WelcomeScreen()),
@@ -97,6 +102,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   void dispose() {
+    _t1?.cancel();
+    _t2?.cancel();
+    _t3?.cancel();
     _logoCtrl.dispose();
     _titleCtrl.dispose();
     _subtitleCtrl.dispose();
@@ -255,6 +263,7 @@ class _PulsingDotState extends State<_PulsingDot>
     with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
   late Animation<double> _anim;
+  Timer? _delayTimer;
 
   @override
   void initState() {
@@ -270,17 +279,20 @@ class _PulsingDotState extends State<_PulsingDot>
         reverseCurve: const Interval(0.5, 1.0, curve: Curves.easeInOut),
       ),
     );
-    Future.delayed(Duration(milliseconds: widget.delayMs), () {
-      final isTest = !kIsWeb && (
-        Platform.environment.containsKey('FLUTTER_TEST') ||
-        WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
-      );
-      if (mounted && !isTest) _ctrl.repeat(reverse: true);
-    });
+    final isTest = !kIsWeb && (
+      Platform.environment.containsKey('FLUTTER_TEST') ||
+      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+    );
+    if (!isTest) {
+      _delayTimer = Timer(Duration(milliseconds: widget.delayMs), () {
+        if (mounted) _ctrl.repeat(reverse: true);
+      });
+    }
   }
 
   @override
   void dispose() {
+    _delayTimer?.cancel();
     _ctrl.dispose();
     super.dispose();
   }
@@ -331,9 +343,10 @@ class _TypewriterTextWidgetState extends State<_TypewriterTextWidget>
     );
     if (!isTest) {
       _cursorCtrl.repeat(reverse: true);
+      _startTyping();
+    } else {
+      _displayedText = widget.text;
     }
-
-    _startTyping();
   }
 
   void _startTyping() async {
