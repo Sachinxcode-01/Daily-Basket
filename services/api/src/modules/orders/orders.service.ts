@@ -124,11 +124,27 @@ export class OrdersService {
         useWallet: data.useWallet,
         paymentMethod: resolvedPaymentMethod,
         userId: validUserId,
+        storeId: store.id,
+        addressId: validAddressId,
       });
+
+      // Blinkit Quick-Commerce Invariant: Check Soft-Close and Minimum Order Value
+      if (pricing.isSoftClosed) {
+        throw new BadRequestException(
+          pricing.softCloseMessage || 'This dark store is temporarily at capacity and soft-closed to protect delivery promises.',
+        );
+      }
+
+      if (pricing.isBelowMinOrder) {
+        throw new BadRequestException(
+          `Minimum order value for 10-minute delivery is ₹${pricing.minOrderValue}. Please add more items to your basket.`,
+        );
+      }
 
       const subtotal = pricing.subtotal;
       const deliveryFee = pricing.deliveryFee;
       const totalAmount = pricing.finalPayable;
+      const estimatedArrivalMins = pricing.estimatedArrivalMins;
       const deliveryOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
       // 5. Resolve Product Variant for each item
@@ -216,7 +232,7 @@ export class OrdersService {
             totalAmount,
             paymentMethod: resolvedPaymentMethod,
             status: OrderStatus.CONFIRMED,
-            estimatedArrivalMins: 10,
+            estimatedArrivalMins,
             items: {
               create: orderItemsData,
             },

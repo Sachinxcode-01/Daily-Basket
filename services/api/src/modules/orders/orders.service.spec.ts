@@ -62,13 +62,25 @@ describe('OrdersService Unit Tests', () => {
   };
 
   const mockOrderPricingService = {
-    calculatePricing: jest.fn().mockReturnValue({
+    calculatePricing: jest.fn().mockResolvedValue({
       subtotal: 250,
       deliveryFee: 25,
+      surgeFee: 0,
+      rainFee: 0,
       couponDiscount: 0,
       itemDiscounts: 0,
       finalPayable: 275,
       selectedPaymentMethod: 'UPI',
+      estimatedArrivalMins: 10,
+      promiseBadge: '10–12 MINS ⚡',
+      isSurgeApplied: false,
+      isRainMode: false,
+      surgeReason: null,
+      storeLoadRatio: 0.25,
+      isSoftClosed: false,
+      softCloseMessage: null,
+      minOrderValue: 149,
+      isBelowMinOrder: false,
     }),
   };
 
@@ -110,6 +122,44 @@ describe('OrdersService Unit Tests', () => {
       expect(mockInventoryService.reserveBatchAtomic).toHaveBeenCalled();
       expect(mockPrismaService.order.create).toHaveBeenCalled();
       expect(mockEventsGateway.broadcastOrderCreated).toHaveBeenCalled();
+    });
+
+    it('should reject order creation if store is soft-closed', async () => {
+      mockOrderPricingService.calculatePricing.mockResolvedValueOnce({
+        subtotal: 250,
+        deliveryFee: 25,
+        finalPayable: 275,
+        isSoftClosed: true,
+        softCloseMessage: 'Store temporarily soft-closed due to high demand.',
+        isBelowMinOrder: false,
+      });
+
+      await expect(
+        service.createOrder('user_101', {
+          addressId: 'addr_101',
+          paymentMethod: 'UPI',
+          items: [{ variantId: 'var_01', productName: 'Milk', price: 54, quantity: 2 }],
+        }),
+      ).rejects.toThrow('Store temporarily soft-closed due to high demand.');
+    });
+
+    it('should reject order creation if subtotal is below minimum order value', async () => {
+      mockOrderPricingService.calculatePricing.mockResolvedValueOnce({
+        subtotal: 50,
+        deliveryFee: 25,
+        finalPayable: 75,
+        isSoftClosed: false,
+        isBelowMinOrder: true,
+        minOrderValue: 149,
+      });
+
+      await expect(
+        service.createOrder('user_101', {
+          addressId: 'addr_101',
+          paymentMethod: 'UPI',
+          items: [{ variantId: 'var_01', productName: 'Milk', price: 50, quantity: 1 }],
+        }),
+      ).rejects.toThrow('Minimum order value for 10-minute delivery is ₹149');
     });
   });
 

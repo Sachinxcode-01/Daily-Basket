@@ -28,6 +28,32 @@ export class StoreOperationsController {
     return this.storeOpsService.updateStoreSettings('default', dto);
   }
 
+  @Get('control-room')
+  async getControlRoom() {
+    return this.storeOpsService.getStoreLiveControlRoom();
+  }
+
+  @Put('rain-mode')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.STORE_MANAGER, Role.BUSINESS_OWNER)
+  async toggleRainMode(@Body() body: { isRainMode: boolean; storeId?: string }) {
+    return this.storeOpsService.toggleRainMode(body.storeId || 'default', body.isRainMode);
+  }
+
+  @Put('promise-buffer')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.STORE_MANAGER, Role.BUSINESS_OWNER)
+  async adjustPromiseBuffer(@Body() body: { bufferMins: number; storeId?: string }) {
+    return this.storeOpsService.adjustPromiseBuffer(body.storeId || 'default', body.bufferMins);
+  }
+
+  @Put('soft-close')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.ADMIN, Role.STORE_MANAGER, Role.BUSINESS_OWNER)
+  async toggleSoftClose(@Body() body: { isSoftClosed: boolean; reason?: string; storeId?: string }) {
+    return this.storeOpsService.toggleSoftClose(body.storeId || 'default', body.isSoftClosed, body.reason);
+  }
+
   @Get('business-automation')
   async getBusinessAutomation() {
     return this.storeOpsService.runBusinessAutomation();

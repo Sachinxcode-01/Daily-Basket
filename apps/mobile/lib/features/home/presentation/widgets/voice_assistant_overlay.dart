@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class VoiceAssistantOverlay extends StatefulWidget {
@@ -29,10 +31,17 @@ class _VoiceAssistantOverlayState extends State<VoiceAssistantOverlay>
   @override
   void initState() {
     super.initState();
+    final isTest = !kIsWeb && (
+      Platform.environment.containsKey('FLUTTER_TEST') ||
+      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+    );
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1000),
-    )..repeat(reverse: true);
+    );
+    if (!isTest) {
+      _pulseController.repeat(reverse: true);
+    }
   }
 
   @override

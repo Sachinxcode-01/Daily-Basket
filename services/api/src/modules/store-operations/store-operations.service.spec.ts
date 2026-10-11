@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { StoreOperationsService } from './store-operations.service';
 import { PrismaService } from '../../database/prisma.service';
+import { RedisService } from '../redis/redis.service';
+import { EventsGateway } from '../events/events.gateway';
 
 describe('StoreOperationsService', () => {
   let service: StoreOperationsService;
@@ -26,6 +28,20 @@ describe('StoreOperationsService', () => {
         storeId: 'store_01',
       }),
     },
+    order: {
+      count: jest.fn().mockResolvedValue(8),
+    },
+  };
+
+  const mockRedisService = {
+    get: jest.fn().mockResolvedValue(null),
+    set: jest.fn().mockResolvedValue('OK'),
+  };
+
+  const mockEventsGateway = {
+    server: {
+      emit: jest.fn(),
+    },
   };
 
   beforeEach(async () => {
@@ -33,6 +49,8 @@ describe('StoreOperationsService', () => {
       providers: [
         StoreOperationsService,
         { provide: PrismaService, useValue: mockPrismaService },
+        { provide: RedisService, useValue: mockRedisService },
+        { provide: EventsGateway, useValue: mockEventsGateway },
       ],
     }).compile();
 
@@ -54,5 +72,23 @@ describe('StoreOperationsService', () => {
     const result = await service.toggleStoreStatus('store_01', false);
     expect(result).toBeDefined();
     expect(result.isOpen).toBe(false);
+  });
+
+  it('should toggle rain mode and persist to Redis', async () => {
+    const result = await service.toggleRainMode('store_01', true);
+    expect(result.isRainMode).toBe(true);
+    expect(mockRedisService.set).toHaveBeenCalledWith('dailybasket:store:store_01:rain_mode', 'true', 86400);
+  });
+
+  it('should adjust promise buffer in Redis', async () => {
+    const result = await service.adjustPromiseBuffer('store_01', 5);
+    expect(result.bufferMins).toBe(5);
+    expect(mockRedisService.set).toHaveBeenCalledWith('dailybasket:store:store_01:promise_buffer', '5', 86400);
+  });
+
+  it('should toggle soft-close and persist to Redis', async () => {
+    const result = await service.toggleSoftClose('store_01', true, 'Overloaded queue');
+    expect(result.isSoftClosed).toBe(true);
+    expect(mockRedisService.set).toHaveBeenCalledWith('dailybasket:store:store_01:soft_closed', 'true', 86400);
   });
 });

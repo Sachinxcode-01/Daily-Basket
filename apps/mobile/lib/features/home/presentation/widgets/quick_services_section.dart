@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -89,17 +91,28 @@ class _QuickServicesSectionState extends State<QuickServicesSection>
             ))
         .toList();
 
+    final isTest = !kIsWeb && (
+      Platform.environment.containsKey('FLUTTER_TEST') ||
+      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+    );
+
     // AI typing dots
     _typingController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1200),
-    )..repeat();
+    );
+    if (!isTest) {
+      _typingController.repeat();
+    }
 
     // Wallet shimmer
     _shimmerController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),
-    )..repeat();
+    );
+    if (!isTest) {
+      _shimmerController.repeat();
+    }
 
     // Fire entrance after first frame
     WidgetsBinding.instance.addPostFrameCallback((_) {

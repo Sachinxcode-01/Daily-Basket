@@ -158,5 +158,15 @@ jobs:
       - name: Run Flutter Tests
         env:
           FLUTTER_TEST: 'true'
-        run: flutter test --reporter=expanded
+        run: |
+          set -o pipefail
+          flutter test --reporter=expanded 2>&1 | tee test_log.txt
         working-directory: apps/mobile
+
+      - name: Publish Flutter Test Summary
+        if: always()
+        run: |
+          echo "### Flutter Test Log Summary" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -n 80 apps/mobile/test_log.txt >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY

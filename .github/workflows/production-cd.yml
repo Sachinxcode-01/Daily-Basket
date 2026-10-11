@@ -72,7 +72,8 @@ jobs:
           cd apps/mobile
           flutter pub get
           flutter analyze --no-fatal-infos
-          flutter test --reporter=expanded
+          set -o pipefail
+          flutter test --reporter=expanded 2>&1 | tee test_log.txt
 
   # 2. Build & Containerize Production Microservices
   build-and-push-containers:
