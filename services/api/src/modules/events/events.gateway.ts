@@ -210,6 +210,42 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to('admin').emit('order_cancelled', payload);
   }
 
+  broadcastItemMissing(orderId: string, userId: string, orderItem: any, substitutes: any[]) {
+    const payload = {
+      orderId,
+      missingItem: orderItem,
+      substitutes,
+      timestamp: new Date().toISOString(),
+    };
+    this.server.to(`order_${orderId}`).emit('item_missing_substitution_offered', payload);
+    this.server.to(`customer_${userId}`).emit('item_missing_substitution_offered', payload);
+    this.server.to('admin').emit('item_missing_alert', payload);
+  }
+
+  broadcastSubstituteAccepted(orderId: string, userId: string, orderItem: any, delta: number) {
+    const payload = {
+      orderId,
+      updatedItem: orderItem,
+      priceDelta: delta,
+      timestamp: new Date().toISOString(),
+    };
+    this.server.to(`order_${orderId}`).emit('substitute_accepted', payload);
+    this.server.to(`customer_${userId}`).emit('substitute_accepted', payload);
+    this.server.to('admin').emit('substitute_accepted', payload);
+  }
+
+  broadcastItemRemovedAndRefunded(orderId: string, userId: string, itemId: string, refundAmount: number) {
+    const payload = {
+      orderId,
+      removedItemId: itemId,
+      refundAmount,
+      timestamp: new Date().toISOString(),
+    };
+    this.server.to(`order_${orderId}`).emit('item_removed_refund_issued', payload);
+    this.server.to(`customer_${userId}`).emit('item_removed_refund_issued', payload);
+    this.server.to('admin').emit('item_removed_refund_issued', payload);
+  }
+
   broadcastInventoryUpdate(productId: string, newStock: number, isAvailable: boolean) {
     const payload = { productId, newStock, isAvailable, timestamp: new Date().toISOString() };
     this.server.emit('inventory.updated', payload);

@@ -19,6 +19,7 @@ build/
 *.aab
 *.app
 *.ipa
+.kotlin/
 
 # Environment & Credentials
 .env

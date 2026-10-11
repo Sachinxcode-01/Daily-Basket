@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { OrderPricingService } from './order-pricing.service';
+import { SubstitutionsService } from './substitutions.service';
 import { RedisModule } from '../redis/redis.module';
 import { EventsModule } from '../events/events.module';
 import { QueueModule } from '../queue/queue.module';
@@ -11,7 +12,7 @@ import { InventoryModule } from '../inventory/inventory.module';
 @Module({
   imports: [RedisModule, EventsModule, QueueModule, CouponsModule, InventoryModule],
   controllers: [OrdersController],
-  providers: [OrdersService, OrderPricingService],
-  exports: [OrdersService, OrderPricingService],
+  providers: [OrdersService, OrderPricingService, SubstitutionsService],
+  exports: [OrdersService, OrderPricingService, SubstitutionsService],
 })
 export class OrdersModule {}

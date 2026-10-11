@@ -1,7 +1,8 @@
-import { Controller, Post, Get, Param, Body, ForbiddenException, UseGuards } from '@nestjs/common';
+import { Controller, Post, Get, Param, Query, Body, ForbiddenException, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { OrdersService } from './orders.service';
 import { OrderPricingService, CalculatePricingDto } from './order-pricing.service';
+import { SubstitutionsService } from './substitutions.service';
 import { OptionalJwtAuthGuard } from '../../common/guards/optional-jwt-auth.guard';
 import { ResolvedUserId } from '../../common/decorators/resolved-user-id.decorator';
 
@@ -13,7 +14,17 @@ export class OrdersController {
   constructor(
     private readonly ordersService: OrdersService,
     private readonly orderPricingService: OrderPricingService,
+    private readonly substitutionsService: SubstitutionsService,
   ) {}
+
+  @Get('substitutes')
+  @ApiOperation({ summary: 'Get smart 1:1 in-stock substitutes within category and price proximity' })
+  async getSubstitutes(
+    @Query('storeId') storeId: string,
+    @Query('variantId') variantId: string,
+  ) {
+    return this.substitutionsService.getAvailableSubstitutes(storeId || 'default', variantId);
+  }
 
   @Post('calculate')
   @ApiOperation({ summary: 'Calculate dynamic order pricing, delivery fees, taxes, discounts & payment methods' })
@@ -87,4 +98,37 @@ export class OrdersController {
   ) {
     return this.ordersService.cancelOrder(id, userId, body?.reason);
   }
+
+  @Post(':id/items/:itemId/mark-missing')
+  @ApiOperation({ summary: 'Flag item missing/damaged during picking, zero phantom stock & offer smart substitutes' })
+  async markItemMissing(
+    @Param('id') orderId: string,
+    @Param('itemId') itemId: string,
+    @Body() body: { reason?: string },
+  ) {
+    return this.substitutionsService.markItemMissing(orderId, itemId, body?.reason);
+  }
+
+  @Post(':id/items/:itemId/accept-substitute')
+  @ApiOperation({ summary: 'Accept substitute item with price protection and automated wallet refund if cheaper' })
+  async acceptSubstitute(
+    @ResolvedUserId() userId: string,
+    @Param('id') orderId: string,
+    @Param('itemId') itemId: string,
+    @Body() body: { substituteVariantId: string },
+  ) {
+    return this.substitutionsService.acceptSubstitute(orderId, itemId, body.substituteVariantId, userId);
+  }
+
+  @Post(':id/items/:itemId/remove-and-refund')
+  @ApiOperation({ summary: 'Decline substitute or remove out-of-stock item with instant 100% wallet refund' })
+  async removeItemAndRefund(
+    @ResolvedUserId() userId: string,
+    @Param('id') orderId: string,
+    @Param('itemId') itemId: string,
+    @Body() body: { reason?: string },
+  ) {
+    return this.substitutionsService.removeItemAndRefund(orderId, itemId, userId, body?.reason);
+  }
 }
+

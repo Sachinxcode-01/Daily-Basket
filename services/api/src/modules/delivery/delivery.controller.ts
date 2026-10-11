@@ -2,6 +2,7 @@ import { Controller, Get, Post, Param, Body } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { DeliveryService } from './delivery.service';
 import { GeofenceService } from './geofence.service';
+import { TimedDispatchService } from './timed-dispatch.service';
 
 @ApiTags('Delivery & GPS Tracking')
 @Controller('delivery')
@@ -9,7 +10,23 @@ export class DeliveryController {
   constructor(
     private readonly deliveryService: DeliveryService,
     private readonly geofenceService: GeofenceService,
+    private readonly timedDispatchService: TimedDispatchService,
   ) {}
+
+  @Post('dispatch/:orderId')
+  @ApiOperation({ summary: 'Evaluate timed dispatch (60% packing progress) and dynamic corridor batching' })
+  async dispatchOrder(
+    @Param('orderId') orderId: string,
+    @Body() body: { forceImmediate?: boolean },
+  ) {
+    return this.timedDispatchService.dispatchOrder(orderId, body?.forceImmediate);
+  }
+
+  @Get('dispatch-status/:storeId')
+  @ApiOperation({ summary: 'Get live dark store fleet dispatch roster & availability heatmap' })
+  async getDispatchStatus(@Param('storeId') storeId: string) {
+    return this.timedDispatchService.getFleetDispatchStatus(storeId);
+  }
 
   @Get('track/:orderId')
   @ApiOperation({ summary: 'Get live GPS tracking and delivery telemetry' })
