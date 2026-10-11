@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { EventsGateway } from '../events/events.gateway';
@@ -6,6 +6,7 @@ import { QueueProcessor } from '../queue/queue.processor';
 import { OrderStatus, PaymentMethod } from '@prisma/client';
 
 import { OrderPricingService } from './order-pricing.service';
+import { InventoryService } from '../inventory/inventory.service';
 
 @Injectable()
 export class OrdersService {
@@ -17,6 +18,7 @@ export class OrdersService {
     private eventsGateway: EventsGateway,
     private queueProcessor: QueueProcessor,
     private orderPricingService: OrderPricingService,
+    private inventoryService: InventoryService,
   ) {}
 
   async createOrder(
@@ -182,28 +184,53 @@ export class OrdersService {
         };
       });
 
-      const order = await this.prisma.order.create({
-        data: {
-          orderNumber,
-          storeId: store.id,
-          userId: validUserId,
-          addressId: validAddressId,
-          subtotal,
-          deliveryFee,
-          discount: pricing.couponDiscount,
-          totalAmount,
-          paymentMethod: resolvedPaymentMethod,
-          status: OrderStatus.CONFIRMED,
-          estimatedArrivalMins: 10,
-          items: {
-            create: orderItemsData,
+      // 6. Atomic Inventory Hold (Blinkit 3-State Model Invariant)
+      // Reserve stock with PostgreSQL conditional row update and rollback on failure.
+      const reservationItems = orderItemsData.map((item) => ({
+        variantId: item.variantId,
+        quantity: item.quantity,
+      }));
+
+      const reservationResult = await this.inventoryService.reserveBatchAtomic(
+        store.id,
+        reservationItems,
+      );
+
+      if (!reservationResult.success) {
+        throw new BadRequestException(
+          `One or more items in your cart are currently out of stock or reserved by another customer. Please adjust your cart.`,
+        );
+      }
+
+      let order;
+      try {
+        order = await this.prisma.order.create({
+          data: {
+            orderNumber,
+            storeId: store.id,
+            userId: validUserId,
+            addressId: validAddressId,
+            subtotal,
+            deliveryFee,
+            discount: pricing.couponDiscount,
+            totalAmount,
+            paymentMethod: resolvedPaymentMethod,
+            status: OrderStatus.CONFIRMED,
+            estimatedArrivalMins: 10,
+            items: {
+              create: orderItemsData,
+            },
           },
-        },
-        include: {
-          items: true,
-          address: true,
-        },
-      });
+          include: {
+            items: true,
+            address: true,
+          },
+        });
+      } catch (createErr) {
+        // Rollback reserved items if database insertion fails
+        await this.inventoryService.releaseBatchAtomic(store.id, reservationItems);
+        throw createErr;
+      }
 
       // Background Async Notification & Queue Dispatch
       try {
@@ -273,6 +300,15 @@ export class OrdersService {
       data: { status: OrderStatus.DELIVERED },
     });
 
+    // Commit physical stock deduction upon fulfillment (Blinkit Invariant)
+    const itemsToCommit = (order.items || []).map((item) => ({
+      variantId: item.variantId,
+      quantity: item.quantity,
+    }));
+    if (itemsToCommit.length > 0) {
+      await this.inventoryService.commitBatchAtomic(order.storeId, itemsToCommit);
+    }
+
     const invoice = {
       invoiceNumber: `INV-${Date.now().toString().slice(-8)}`,
       gstin: '29AABCD1234E1Z5',
@@ -293,6 +329,89 @@ export class OrdersService {
 
     this.eventsGateway.broadcastOrderDelivered(orderId, order.userId, invoice);
     return { order: updatedOrder, invoice };
+  }
+
+  /**
+   * Cancel order with legal state machine transition & automatic stock release (Blinkit Lifecycle Invariant)
+   */
+  async cancelOrder(
+    orderId: string,
+    userId: string,
+    reason = 'Customer requested cancellation',
+    isAdmin = false,
+  ) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+      include: { items: true },
+    });
+
+    if (!order) {
+      throw new NotFoundException(`Order ${orderId} not found`);
+    }
+
+    if (!isAdmin && order.userId !== userId) {
+      throw new BadRequestException('You do not have permission to cancel this order.');
+    }
+
+    // State machine check
+    if (
+      order.status === OrderStatus.CANCELLED ||
+      order.status === OrderStatus.DELIVERED ||
+      order.status === OrderStatus.REFUNDED
+    ) {
+      throw new BadRequestException(`Order cannot be cancelled because it is already ${order.status.toLowerCase()}.`);
+    }
+
+    if (
+      (order.status === OrderStatus.READY_FOR_PICKUP || order.status === OrderStatus.OUT_FOR_DELIVERY) &&
+      !isAdmin
+    ) {
+      throw new BadRequestException(
+        'Order cannot be cancelled once a delivery partner has been assigned or the order is out for delivery.',
+      );
+    }
+
+    // 1. Release reserved inventory back to dark store
+    const itemsToRelease = (order.items || []).map((item) => ({
+      variantId: item.variantId,
+      quantity: item.quantity,
+    }));
+    if (itemsToRelease.length > 0) {
+      await this.inventoryService.releaseBatchAtomic(order.storeId, itemsToRelease);
+    }
+
+    // 2. Update order status to CANCELLED (and payment status to REFUNDED if paid)
+    const updatedOrder = await this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: OrderStatus.CANCELLED,
+        paymentStatus: order.paymentStatus === 'SUCCESS' ? 'REFUNDED' : order.paymentStatus,
+      },
+      include: { items: true, address: true },
+    });
+
+    // 3. Emit real-time cancellation event & push notifications
+    try {
+      this.eventsGateway.broadcastOrderCancelled(orderId, order.userId, reason);
+      await this.queueProcessor.enqueueJob('NOTIFICATION', {
+        userId: order.userId,
+        title: 'Order Cancelled 🚫',
+        body: `Order ${order.orderNumber} has been cancelled. Any pre-authorized amount will be refunded.`,
+        data: { orderId, reason },
+      });
+      await this.queueProcessor.enqueueJob('ANALYTICS', {
+        event: 'ORDER_CANCELLED',
+        orderId,
+        reason,
+        recoveredStockItems: itemsToRelease.length,
+      });
+    } catch (_) {}
+
+    return {
+      success: true,
+      message: 'Order cancelled successfully and reserved inventory has been released.',
+      order: updatedOrder,
+    };
   }
 
   async findByUser(userId: string) {

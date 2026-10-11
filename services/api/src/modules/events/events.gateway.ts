@@ -197,6 +197,19 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to('admin').emit('order_delivered', payload);
   }
 
+  broadcastOrderCancelled(orderId: string, userId: string, reason = 'Order cancelled') {
+    const payload = {
+      orderId,
+      status: 'CANCELLED',
+      reason,
+      cancelledAt: new Date().toISOString(),
+    };
+    this.server.emit('order.updated', payload);
+    this.server.to(`order_${orderId}`).emit('order_cancelled', payload);
+    this.server.to(`customer_${userId}`).emit('order_status_update', payload);
+    this.server.to('admin').emit('order_cancelled', payload);
+  }
+
   broadcastInventoryUpdate(productId: string, newStock: number, isAvailable: boolean) {
     const payload = { productId, newStock, isAvailable, timestamp: new Date().toISOString() };
     this.server.emit('inventory.updated', payload);

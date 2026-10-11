@@ -68,6 +68,10 @@ export class InventoryService {
   /**
    * Atomic stock reservation with PostgreSQL row-level condition & Redlock
    * Prevents race conditions and negative inventory under flash sales / heavy concurrency.
+   *
+   * 3-state inventory model (Blinkit System Design Invariant):
+   * available = stockQuantity (on-hand) - reservedQuantity.
+   * Reserving increments reservedQuantity without reducing physical stock until dispatch/delivery.
    */
   async reserveStockAtomic(storeId: string, variantId: string, quantity: number): Promise<boolean> {
     const lockToken = await this.redisService.acquireLock(`inventory:${storeId}:${variantId}`, 5);
@@ -76,15 +80,14 @@ export class InventoryService {
     }
 
     try {
-      // Execute atomic UPDATE query: only updates if stockQuantity >= quantity
+      // Execute atomic UPDATE query: only updates if available stock (stockQuantity - reservedQuantity) >= quantity
       const rowsUpdated = await this.prisma.$executeRaw`
         UPDATE inventories
-        SET "stockQuantity" = "stockQuantity" - ${quantity},
-            "reservedQuantity" = "reservedQuantity" + ${quantity},
+        SET "reservedQuantity" = "reservedQuantity" + ${quantity},
             "updatedAt" = NOW()
         WHERE "storeId" = ${storeId}
           AND "variantId" = ${variantId}
-          AND "stockQuantity" >= ${quantity}
+          AND ("stockQuantity" - "reservedQuantity") >= ${quantity}
       `;
 
       if (rowsUpdated > 0) {
@@ -105,7 +108,26 @@ export class InventoryService {
   async releaseStockAtomic(storeId: string, variantId: string, quantity: number): Promise<boolean> {
     const rowsUpdated = await this.prisma.$executeRaw`
       UPDATE inventories
-      SET "stockQuantity" = "stockQuantity" + ${quantity},
+      SET "reservedQuantity" = GREATEST(0, "reservedQuantity" - ${quantity}),
+          "updatedAt" = NOW()
+      WHERE "storeId" = ${storeId}
+        AND "variantId" = ${variantId}
+    `;
+    if (rowsUpdated > 0) {
+      await this.redisService.del(`dailybasket:inventory:store:${storeId}`);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Commit physical inventory deduction upon fulfillment / delivery completion.
+   * Both on-hand stock and reserved quantity decrement atomically.
+   */
+  async commitStockAtomic(storeId: string, variantId: string, quantity: number): Promise<boolean> {
+    const rowsUpdated = await this.prisma.$executeRaw`
+      UPDATE inventories
+      SET "stockQuantity" = GREATEST(0, "stockQuantity" - ${quantity}),
           "reservedQuantity" = GREATEST(0, "reservedQuantity" - ${quantity}),
           "updatedAt" = NOW()
       WHERE "storeId" = ${storeId}
@@ -116,6 +138,86 @@ export class InventoryService {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Reserve an entire cart of items atomically.
+   * If any single item cannot be reserved due to insufficient stock,
+   * all previously reserved items in this batch are rolled back immediately.
+   */
+  async reserveBatchAtomic(
+    storeId: string,
+    items: { variantId: string; quantity: number }[],
+  ): Promise<{ success: boolean; failedVariantId?: string }> {
+    const reservedItems: { variantId: string; quantity: number }[] = [];
+
+    for (const item of items) {
+      // Ensure inventory record exists (fallback initialization for new variants in dev/demo)
+      const existing = await this.prisma.inventory.findUnique({
+        where: { storeId_variantId: { storeId, variantId: item.variantId } },
+      });
+      if (!existing) {
+        await this.prisma.inventory.create({
+          data: {
+            storeId,
+            variantId: item.variantId,
+            stockQuantity: 100, // Safe dev/seed stock
+            reservedQuantity: 0,
+          },
+        });
+      }
+
+      const reserved = await this.reserveStockAtomic(storeId, item.variantId, item.quantity);
+      if (!reserved) {
+        this.logger.warn(
+          `Batch reserve failed for variant ${item.variantId} in store ${storeId}. Rolling back ${reservedItems.length} reserved items.`,
+        );
+        // Roll back already reserved items
+        for (const prev of reservedItems) {
+          await this.releaseStockAtomic(storeId, prev.variantId, prev.quantity);
+        }
+        return { success: false, failedVariantId: item.variantId };
+      }
+      reservedItems.push(item);
+    }
+
+    return { success: true };
+  }
+
+  /**
+   * Release an entire batch of reserved items (e.g. order cancelled or aborted)
+   */
+  async releaseBatchAtomic(
+    storeId: string,
+    items: { variantId: string; quantity: number }[],
+  ): Promise<void> {
+    for (const item of items) {
+      await this.releaseStockAtomic(storeId, item.variantId, item.quantity);
+    }
+  }
+
+  /**
+   * Commit an entire batch of items (e.g. order delivered)
+   */
+  async commitBatchAtomic(
+    storeId: string,
+    items: { variantId: string; quantity: number }[],
+  ): Promise<void> {
+    for (const item of items) {
+      await this.commitStockAtomic(storeId, item.variantId, item.quantity);
+    }
+  }
+
+  /**
+   * Get available stock for a variant in a specific store (stockQuantity - reservedQuantity)
+   */
+  async getAvailableStock(storeId: string, variantId: string): Promise<number> {
+    const inv = await this.prisma.inventory.findUnique({
+      where: { storeId_variantId: { storeId, variantId } },
+      select: { stockQuantity: true, reservedQuantity: true },
+    });
+    if (!inv) return 0;
+    return Math.max(0, inv.stockQuantity - inv.reservedQuantity);
   }
 
   async getVendors() {

@@ -77,4 +77,14 @@ export class OrdersController {
   async completeDelivery(@Param('id') id: string, @Body() body: { otp?: string }) {
     return this.ordersService.completeDelivery(id, body.otp);
   }
+
+  @Post(':id/cancel')
+  @ApiOperation({ summary: 'Cancel order and release reserved stock according to lifecycle state machine' })
+  async cancelOrder(
+    @ResolvedUserId() userId: string,
+    @Param('id') id: string,
+    @Body() body: { reason?: string },
+  ) {
+    return this.ordersService.cancelOrder(id, userId, body?.reason);
+  }
 }

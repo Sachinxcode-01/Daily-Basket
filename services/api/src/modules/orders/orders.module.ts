@@ -6,9 +6,10 @@ import { RedisModule } from '../redis/redis.module';
 import { EventsModule } from '../events/events.module';
 import { QueueModule } from '../queue/queue.module';
 import { CouponsModule } from '../coupons/coupons.module';
+import { InventoryModule } from '../inventory/inventory.module';
 
 @Module({
-  imports: [RedisModule, EventsModule, QueueModule, CouponsModule],
+  imports: [RedisModule, EventsModule, QueueModule, CouponsModule, InventoryModule],
   controllers: [OrdersController],
   providers: [OrdersService, OrderPricingService],
   exports: [OrdersService, OrderPricingService],

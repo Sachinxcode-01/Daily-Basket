@@ -5,9 +5,16 @@ import { RedisService } from '../redis/redis.service';
 import { EventsGateway } from '../events/events.gateway';
 import { QueueProcessor } from '../queue/queue.processor';
 import { OrderPricingService } from './order-pricing.service';
+import { InventoryService } from '../inventory/inventory.service';
 
 describe('OrdersService Unit Tests', () => {
   let service: OrdersService;
+
+  const mockInventoryService = {
+    reserveBatchAtomic: jest.fn().mockResolvedValue({ success: true }),
+    releaseBatchAtomic: jest.fn().mockResolvedValue(undefined),
+    commitBatchAtomic: jest.fn().mockResolvedValue(undefined),
+  };
 
   const mockPrismaService = {
     order: {
@@ -76,6 +83,7 @@ describe('OrdersService Unit Tests', () => {
         { provide: EventsGateway, useValue: mockEventsGateway },
         { provide: QueueProcessor, useValue: mockQueueProcessor },
         { provide: OrderPricingService, useValue: mockOrderPricingService },
+        { provide: InventoryService, useValue: mockInventoryService },
       ],
     }).compile();
 
@@ -83,7 +91,7 @@ describe('OrdersService Unit Tests', () => {
   });
 
   describe('createOrder', () => {
-    it('should create order, enqueue jobs, and broadcast realtime events', async () => {
+    it('should create order, reserve inventory atomically, enqueue jobs, and broadcast realtime events', async () => {
       const mockOrderObj = {
         id: 'ord_101',
         orderNumber: 'DB-100001',
@@ -99,8 +107,29 @@ describe('OrdersService Unit Tests', () => {
       });
 
       expect(result).toBeDefined();
+      expect(mockInventoryService.reserveBatchAtomic).toHaveBeenCalled();
       expect(mockPrismaService.order.create).toHaveBeenCalled();
       expect(mockEventsGateway.broadcastOrderCreated).toHaveBeenCalled();
+    });
+  });
+
+  describe('cancelOrder', () => {
+    it('should cancel confirmed order and release reserved stock', async () => {
+      const mockOrder = {
+        id: 'ord_101',
+        userId: 'user_101',
+        orderNumber: 'DB-100001',
+        storeId: 'store_101',
+        status: 'CONFIRMED',
+        paymentStatus: 'SUCCESS',
+        items: [{ variantId: 'var_01', quantity: 2 }],
+      };
+      mockPrismaService.order.findUnique.mockResolvedValue(mockOrder);
+      mockPrismaService.order.update.mockResolvedValue({ ...mockOrder, status: 'CANCELLED', paymentStatus: 'REFUNDED' });
+
+      const result = await service.cancelOrder('ord_101', 'user_101', 'Changed mind');
+      expect(result.success).toBe(true);
+      expect(mockInventoryService.releaseBatchAtomic).toHaveBeenCalledWith('store_101', [{ variantId: 'var_01', quantity: 2 }]);
     });
   });
 
