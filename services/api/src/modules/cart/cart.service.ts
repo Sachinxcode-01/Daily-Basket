@@ -8,6 +8,7 @@ export interface AddToCartDto {
   unitName: string;
   price: number;
   quantity?: number;
+  imageUrl?: string;
 }
 
 @Injectable()
@@ -142,6 +143,7 @@ export class CartService {
           unitName: dto.unitName,
           price: dto.price,
           quantity,
+          imageUrl: dto.imageUrl ?? null,
         },
       });
     }

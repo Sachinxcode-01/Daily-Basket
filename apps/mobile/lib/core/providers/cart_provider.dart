@@ -93,7 +93,11 @@ class CartProvider extends ChangeNotifier {
               subtitle: raw['unitName'] ?? '1 pack',
               price: (raw['price'] as num?)?.toDouble() ?? 50.0,
               qty: (raw['quantity'] as num?)?.toInt() ?? 1,
-              image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300',
+              image: (raw['imageUrl'] as String?)?.isNotEmpty == true
+                  ? raw['imageUrl'] as String
+                  : (raw['image'] as String?)?.isNotEmpty == true
+                      ? raw['image'] as String
+                      : 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300',
             ));
           }
           notifyListeners();
