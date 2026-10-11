@@ -96,17 +96,30 @@ export class ApiClient {
     });
   }
 
-  public async forgotPassword(email: string): Promise<{ success: boolean; message: string }> {
+  public async forgotPassword(email: string): Promise<{ success: boolean; message: string; demoOtp?: string }> {
     return this.fetcher('/api/v1/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     });
   }
 
-  public async resetPassword(token: string, newPass: string): Promise<{ success: boolean; message: string }> {
+  public async verifyPasswordOtp(email: string, otp: string): Promise<{ success: boolean; message: string }> {
+    return this.fetcher('/api/v1/auth/verify-password-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp }),
+    });
+  }
+
+  public async resetPassword(
+    payload: { email?: string; otp?: string; token?: string; newPass: string } | string,
+    maybePass?: string,
+  ): Promise<{ success: boolean; message: string }> {
+    const body = typeof payload === 'string'
+      ? { token: payload, newPass: maybePass }
+      : payload;
     return this.fetcher('/api/v1/auth/reset-password', {
       method: 'POST',
-      body: JSON.stringify({ token, newPass }),
+      body: JSON.stringify(body),
     });
   }
 

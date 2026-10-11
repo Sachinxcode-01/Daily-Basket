@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@daily-basket/api-client';
+import { STATIC_CATEGORIES } from '../../lib/catalog';
 
 /**
  * Browse Categories Page — Daily Basket
@@ -18,10 +19,17 @@ export default function BrowseCategoriesPage() {
     refetch,
   } = useQuery({
     queryKey: ['categories'],
-    queryFn: () => apiClient.getCategories(),
+    queryFn: async () => {
+      try {
+        return await apiClient.getCategories();
+      } catch {
+        return [];
+      }
+    },
+    retry: 1,
   });
 
-  const all = Array.isArray(categories) ? categories : [];
+  const all = Array.isArray(categories) && categories.length > 0 ? categories : STATIC_CATEGORIES;
   const featured = all.slice(0, 2);
 
   const fallbackImage =
@@ -65,7 +73,7 @@ export default function BrowseCategoriesPage() {
         )}
 
         {/* Error */}
-        {isError && (
+        {isError && all.length === 0 && (
           <div className="text-center py-16 space-y-3">
             <div className="text-4xl">⚠️</div>
             <p className="font-semibold text-[#1a1c1e]">Couldn&rsquo;t load categories</p>
@@ -79,14 +87,14 @@ export default function BrowseCategoriesPage() {
         )}
 
         {/* Empty */}
-        {!isLoading && !isError && all.length === 0 && (
+        {!isLoading && all.length === 0 && (
           <div className="text-center py-16 space-y-2">
             <div className="text-4xl">🗂️</div>
             <p className="font-semibold text-[#1a1c1e]">No categories available yet</p>
           </div>
         )}
 
-        {!isLoading && !isError && all.length > 0 && (
+        {!isLoading && all.length > 0 && (
           <>
             {/* Featured Categories */}
             {featured.length > 0 && (

@@ -143,7 +143,7 @@ export class CartService {
           unitName: dto.unitName,
           price: dto.price,
           quantity,
-          imageUrl: dto.imageUrl ?? null,
+          ...((dto.imageUrl ? { imageUrl: dto.imageUrl } : {}) as any),
         },
       });
     }

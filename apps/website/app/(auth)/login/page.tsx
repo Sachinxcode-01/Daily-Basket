@@ -107,90 +107,93 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center p-4 sm:p-6 font-sans">
+    <div className="relative min-h-[100dvh] w-full flex flex-col items-center justify-center px-3.5 py-6 sm:p-6 font-sans overflow-x-hidden selection:bg-[#078730]/20">
       {/* Organic Moving Canvas Background */}
       <OrganicShaderBackground />
 
-      <div className="w-full max-w-md bg-white border border-slate-100 rounded-[28px] p-6 sm:p-9 shadow-xl shadow-slate-200/50 animate-[fadeInUp_0.6s_ease-out]">
+      <div className="w-full max-w-[420px] bg-white border border-slate-100/80 rounded-[24px] sm:rounded-[28px] p-5 sm:p-8 md:p-9 shadow-xl shadow-slate-200/50 relative z-10 my-auto animate-[fadeInUp_0.5s_ease-out]">
         
         {/* Brand Header: Green Circular Badge + Daily Basket Text */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="w-11 h-11 rounded-full bg-[#078730] flex items-center justify-center text-white shadow-md shadow-[#078730]/20">
-            <ShoppingBasket className="w-6 h-6 stroke-[2.2]" />
+        <div className="flex items-center gap-2.5 sm:gap-3 mb-5 sm:mb-7">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-[#078730] flex items-center justify-center text-white shadow-md shadow-[#078730]/20 flex-shrink-0">
+            <ShoppingBasket className="w-5 h-5 sm:w-6 sm:h-6 stroke-[2.2]" />
           </div>
-          <h2 className="text-2xl font-extrabold tracking-tight text-[#078730] font-outfit">
+          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-[#078730] font-outfit">
             Daily Basket
           </h2>
         </div>
 
         {/* Title & Subtitle */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-slate-900 font-outfit mb-2">
+        <div className="mb-5 sm:mb-7">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-outfit mb-1.5 tracking-tight">
             Welcome back
           </h1>
-          <p className="text-slate-600 text-sm sm:text-base font-inter">
+          <p className="text-slate-600 text-xs sm:text-sm font-inter">
             Enter your details to access your account.
           </p>
         </div>
 
         {/* Error Notification */}
         {errorMsg && (
-          <div className="mb-6 p-3.5 rounded-2xl bg-red-50 border border-red-200 flex items-center gap-3 text-red-600 text-sm font-medium">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
-            <span>{errorMsg}</span>
+          <div className="mb-5 p-3 sm:p-3.5 rounded-2xl bg-red-50 border border-red-200 flex items-center gap-2.5 sm:gap-3 text-red-600 text-xs sm:text-sm font-medium">
+            <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <span className="leading-snug">{errorMsg}</span>
           </div>
         )}
 
         {/* EMAIL LOGIN FORM */}
-        <form onSubmit={handleEmailSubmit} className="space-y-5">
+        <form onSubmit={handleEmailSubmit} className="space-y-4 sm:space-y-5">
           
           {/* Email Address Field */}
           <div>
-            <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2 font-outfit">
+            <label className="block text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5 sm:mb-2 font-outfit">
               EMAIL ADDRESS
             </label>
             <div className="relative flex items-center">
-              <Mail className="absolute left-4 w-5 h-5 text-slate-500" />
+              <Mail className="absolute left-3.5 sm:left-4 w-4 h-4 sm:w-5 sm:h-5 text-slate-500 pointer-events-none" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@example.com"
-                className="w-full bg-[#E5EFE7]/80 border border-slate-300/60 focus:border-[#078730] focus:bg-white focus:ring-2 focus:ring-[#078730]/20 rounded-xl py-3.5 pl-12 pr-4 text-slate-800 font-medium placeholder-slate-400 outline-none transition-all duration-200"
+                className="w-full bg-[#E5EFE7]/80 border border-slate-300/60 focus:border-[#078730] focus:bg-white focus:ring-2 focus:ring-[#078730]/20 rounded-xl py-3 sm:py-3.5 pl-10 sm:pl-12 pr-4 text-slate-800 text-base font-medium placeholder-slate-400 outline-none transition-all duration-200"
                 disabled={isLoading}
+                autoComplete="email"
               />
             </div>
           </div>
 
           {/* Password Field */}
           <div>
-            <div className="flex justify-between items-center mb-2">
-              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider font-outfit">
+            <div className="flex justify-between items-center mb-1.5 sm:mb-2">
+              <label className="block text-[11px] sm:text-xs font-bold text-slate-700 uppercase tracking-wider font-outfit">
                 PASSWORD
               </label>
               <Link
                 href="/forgot-password"
-                className="text-xs font-bold text-[#078730] hover:underline transition font-outfit"
+                className="text-xs font-bold text-[#078730] hover:underline transition font-outfit py-0.5"
               >
                 Forgot Password?
               </Link>
             </div>
             <div className="relative flex items-center">
-              <Lock className="absolute left-4 w-5 h-5 text-slate-500" />
+              <Lock className="absolute left-3.5 sm:left-4 w-4 h-4 sm:w-5 sm:h-5 text-slate-500 pointer-events-none" />
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-[#E5EFE7]/80 border border-slate-300/60 focus:border-[#078730] focus:bg-white focus:ring-2 focus:ring-[#078730]/20 rounded-xl py-3.5 pl-12 pr-12 text-slate-800 font-medium placeholder-slate-400 outline-none transition-all duration-200"
+                className="w-full bg-[#E5EFE7]/80 border border-slate-300/60 focus:border-[#078730] focus:bg-white focus:ring-2 focus:ring-[#078730]/20 rounded-xl py-3 sm:py-3.5 pl-10 sm:pl-12 pr-11 sm:pr-12 text-slate-800 text-base font-medium placeholder-slate-400 outline-none transition-all duration-200"
                 disabled={isLoading}
+                autoComplete="current-password"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 text-slate-500 hover:text-slate-700 transition"
+                className="absolute right-3 sm:right-3.5 p-1 text-slate-500 hover:text-slate-700 transition"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
-                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
               </button>
             </div>
           </div>
@@ -199,23 +202,23 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-4 bg-[#006823] hover:bg-[#00531a] active:scale-[0.98] text-white font-bold text-base rounded-full shadow-md shadow-[#006823]/20 flex items-center justify-center gap-2.5 transition-all duration-200 disabled:opacity-50"
+            className="w-full py-3.5 sm:py-4 bg-[#006823] hover:bg-[#00531a] active:scale-[0.98] text-white font-bold text-sm sm:text-base rounded-full shadow-md shadow-[#006823]/20 flex items-center justify-center gap-2 transition-all duration-200 disabled:opacity-50 cursor-pointer"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
             ) : (
               <>
                 <span>Login</span>
-                <ArrowRight className="w-5 h-5 stroke-[2.2]" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 stroke-[2.2]" />
               </>
             )}
           </button>
         </form>
 
         {/* Divider */}
-        <div className="relative flex items-center justify-center my-6">
+        <div className="relative flex items-center justify-center my-4 sm:my-6">
           <div className="border-t border-slate-200 w-full" />
-          <span className="bg-white px-3 text-xs text-slate-400 font-bold uppercase tracking-wider font-outfit">
+          <span className="bg-white px-3 text-[11px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider font-outfit">
             OR
           </span>
           <div className="border-t border-slate-200 w-full" />
@@ -226,27 +229,27 @@ export default function LoginPage() {
           type="button"
           onClick={handleGoogleLogin}
           disabled={isLoading || isGoogleLoading}
-          className="w-full py-3.5 bg-white border border-slate-200 hover:bg-slate-50 active:scale-[0.98] text-slate-800 font-bold text-sm rounded-full shadow-xs flex items-center justify-center gap-3 transition-all duration-200 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
+          className="w-full py-3 sm:py-3.5 px-3 bg-white border border-slate-200 hover:bg-slate-50 active:scale-[0.98] text-slate-800 font-bold text-xs sm:text-sm rounded-full shadow-xs flex items-center justify-center gap-2.5 sm:gap-3 transition-all duration-200 disabled:opacity-75 disabled:cursor-not-allowed cursor-pointer"
         >
           {isGoogleLoading ? (
             <>
-              <Loader2 className="w-5 h-5 text-[#078730] animate-spin" />
-              <span>Connecting Google account...</span>
+              <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#078730] animate-spin" />
+              <span className="truncate">Connecting Google account...</span>
             </>
           ) : (
             <>
-              <GoogleGLogo className="w-5 h-5" />
-              <span>Continue with Google</span>
+              <GoogleGLogo className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+              <span className="truncate">Continue with Google</span>
             </>
           )}
         </button>
 
         {/* Footer Link: Don't have an account? Sign up */}
-        <div className="mt-8 text-center text-sm font-medium text-slate-600 font-inter">
+        <div className="mt-6 sm:mt-8 text-center text-xs sm:text-sm font-medium text-slate-600 font-inter">
           Don&apos;t have an account?{' '}
           <Link
             href="/register"
-            className="text-[#078730] font-bold hover:underline transition font-outfit text-base ml-1"
+            className="text-[#078730] font-bold hover:underline transition font-outfit text-sm sm:text-base ml-1 inline-block"
           >
             Sign up
           </Link>

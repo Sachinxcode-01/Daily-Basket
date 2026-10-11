@@ -199,15 +199,37 @@ export class ForgotPasswordDto {
 }
 
 export class ResetPasswordDto {
-  @ApiProperty({ example: 'reset_token_xyz' })
+  @ApiPropertyOptional({ example: 'user@dailybasket.com' })
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @ApiPropertyOptional({ example: '482109' })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  token!: string;
+  otp?: string;
+
+  @ApiPropertyOptional({ example: '482109' })
+  @IsOptional()
+  @IsString()
+  token?: string;
 
   @ApiProperty({ example: 'NewP@ssword123!' })
   @IsString()
   @MinLength(8)
   newPass!: string;
+}
+
+export class VerifyPasswordOtpDto {
+  @ApiProperty({ example: 'user@dailybasket.com' })
+  @IsEmail()
+  @IsNotEmpty()
+  email!: string;
+
+  @ApiProperty({ example: '482109' })
+  @IsString()
+  @IsNotEmpty()
+  otp!: string;
 }
 
 export class VerifyEmailDto {

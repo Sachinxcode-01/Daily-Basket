@@ -64,7 +64,15 @@ export default function HomePage() {
     refetch: refetchProducts,
   } = useQuery({
     queryKey: ['products'],
-    queryFn: () => apiClient.getProducts(),
+    queryFn: async () => {
+      try {
+        return await apiClient.getProducts();
+      } catch (err) {
+        console.warn('Backend API getProducts unreachable, falling back to local master catalog:', err);
+        return [];
+      }
+    },
+    retry: 1,
   });
 
   const catalog: Product[] = useMemo(() => {
@@ -259,41 +267,53 @@ export default function HomePage() {
         </section>
 
         {/* ─── My Impact & Sustainability Section ────────────────────────────── */}
-        <section className="bg-emerald-950 text-white rounded-3xl p-6 sm:p-8 shadow-level-2 border border-emerald-800">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-6">
+        <section className="relative overflow-hidden bg-[#042618] text-white rounded-[28px] p-6 sm:p-8 md:p-9 shadow-xl border border-[#0d4a32] transition-all">
+          {/* Subtle Ambient Radial Glow */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-[#006823]/15 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 sm:mb-8">
             <div>
-              <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-400 bg-emerald-900/60 px-3 py-1 rounded-full">
-                🌱 MY SUSTAINABILITY IMPACT
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-bold font-outfit text-white mt-2">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#0a3d28]/80 border border-[#145d3e] text-[#4ade80] text-[11px] sm:text-xs font-bold uppercase tracking-wider mb-2 shadow-xs">
+                <span>🌱</span>
+                <span>MY SUSTAINABILITY IMPACT</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold font-outfit text-white tracking-tight">
                 Your Eco-Friendly Shopping Impact
               </h2>
             </div>
-            <Link href="/about" className="text-xs text-emerald-300 font-bold hover:underline flex items-center gap-1">
-              Learn about our 100% Organic Supply Chain →
+            <Link
+              href="/impact"
+              className="text-xs sm:text-sm text-[#5ee398] hover:text-[#86efac] font-medium transition-colors flex items-center gap-1.5 hover:underline whitespace-nowrap self-start md:self-auto"
+            >
+              <span>Learn about our 100% Organic Supply Chain</span>
+              <span>→</span>
             </Link>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="bg-emerald-900/40 border border-emerald-800 rounded-2xl p-4 text-center">
-              <span className="text-2xl">🚴</span>
-              <div className="text-xl sm:text-2xl font-bold text-emerald-300 font-outfit mt-1">14.2 kg</div>
-              <div className="text-xs text-emerald-200 font-medium">CO2 Emissions Saved</div>
+          <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+            <div className="group bg-[#062f1f]/50 hover:bg-[#062f1f]/80 backdrop-blur-md border border-[#0d4f35]/80 hover:border-[#15724b] rounded-2xl p-4 sm:p-5 text-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
+              <span className="text-2xl sm:text-3xl inline-block mb-1 transform group-hover:scale-110 transition-transform">🚴</span>
+              <div className="text-xl sm:text-2xl font-bold text-[#4ade80] font-outfit tracking-tight mt-0.5">14.2 kg</div>
+              <div className="text-[11px] sm:text-xs text-[#a7f3d0]/80 font-medium mt-1">CO2 Emissions Saved</div>
             </div>
-            <div className="bg-emerald-900/40 border border-emerald-800 rounded-2xl p-4 text-center">
-              <span className="text-2xl">🛍️</span>
-              <div className="text-xl sm:text-2xl font-bold text-emerald-300 font-outfit mt-1">3.8 kg</div>
-              <div className="text-xs text-emerald-200 font-medium">Plastic Waste Reduced</div>
+
+            <div className="group bg-[#062f1f]/50 hover:bg-[#062f1f]/80 backdrop-blur-md border border-[#0d4f35]/80 hover:border-[#15724b] rounded-2xl p-4 sm:p-5 text-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
+              <span className="text-2xl sm:text-3xl inline-block mb-1 transform group-hover:scale-110 transition-transform">🛍️</span>
+              <div className="text-xl sm:text-2xl font-bold text-[#4ade80] font-outfit tracking-tight mt-0.5">3.8 kg</div>
+              <div className="text-[11px] sm:text-xs text-[#a7f3d0]/80 font-medium mt-1">Plastic Waste Reduced</div>
             </div>
-            <div className="bg-emerald-900/40 border border-emerald-800 rounded-2xl p-4 text-center">
-              <span className="text-2xl">👩‍🌾</span>
-              <div className="text-xl sm:text-2xl font-bold text-emerald-300 font-outfit mt-1">18 Farms</div>
-              <div className="text-xs text-emerald-200 font-medium">Local Farmers Supported</div>
+
+            <div className="group bg-[#062f1f]/50 hover:bg-[#062f1f]/80 backdrop-blur-md border border-[#0d4f35]/80 hover:border-[#15724b] rounded-2xl p-4 sm:p-5 text-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
+              <span className="text-2xl sm:text-3xl inline-block mb-1 transform group-hover:scale-110 transition-transform">🧑‍🌾</span>
+              <div className="text-xl sm:text-2xl font-bold text-[#4ade80] font-outfit tracking-tight mt-0.5">18 Farms</div>
+              <div className="text-[11px] sm:text-xs text-[#a7f3d0]/80 font-medium mt-1">Local Farmers Supported</div>
             </div>
-            <div className="bg-emerald-900/40 border border-emerald-800 rounded-2xl p-4 text-center">
-              <span className="text-2xl">🎖️</span>
-              <div className="text-xl sm:text-2xl font-bold text-emerald-300 font-outfit mt-1">Tier 3 Eco</div>
-              <div className="text-xs text-emerald-200 font-medium">Sustainability Badge</div>
+
+            <div className="group bg-[#062f1f]/50 hover:bg-[#062f1f]/80 backdrop-blur-md border border-[#0d4f35]/80 hover:border-[#15724b] rounded-2xl p-4 sm:p-5 text-center transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/20">
+              <span className="text-2xl sm:text-3xl inline-block mb-1 transform group-hover:scale-110 transition-transform">🎖️</span>
+              <div className="text-xl sm:text-2xl font-bold text-[#4ade80] font-outfit tracking-tight mt-0.5">Tier 3 Eco</div>
+              <div className="text-[11px] sm:text-xs text-[#a7f3d0]/80 font-medium mt-1">Sustainability Badge</div>
             </div>
           </div>
         </section>
@@ -346,8 +366,8 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Error state */}
-          {productsError && (
+          {/* Error state (only shown if both API and local fallback catalog have no items) */}
+          {productsError && catalog.length === 0 && (
             <div className="text-center py-16 space-y-3">
               <div className="text-4xl">⚠️</div>
               <p className="font-bold text-on-surface">Couldn&rsquo;t load the catalog</p>
@@ -362,7 +382,7 @@ export default function HomePage() {
           )}
 
           {/* Empty state */}
-          {!productsLoading && !productsError && filteredProducts.length === 0 && (
+          {!productsLoading && (catalog.length === 0 ? !productsError : true) && filteredProducts.length === 0 && (
             <div className="text-center py-16 space-y-2">
               <div className="text-4xl">🧺</div>
               <p className="font-bold text-on-surface">No products found</p>
@@ -371,7 +391,7 @@ export default function HomePage() {
           )}
 
           {/* Product Grid (Responsive: 2-col mobile, 3-col tablet, 4-col laptop, 5-col desktop, 6-col wide) */}
-          {!productsLoading && !productsError && filteredProducts.length > 0 && (
+          {!productsLoading && filteredProducts.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 sm:gap-5">
             {filteredProducts.map((p) => {
               const qty = qtyForVariant(p.variantId);

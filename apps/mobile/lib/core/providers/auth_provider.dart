@@ -185,7 +185,7 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// 4. Real Forgot Password Dispatch via Gmail SMTP
+  /// 4. Forgot Password Dispatch via Email OTP
   Future<Map<String, dynamic>> forgotPassword(String email) async {
     _isLoading = true;
     _errorMessage = null;
@@ -198,7 +198,7 @@ class AuthProvider extends ChangeNotifier {
 
       _isLoading = false;
       if (res['success'] != true) {
-        _errorMessage = res['error'] ?? res['message'] ?? 'Failed to send reset link.';
+        _errorMessage = res['error'] ?? res['message'] ?? 'Failed to send verification code.';
       }
       notifyListeners();
       return res;
@@ -210,9 +210,11 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// 5. Real Reset Password via Token
+  /// 5. Reset Password via Email OTP or Token
   Future<Map<String, dynamic>> resetPassword({
-    required String token,
+    String? token,
+    String? otp,
+    String? email,
     required String newPass,
   }) async {
     _isLoading = true;
@@ -220,10 +222,14 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await _apiClient.post('/auth/reset-password', {
-        'token': token.trim(),
+      final payload = <String, dynamic>{
         'newPass': newPass,
-      });
+      };
+      if (token != null && token.isNotEmpty) payload['token'] = token.trim();
+      if (otp != null && otp.isNotEmpty) payload['otp'] = otp.trim();
+      if (email != null && email.isNotEmpty) payload['email'] = email.trim().toLowerCase();
+
+      final res = await _apiClient.post('/auth/reset-password', payload);
 
       _isLoading = false;
       if (res['success'] != true) {

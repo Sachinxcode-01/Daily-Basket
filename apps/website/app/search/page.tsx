@@ -117,7 +117,14 @@ export default function SearchPage() {
     refetch,
   } = useQuery({
     queryKey: ['search', debouncedQuery],
-    queryFn: () => apiClient.getProducts(undefined, debouncedQuery || undefined),
+    queryFn: async () => {
+      try {
+        return await apiClient.getProducts(undefined, debouncedQuery || undefined);
+      } catch {
+        return [];
+      }
+    },
+    retry: 1,
   });
 
   const baseResults: WebsiteProduct[] = useMemo(() => {
@@ -310,7 +317,7 @@ export default function SearchPage() {
         )}
 
         {/* Error */}
-        {!loading && isError && (
+        {!loading && isError && baseResults.length === 0 && (
           <div className="text-center py-16 space-y-3">
             <div className="text-4xl">⚠️</div>
             <p className="font-bold text-white">Search failed</p>
@@ -324,7 +331,7 @@ export default function SearchPage() {
         )}
 
         {/* Empty */}
-        {!loading && !isError && results.length === 0 && (
+        {!loading && (baseResults.length === 0 ? !isError : true) && results.length === 0 && (
           <div className="text-center py-16 space-y-2">
             <div className="text-4xl">🔍</div>
             <p className="font-bold text-white">No products found</p>
@@ -335,7 +342,7 @@ export default function SearchPage() {
         )}
 
         {/* Results Grid */}
-        {!loading && !isError && results.length > 0 && (
+        {!loading && results.length > 0 && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
             {results.map((item) => {
               const count = qtyFor(item.variantId);

@@ -12,6 +12,7 @@ import {
   GoogleOAuthDto,
   ForgotPasswordDto,
   ResetPasswordDto,
+  VerifyPasswordOtpDto,
   VerifyEmailDto,
   ChangePasswordDto,
 } from './dto/auth.dto';
@@ -66,15 +67,21 @@ export class AuthController {
   }
 
   @Post('forgot-password')
-  @ApiOperation({ summary: 'Request single-use password reset link & token' })
+  @ApiOperation({ summary: 'Request 6-digit Email OTP for password reset (No link sent)' })
   async forgotPassword(@Body() body: ForgotPasswordDto) {
     return this.authService.forgotPassword(body.email);
   }
 
+  @Post('verify-password-otp')
+  @ApiOperation({ summary: 'Verify 6-digit password reset Email OTP' })
+  async verifyPasswordOtp(@Body() body: VerifyPasswordOtpDto) {
+    return this.authService.verifyPasswordResetOtp(body.email, body.otp);
+  }
+
   @Post('reset-password')
-  @ApiOperation({ summary: 'Reset account password, enforce history, and revoke active sessions' })
+  @ApiOperation({ summary: 'Reset account password using Email OTP, enforce history, and revoke active sessions' })
   async resetPassword(@Body() body: ResetPasswordDto) {
-    return this.authService.resetPassword(body.token, body.newPass);
+    return this.authService.resetPassword(body);
   }
 
   @Post('verify-email')

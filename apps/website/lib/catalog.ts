@@ -98,6 +98,32 @@ export function getProductById(id: string): WebsiteProduct | undefined {
   );
 }
 
+export interface WebsiteCategory {
+  id: string;
+  name: string;
+  slug: string;
+  imageUrl?: string;
+  bannerImage?: string;
+  itemCount?: number;
+}
+
+export const STATIC_CATEGORIES: WebsiteCategory[] = CANONICAL_CATEGORIES.map((slug) => {
+  const meta = CATEGORY_DISPLAY_MAP[slug] || {
+    name: slug.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
+    slug,
+  };
+  const firstProd = ALL_WEBSITE_PRODUCTS.find((p) => p.categorySlug === slug);
+  const count = ALL_WEBSITE_PRODUCTS.filter((p) => p.categorySlug === slug).length;
+  return {
+    id: slug,
+    name: meta.name,
+    slug: meta.slug,
+    imageUrl: firstProd?.image || '/images/daily_basket_logo.png',
+    bannerImage: firstProd?.image,
+    itemCount: count,
+  };
+});
+
 export function searchProducts(query: string, categoryFilter?: string): WebsiteProduct[] {
   const norm = (s: string) =>
     (s || '')

@@ -201,43 +201,46 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isSmallScreen = screenWidth < 360;
+
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(
-              horizontal: AppTheme.marginMobile,
-              vertical: AppTheme.spacingLg,
+            physics: const ClampingScrollPhysics(),
+            padding: EdgeInsets.symmetric(
+              horizontal: isSmallScreen ? 12 : AppTheme.marginMobile,
+              vertical: isSmallScreen ? 14 : AppTheme.spacingLg,
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
-
                 children: [
                   // ─── Brand Header: Green Circular Badge + Daily Basket ──────
                   Row(
                     children: [
                       Container(
-                        width: 44,
-                        height: 44,
+                        width: isSmallScreen ? 38 : 44,
+                        height: isSmallScreen ? 38 : 44,
                         decoration: const BoxDecoration(
                           color: AppColors.primary,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.shopping_basket_rounded,
                           color: Colors.white,
-                          size: 24,
+                          size: isSmallScreen ? 20 : 24,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Text(
                         'Daily Basket',
                         style: GoogleFonts.outfit(
-                          fontSize: 24,
+                          fontSize: isSmallScreen ? 21 : 24,
                           fontWeight: FontWeight.w800,
                           color: AppColors.primary,
                           letterSpacing: -0.5,
@@ -246,12 +249,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 32),
+                  SizedBox(height: isSmallScreen ? 20 : 32),
 
                   // ─── Main White Card Container ──────────────────────────
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(28),
+                    padding: EdgeInsets.all(isSmallScreen ? 20 : 28),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(28),
@@ -268,13 +271,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-
                       children: [
                         // Title: Welcome back
                         Text(
                           'Welcome back',
                           style: GoogleFonts.outfit(
-                            fontSize: 28,
+                            fontSize: isSmallScreen ? 24 : 28,
                             fontWeight: FontWeight.w800,
                             color: AppColors.onSurface,
                           ),
@@ -283,7 +285,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Text(
                           'Enter your details to access your account.',
                           style: GoogleFonts.inter(
-                            fontSize: 14,
+                            fontSize: isSmallScreen ? 13 : 14,
                             color: AppColors.onSurfaceVariant,
                           ),
                         ),

@@ -9,6 +9,7 @@ import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../../store/useCart';
 import {
   ALL_WEBSITE_PRODUCTS,
+  CATEGORY_DISPLAY_MAP,
   AdvancedFilterState,
   INITIAL_FILTER_STATE,
   filterAndSortWebsiteProducts,
@@ -45,7 +46,14 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
 
   const { data: categories } = useQuery({
     queryKey: ['categories'],
-    queryFn: () => apiClient.getCategories(),
+    queryFn: async () => {
+      try {
+        return await apiClient.getCategories();
+      } catch {
+        return [];
+      }
+    },
+    retry: 1,
   });
 
   const {
@@ -55,14 +63,22 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
     refetch,
   } = useQuery({
     queryKey: ['products', 'category', categoryId],
-    queryFn: () => apiClient.getProducts(categoryId),
+    queryFn: async () => {
+      try {
+        return await apiClient.getProducts(categoryId);
+      } catch {
+        return [];
+      }
+    },
+    retry: 1,
   });
 
   const category = useMemo(
     () => (Array.isArray(categories) ? categories.find((c: any) => c.id === categoryId) : undefined),
     [categories, categoryId],
   );
-  const categoryName = category?.name ?? 'Category';
+  const staticMeta = CATEGORY_DISPLAY_MAP[categoryId];
+  const categoryName = category?.name ?? staticMeta?.name ?? categoryId.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   const banner =
     (category as any)?.bannerImage ||
     category?.imageUrl ||
@@ -229,7 +245,7 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
         )}
 
         {/* Error */}
-        {isError && (
+        {isError && rawProducts.length === 0 && (
           <div className="text-center py-16 space-y-3">
             <div className="text-4xl">⚠️</div>
             <p className="font-bold text-white">Couldn&rsquo;t load products</p>
@@ -243,7 +259,7 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
         )}
 
         {/* Empty */}
-        {!isLoading && !isError && filteredProducts.length === 0 && (
+        {!isLoading && (rawProducts.length === 0 ? !isError : true) && filteredProducts.length === 0 && (
           <div className="text-center py-16 space-y-2">
             <div className="text-4xl">🧺</div>
             <p className="font-bold text-white">No products in this category</p>
@@ -252,7 +268,7 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
         )}
 
         {/* Product Grid */}
-        {!isLoading && !isError && filteredProducts.length > 0 && (
+        {!isLoading && filteredProducts.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts.map((p) => (
               <div
