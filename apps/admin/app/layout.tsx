@@ -45,100 +45,200 @@ export default function AdminLayout({
             </div>
 
             {/* Nav Items */}
-            <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-              <Link
-                href="/"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#1a1c1e] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
-              >
-                <LayoutDashboard className="w-4 h-4 text-[#006b23]" />
-                <span>Overview</span>
-              </Link>
+            <nav className="flex-1 p-3 space-y-4 overflow-y-auto scrollbar-thin">
+              {/* Primary Fast Actions */}
+              <div className="space-y-1">
+                <Link
+                  href="/"
+                  className="flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-[#1a1c1e] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <LayoutDashboard className="w-4 h-4 text-[#006b23]" />
+                  <span>Overview</span>
+                </Link>
 
-              <Link
-                href="/executive-analytics"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-primary hover:bg-primary-container/20 transition"
-              >
-                <TrendingUp className="w-4 h-4 text-primary" />
-                <span className="font-bold">Executive Analytics</span>
-              </Link>
+                {/* Fast Daily Price Editor Highlight */}
+                <Link
+                  href="/products/daily-pricing"
+                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold text-[#006b23] bg-[#006b23]/10 hover:bg-[#006b23]/15 transition border border-[#006b23]/20"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Zap className="w-4 h-4 text-[#006b23] fill-current" />
+                    <span>Daily Price Editor</span>
+                  </div>
+                  <span className="text-[9px] uppercase font-black bg-[#006b23] text-white px-1.5 py-0.5 rounded-md">
+                    60s
+                  </span>
+                </Link>
 
-              {/* Fast Daily Price Editor Highlight */}
-              <Link
-                href="/products/daily-pricing"
-                className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-bold text-[#006b23] bg-[#006b23]/10 hover:bg-[#006b23]/15 transition border border-[#006b23]/20"
-              >
-                <div className="flex items-center gap-3">
-                  <Zap className="w-4 h-4 text-[#006b23] fill-current" />
-                  <span>Daily Price Editor</span>
-                </div>
-                <span className="text-[10px] uppercase font-black bg-[#006b23] text-white px-1.5 py-0.5 rounded-md">
-                  60s
+                <Link
+                  href="/orders"
+                  className="flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <div className="flex items-center gap-3">
+                    <ShoppingCart className="w-4 h-4" />
+                    <span>Order Pipeline</span>
+                  </div>
+                  <span className="text-[10px] font-bold bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded-full">
+                    LIVE
+                  </span>
+                </Link>
+              </div>
+
+              {/* Operations & Dark Store */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block">
+                  Store Operations
                 </span>
-              </Link>
+                <Link
+                  href="/store-operations"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Store className="w-4 h-4" />
+                  <span>Store Operations</span>
+                </Link>
+                <Link
+                  href="/retail-os"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Package className="w-4 h-4" />
+                  <span>Retail OS Hub</span>
+                </Link>
+                <Link
+                  href="/checklist"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Zap className="w-4 h-4" />
+                  <span>Daily Checklist</span>
+                </Link>
+                <Link
+                  href="/grn"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Package className="w-4 h-4" />
+                  <span>Inward GRN</span>
+                </Link>
+              </div>
 
-              <Link
-                href="/products"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
-              >
-                <Package className="w-4 h-4" />
-                <span>Product Catalog</span>
-              </Link>
+              {/* Catalog & Inventory */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block">
+                  Catalog & Inventory
+                </span>
+                <Link
+                  href="/products"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Package className="w-4 h-4" />
+                  <span>Product Catalog</span>
+                </Link>
+                <Link
+                  href="/products/editor"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Edit3 className="w-4 h-4" />
+                  <span>Product Editor</span>
+                </Link>
+                <Link
+                  href="/inventory"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Package className="w-4 h-4" />
+                  <span>Inventory & Batches</span>
+                </Link>
+                <Link
+                  href="/suppliers"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Users className="w-4 h-4" />
+                  <span>Suppliers</span>
+                </Link>
+              </div>
 
-              <Link
-                href="/products/editor"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
-              >
-                <Edit3 className="w-4 h-4" />
-                <span>Product Editor</span>
-              </Link>
+              {/* Intelligence & Analytics */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block">
+                  AI & Analytics
+                </span>
+                <Link
+                  href="/executive-analytics"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <TrendingUp className="w-4 h-4 text-[#006b23]" />
+                  <span>Executive Analytics</span>
+                </Link>
+                <Link
+                  href="/ai-analytics"
+                  className="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <div className="flex items-center gap-3">
+                    <TrendingUp className="w-4 h-4" />
+                    <span>Demand Forecast</span>
+                  </div>
+                  <span className="text-[9px] font-extrabold bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded">
+                    AI
+                  </span>
+                </Link>
+                <Link
+                  href="/copilot"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Zap className="w-4 h-4 text-amber-500" />
+                  <span>Store Copilot</span>
+                </Link>
+              </div>
 
-              <Link
-                href="/inventory"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
-              >
-                <Package className="w-4 h-4" />
-                <span>Inventory & Batches</span>
-              </Link>
+              {/* Fleet & Customers */}
+              <div className="space-y-1">
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 px-3 block">
+                  Fleet & Customers
+                </span>
+                <Link
+                  href="/riders"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Bike className="w-4 h-4" />
+                  <span>Rider Performance</span>
+                </Link>
+                <Link
+                  href="/customers"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Users className="w-4 h-4" />
+                  <span>Customer Insights</span>
+                </Link>
+                <Link
+                  href="/marketing/coupons"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Megaphone className="w-4 h-4" />
+                  <span>Coupons & Promos</span>
+                </Link>
+              </div>
 
-              <Link
-                href="/orders"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
-              >
-                <ShoppingCart className="w-4 h-4" />
-                <span>Order Pipeline</span>
-              </Link>
-
-              <Link
-                href="/customers"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
-              >
-                <Users className="w-4 h-4" />
-                <span>Customer Insights</span>
-              </Link>
-
-              <Link
-                href="/riders"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
-              >
-                <Bike className="w-4 h-4" />
-                <span>Rider Performance</span>
-              </Link>
-
-              <Link
-                href="/marketing"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
-              >
-                <Megaphone className="w-4 h-4" />
-                <span>Marketing & Promos</span>
-              </Link>
-
-              <Link
-                href="/settings"
-                className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
-              >
-                <Settings className="w-4 h-4" />
-                <span>System Settings</span>
-              </Link>
+              {/* Settings & System */}
+              <div className="space-y-1 pt-2 border-t border-slate-100">
+                <Link
+                  href="/finance/dashboard"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  <span>Finance Dashboard</span>
+                </Link>
+                <Link
+                  href="/support"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Bell className="w-4 h-4" />
+                  <span>Support Desk</span>
+                </Link>
+                <Link
+                  href="/settings"
+                  className="flex items-center gap-3 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#3f4a3d] hover:bg-[#dce5dd]/60 hover:text-[#006b23] transition"
+                >
+                  <Settings className="w-4 h-4" />
+                  <span>System Settings</span>
+                </Link>
+              </div>
             </nav>
 
             {/* User Footer */}

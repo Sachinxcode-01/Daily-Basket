@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import {
   Bike,
   Navigation,
@@ -558,6 +559,34 @@ export default function DeliveryRiderDashboardPage() {
           </div>
         </div>
       )}
+
+      {/* Persistent Bottom PWA Navigation Bar */}
+      <nav className="fixed bottom-0 inset-x-0 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 p-2 z-40 max-w-md mx-auto flex items-center justify-around shadow-2xl">
+        <Link
+          href="/"
+          className="flex flex-col items-center gap-1 py-1 px-4 text-emerald-400 font-bold text-xs"
+        >
+          <Bike className="w-5 h-5 text-emerald-400" />
+          <span>Active Order</span>
+        </Link>
+
+        <Link
+          href="/performance"
+          className="flex flex-col items-center gap-1 py-1 px-4 text-slate-400 hover:text-slate-200 transition text-xs font-semibold"
+        >
+          <DollarSign className="w-5 h-5 text-slate-400" />
+          <span>Performance</span>
+        </Link>
+
+        <Link
+          href="/api/status"
+          target="_blank"
+          className="flex flex-col items-center gap-1 py-1 px-4 text-slate-500 hover:text-slate-300 transition text-[10px]"
+        >
+          <Radio className="w-4 h-4 text-slate-500" />
+          <span>Telemetry</span>
+        </Link>
+      </nav>
     </div>
   );
 }
