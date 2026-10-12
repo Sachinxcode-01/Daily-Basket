@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, LayoutGrid, ShoppingBag, UserCheck, ShieldAlert, Sparkles, Navigation } from 'lucide-react';
+import { Menu, X, LayoutGrid, ShoppingBag, UserCheck, ShieldAlert, Sparkles, Navigation, Activity } from 'lucide-react';
 
 interface RouteGroup {
   category: string;
@@ -11,50 +11,76 @@ interface RouteGroup {
 
 const allRoutes: RouteGroup[] = [
   {
-    category: 'Store & Shopping',
+    category: 'Store & Shopping Experience',
     items: [
       { label: 'Home Page', href: '/' },
       { label: 'Search Results', href: '/search' },
       { label: 'Browse Categories', href: '/categories' },
-      { label: 'Fresh Produce Explorer', href: '/freshness' },
+      { label: 'Fresh Vegetables Category', href: '/categories/fresh-vegetables' },
+      { label: 'Dairy & Bread Category', href: '/categories/dairy-bread-eggs' },
+      { label: 'Fresh Produce Explorer', href: '/freshness', badge: 'PRODUCE' },
+      { label: 'Coupons & Deals Hub', href: '/offers', badge: 'OFFERS' },
+      { label: 'Quick Buy (Reorder)', href: '/quick-buy' },
+      { label: 'Saved Wishlist', href: '/wishlist' },
       { label: 'Shopping Cart', href: '/cart' },
       { label: 'Empty Cart State', href: '/cart/empty' },
       { label: 'Checkout', href: '/checkout' },
-      { label: 'Order Success', href: '/order-success' },
+      { label: 'Order Success Confirmation', href: '/order-success' },
     ],
   },
   {
-    category: 'Delivery & Account Services',
+    category: 'Delivery, Logistics & User Account',
     items: [
-      { label: 'Live Delivery Tracking', href: '/tracking/ORD-9824', badge: 'LIVE' },
+      { label: 'Order Tracking Hub', href: '/tracking', badge: 'NEW' },
+      { label: 'Live GPS Order Tracking (Demo)', href: '/tracking/ORD-9824', badge: 'LIVE GPS' },
+      { label: 'Select Delivery Location', href: '/select-location' },
+      { label: 'Add New Address', href: '/add-address' },
       { label: 'Rate Your Delivery', href: '/rate-delivery' },
-      { label: 'Notification Center', href: '/notifications' },
+      { label: 'User Profile & Preferences', href: '/profile' },
       { label: 'Wallet & Transactions', href: '/wallet' },
+      { label: 'Notification Center', href: '/notifications' },
       { label: 'Daily Basket Plus VIP', href: '/loyalty', badge: 'VIP' },
-      { label: 'Help Center & Support', href: '/help' },
+      { label: 'Product Reviews & Ratings', href: '/reviews' },
+      { label: 'Stock Alerts & Back-in-Stock', href: '/stock-alerts' },
+      { label: 'Support Desk (Priority Help)', href: '/support', badge: '24/7' },
+      { label: 'Help Center & FAQs', href: '/help' },
     ],
   },
   {
-    category: 'Authentication & Security',
+    category: 'System Health & Operations',
+    items: [
+      { label: 'System Status Dashboard', href: '/status', badge: 'LIVE HEALTH' },
+      { label: 'Status JSON API Endpoint', href: '/api/status', badge: 'API' },
+      { label: 'Store Closed / Maintenance', href: '/store-closed' },
+      { label: 'Brand Reveal Experience', href: '/brand-reveal' },
+      { label: '3D Visual Experience', href: '/experience/three-js' },
+      { label: 'Shader Visual Experience', href: '/experience/shader' },
+    ],
+  },
+  {
+    category: 'Authentication & Account Security',
     items: [
       { label: 'Login Options', href: '/login' },
       { label: 'Create Account', href: '/register' },
-      { label: 'Verify Email', href: '/verify-email' },
+      { label: 'Verify Email OTP', href: '/verify-email' },
       { label: 'Email Verified Success', href: '/success' },
       { label: 'Forgot Password', href: '/forgot-password' },
       { label: 'Reset Password', href: '/reset-password' },
-      { label: 'Enable Biometrics', href: '/enable-biometrics' },
-      { label: 'Account Locked', href: '/account-locked' },
+      { label: 'Enable Biometrics (WebAuthn)', href: '/enable-biometrics' },
+      { label: 'Account Locked Safeguard', href: '/account-locked' },
     ],
   },
   {
-    category: 'Company & Info',
+    category: 'Company, Impact & Policies',
     items: [
-      { label: 'App Features', href: '/features' },
-      { label: 'How It Works', href: '/how-it-works' },
+      { label: 'App Features & Tech Stack', href: '/features' },
+      { label: 'How 10-Min Delivery Works', href: '/how-it-works' },
       { label: 'About Us', href: '/about' },
-      { label: 'Security Overview', href: '/security' },
-      { label: 'AI Shopping Assistant', href: '/ai-assistant' },
+      { label: 'Contact Us', href: '/contact' },
+      { label: 'Careers at Daily Basket', href: '/careers' },
+      { label: 'Environmental Impact', href: '/impact' },
+      { label: 'Security & Encryption Overview', href: '/security' },
+      { label: 'AI Shopping Assistant', href: '/ai-assistant', badge: 'AI' },
       { label: 'Terms of Service', href: '/terms' },
       { label: 'Privacy Policy', href: '/privacy' },
     ],
@@ -63,6 +89,7 @@ const allRoutes: RouteGroup[] = [
 
 export default function QuickNavMenu() {
   const [isOpen, setIsOpen] = useState(false);
+  const totalScreens = allRoutes.reduce((acc, g) => acc + g.items.length, 0);
 
   return (
     <>
@@ -73,14 +100,13 @@ export default function QuickNavMenu() {
         aria-label="Open Screen Navigator"
       >
         <LayoutGrid className="w-4 h-4" />
-        <span>All Screens ({allRoutes.reduce((acc, g) => acc + g.items.length, 0)})</span>
+        <span>All Screens ({totalScreens})</span>
       </button>
 
       {/* Modal Backdrop */}
       {isOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-[fadeIn_0.2s_ease-out]">
-          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden">
-            
+          <div className="bg-white rounded-3xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl border border-slate-100 overflow-hidden">
             {/* Modal Header */}
             <div className="p-5 sm:p-6 bg-slate-50 border-b border-slate-200/80 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -92,7 +118,7 @@ export default function QuickNavMenu() {
                     Screen Navigator Hub
                   </h2>
                   <p className="text-xs text-slate-500 font-inter">
-                    Direct access to all Daily Basket application pages
+                    Direct access to all {totalScreens} Daily Basket application pages & features
                   </p>
                 </div>
               </div>
@@ -120,9 +146,9 @@ export default function QuickNavMenu() {
                         onClick={() => setIsOpen(false)}
                         className="p-3 bg-slate-50 hover:bg-emerald-50 border border-slate-100 hover:border-emerald-200 rounded-xl text-sm font-semibold font-outfit text-slate-800 hover:text-[#006b23] flex items-center justify-between transition group"
                       >
-                        <span>{item.label}</span>
+                        <span className="truncate pr-2">{item.label}</span>
                         {item.badge && (
-                          <span className="text-[10px] font-extrabold bg-[#006b23] text-white px-2 py-0.5 rounded-full">
+                          <span className="text-[10px] font-extrabold bg-[#006b23] text-white px-2 py-0.5 rounded-full shrink-0">
                             {item.badge}
                           </span>
                         )}
@@ -134,10 +160,11 @@ export default function QuickNavMenu() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 bg-slate-50 border-t border-slate-200/80 text-center text-xs text-slate-500 font-inter font-medium">
-              Daily Basket Quick-Commerce Suite • All 27+ Screens Active
+            <div className="p-4 bg-slate-50 border-t border-slate-200/80 text-center text-xs text-slate-500 font-inter font-medium flex items-center justify-center gap-4">
+              <span>Daily Basket Quick-Commerce Suite</span>
+              <span>•</span>
+              <span className="font-bold text-[#006b23]">{totalScreens} Production Screens Operational</span>
             </div>
-
           </div>
         </div>
       )}
