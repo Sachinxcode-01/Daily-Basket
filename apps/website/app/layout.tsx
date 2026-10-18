@@ -31,6 +31,8 @@ export default function RootLayout({
           async
           defer
         ></script>
+        {/* YouPI PG V2 Universal Checkout Script */}
+        <script src="http://localhost:7000/youpi.js" async></script>
       </head>
       <body className="bg-background text-on-background font-body-lg antialiased min-h-screen">
         <ErrorBoundary>

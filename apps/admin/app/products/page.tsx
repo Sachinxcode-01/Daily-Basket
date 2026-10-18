@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Menu,
   Bell,
@@ -331,24 +332,24 @@ export default function ProductsManagementPage() {
                   <div className="flex gap-2 pt-1">
                     {p.isLowStock ? (
                       <>
-                        <button className="flex-1 py-1.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 hover:bg-[#f8fafc]">
-                          <Edit className="w-3.5 h-3.5" /> Edit
-                        </button>
-                        <button className="flex-1 py-1.5 bg-[#006837] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm hover:bg-[#00522b]">
+                        <Link href={`/products/details?id=${p.id}`} className="flex-1 py-1.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 hover:bg-[#f8fafc]">
+                          <Edit className="w-3.5 h-3.5" /> Details
+                        </Link>
+                        <Link href={`/products/details?id=${p.id}`} className="flex-1 py-1.5 bg-[#006837] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm hover:bg-[#00522b]">
                           <ShoppingCart className="w-3.5 h-3.5" /> Restock
-                        </button>
+                        </Link>
                       </>
                     ) : (
                       <>
-                        <button className="flex-1 py-1.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1 hover:bg-[#f8fafc]">
-                          <Edit className="w-3.5 h-3.5" /> Edit
-                        </button>
-                        <button className="flex-1 py-1.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1 hover:bg-[#f8fafc]">
+                        <Link href={`/products/details?id=${p.id}`} className="flex-1 py-1.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1 hover:bg-[#f8fafc]">
+                          <Edit className="w-3.5 h-3.5" /> Details
+                        </Link>
+                        <Link href={`/products/details?id=${p.id}`} className="flex-1 py-1.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1 hover:bg-[#f8fafc]">
                           <Package className="w-3.5 h-3.5" /> Stock
-                        </button>
-                        <button className="flex-1 py-1.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1 hover:bg-[#f8fafc]">
+                        </Link>
+                        <Link href={`/products/details?id=${p.id}`} className="flex-1 py-1.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1 hover:bg-[#f8fafc]">
                           <Tag className="w-3.5 h-3.5" /> Price
-                        </button>
+                        </Link>
                       </>
                     )}
                   </div>
@@ -527,24 +528,24 @@ export default function ProductsManagementPage() {
                 <div className="flex gap-3 pt-1">
                   {p.isLowStock ? (
                     <>
-                      <button className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]">
-                        <Edit className="w-4 h-4" /> Edit
-                      </button>
-                      <button className="flex-1 py-2.5 bg-[#006837] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm hover:bg-[#00522b]">
+                      <Link href={`/products/details?id=${p.id}`} className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]">
+                        <Edit className="w-4 h-4" /> Details
+                      </Link>
+                      <Link href={`/products/details?id=${p.id}`} className="flex-1 py-2.5 bg-[#006837] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm hover:bg-[#00522b]">
                         <ShoppingCart className="w-4 h-4" /> Restock
-                      </button>
+                      </Link>
                     </>
                   ) : (
                     <>
-                      <button className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]">
-                        <Edit className="w-4 h-4" /> Edit
-                      </button>
-                      <button className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]">
+                      <Link href={`/products/details?id=${p.id}`} className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]">
+                        <Edit className="w-4 h-4" /> Details
+                      </Link>
+                      <Link href={`/products/details?id=${p.id}`} className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]">
                         <Package className="w-4 h-4" /> Stock
-                      </button>
-                      <button className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]">
+                      </Link>
+                      <Link href={`/products/details?id=${p.id}`} className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]">
                         <Tag className="w-4 h-4" /> Price
-                      </button>
+                      </Link>
                     </>
                   )}
                 </div>
@@ -573,21 +574,24 @@ export default function ProductsManagementPage() {
                   <tr key={p.id} className="hover:bg-[#f8fafc] transition">
                     <td className="py-3.5 font-bold font-mono text-[#006837]">{p.sku}</td>
                     <td className="py-3.5 font-bold text-[#1e2923]">
-                      <div>{p.name}</div>
-                      <div className="text-[10px] text-[#64748b] uppercase">{p.brand}</div>
+                      <Link href={`/products/details?id=${p.id}`} className="hover:text-[#006837] transition">
+                        <div>{p.name}</div>
+                        <div className="text-[10px] text-[#64748b] uppercase">{p.brand}</div>
+                      </Link>
                     </td>
                     <td className="py-3.5 text-[#64748b]">{p.category}</td>
                     <td className="py-3.5 font-black text-[#1e2923]">{p.price}</td>
                     <td className="py-3.5 font-bold text-[#15803d]">{p.margin}</td>
                     <td className="py-3.5 font-mono font-bold text-[#1e2923]">{p.stockAvailable} units</td>
                     <td className="py-3.5">
-                      <button
-                        className={`px-3 py-1.5 text-white rounded-xl text-xs font-bold ${
+                      <Link
+                        href={`/products/details?id=${p.id}`}
+                        className={`inline-block px-3 py-1.5 text-white rounded-xl text-xs font-bold ${
                           p.isLowStock ? 'bg-[#b91c1c]' : 'bg-[#006837]'
                         }`}
                       >
-                        {p.isLowStock ? 'Restock' : 'Edit'}
-                      </button>
+                        {p.isLowStock ? 'Restock' : 'Details'}
+                      </Link>
                     </td>
                   </tr>
                 ))}

@@ -34,6 +34,9 @@ export const API_ROUTES = {
   PAYMENTS: {
     INITIATE: '/api/v1/payments/initiate',
     VERIFY: '/api/v1/payments/verify',
+    YOUPI_INITIATE: '/api/v1/payments/youpi/initiate',
+    YOUPI_WEBHOOK: '/api/v1/payments/youpi/webhook',
+    YOUPI_STATUS: (id: string) => `/api/v1/payments/youpi/status/${id}`,
   },
   ADMIN: {
     INVENTORY: '/api/v1/admin/inventory',

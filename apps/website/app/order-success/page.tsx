@@ -44,9 +44,16 @@ function OrderSuccessInner() {
         Order ID: <span className="text-emerald-400 font-bold">{orderNumber || '—'}</span>
       </p>
       {order && (
-        <p className="text-slate-400 text-sm mb-6">
+        <p className="text-slate-400 text-sm mb-2">
           Total paid: <span className="text-white font-bold">{formatCurrency(order.totalAmount)}</span> · {order.status}
         </p>
+      )}
+
+      {searchParams?.get('utr') && (
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-xs text-emerald-400 font-mono mb-6">
+          <span>⚡ UPI Bank Ref (UTR):</span>
+          <span className="font-bold text-white">{searchParams.get('utr')}</span>
+        </div>
       )}
 
       {/* Countdown Timer Box */}

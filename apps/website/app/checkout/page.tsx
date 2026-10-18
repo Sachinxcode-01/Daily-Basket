@@ -105,8 +105,31 @@ function CheckoutInner() {
         });
         orderId = order?.id || '';
 
-        // 2. Online payment: initiate Razorpay + verify server-side. COD skips the gateway.
-        if (selectedPayment !== 'COD' && orderId) {
+        // 2. Online payment:
+        if (selectedPayment === 'UPI' && orderId) {
+          try {
+            const youpiSession = await apiClient.initiateYoupiPayment(order.id, payable || order.totalAmount);
+            if (typeof window !== 'undefined' && (window as any).Youpi) {
+              (window as any).Youpi.pay({
+                order_id: order.id,
+                amount: payable || order.totalAmount,
+                currency: 'INR',
+                name: 'Daily Basket',
+                description: 'Instant 10-Minute Grocery Delivery',
+                handler: async function (response: any) {
+                  await clear.mutateAsync().catch(() => {});
+                  router.push(`/order-success?orderId=${orderId}&utr=${response?.utr || ''}`);
+                },
+                onClose: function () {
+                  setIsPlacing(false);
+                },
+              });
+              return;
+            }
+          } catch {
+            // Local preview fallback if YouPI server is connecting
+          }
+        } else if (selectedPayment === 'CARD' && orderId) {
           try {
             const init = await apiClient.initiatePayment(order.id, order.totalAmount);
             await apiClient.verifyPayment({
@@ -204,8 +227,11 @@ function CheckoutInner() {
               <div className="flex items-center gap-3">
                 <ShieldCheck className="w-5 h-5 text-emerald-400" />
                 <div>
-                  <p className="text-sm font-bold text-white">UPI (Google Pay, PhonePe, Paytm)</p>
-                  <p className="text-xs text-slate-400">Fast 1-tap instant payment</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-bold text-white">Direct UPI (0% Fee Instant)</p>
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">⚡ YouPI</span>
+                  </div>
+                  <p className="text-xs text-slate-400">Google Pay, PhonePe, Paytm, CRED with Instant Settlement</p>
                 </div>
               </div>
               {selectedPayment === 'UPI' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}

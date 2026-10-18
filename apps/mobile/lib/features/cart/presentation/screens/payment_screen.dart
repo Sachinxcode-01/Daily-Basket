@@ -28,9 +28,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
   final List<Map<String, dynamic>> _methods = [
     {
       'id': 'UPI',
-      'title': 'UPI (Instant)',
-      'badge': 'FASTEST',
-      'subtitle': 'Google Pay, PhonePe, Paytm, BHIM',
+      'title': 'Direct UPI (Instant)',
+      'badge': '0% FEE • YOUPI',
+      'subtitle': 'Google Pay, PhonePe, Paytm, CRED',
       'icon': Icons.bolt_rounded,
     },
     {
@@ -110,6 +110,21 @@ class _PaymentScreenState extends State<PaymentScreen> {
         },
         token: auth.accessToken,
       );
+
+      // Trigger 0% fee YouPI payment session for UPI orders
+      final createdOrderId = res['id'] ?? res['orderNumber'];
+      if (checkoutProvider.selectedPaymentMethod == 'UPI' && createdOrderId != null) {
+        try {
+          await auth.apiClient.post(
+            '/payments/youpi/initiate',
+            {
+              'orderId': createdOrderId,
+              'amount': widget.totalAmount > 0 ? widget.totalAmount : 60.0,
+            },
+            token: auth.accessToken,
+          );
+        } catch (_) {}
+      }
     } catch (_) {}
 
     if (!mounted) return;

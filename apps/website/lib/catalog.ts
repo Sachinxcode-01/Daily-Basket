@@ -51,14 +51,17 @@ const CANONICAL_CATEGORIES = [
   'vermicelli',
 ];
 
-export const ALL_WEBSITE_PRODUCTS: WebsiteProduct[] = CANONICAL_CATEGORIES.flatMap((catKey) => {
-  const items = (masterCatalogJson as Record<string, any[]>)[catKey] || [];
-  const meta = CATEGORY_DISPLAY_MAP[catKey] || {
-    name: catKey.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
-    slug: catKey,
-  };
+export const ALL_WEBSITE_PRODUCTS: WebsiteProduct[] = (() => {
+  const seenIds = new Set<string>();
+  const allList: WebsiteProduct[] = [];
 
-  return items.map((p) => {
+  // Helper to map raw catalog product
+  const mapRawProduct = (p: any, defaultCatKey = 'grocery'): WebsiteProduct => {
+    const catKey = p.categorySlug || p.folder || defaultCatKey;
+    const meta = CATEGORY_DISPLAY_MAP[catKey] || {
+      name: p.category || catKey.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase()),
+      slug: catKey,
+    };
     const webImage = normalizeImagePath(p.image);
     const price = Number(p.price) || 0;
     const mrp = Number(p.mrp) || price;
@@ -66,7 +69,7 @@ export const ALL_WEBSITE_PRODUCTS: WebsiteProduct[] = CANONICAL_CATEGORIES.flatM
     const isOrganic = Boolean(
       p.badge?.toLowerCase().includes('organic') ||
         p.category?.toLowerCase() === 'organic' ||
-        p.name.toLowerCase().includes('organic'),
+        p.name?.toLowerCase().includes('organic'),
     );
 
     return {
@@ -78,7 +81,7 @@ export const ALL_WEBSITE_PRODUCTS: WebsiteProduct[] = CANONICAL_CATEGORIES.flatM
       price,
       mrp,
       discount,
-      rating: p.rating || 4.5,
+      rating: p.rating || 4.6,
       reviews: parseInt(p.reviews, 10) || 128,
       category: meta.name,
       categorySlug: meta.slug,
@@ -86,16 +89,74 @@ export const ALL_WEBSITE_PRODUCTS: WebsiteProduct[] = CANONICAL_CATEGORIES.flatM
       image: webImage,
       images: [webImage],
       isOrganic,
-      description: `${p.name} (${p.subtitle || p.unit}). Fresh quality guaranteed by Daily Basket. Delivered in 10 minutes.`,
+      description: `${p.name} (${p.subtitle || p.unit || 'Standard Pack'}). Fresh quality guaranteed by Daily Basket. Delivered in 10 minutes.`,
       inStock: p.inStock ?? true,
     };
-  });
-});
+  };
+
+  // 1. Process canonical categories
+  for (const catKey of CANONICAL_CATEGORIES) {
+    const items = (masterCatalogJson as Record<string, any[]>)[catKey] || [];
+    for (const p of items) {
+      if (p?.id && !seenIds.has(p.id)) {
+        seenIds.add(p.id);
+        allList.push(mapRawProduct(p, catKey));
+      }
+    }
+  }
+
+  // 2. Also process 'all' or any remaining keys to guarantee all 607 products are present
+  const masterAll = (masterCatalogJson as Record<string, any[]>).all || [];
+  for (const p of masterAll) {
+    if (p?.id && !seenIds.has(p.id)) {
+      seenIds.add(p.id);
+      allList.push(mapRawProduct(p, p.categorySlug || 'grocery'));
+    }
+  }
+
+  return allList;
+})();
 
 export function getProductById(id: string): WebsiteProduct | undefined {
-  return ALL_WEBSITE_PRODUCTS.find(
-    (p) => p.id === id || p.id === `prod_${id}` || p.id.replace('prod_', '') === id,
+  if (!id) return undefined;
+  const cleanId = decodeURIComponent(id).trim().toLowerCase();
+
+  // 1. Direct ID match
+  let found = ALL_WEBSITE_PRODUCTS.find((p) => p.id.toLowerCase() === cleanId);
+  if (found) return found;
+
+  // 2. Match with or without prod_ prefix
+  found = ALL_WEBSITE_PRODUCTS.find(
+    (p) =>
+      `prod_${p.id.toLowerCase()}` === cleanId ||
+      p.id.toLowerCase().replace(/^prod_/, '') === cleanId ||
+      cleanId.replace(/^prod_/, '') === p.id.toLowerCase().replace(/^prod_/, ''),
   );
+  if (found) return found;
+
+  // 3. Substring match (e.g. slug ending with prod_veg_001)
+  found = ALL_WEBSITE_PRODUCTS.find(
+    (p) =>
+      cleanId.includes(p.id.toLowerCase()) ||
+      p.id.toLowerCase().includes(cleanId) ||
+      (p.variantId && cleanId.includes(p.variantId.toLowerCase())),
+  );
+  if (found) return found;
+
+  // 4. Slugified name match
+  found = ALL_WEBSITE_PRODUCTS.find((p) => {
+    const slugName = p.name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    return cleanId.includes(slugName) || slugName.includes(cleanId);
+  });
+  if (found) return found;
+
+  // 5. Name contains or equals
+  found = ALL_WEBSITE_PRODUCTS.find(
+    (p) => p.name.toLowerCase() === cleanId || p.name.toLowerCase().includes(cleanId),
+  );
+  if (found) return found;
+
+  return undefined;
 }
 
 export interface WebsiteCategory {

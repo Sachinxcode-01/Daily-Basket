@@ -60,3 +60,7 @@ graphify-out/
 # Added by code-review-graph
 .code-review-graph/
 *.bak
+
+# YouPI-PG Local Gateway Service
+youpi-pg/
+

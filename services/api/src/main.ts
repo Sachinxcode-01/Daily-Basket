@@ -10,6 +10,7 @@ async function bootstrap() {
   const logger = new Logger('DailyBasketAPI');
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
+    rawBody: true,
   });
 
   // Enable Graceful Shutdown Hooks
