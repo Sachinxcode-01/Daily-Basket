@@ -29,114 +29,70 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 
+import { apiClient } from '@daily-basket/api-client';
+import catalogJson from '@daily-basket/shared-types/src/products_catalog.json';
+
 // Google Stitch Source of Truth Specs
 // Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
 // Screen: Inventory Management Dashboard (ID: 97fc58a67cca4a028c337f14f0d1233c)
 
-const INITIAL_INVENTORY = [
-  {
-    id: 'VEG-TOM-001',
-    name: 'Fresh Hybrid Tomatoes',
-    sku: 'SKU: VEG-TOM-001',
-    price: '₹42',
-    unit: '/ 1 kg',
-    stock: 85,
-    isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300',
-  },
-  {
-    id: 'MLK-NAN-002',
-    name: 'Nandini Toned Fresh Milk',
-    sku: 'SKU: MLK-NAN-002',
-    price: '₹24',
-    unit: '/ 500 ml',
-    stock: 8,
-    isLowStock: true,
-    image: 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300',
-  },
-  {
-    id: 'BRD-ENG-003',
-    name: 'English Oven 100% Whole Wheat Bread',
-    sku: 'SKU: BRD-ENG-003',
-    price: '₹50',
-    unit: '/ 400 g',
-    stock: 34,
-    isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=300',
-  },
-  {
-    id: 'EGG-FRM-004',
-    name: 'Fresh Farm Free-Range Eggs',
-    sku: 'SKU: EGG-FRM-004',
-    price: '₹95',
-    unit: '/ 12 pcs',
-    stock: 62,
-    isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1587486913049-53fc88980cfc?w=300',
-  },
-  {
-    id: 'FRT-MAN-005',
-    name: 'Alphonso Mangoes Ratnagiri',
-    sku: 'SKU: FRT-MAN-005',
-    price: '₹280',
-    unit: '/ 1 kg',
-    stock: 14,
-    isLowStock: true,
-    image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=300',
-  },
-  {
-    id: 'FLK-KEL-006',
-    name: "Kellogg's Corn Flakes Original",
-    sku: 'SKU: FLK-KEL-006',
-    price: '₹195',
-    unit: '/ 500 g',
-    stock: 48,
-    isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1584473457406-6240486418e9?w=300',
-  },
-  {
-    id: 'VER-BAM-007',
-    name: 'Bambino Roasted Short Vermicelli',
-    sku: 'SKU: VER-BAM-007',
-    price: '₹45',
-    unit: '/ 400 g',
-    stock: 52,
-    isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1612927601601-6638404737ce?w=300',
-  },
-  {
-    id: 'GRA-POH-008',
-    name: 'Fortune Thick Raw Poha',
-    sku: 'SKU: GRA-POH-008',
-    price: '₹38',
-    unit: '/ 500 g',
-    stock: 40,
-    isLowStock: false,
-    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=300',
-  },
-  {
-    id: 'CRD-MLK-009',
-    name: 'Milky Mist Natural Set Curd',
-    sku: 'SKU: CRD-MLK-009',
-    price: '₹40',
-    unit: '/ 400 g',
-    stock: 18,
-    isLowStock: true,
-    image: 'https://images.unsplash.com/photo-1571212515416-fef01fc43637?w=300',
-  },
-];
+const ALL_CATALOG_INVENTORY = Object.entries(catalogJson as Record<string, any[]>).flatMap(([catKey, catalogItems]) => {
+  return catalogItems.map((p, idx) => {
+    const webImg = p.image?.startsWith('assets/') ? `/${p.image.replace(/^assets\//, '')}` : p.image;
+    const stock = 120 - (idx % 12) * 8;
+    return {
+      id: p.id,
+      name: p.name,
+      sku: `SKU: ${catKey.substring(0, 3).toUpperCase()}-${p.id.replace('prod_', '').toUpperCase()}`,
+      price: `₹${(p.price || 99).toFixed(0)}`,
+      unit: `/ ${p.unit || p.subtitle || '1 unit'}`,
+      stock: Math.max(5, stock),
+      isLowStock: stock < 20,
+      image: webImg || '/images/daily_basket_logo.png',
+      category: p.category || catKey.replace(/-/g, ' '),
+    };
+  });
+});
 
 export default function InventoryManagementPage() {
   const [selectedFilter, setSelectedFilter] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'card' | 'table' | 'mobile'>('card');
-  const [items, setItems] = useState(INITIAL_INVENTORY);
+  const [items, setItems] = useState(ALL_CATALOG_INVENTORY);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const toastTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const socket = getAdminSocket('admin_inventory');
     joinAdminRoom('admin');
+
+    // Fetch dynamic products list
+    fetch('/api/products')
+      .then((res) => res.json())
+      .then((payload) => {
+        const apiItems = Array.isArray(payload) ? payload : payload.data || [];
+        if (Array.isArray(apiItems) && apiItems.length > 0) {
+          const mapped = apiItems.map((p: any) => {
+            const v = (Array.isArray(p.variants) && p.variants[0]) || {};
+            const stock = v.stockQuantity ?? 150;
+            const img = (Array.isArray(p.images) && p.images[0]) || '/images/daily_basket_logo.png';
+            const webImg = img.startsWith('assets/') ? `/${img.replace(/^assets\//, '')}` : img;
+            return {
+              id: p.id,
+              name: p.name,
+              sku: v.sku || `SKU: ${p.id.substring(0, 8)}`,
+              price: `₹${Number(v.price || 99).toFixed(0)}`,
+              unit: `/ ${v.unitName || '1 unit'}`,
+              stock,
+              isLowStock: stock < 20,
+              image: webImg,
+              category: p.category?.name || 'Produce',
+            };
+          });
+          setItems(mapped);
+        }
+      })
+      .catch(() => {});
 
     return () => {
       leaveAdminRoom('admin');
@@ -153,12 +109,20 @@ export default function InventoryManagementPage() {
     const newStock = Math.max(0, currentItem.stock + delta);
     const isLow = newStock < 20;
 
-    // Pure state updater with zero side effects
+    // Pure state updater
     setItems((prev) =>
       prev.map((it) => (it.id === id ? { ...it, stock: newStock, isLowStock: isLow } : it))
     );
 
-    // Side effects executed outside updater
+    // Call API to persist stock count
+    fetch(`/api/products/${currentItem.id}/update-stock`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ newStock }),
+    }).catch(() => {});
+    apiClient.updateProductStock(currentItem.id, newStock).catch(() => {});
+
+    // Broadcast via WebSockets
     const socket = getAdminSocket();
     socket.emit('stock_updated', {
       productId: currentItem.id,

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo, Suspense } from 'react';
+import React, { useState, useMemo, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeft,
   Share2,
@@ -28,7 +28,10 @@ import {
   Store,
   Tag,
   Check,
+  Trash2,
 } from 'lucide-react';
+import { apiClient } from '@daily-basket/api-client';
+
 import catalogJson from '@daily-basket/shared-types/src/products_catalog.json';
 
 // Flatten catalog items to support all products
@@ -68,10 +71,11 @@ const ALL_ADMIN_CATALOG = Object.entries(catalogJson as Record<string, any[]>).f
 });
 
 function ProductDetailsInner() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const paramId = searchParams.get('id') || 'prod_veg_001';
 
-  const product = useMemo(() => {
+  const defaultProduct = useMemo(() => {
     const clean = paramId.toLowerCase().trim();
     return (
       ALL_ADMIN_CATALOG.find(
@@ -84,27 +88,77 @@ function ProductDetailsInner() {
     );
   }, [paramId]);
 
+  const [product, setProduct] = useState(defaultProduct);
   const [viewMode, setViewMode] = useState<'web' | 'mobile'>('web');
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-  const [stockCount, setStockCount] = useState(product.stockAvailable);
+  const [stockCount, setStockCount] = useState(defaultProduct.stockAvailable);
   const [isUpdateStockOpen, setIsUpdateStockOpen] = useState(false);
-  const [newStockInput, setNewStockInput] = useState(product.stockAvailable.toString());
+  const [newStockInput, setNewStockInput] = useState(defaultProduct.stockAvailable.toString());
   const [isSavedToast, setIsSavedToast] = useState(false);
   const [isPublished, setIsPublished] = useState(true);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  // Sync state if product changes
-  React.useEffect(() => {
-    setStockCount(product.stockAvailable);
-    setNewStockInput(product.stockAvailable.toString());
-  }, [product]);
+  // Fetch latest product details from API
+  useEffect(() => {
+    if (!paramId) return;
+    fetch(`/api/products/${paramId}`)
+      .then((res) => res.json())
+      .then((payload) => {
+        const p = payload.data || payload;
+        if (p && p.name) {
+          const v = (Array.isArray(p.variants) && p.variants[0]) || {};
+          const price = Number(v.price ?? p.price ?? defaultProduct.price);
+          const mrp = Number(v.mrp ?? p.mrp ?? defaultProduct.mrp);
+          const discountNum = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
+          const img = (Array.isArray(p.images) && p.images[0]) || p.image || defaultProduct.image;
+          const webImg = img.startsWith('assets/') ? `/${img.replace(/^assets\//, '')}` : img;
+          const stock = v.stockQuantity ?? p.stockAvailable ?? defaultProduct.stockAvailable;
 
-  const handleUpdateStock = () => {
+          setProduct((prev) => ({
+            ...prev,
+            id: p.id,
+            name: p.name,
+            brand: p.brand || prev.brand,
+            sku: v.sku || p.sku || prev.sku,
+            category: p.category?.name || prev.category,
+            price,
+            mrp,
+            discount: discountNum > 0 ? `-${discountNum}%` : null,
+            stockAvailable: stock,
+            image: webImg,
+            description: p.description || prev.description,
+          }));
+          setStockCount(stock);
+          setNewStockInput(stock.toString());
+        }
+      })
+      .catch(() => {});
+  }, [paramId, defaultProduct]);
+
+  const handleUpdateStock = async () => {
     const parsed = parseInt(newStockInput, 10);
     if (!isNaN(parsed)) {
       setStockCount(parsed);
+      await fetch(`/api/products/${product.id}/update-stock`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ newStock: parsed }),
+      }).catch(() => {});
+
+      apiClient.updateProductStock(product.id, parsed).catch(() => {});
       setIsUpdateStockOpen(false);
       setIsSavedToast(true);
       setTimeout(() => setIsSavedToast(false), 2500);
+    }
+  };
+
+  const handleDeleteProduct = async () => {
+    try {
+      await fetch(`/api/products/${product.id}`, { method: 'DELETE' }).catch(() => {});
+      apiClient.deleteProduct(product.id).catch(() => {});
+      router.push('/products');
+    } catch {
+      alert('Failed to delete product');
     }
   };
 
@@ -142,6 +196,22 @@ function ProductDetailsInner() {
 
         {/* View Mode Switches & Actions */}
         <div className="flex items-center gap-3">
+          <Link
+            href={`/products/editor?id=${product.id}`}
+            className="px-4 py-2 bg-white border border-[#cbd5e1] text-[#1e2923] rounded-2xl text-xs font-bold hover:bg-[#f8fafc] transition flex items-center gap-1.5 shadow-sm"
+          >
+            <Edit className="w-3.5 h-3.5 text-[#006837]" />
+            <span>Edit Product</span>
+          </Link>
+
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="px-3.5 py-2 border border-red-200 text-red-600 rounded-2xl text-xs font-bold hover:bg-red-50 transition flex items-center gap-1.5"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Delete</span>
+          </button>
+
           <div className="flex items-center gap-2 bg-[#f1f5f9] p-1.5 rounded-2xl border border-[#e2e8f0]">
             <button
               onClick={() => setViewMode('web')}
@@ -544,6 +614,41 @@ function ProductDetailsInner() {
                 className="flex-1 py-3 bg-[#006837] text-white text-xs font-bold rounded-2xl hover:bg-[#00522b]"
               >
                 Save &amp; Broadcast WebSocket
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal for Delete Product */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-in fade-in zoom-in-95">
+            <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+
+            <div className="text-center space-y-1">
+              <h3 className="text-lg font-black text-[#1e2923]">Delete Product</h3>
+              <p className="text-xs text-[#64748b]">
+                Are you sure you want to permanently delete <span className="font-bold text-[#1e2923]">&quot;{product.name}&quot;</span>?
+                This action cannot be undone.
+              </p>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="flex-1 py-3 border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-2xl hover:bg-[#f8fafc]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteProduct}
+                className="flex-1 py-3 bg-red-600 text-white text-xs font-bold rounded-2xl hover:bg-red-700 shadow-md flex items-center justify-center gap-2"
+              >
+                <Trash2 className="w-4 h-4" />
+                <span>Confirm Delete</span>
               </button>
             </div>
           </div>

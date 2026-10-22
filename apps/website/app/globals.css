@@ -2,20 +2,20 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Inter:wght@400;500;600&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
 
-/* ─── Google Stitch Design System — Daily Basket ─────────────────────────── */
+/* ─── Google Stitch Design System — Daily Basket (design.md) ─────────────── */
 
 html {
   background-color: #f9f9fc;
-  color: #1a1c1e;
+  color: #191c1e;
   -webkit-tap-highlight-color: transparent;
 }
 
 body {
   background-color: #f9f9fc;
-  color: #1a1c1e;
-  font-family: 'Inter', sans-serif;
+  color: #191c1e;
+  font-family: 'Outfit', sans-serif;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
 }
@@ -33,7 +33,7 @@ body {
   font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
 
-/* Glassmorphism Panel (Stitch Specification) */
+/* Glassmorphism Panel (design.md Specification) */
 .glass-panel {
   background: rgba(255, 255, 255, 0.70);
   backdrop-filter: blur(16px);
@@ -61,6 +61,10 @@ body {
   box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.12);
 }
 
+.stitch-shadow-floating {
+  box-shadow: 0px 8px 20px rgba(45, 157, 67, 0.25);
+}
+
 /* Pulse animation for 3D elements */
 @keyframes pulseGlow {
   0%, 100% {
@@ -84,14 +88,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #EEEEF0;
+  background: #eceef0;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #BECAB9;
+  background: #becab9;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #006B23;
+  background: #2d9d43;
 }

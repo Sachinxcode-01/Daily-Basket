@@ -8,9 +8,17 @@ import { EventsModule } from '../events/events.module';
 import { QueueModule } from '../queue/queue.module';
 import { CouponsModule } from '../coupons/coupons.module';
 import { InventoryModule } from '../inventory/inventory.module';
+import { MultiStoreModule } from '../multi-store/multi-store.module';
 
 @Module({
-  imports: [RedisModule, EventsModule, QueueModule, CouponsModule, InventoryModule],
+  imports: [
+    RedisModule,
+    EventsModule,
+    QueueModule,
+    CouponsModule,
+    InventoryModule,
+    MultiStoreModule,
+  ],
   controllers: [OrdersController],
   providers: [OrdersService, OrderPricingService, SubstitutionsService],
   exports: [OrdersService, OrderPricingService, SubstitutionsService],

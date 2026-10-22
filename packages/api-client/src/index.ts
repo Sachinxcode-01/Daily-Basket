@@ -148,6 +148,70 @@ export class ApiClient {
     return this.fetcher(API_ROUTES.PRODUCTS.DETAILS(id));
   }
 
+  public async createProduct(productData: {
+    name: string;
+    brand?: string;
+    category?: string;
+    categoryId?: string;
+    price?: number;
+    mrp?: number;
+    unit?: string;
+    unitName?: string;
+    description?: string;
+    stockQuantity?: number;
+    barcode?: string;
+    images?: string[];
+    image?: string;
+    isOrganic?: boolean;
+  }): Promise<Product> {
+    return this.fetcher(API_ROUTES.PRODUCTS.LIST, {
+      method: 'POST',
+      body: JSON.stringify(productData),
+    });
+  }
+
+  public async updateProduct(id: string, productData: Partial<{
+    name: string;
+    brand: string;
+    category: string;
+    categoryId: string;
+    price: number;
+    mrp: number;
+    unit: string;
+    unitName: string;
+    description: string;
+    stockQuantity: number;
+    isAvailable: boolean;
+    images: string[];
+    image: string;
+    isOrganic: boolean;
+  }>): Promise<Product> {
+    return this.fetcher(API_ROUTES.PRODUCTS.DETAILS(id), {
+      method: 'PUT',
+      body: JSON.stringify(productData),
+    });
+  }
+
+  public async deleteProduct(id: string): Promise<{ success: boolean; message: string; id: string }> {
+    return this.fetcher(API_ROUTES.PRODUCTS.DETAILS(id), {
+      method: 'DELETE',
+    });
+  }
+
+  public async updateProductStock(id: string, newStock: number): Promise<{ id: string; newStock: number; isAvailable: boolean }> {
+    return this.fetcher(`${API_ROUTES.PRODUCTS.DETAILS(id)}/update-stock`, {
+      method: 'POST',
+      body: JSON.stringify({ newStock }),
+    });
+  }
+
+  public async toggleProductStatus(id: string, isAvailable: boolean): Promise<{ id: string; isAvailable: boolean }> {
+    return this.fetcher(`${API_ROUTES.PRODUCTS.DETAILS(id)}/toggle-status`, {
+      method: 'POST',
+      body: JSON.stringify({ isAvailable }),
+    });
+  }
+
   // Order Methods
   public async createOrder(orderPayload: {
     userId?: string;

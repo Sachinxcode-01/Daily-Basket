@@ -7,6 +7,7 @@ import { OrderStatus, PaymentMethod } from '@prisma/client';
 
 import { OrderPricingService } from './order-pricing.service';
 import { InventoryService } from '../inventory/inventory.service';
+import { MultiStoreService } from '../multi-store/multi-store.service';
 
 @Injectable()
 export class OrdersService {
@@ -19,6 +20,7 @@ export class OrdersService {
     private queueProcessor: QueueProcessor,
     private orderPricingService: OrderPricingService,
     private inventoryService: InventoryService,
+    private multiStoreService: MultiStoreService,
   ) {}
 
   async createOrder(
@@ -58,26 +60,9 @@ export class OrdersService {
         }
       }
 
-      // 2. Resolve Store
-      let store = await this.prisma.store.findFirst();
-      if (!store) {
-        store = await this.prisma.store.create({
-          data: {
-            name: 'Daily Basket Dark Store Indiranagar',
-            code: 'STR_BLR_01',
-            address: '100ft Road, Indiranagar',
-            city: 'Bengaluru',
-            pincode: '560038',
-            latitude: 12.9716,
-            longitude: 77.5946,
-            isOpen: true,
-          },
-        });
-      }
-
-      // 3. Resolve Address
+      // 2. Resolve Delivery Address
       let validAddressId = data.addressId;
-      const existingAddress = validAddressId
+      let existingAddress = validAddressId
         ? await this.prisma.address.findUnique({ where: { id: validAddressId } })
         : null;
 
@@ -85,8 +70,9 @@ export class OrdersService {
         const userAddr = await this.prisma.address.findFirst({ where: { userId: validUserId } });
         if (userAddr) {
           validAddressId = userAddr.id;
+          existingAddress = userAddr;
         } else {
-          const newAddr = await this.prisma.address.create({
+          existingAddress = await this.prisma.address.create({
             data: {
               userId: validUserId,
               label: 'HOME',
@@ -99,9 +85,25 @@ export class OrdersService {
               isDefault: true,
             },
           });
-          validAddressId = newAddr.id;
+          validAddressId = existingAddress.id;
         }
       }
+
+      // 3. Multi-Dark-Store Intelligent Dispatch Engine:
+      // Computes Haversine distance, checks SKU stock availability per hub,
+      // and balances active packing queue congestion.
+      const candidateItems = (data.items || []).map((i) => ({
+        variantId: i.variantId || i.id,
+        quantity: i.quantity || i.qty || 1,
+      }));
+
+      const dispatchResult = await this.multiStoreService.resolveOptimalStore({
+        latitude: existingAddress.latitude,
+        longitude: existingAddress.longitude,
+        items: candidateItems,
+      });
+
+      const store = dispatchResult.selectedStore;
 
       // 4. Resolve Payment Method Enum
       let resolvedPaymentMethod: PaymentMethod = PaymentMethod.UPI;
@@ -144,7 +146,7 @@ export class OrdersService {
       const subtotal = pricing.subtotal;
       const deliveryFee = pricing.deliveryFee;
       const totalAmount = pricing.finalPayable;
-      const estimatedArrivalMins = pricing.estimatedArrivalMins;
+      const estimatedArrivalMins = dispatchResult.estimatedArrivalMins || pricing.estimatedArrivalMins;
       const deliveryOtp = Math.floor(100000 + Math.random() * 900000).toString();
 
       // 5. Resolve Product Variant for each item

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'admin_add_product_basic_info_screen.dart';
 
 /// Google Stitch Source of Truth Screen: Product Management Dashboard
 /// Project ID: 6885817708675501691
@@ -121,6 +122,168 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
     }).toList();
   }
 
+  void _showEditProductDialog(Map<String, dynamic> product) {
+    final nameCtrl = TextEditingController(text: product['name']);
+    final priceCtrl = TextEditingController(
+      text: product['price'].toString().replaceAll(RegExp(r'[^0-9.]'), ''),
+    );
+    final stockCtrl = TextEditingController(text: product['stockAvailable'].toString());
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Edit Product', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: _textDark)),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Product Name', border: OutlineInputBorder()),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: priceCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Selling Price (₹)', border: OutlineInputBorder()),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: stockCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Stock Units', border: OutlineInputBorder()),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _primaryGreen,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () {
+              final newStock = int.tryParse(stockCtrl.text) ?? product['stockAvailable'];
+              setState(() {
+                product['name'] = nameCtrl.text;
+                product['price'] = '₹${priceCtrl.text}';
+                product['stockAvailable'] = newStock;
+                product['isLowStock'] = newStock < 20;
+                product['stockBadge'] = newStock < 20 ? 'Alert' : 'Good';
+              });
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Updated ${product['name']}'),
+                  backgroundColor: _primaryGreen,
+                ),
+              );
+            },
+            child: const Text('Save Changes'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showRestockDialog(Map<String, dynamic> product) {
+    final stockCtrl = TextEditingController(text: product['stockAvailable'].toString());
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Quick Stock Adjustment: ${product['name']}',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: _textDark)),
+            const SizedBox(height: 8),
+            Text('Current Units: ${product['stockAvailable']}', style: const TextStyle(color: _textMuted, fontSize: 13)),
+            const SizedBox(height: 16),
+            TextField(
+              controller: stockCtrl,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'New Stock Units', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Cancel'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(backgroundColor: _primaryGreen, foregroundColor: Colors.white),
+                    onPressed: () {
+                      final newQty = int.tryParse(stockCtrl.text) ?? product['stockAvailable'];
+                      setState(() {
+                        product['stockAvailable'] = newQty;
+                        product['isLowStock'] = newQty < 20;
+                        product['stockBadge'] = newQty < 20 ? 'Alert' : 'Good';
+                      });
+                      Navigator.pop(ctx);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Stock updated to $newQty units'),
+                          backgroundColor: _primaryGreen,
+                        ),
+                      );
+                    },
+                    child: const Text('Update Stock'),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showDeleteProductDialog(Map<String, dynamic> product) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Delete Product', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+        content: Text('Are you sure you want to permanently delete "${product['name']}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+            onPressed: () {
+              setState(() {
+                _productsList.removeWhere((p) => p['id'] == product['id']);
+              });
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Deleted "${product['name']}"')),
+              );
+            },
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _searchController.dispose();
@@ -132,6 +295,17 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
     return Scaffold(
       backgroundColor: _bgLight,
       appBar: _buildStitchAppBar(),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: _primaryGreen,
+        child: const Icon(Icons.add, color: Colors.white),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AdminAddProductBasicInfoScreen()),
+          );
+        },
+      ),
+
       body: SafeArea(
         child: Column(
           children: [
@@ -178,12 +352,6 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
             ),
           ],
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pushNamed(context, '/admin/products/new'),
-        backgroundColor: _primaryGreen,
-        elevation: 4,
-        child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
@@ -527,29 +695,43 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                             letterSpacing: 0.5,
                           ),
                         ),
-                        if (isLowStock)
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: _redBg,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(Icons.warning_amber_rounded, color: _redText, size: 12),
-                                SizedBox(width: 3),
-                                Text(
-                                  'Low Stock',
-                                  style: TextStyle(
-                                    color: _redText,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 10,
-                                  ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            if (isLowStock)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                margin: const EdgeInsets.only(right: 6),
+                                decoration: BoxDecoration(
+                                  color: _redBg,
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                              ],
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.warning_amber_rounded, color: _redText, size: 12),
+                                    SizedBox(width: 3),
+                                    Text(
+                                      'Low Stock',
+                                      style: TextStyle(
+                                        color: _redText,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFEF4444), size: 18),
+                              splashRadius: 18,
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              tooltip: 'Delete Product',
+                              onPressed: () => _showDeleteProductDialog(product),
                             ),
-                          ),
+                          ],
+                        ),
                       ],
                     ),
                     const SizedBox(height: 2),
@@ -746,7 +928,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                       child: SizedBox(
                         height: 44,
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _showEditProductDialog(product),
                           icon: const Icon(Icons.edit_outlined, size: 18),
                           label: const Text('Edit', style: TextStyle(fontWeight: FontWeight.bold)),
                           style: OutlinedButton.styleFrom(
@@ -762,7 +944,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                       child: SizedBox(
                         height: 44,
                         child: ElevatedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _showRestockDialog(product),
                           icon: const Icon(Icons.add_shopping_cart_rounded, color: Colors.white, size: 18),
                           label: const Text('Restock', style: TextStyle(fontWeight: FontWeight.bold)),
                           style: ElevatedButton.styleFrom(
@@ -779,7 +961,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                       child: SizedBox(
                         height: 44,
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _showEditProductDialog(product),
                           icon: const Icon(Icons.edit_outlined, size: 18),
                           label: const Text('Edit', style: TextStyle(fontWeight: FontWeight.bold)),
                           style: OutlinedButton.styleFrom(
@@ -795,7 +977,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                       child: SizedBox(
                         height: 44,
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _showRestockDialog(product),
                           icon: const Icon(Icons.inventory_2_outlined, size: 18),
                           label: const Text('Stock', style: TextStyle(fontWeight: FontWeight.bold)),
                           style: OutlinedButton.styleFrom(
@@ -811,7 +993,7 @@ class _AdminProductsScreenState extends State<AdminProductsScreen> {
                       child: SizedBox(
                         height: 44,
                         child: OutlinedButton.icon(
-                          onPressed: () {},
+                          onPressed: () => _showEditProductDialog(product),
                           icon: const Icon(Icons.local_offer_outlined, size: 18),
                           label: const Text('Price', style: TextStyle(fontWeight: FontWeight.bold)),
                           style: OutlinedButton.styleFrom(

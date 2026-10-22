@@ -1,19 +1,31 @@
-import { m3Colors, typography } from '@daily-basket/theme';
+import { m3Colors, typography, googleStitchColors } from '@daily-basket/theme';
 
 export const designTokens = {
   colors: m3Colors,
+  stitchColors: googleStitchColors,
   typography: typography,
   borderRadius: {
-    sm: '0.375rem',
-    md: '0.5rem',
-    lg: '0.75rem',
-    xl: '1rem',
-    full: '9999px',
+    xs: '4px',
+    sm: '6px',
+    DEFAULT: '8px',
+    md: '8px',        // Input fields & small cards
+    lg: '16px',       // Product tiles & bento cards
+    xl: '24px',       // Bottom navigation & modal sheets
+    full: '9999px',   // Badges & action pills
+  },
+  spacing: {
+    base: '4px',
+    marginMobile: '16px',
+    gutterHorizontal: '12px',
+    gutterVertical: '16px',
+    touchTargetMin: '48px',
   },
   shadows: {
-    card: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+    card: '0 4px 12px rgba(0, 0, 0, 0.06)',
     modal: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-    elevated: '0 10px 15px -3px rgba(5, 150, 105, 0.15)',
+    bottomNav: '0px -4px 16px rgba(0, 0, 0, 0.06)',
+    floatingCta: '0px 8px 20px rgba(45, 157, 67, 0.25)',
+    elevated: '0 10px 15px -3px rgba(45, 157, 67, 0.18)',
   },
   transitions: {
     default: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',

@@ -6,9 +6,31 @@ import { EventsGateway } from '../events/events.gateway';
 import { QueueProcessor } from '../queue/queue.processor';
 import { OrderPricingService } from './order-pricing.service';
 import { InventoryService } from '../inventory/inventory.service';
+import { MultiStoreService } from '../multi-store/multi-store.service';
 
 describe('OrdersService Unit Tests', () => {
   let service: OrdersService;
+
+  const mockMultiStoreService = {
+    resolveOptimalStore: jest.fn().mockResolvedValue({
+      selectedStore: {
+        id: 'store_101',
+        name: 'Dark Store',
+        code: 'STR_BLR_01',
+        address: '100ft Road, Indiranagar',
+        city: 'Bengaluru',
+        pincode: '560038',
+        latitude: 12.9716,
+        longitude: 77.5946,
+      },
+      distanceKm: 1.5,
+      estimatedArrivalMins: 9,
+      isFullyStocked: true,
+      activeOrdersCount: 2,
+      congestionLevel: 'LOW',
+      routingReason: 'Optimal route',
+    }),
+  };
 
   const mockInventoryService = {
     reserveBatchAtomic: jest.fn().mockResolvedValue({ success: true }),
@@ -96,6 +118,7 @@ describe('OrdersService Unit Tests', () => {
         { provide: QueueProcessor, useValue: mockQueueProcessor },
         { provide: OrderPricingService, useValue: mockOrderPricingService },
         { provide: InventoryService, useValue: mockInventoryService },
+        { provide: MultiStoreService, useValue: mockMultiStoreService },
       ],
     }).compile();
 
