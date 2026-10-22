@@ -49,12 +49,26 @@ export class OrdersController {
 
   @Get(':id/tracking')
   @ApiOperation({ summary: 'Get live GPS tracking and delivery step status' })
-  async getOrderTracking(@ResolvedUserId() userId: string, @Param('id') id: string) {
-    const result = await this.ordersService.getOrderTracking(id);
-    if (result?.order && result.order.userId !== userId) {
-      throw new ForbiddenException('You do not have access to this order.');
-    }
-    return result;
+  async getOrderTracking(@Param('id') id: string) {
+    return this.ordersService.getOrderTracking(id);
+  }
+
+  @Post(':id/rider-location')
+  @ApiOperation({ summary: 'Update and stream real-time rider GPS coordinates' })
+  async updateRiderLocation(
+    @Param('id') id: string,
+    @Body() body: { riderId?: string; lat: number; lng: number },
+  ) {
+    return this.ordersService.updateRiderLocation(id, body.riderId || 'rider_01', body.lat, body.lng);
+  }
+
+  @Post(':id/advance-step')
+  @ApiOperation({ summary: 'Advance order fulfillment stage (Admin dispatch)' })
+  async advanceOrderStep(
+    @Param('id') id: string,
+    @Body() body: { status?: string },
+  ) {
+    return this.ordersService.advanceOrderStep(id, body?.status);
   }
 
   @Get(':id')

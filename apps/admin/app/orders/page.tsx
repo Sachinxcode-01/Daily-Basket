@@ -23,7 +23,10 @@ import {
   SlidersHorizontal,
   Smartphone,
   LayoutGrid,
-  Table as TableIcon
+  Table as TableIcon,
+  Bike,
+  Navigation,
+  ExternalLink,
 } from 'lucide-react';
 
 // Google Stitch Source of Truth Specs
@@ -281,6 +284,35 @@ export default function OrderManagementPage() {
       setLiveToast(`❌ Failed to update status for ${orderId}: ${err?.message || 'Server error'}`);
       setTimeout(() => setLiveToast(null), 5000);
     }
+  };
+
+  const handleStreamRiderGps = (orderId: string) => {
+    const cleanId = orderId.replace('#', '');
+    setLiveToast(`🛵 Simulating live GPS ride telemetry for ${orderId}...`);
+    setTimeout(() => setLiveToast(null), 4000);
+
+    const coordinates = [
+      { lat: 12.9352, lng: 77.6245 },
+      { lat: 12.9360, lng: 77.6232 },
+      { lat: 12.9368, lng: 77.6220 },
+      { lat: 12.9375, lng: 77.6210 },
+      { lat: 12.9385, lng: 77.6198 },
+    ];
+
+    coordinates.forEach((coord, idx) => {
+      setTimeout(async () => {
+        try {
+          const socket = getAdminSocket('admin_dispatch');
+          socket.emit('rider_gps_tick', {
+            orderId: cleanId,
+            riderId: 'rider_01',
+            lat: coord.lat,
+            lng: coord.lng,
+          });
+          await apiClient.sendRiderGps(cleanId, 'rider_01', coord.lat, coord.lng);
+        } catch {}
+      }, idx * 1800);
+    });
   };
 
   const handleSimulateNewOrder = () => {
@@ -547,37 +579,53 @@ export default function OrderManagementPage() {
                     <span className="flex items-center gap-1 text-[#006837] font-bold"><CheckCircle2 className="w-3 h-3" /> {ord.paymentMethod}</span>
                   </div>
 
-                  <div className="flex gap-2 pt-1">
-                    <button
-                      onClick={() => handleAdvanceStep(ord.id)}
-                      disabled={ord.statusStep >= 4 || ord.hasMissingRequiredData}
-                      className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
-                        ord.statusStep >= 4
-                          ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                          : ord.hasMissingRequiredData
-                          ? 'bg-amber-100 text-amber-700 border border-amber-300 cursor-not-allowed'
-                          : 'bg-[#006837] text-white hover:bg-[#00522b]'
-                      }`}
-                    >
-                      {ord.hasMissingRequiredData
-                        ? 'Missing Info'
-                        : ord.statusStep === 0
-                        ? 'Accept Order'
-                        : ord.statusStep === 1
-                        ? 'Mark as Packed'
-                        : ord.statusStep === 2
-                        ? 'Assign Delivery'
-                        : ord.statusStep === 3
-                        ? 'Mark Delivered'
-                        : 'Completed'}
-                    </button>
-                    <button
-                      onClick={() => setSelectedOrderForPrint(ord.id)}
-                      className="p-2 border border-[#cbd5e1] rounded-xl hover:bg-[#f8fafc] text-[#1e2923]"
-                    >
-                      <Printer className="w-4 h-4" />
-                    </button>
-                  </div>
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        onClick={() => handleAdvanceStep(ord.id)}
+                        disabled={ord.statusStep >= 4 || ord.hasMissingRequiredData}
+                        className={`flex-1 py-2 text-xs font-bold rounded-xl transition ${
+                          ord.statusStep >= 4
+                            ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                            : ord.hasMissingRequiredData
+                            ? 'bg-amber-100 text-amber-700 border border-amber-300 cursor-not-allowed'
+                            : 'bg-[#006837] text-white hover:bg-[#00522b]'
+                        }`}
+                      >
+                        {ord.hasMissingRequiredData
+                          ? 'Missing Info'
+                          : ord.statusStep === 0
+                          ? 'Accept Order'
+                          : ord.statusStep === 1
+                          ? 'Mark as Packed'
+                          : ord.statusStep === 2
+                          ? 'Assign Delivery'
+                          : ord.statusStep === 3
+                          ? 'Mark Delivered'
+                          : 'Completed'}
+                      </button>
+                      <button
+                        onClick={() => handleStreamRiderGps(ord.id)}
+                        className="p-2 border border-emerald-200 bg-emerald-50 rounded-xl hover:bg-emerald-100 text-[#006837]"
+                        title="Simulate live rider GPS movement"
+                      >
+                        <Bike className="w-4 h-4" />
+                      </button>
+                      <a
+                        href={`http://localhost:3000/tracking/${encodeURIComponent(ord.id.replace('#', ''))}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-700 flex items-center justify-center"
+                        title="View live customer tracking"
+                      >
+                        <Navigation className="w-4 h-4" />
+                      </a>
+                      <button
+                        onClick={() => setSelectedOrderForPrint(ord.id)}
+                        className="p-2 border border-[#cbd5e1] rounded-xl hover:bg-[#f8fafc] text-[#1e2923]"
+                      >
+                        <Printer className="w-4 h-4" />
+                      </button>
+                    </div>
                 </div>
               ))}
             </div>
@@ -731,7 +779,7 @@ export default function OrderManagementPage() {
                 </div>
 
                 {/* Actions */}
-                <div className="flex gap-3 pt-1">
+                <div className="flex gap-2.5 pt-1">
                   <button
                     onClick={() => handleAdvanceStep(ord.id)}
                     disabled={ord.statusStep >= 4 || ord.hasMissingRequiredData}
@@ -755,6 +803,24 @@ export default function OrderManagementPage() {
                       ? 'Mark as Delivered'
                       : 'Completed'}
                   </button>
+                  <button
+                    onClick={() => handleStreamRiderGps(ord.id)}
+                    className="px-3 py-2.5 border border-emerald-300 bg-emerald-50 rounded-xl hover:bg-emerald-100 text-[#006837] text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                    title="Simulate live rider GPS telemetry to map"
+                  >
+                    <Bike className="w-4 h-4 text-[#006837]" />
+                    <span>GPS Sim</span>
+                  </button>
+                  <a
+                    href={`http://localhost:3000/tracking/${encodeURIComponent(ord.id.replace('#', ''))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-2.5 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                    title="Open live customer tracking view"
+                  >
+                    <Navigation className="w-3.5 h-3.5 text-emerald-700" />
+                    <span>Track</span>
+                  </a>
                   <button
                     onClick={() => setSelectedOrderForPrint(ord.id)}
                     className="p-2.5 border border-[#cbd5e1] rounded-xl hover:bg-[#f8fafc] text-[#1e2923] transition"
@@ -796,23 +862,41 @@ export default function OrderManagementPage() {
                     </td>
                     <td className="py-3.5 text-[#64748b]">{ord.paymentMethod}</td>
                     <td className="py-3.5">
-                      <button
-                        onClick={() => handleAdvanceStep(ord.id)}
-                        disabled={ord.statusStep >= 4 || ord.hasMissingRequiredData}
-                        className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                          ord.statusStep >= 4
-                            ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
-                            : ord.hasMissingRequiredData
-                            ? 'bg-amber-100 text-amber-700 border border-amber-300 cursor-not-allowed'
-                            : 'bg-[#006837] text-white hover:bg-[#00522b]'
-                        }`}
-                      >
-                        {ord.hasMissingRequiredData
-                          ? 'Missing Info'
-                          : ord.statusStep >= 4
-                          ? 'Completed'
-                          : 'Advance Step'}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => handleAdvanceStep(ord.id)}
+                          disabled={ord.statusStep >= 4 || ord.hasMissingRequiredData}
+                          className={`px-3 py-1.5 rounded-xl text-xs font-bold transition shadow-sm ${
+                            ord.statusStep >= 4
+                              ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                              : ord.hasMissingRequiredData
+                              ? 'bg-amber-100 text-amber-700 border border-amber-300 cursor-not-allowed'
+                              : 'bg-[#006837] text-white hover:bg-[#00522b]'
+                          }`}
+                        >
+                          {ord.hasMissingRequiredData
+                            ? 'Missing Info'
+                            : ord.statusStep >= 4
+                            ? 'Completed'
+                            : 'Advance Step'}
+                        </button>
+                        <button
+                          onClick={() => handleStreamRiderGps(ord.id)}
+                          className="p-1.5 bg-emerald-50 text-[#006837] rounded-lg border border-emerald-200 hover:bg-emerald-100 transition"
+                          title="Stream live rider GPS to tracking map"
+                        >
+                          <Bike className="w-3.5 h-3.5" />
+                        </button>
+                        <a
+                          href={`http://localhost:3000/tracking/${encodeURIComponent(ord.id.replace('#', ''))}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 bg-slate-50 text-slate-700 rounded-lg border border-slate-200 hover:bg-slate-100 transition"
+                          title="Open live customer tracking"
+                        >
+                          <Navigation className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
                     </td>
                   </tr>
                 ))}

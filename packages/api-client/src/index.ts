@@ -370,10 +370,19 @@ export class ApiClient {
   }
 
   public async updateDeliveryStatus(orderId: string, status: string): Promise<any> {
+    const cleanId = orderId.replace(/^#/, '');
     return this.fetcher(API_ROUTES.DELIVERY.STATUS_UPDATE, {
       method: 'POST',
-      body: JSON.stringify({ orderId, status }),
+      body: JSON.stringify({ orderId: cleanId, status }),
     });
+  }
+
+  public async sendRiderGps(orderId: string, riderId: string, lat: number, lng: number): Promise<any> {
+    const cleanId = orderId.replace(/^#/, '');
+    return this.fetcher(`/api/v1/orders/${cleanId}/rider-location`, {
+      method: 'POST',
+      body: JSON.stringify({ riderId, lat, lng }),
+    }).catch(() => null);
   }
 
   // Notifications & FCM Methods

@@ -20,6 +20,10 @@ import {
   Sparkles,
   Receipt,
   Radio,
+  Play,
+  Pause,
+  RotateCcw,
+  FastForward,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@daily-basket/api-client';
@@ -54,6 +58,54 @@ export default function DeliveryTrackingPage() {
   const [liveRiderCoords, setLiveRiderCoords] = useState<{ lat: number; lng: number } | null>(null);
   const [lastTelemetryUpdate, setLastTelemetryUpdate] = useState<string>('');
   const [deliveryProgressRatio, setDeliveryProgressRatio] = useState<number>(0.45);
+  const [isSimulating, setIsSimulating] = useState<boolean>(false);
+  const [simStepIndex, setSimStepIndex] = useState<number>(2);
+
+  // Accelerated 10-Minute Rapid Delivery Simulation Runner
+  useEffect(() => {
+    if (!isSimulating) return;
+
+    const interval = setInterval(() => {
+      setDeliveryProgressRatio((prev) => {
+        const next = prev + 0.14;
+        if (next >= 1.0) {
+          setIsSimulating(false);
+          setLiveStatus('DELIVERED');
+          setDeliveryProgressRatio(1.0);
+          setLastTelemetryUpdate(new Date().toLocaleTimeString());
+          return 1.0;
+        }
+
+        const lat = 12.9352 + next * (12.939 - 12.9352);
+        const lng = 77.6245 - next * (77.6245 - 77.618);
+        setLiveRiderCoords({ lat, lng });
+        setLastTelemetryUpdate(new Date().toLocaleTimeString());
+        return next;
+      });
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isSimulating]);
+
+  const handleManualStepCycle = () => {
+    const cycle = ['CONFIRMED', 'PACKING', 'OUT_FOR_DELIVERY', 'DELIVERED'];
+    const nextIdx = (simStepIndex + 1) % cycle.length;
+    setSimStepIndex(nextIdx);
+    const newStatus = cycle[nextIdx];
+    setLiveStatus(newStatus);
+    if (newStatus === 'CONFIRMED') setDeliveryProgressRatio(0.05);
+    else if (newStatus === 'PACKING') setDeliveryProgressRatio(0.25);
+    else if (newStatus === 'OUT_FOR_DELIVERY') setDeliveryProgressRatio(0.55);
+    else if (newStatus === 'DELIVERED') setDeliveryProgressRatio(1.0);
+  };
+
+  const handleResetSimulation = () => {
+    setIsSimulating(false);
+    setLiveStatus('OUT_FOR_DELIVERY');
+    setDeliveryProgressRatio(0.35);
+    setLiveRiderCoords({ lat: 12.9352, lng: 77.6245 });
+    setLastTelemetryUpdate('Reset to dark store');
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -207,6 +259,61 @@ export default function DeliveryTrackingPage() {
           </div>
         </div>
       </header>
+
+      {/* Interactive Simulation & Live Telemetry Controls */}
+      <div className="bg-emerald-950 text-white border-b border-emerald-800/80 px-4 sm:px-8 py-2.5 shadow-sm">
+        <div className="max-w-4xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span className="font-bold font-outfit uppercase tracking-wider text-emerald-300">
+              Interactive 10-Min Live Simulation
+            </span>
+            <span className="hidden md:inline text-slate-400 font-inter">
+              (Live WebSocket &amp; Vector Map telemetry)
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setIsSimulating(!isSimulating)}
+              className={`px-3 py-1.5 rounded-xl font-bold flex items-center gap-1.5 transition ${
+                isSimulating
+                  ? 'bg-amber-500 text-slate-950 hover:bg-amber-400'
+                  : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+              }`}
+            >
+              {isSimulating ? (
+                <>
+                  <Pause className="w-3.5 h-3.5" />
+                  <span>Pause Ride</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Start Live Ride</span>
+                </>
+              )}
+            </button>
+
+            <button
+              onClick={handleManualStepCycle}
+              className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-emerald-100 rounded-xl font-bold flex items-center gap-1 transition"
+              title="Manually advance through fulfillment milestones"
+            >
+              <FastForward className="w-3.5 h-3.5" />
+              <span>Step Status</span>
+            </button>
+
+            <button
+              onClick={handleResetSimulation}
+              className="p-1.5 bg-white/10 hover:bg-white/20 text-slate-300 rounded-xl transition"
+              title="Reset simulation to Hub store"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      </div>
 
       <main className="max-w-4xl mx-auto px-4 sm:px-8 pt-6 space-y-6">
         {isLoading && !localFallbackOrder && (
