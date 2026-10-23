@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
-import { createHmac } from 'crypto';
+import { createHmac, timingSafeEqual } from 'crypto';
 
 @Injectable()
 export class PaymentsService {
@@ -41,8 +41,17 @@ export class PaymentsService {
     const body = `${razorpayOrderId}|${paymentId}`;
     const expectedSignature = createHmac('sha256', secret).update(body).digest('hex');
 
-    // In dev demo mode, accept test signature or match
-    const isValid = expectedSignature === razorpaySignature || razorpaySignature.startsWith('sig_test');
+    // Strict HMAC SHA-256 validation with constant-time equality check
+    let isValid = false;
+    try {
+      const expectedBuffer = Buffer.from(expectedSignature, 'utf8');
+      const signatureBuffer = Buffer.from(razorpaySignature || '', 'utf8');
+      if (expectedBuffer.length === signatureBuffer.length) {
+        isValid = timingSafeEqual(expectedBuffer, signatureBuffer);
+      }
+    } catch {
+      isValid = false;
+    }
 
     if (!isValid) {
       throw new BadRequestException('Razorpay payment signature verification failed.');
@@ -174,21 +183,25 @@ export class PaymentsService {
       ? rawPayload
       : JSON.stringify(rawPayload);
 
-    if (signatureHeader && signatureHeader.startsWith('sha256=')) {
-      const expectedSignature =
-        'sha256=' +
-        createHmac('sha256', this.youpiWebhookSecret)
-          .update(payloadString)
-          .digest('hex');
+    if (!signatureHeader || !signatureHeader.startsWith('sha256=')) {
+      throw new BadRequestException('Missing or invalid YouPI webhook signature header');
+    }
 
-      const actualSignature = signatureHeader;
-      const isValid =
-        actualSignature.length === expectedSignature.length &&
-        actualSignature === expectedSignature;
+    const expectedSignature =
+      'sha256=' +
+      createHmac('sha256', this.youpiWebhookSecret)
+        .update(payloadString)
+        .digest('hex');
 
-      if (!isValid && !actualSignature.startsWith('sha256=test')) {
-        throw new BadRequestException('YouPI Webhook signature verification failed');
-      }
+    const expectedBuffer = Buffer.from(expectedSignature, 'utf8');
+    const signatureBuffer = Buffer.from(signatureHeader, 'utf8');
+
+    const isValid =
+      expectedBuffer.length === signatureBuffer.length &&
+      timingSafeEqual(expectedBuffer, signatureBuffer);
+
+    if (!isValid) {
+      throw new BadRequestException('YouPI Webhook signature verification failed');
     }
 
     let payload: any = {};

@@ -22,6 +22,7 @@ describe('ProductsService Enterprise Unit Tests', () => {
     product: {
       findMany: jest.fn(),
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
     },
     category: {
       findMany: jest.fn().mockResolvedValue([]),
@@ -51,14 +52,22 @@ describe('ProductsService Enterprise Unit Tests', () => {
   });
 
   it('should fetch product by ID using findOne', async () => {
-    mockPrismaService.product.findUnique.mockResolvedValue(mockProduct);
+    mockPrismaService.product.findFirst.mockResolvedValue(mockProduct);
 
     const product = await service.findOne('prod_1');
     expect(product).toBeDefined();
     expect(product.id).toBe('prod_1');
-    expect(mockPrismaService.product.findUnique).toHaveBeenCalledWith({
-      where: { id: 'prod_1' },
-      include: { category: true, variants: true, reviews: true },
+    expect(mockPrismaService.product.findFirst).toHaveBeenCalledWith({
+      where: {
+        OR: [
+          { id: 'prod_1' },
+          { slug: 'prod_1' },
+          { slug: { contains: 'prod_1', mode: 'insensitive' } },
+          { barcode: 'prod_1' },
+          { variants: { some: { sku: { contains: 'prod_1', mode: 'insensitive' } } } },
+        ],
+      },
+      include: { category: true, variants: true, reviews: true, aiInsight: true },
     });
   });
 

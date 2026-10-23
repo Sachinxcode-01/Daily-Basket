@@ -2,9 +2,10 @@ name: Daily Basket Enterprise CI/CD & Reliability Pipeline
 
 on:
   push:
-    branches: [ main, master, release/* ]
+    branches: [ release/* ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ release/* ]
+  workflow_dispatch:
 
 concurrency:
   group: enterprise-ci-cd-${{ github.workflow }}-${{ github.ref }}
@@ -18,6 +19,8 @@ jobs:
   code-quality-and-lint:
     name: 🛡️ Code Quality & Typecheck
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -50,6 +53,8 @@ jobs:
   security-and-vulnerability-scan:
     name: 🔒 Security & Dependency Audit
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -72,6 +77,8 @@ jobs:
     name: 🧪 Unit, Integration & Performance Tests
     runs-on: ubuntu-latest
     needs: [code-quality-and-lint]
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -102,7 +109,10 @@ jobs:
     name: 🐳 Docker Multi-Stage Build & Image Push
     runs-on: ubuntu-latest
     needs: [unit-and-integration-tests, security-and-vulnerability-scan]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    permissions:
+      contents: read
+      packages: write
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -110,9 +120,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Downcase Owner Name
-        id: repo_owner
-        run: echo "OWNER=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+      - name: Downcase Names
+        id: names
+        run: |
+          echo "OWNER=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
+          echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
 
       - name: Log in to GitHub Container Registry (GHCR)
         uses: docker/login-action@v3
@@ -128,14 +140,18 @@ jobs:
           file: infrastructure/docker/Dockerfile.api
           push: true
           tags: |
-            ghcr.io/${{ steps.repo_owner.outputs.OWNER }}/daily-basket-api:latest
-            ghcr.io/${{ steps.repo_owner.outputs.OWNER }}/daily-basket-api:${{ github.sha }}
+            ghcr.io/${{ steps.names.outputs.OWNER }}/daily-basket-api:latest
+            ghcr.io/${{ steps.names.outputs.OWNER }}/daily-basket-api:${{ github.sha }}
+            ghcr.io/${{ steps.names.outputs.REPO }}/api:latest
+            ghcr.io/${{ steps.names.outputs.REPO }}/api:${{ github.sha }}
 
   k8s-zero-downtime-deploy:
     name: 🚀 Kubernetes Zero-Downtime Deployment
     runs-on: ubuntu-latest
     needs: [docker-build-and-push]
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    permissions:
+      contents: read
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -160,7 +176,7 @@ jobs:
       - name: Rollout Status & Automated Rollback Protection
         run: |
           if [ -f ~/.kube/config ]; then
-            kubectl rollout status deployment/daily-basket-api -n daily-basket --timeout=120s || (kubectl rollout undo deployment/daily-basket-api -n daily-basket && exit 1)
+            kubectl rollout status deployment/daily-basket-api -n daily-basket --timeout=180s || (kubectl rollout undo deployment/daily-basket-api -n daily-basket && exit 1)
           else
             echo "Kubernetes config not present. Rollout status check skipped."
           fi

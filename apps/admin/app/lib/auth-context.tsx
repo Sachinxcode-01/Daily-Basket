@@ -30,10 +30,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const [user, setUser] = useState<AdminUser | null>(ADMIN_PRESETS.SUPER_ADMIN.user);
-  const [role, setRole] = useState<AdminRole>('SUPER_ADMIN');
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(true);
-  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(false);
+  const [user, setUser] = useState<AdminUser | null>(null);
+  const [role, setRole] = useState<AdminRole>('STORE_MANAGER');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState<boolean>(true);
   const [requiresTwoFactor, setRequiresTwoFactor] = useState<boolean>(false);
   const [pendingEmail, setPendingEmail] = useState<string>('');
   const [tempToken, setTempToken] = useState<string>('');
@@ -47,14 +47,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const res = await fetch('/api/auth/me');
         if (res.ok) {
           const data = await res.json();
-          if (isMounted && data.authenticated && data.user) {
-            setUser(data.user);
-            setRole(data.user.role);
-            setIsAuthenticated(true);
+          if (isMounted) {
+            if (data.authenticated && data.user) {
+              setUser(data.user);
+              setRole(data.user.role);
+              setIsAuthenticated(true);
+            } else {
+              setUser(null);
+              setIsAuthenticated(false);
+            }
+          }
+        } else {
+          if (isMounted) {
+            setUser(null);
+            setIsAuthenticated(false);
           }
         }
       } catch {
-        /* fallback to local preset if network error */
+        if (isMounted) {
+          setUser(null);
+          setIsAuthenticated(false);
+        }
       } finally {
         if (isMounted) setIsCheckingAuth(false);
       }

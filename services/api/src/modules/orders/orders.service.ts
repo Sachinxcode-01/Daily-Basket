@@ -142,24 +142,10 @@ export class OrdersService {
       const orderNumber = `DB-${Date.now().toString().slice(-6)}`;
 
       // 1. Resolve User
-      let validUserId = userId;
-      let existingUser = await this.prisma.user.findUnique({ where: { id: userId } });
+      const validUserId = userId;
+      const existingUser = await this.prisma.user.findUnique({ where: { id: userId } });
       if (!existingUser) {
-        existingUser = await this.prisma.user.findFirst();
-        if (existingUser) {
-          validUserId = existingUser.id;
-        } else {
-          const newUser = await this.prisma.user.create({
-            data: {
-              fullName: 'Daily Basket Customer',
-              phoneNumber: '+919876543210',
-              email: 'customer@dailybasket.com',
-              role: 'CUSTOMER',
-              isVerified: true,
-            },
-          });
-          validUserId = newUser.id;
-        }
+        throw new BadRequestException(`Customer account not found for user ID: ${userId}`);
       }
 
       // 2. Resolve Delivery Address
@@ -289,20 +275,40 @@ export class OrdersService {
         });
       }
 
-      const orderItemsData = (data.items && data.items.length > 0 ? data.items : [
-        { productName: 'Farm Fresh Produce', price: subtotal || 99, quantity: 1 }
-      ]).map((item) => {
-        const itemQty = item.quantity || item.qty || 1;
-        const itemPrice = item.price || 50;
-        return {
-          variantId: item.variantId || defaultVariant!.id,
-          productName: item.productName || item.name || 'Grocery Item',
-          unitName: item.unitName || item.subtitle || '1 pack',
-          price: itemPrice,
-          quantity: itemQty,
-          totalPrice: itemPrice * itemQty,
-        };
-      });
+      const orderItemsData = await Promise.all(
+        (data.items && data.items.length > 0 ? data.items : [
+          { productName: 'Farm Fresh Produce', price: subtotal || 99, quantity: 1 }
+        ]).map(async (item) => {
+          const itemQty = item.quantity || item.qty || 1;
+          const targetVariantId = item.variantId || defaultVariant!.id;
+          let itemPrice = item.price || 50;
+          let itemProductName = item.productName || item.name || 'Grocery Item';
+          let itemUnitName = item.unitName || item.subtitle || '1 pack';
+
+          try {
+            const variant = await this.prisma.productVariant.findUnique({
+              where: { id: targetVariantId },
+              include: { product: true },
+            });
+            if (variant) {
+              itemPrice = variant.price;
+              if (variant.product?.name) itemProductName = variant.product.name;
+              if (variant.unitName) itemUnitName = variant.unitName;
+            }
+          } catch {
+            // Keep fallback item price if database lookup fails
+          }
+
+          return {
+            variantId: targetVariantId,
+            productName: itemProductName,
+            unitName: itemUnitName,
+            price: itemPrice,
+            quantity: itemQty,
+            totalPrice: itemPrice * itemQty,
+          };
+        }),
+      );
 
       // 6. Atomic Inventory Hold (Blinkit 3-State Model Invariant)
       // Reserve stock with PostgreSQL conditional row update and rollback on failure.

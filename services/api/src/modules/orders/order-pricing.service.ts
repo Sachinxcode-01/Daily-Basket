@@ -105,10 +105,29 @@ export class OrderPricingService {
     for (const item of items) {
       const qty = item.quantity || 1;
       totalItemsQuantity += qty;
-      const lineTotal = item.price * qty;
+
+      let itemPrice = item.price;
+      let itemMrp = item.mrp;
+
+      // Server-Authoritative Pricing: Validate variant price from database
+      if (item.id) {
+        try {
+          const variant = await this.prisma.productVariant.findUnique({
+            where: { id: item.id },
+          });
+          if (variant) {
+            itemPrice = variant.price;
+            itemMrp = variant.mrp ?? itemMrp;
+          }
+        } catch {
+          // Keep item price fallback if database lookup fails
+        }
+      }
+
+      const lineTotal = itemPrice * qty;
       subtotal += lineTotal;
-      if (item.mrp && item.mrp > item.price) {
-        itemDiscounts += (item.mrp - item.price) * qty;
+      if (itemMrp && itemMrp > itemPrice) {
+        itemDiscounts += (itemMrp - itemPrice) * qty;
       }
     }
 

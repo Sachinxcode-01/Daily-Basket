@@ -7,15 +7,24 @@ on:
       - 'apps/website/**'
       - 'packages/**'
       - '.github/workflows/cd-website.yml'
+  workflow_dispatch:
 
 concurrency:
   group: cd-website-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   deploy-website:
     name: Build & Validate Customer Website
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      NODE_ENV: 'production'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

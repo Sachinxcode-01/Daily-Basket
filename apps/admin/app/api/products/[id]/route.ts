@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { deleteProductMemory, updateProductMemory } from '../route';
+import { deleteProductMemory, updateProductMemory } from '../../../lib/products-store';
 import catalogJson from '@daily-basket/shared-types/src/products_catalog.json';
 
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {

@@ -29,6 +29,9 @@ importers:
       '@daily-basket/shared-utils':
         specifier: workspace:*
         version: link:../../packages/shared-utils
+      framer-motion:
+        specifier: ^11.18.2
+        version: 11.18.2
       lucide-react:
         specifier: ^0.354.0
         version: 0.354.0(react@18.3.1)

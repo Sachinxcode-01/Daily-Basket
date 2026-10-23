@@ -42,6 +42,7 @@ describe('OrdersService Unit Tests', () => {
     order: {
       create: jest.fn(),
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       update: jest.fn(),
     },
     user: {
@@ -214,7 +215,7 @@ describe('OrdersService Unit Tests', () => {
         estimatedArrivalMins: 10,
         items: [],
       };
-      mockPrismaService.order.findUnique.mockResolvedValue(mockOrderObj);
+      mockPrismaService.order.findFirst.mockResolvedValue(mockOrderObj);
 
       const tracking = await service.getOrderTracking('ord_101');
       expect(tracking.estimatedEtaMins).toBe(10);

@@ -518,10 +518,22 @@ export class ApiClient {
     });
   }
 
-  public async removeFavorite(productId: string, userId = 'usr_default'): Promise<any> {
-    return this.fetcher(`${API_ROUTES.FAVORITES.REMOVE(productId)}?userId=${encodeURIComponent(userId)}`, {
-      method: 'DELETE',
-    });
+  // Admin Dashboard Methods
+  public async getAdminDashboardSummary(storeId?: string): Promise<any> {
+    const query = storeId ? `?storeId=${encodeURIComponent(storeId)}` : '';
+    return this.fetcher(`${API_ROUTES.ADMIN.DASHBOARD_SUMMARY}${query}`);
+  }
+
+  public async getAdminSalesTrend(days = 7): Promise<any> {
+    return this.fetcher(`${API_ROUTES.ADMIN.DASHBOARD_SALES}?days=${days}`);
+  }
+
+  public async getAdminRecentOrders(limit = 10): Promise<any> {
+    return this.fetcher(`${API_ROUTES.ADMIN.DASHBOARD_RECENT_ORDERS}?limit=${limit}`);
+  }
+
+  public async getAdminInventoryAlerts(limit = 10): Promise<any> {
+    return this.fetcher(`${API_ROUTES.ADMIN.DASHBOARD_INVENTORY_ALERTS}?limit=${limit}`);
   }
 }
 

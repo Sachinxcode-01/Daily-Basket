@@ -39,6 +39,10 @@ export const API_ROUTES = {
     YOUPI_STATUS: (id: string) => `/api/v1/payments/youpi/status/${id}`,
   },
   ADMIN: {
+    DASHBOARD_SUMMARY: '/api/v1/admin/dashboard/summary',
+    DASHBOARD_SALES: '/api/v1/admin/dashboard/sales',
+    DASHBOARD_RECENT_ORDERS: '/api/v1/admin/dashboard/recent-orders',
+    DASHBOARD_INVENTORY_ALERTS: '/api/v1/admin/dashboard/inventory-alerts',
     INVENTORY: '/api/v1/admin/inventory',
     ORDERS: '/api/v1/admin/orders',
     ANALYTICS: '/api/v1/admin/analytics',

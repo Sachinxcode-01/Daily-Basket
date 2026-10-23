@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateProductMemory } from '../../route';
+import { updateProductMemory } from '../../../../lib/products-store';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const { id } = params;

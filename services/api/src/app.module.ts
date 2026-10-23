@@ -56,6 +56,7 @@ import { ObservabilityModule } from './modules/observability/observability.modul
 import { RetailOsModule } from './modules/retail-os/retail-os.module';
 import { FeatureFlagsModule } from './modules/feature-flags/feature-flags.module';
 import { CartModule } from './modules/cart/cart.module';
+import { AdminDashboardModule } from './modules/admin/dashboard/admin-dashboard.module';
 import { BotDetectionMiddleware } from './common/middleware/bot-detection.middleware';
 
 @Module({
@@ -110,6 +111,7 @@ import { BotDetectionMiddleware } from './common/middleware/bot-detection.middle
     StockAlertsModule,
     FinanceModule,
     MarketingModule,
+    AdminDashboardModule,
   ],
 
   providers: [

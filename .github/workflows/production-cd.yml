@@ -6,21 +6,25 @@ on:
       - 'v*.*.*'
     branches:
       - main
+  workflow_dispatch:
 
 concurrency:
   group: production-cd-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
   packages: write
+  pull-requests: write
 
 jobs:
   # 1. Quality Control & Unit Tests
   test-and-audit:
     name: Test & Security Audit
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      contents: write
+      pull-requests: write
 
     steps:
       - name: Checkout Code
@@ -40,13 +44,10 @@ jobs:
       - name: Install Workspace Dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Prisma Schema Validation & Generation
+      - name: Prisma Client Generation
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daily_basket?schema=public"
-        run: |
-          cd services/api
-          npx prisma validate
-          npx prisma generate
+        run: pnpm --filter api run prisma:generate
 
       - name: NestJS Unit & Security Tests
         run: pnpm --filter api run test
@@ -76,7 +77,19 @@ jobs:
           set -o pipefail
           flutter test --reporter=expanded 2>&1 | tee test_log.txt
 
-      - name: Post Flutter Test Log to Commit Comment
+      - name: Publish Flutter Test Summary
+        if: always()
+        run: |
+          echo "### Production CD Flutter Test Log" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          if [ -f apps/mobile/test_log.txt ]; then
+            tail -n 80 apps/mobile/test_log.txt >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No test log generated." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Post Flutter Test Log to Commit / PR Comment
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -89,13 +102,17 @@ jobs:
         with:
           name: flutter-prod-test-log
           path: apps/mobile/test_log.txt
+          if-no-files-found: ignore
 
   # 2. Build & Containerize Production Microservices
   build-and-push-containers:
     name: Containerize & Push Docker Images
     needs: test-and-audit
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    permissions:
+      contents: read
+      packages: write
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout Code
@@ -104,11 +121,13 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Downcase Repo Name
-        id: repo
-        run: echo "NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+      - name: Downcase Names
+        id: names
+        run: |
+          echo "REPO_NAME=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+          echo "OWNER_NAME=${GITHUB_REPOSITORY_OWNER,,}" >> $GITHUB_OUTPUT
 
-      - name: Log in to GitHub Container Registry
+      - name: Log in to GitHub Container Registry (GHCR)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -122,8 +141,10 @@ jobs:
           file: infrastructure/docker/Dockerfile.api
           push: true
           tags: |
-            ghcr.io/${{ steps.repo.outputs.NAME }}/api:latest
-            ghcr.io/${{ steps.repo.outputs.NAME }}/api:${{ github.sha }}
+            ghcr.io/${{ steps.names.outputs.REPO_NAME }}/api:latest
+            ghcr.io/${{ steps.names.outputs.REPO_NAME }}/api:${{ github.sha }}
+            ghcr.io/${{ steps.names.outputs.OWNER_NAME }}/daily-basket-api:latest
+            ghcr.io/${{ steps.names.outputs.OWNER_NAME }}/daily-basket-api:${{ github.sha }}
 
       - name: Build & Push Website Image
         uses: docker/build-push-action@v5
@@ -132,8 +153,10 @@ jobs:
           file: infrastructure/docker/Dockerfile.website
           push: true
           tags: |
-            ghcr.io/${{ steps.repo.outputs.NAME }}/website:latest
-            ghcr.io/${{ steps.repo.outputs.NAME }}/website:${{ github.sha }}
+            ghcr.io/${{ steps.names.outputs.REPO_NAME }}/website:latest
+            ghcr.io/${{ steps.names.outputs.REPO_NAME }}/website:${{ github.sha }}
+            ghcr.io/${{ steps.names.outputs.OWNER_NAME }}/daily-basket-website:latest
+            ghcr.io/${{ steps.names.outputs.OWNER_NAME }}/daily-basket-website:${{ github.sha }}
 
       - name: Build & Push Admin Image
         uses: docker/build-push-action@v5
@@ -142,8 +165,10 @@ jobs:
           file: infrastructure/docker/Dockerfile.admin
           push: true
           tags: |
-            ghcr.io/${{ steps.repo.outputs.NAME }}/admin:latest
-            ghcr.io/${{ steps.repo.outputs.NAME }}/admin:${{ github.sha }}
+            ghcr.io/${{ steps.names.outputs.REPO_NAME }}/admin:latest
+            ghcr.io/${{ steps.names.outputs.REPO_NAME }}/admin:${{ github.sha }}
+            ghcr.io/${{ steps.names.outputs.OWNER_NAME }}/daily-basket-admin:latest
+            ghcr.io/${{ steps.names.outputs.OWNER_NAME }}/daily-basket-admin:${{ github.sha }}
 
       - name: Build & Push Delivery Image
         uses: docker/build-push-action@v5
@@ -152,25 +177,45 @@ jobs:
           file: infrastructure/docker/Dockerfile.delivery
           push: true
           tags: |
-            ghcr.io/${{ steps.repo.outputs.NAME }}/delivery:latest
-            ghcr.io/${{ steps.repo.outputs.NAME }}/delivery:${{ github.sha }}
+            ghcr.io/${{ steps.names.outputs.REPO_NAME }}/delivery:latest
+            ghcr.io/${{ steps.names.outputs.REPO_NAME }}/delivery:${{ github.sha }}
+            ghcr.io/${{ steps.names.outputs.OWNER_NAME }}/daily-basket-delivery:latest
+            ghcr.io/${{ steps.names.outputs.OWNER_NAME }}/daily-basket-delivery:${{ github.sha }}
 
   # 3. Production Deployment & Zero-Downtime Rollout
   deploy-production:
-    name: Deploy to Production Kubernetes / Cloud Cluster
+    name: Deploy to Production Kubernetes Cluster
     needs: build-and-push-containers
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    permissions:
+      contents: read
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: SSH & Deploy via Docker Compose / K8s
+      - name: Deploy Kubernetes Manifests
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBECONFIG }}
         run: |
-          echo "Triggering zero-downtime rolling deployment..."
-          echo "Services updated successfully to commit ${{ github.sha }}"
+          if [ -n "$KUBE_CONFIG" ]; then
+            mkdir -p ~/.kube
+            echo "$KUBE_CONFIG" > ~/.kube/config
+            chmod 600 ~/.kube/config
+            kubectl apply -f infrastructure/k8s/configmap.yaml
+            kubectl apply -f infrastructure/k8s/deployment.yaml
+            kubectl apply -f infrastructure/k8s/service.yaml
+            kubectl apply -f infrastructure/k8s/ingress.yaml
+            kubectl apply -f infrastructure/k8s/hpa.yaml
+          else
+            echo "KUBECONFIG secret not configured. Docker images built and published to GHCR. Kubernetes deployment skipped."
+          fi
 
-      - name: Post-Deployment Health Check Verification
+      - name: Rollout Status & Automated Rollback Protection
         run: |
-          echo "Verifying production health endpoints..."
+          if [ -f ~/.kube/config ]; then
+            kubectl rollout status deployment/daily-basket-api -n daily-basket --timeout=180s || (kubectl rollout undo deployment/daily-basket-api -n daily-basket && exit 1)
+          else
+            echo "Kubernetes config not present. Rollout status check skipped."
+          fi

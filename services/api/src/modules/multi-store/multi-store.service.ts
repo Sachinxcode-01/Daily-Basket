@@ -163,7 +163,7 @@ export class MultiStoreService {
     const customerLon = input.longitude ?? 77.5946;
 
     // 1. Fetch all currently open dark stores
-    let stores = await this.prisma.store.findMany({
+    const stores = await this.prisma.store.findMany({
       where: { isOpen: true },
     });
 

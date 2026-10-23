@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   TrendingUp,
   ShoppingBag,
@@ -19,18 +20,38 @@ import {
   Filter,
   RefreshCw,
   Zap,
+  Sparkles,
+  ShieldCheck,
 } from 'lucide-react';
+import AnimatedKpiCard from '../../components/analytics/AnimatedKpiCard';
+import AnalyticsChart from '../../components/analytics/AnalyticsChart';
 
 export default function ExecutiveAnalyticsDashboard() {
   const [timeframe, setTimeframe] = useState<'today' | 'week' | 'month'>('today');
   const [selectedHub, setSelectedHub] = useState<string>('all');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [aiReport, setAiReport] = useState<string | null>(null);
+
+  const handleGenerateAiInsights = () => {
+    setIsAiLoading(true);
+    setTimeout(() => {
+      setIsAiLoading(false);
+      setAiReport(
+        'Executive AI Brief: Evening order velocity is trending +18% above forecast. Reallocate 6 electric fleet riders from Whitefield to Koramangala Hub to maintain 9.2m average SLA. Produce spoilage is at a record low of 0.4%.'
+      );
+    }, 800);
+  };
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
-      {/* ─── Top Executive Banner (Google Stitch Spec) ─────────────────────────── */}
-      <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-surface-variant flex flex-col md:flex-row md:items-center justify-between gap-6">
+      {/* ─── Top Executive Banner ─────────────────────────────────────────── */}
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="glass-card rounded-2xl p-6 md:p-8 shadow-sm border border-zinc-200/80 flex flex-col md:flex-row md:items-center justify-between gap-6"
+      >
         <div className="flex items-center gap-4">
-          <div className="relative w-14 h-14 rounded-full overflow-hidden border-2 border-primary-container shrink-0 shadow-md">
+          <div className="relative w-14 h-14 rounded-2xl overflow-hidden border-2 border-[#2d9d43] shrink-0 shadow-md">
             <img
               src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=256&q=80"
               alt="Executive Profile"
@@ -39,17 +60,18 @@ export default function ExecutiveAnalyticsDashboard() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl md:text-3xl font-extrabold text-on-surface tracking-tight">
-                Good Morning, Sachin <span className="inline-block animate-bounce">👋</span>
+              <h1 className="text-2xl md:text-3xl font-extrabold text-zinc-950 font-headline tracking-tight">
+                Executive Control Deck
               </h1>
+              <span className="text-xl">🚀</span>
             </div>
             <div className="flex items-center gap-2 mt-1">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container/20 text-primary text-xs font-bold">
-                <span className="w-2 h-2 rounded-full bg-status-success animate-pulse" />
-                Store Open & Operational
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#078730] border border-emerald-200/80 text-xs font-bold">
+                <span className="w-2 h-2 rounded-full bg-[#2d9d43] animate-pulse" />
+                Store Network Operational
               </span>
-              <span className="text-xs text-on-surface-subtle">
-                Dark Store Network • 12 Active Hubs
+              <span className="text-xs text-zinc-500 font-medium">
+                Dark Store Network • 4 Active Micro-Hubs
               </span>
             </div>
           </div>
@@ -57,240 +79,235 @@ export default function ExecutiveAnalyticsDashboard() {
 
         {/* Action Controls & Filter Buttons */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="bg-surface-container-low p-1 rounded-2xl border border-surface-variant flex items-center gap-1">
+          <div className="bg-zinc-100 p-1 rounded-xl border border-zinc-200/60 flex items-center gap-1">
             {(['today', 'week', 'month'] as const).map((t) => (
               <button
                 key={t}
                 onClick={() => setTimeframe(t)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold capitalize transition-all ${
+                className={`relative px-3.5 py-1.5 rounded-lg text-xs font-bold capitalize transition-all ${
                   timeframe === t
-                    ? 'bg-primary text-on-primary shadow-sm'
-                    : 'text-on-surface-variant hover:text-on-surface'
+                    ? 'text-zinc-950'
+                    : 'text-zinc-500 hover:text-zinc-900'
                 }`}
               >
-                {t}
+                {timeframe === t && (
+                  <motion.div
+                    layoutId="execTimeframe"
+                    className="absolute inset-0 bg-white rounded-lg shadow-sm border border-zinc-200"
+                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">{t}</span>
               </button>
             ))}
           </div>
 
-          <button className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-surface-container-high hover:bg-surface-container-highest text-on-surface-variant text-xs font-bold transition-all active:scale-95">
-            <Bot className="w-4 h-4 text-primary" />
-            <span>AI Copilot Insights</span>
+          <button
+            onClick={handleGenerateAiInsights}
+            disabled={isAiLoading}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#2d9d43] hover:bg-[#078730] text-white text-xs font-bold transition-all shadow-md active:scale-95 disabled:opacity-50"
+          >
+            <Bot className={`w-4 h-4 text-white ${isAiLoading ? 'animate-spin' : ''}`} />
+            <span>{isAiLoading ? 'Analyzing Fleet...' : 'AI Copilot Brief'}</span>
           </button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* ─── Executive KPI Cards Grid (Exact Stitch Specifications) ───────────────── */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        {/* Today's Revenue */}
-        <div className="glass-card rounded-3xl p-5 flex flex-col justify-between min-h-[140px] relative overflow-hidden bg-gradient-to-br from-primary-container/15 via-white to-transparent border border-primary-container/20">
-          <div className="flex justify-between items-start mb-2 z-10">
-            <span className="text-xs font-bold text-on-surface-subtle uppercase tracking-wider">
-              Today&apos;s Revenue
-            </span>
-            <div className="bg-primary/10 p-2 rounded-full text-primary">
-              <DollarSign className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="z-10">
-            <h2 className="text-3xl font-black text-on-surface">$12,450</h2>
-            <div className="flex items-center gap-1 mt-1.5">
-              <ArrowUpRight className="w-4 h-4 text-status-success" />
-              <span className="text-xs font-bold text-status-success">+14% vs yesterday</span>
-            </div>
-          </div>
-          {/* Sparkline Decorative Overlay */}
-          <svg
-            className="absolute bottom-0 left-0 w-full h-14 opacity-25 text-primary pointer-events-none"
-            preserveAspectRatio="none"
-            viewBox="0 0 100 30"
+      {/* AI Report Drawer Banner */}
+      <AnimatePresence>
+        {aiReport && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
           >
-            <path
-              d="M0 30 L10 20 L20 25 L30 10 L40 15 L50 5 L60 12 L70 8 L80 18 L90 5 L100 15 L100 30 Z"
-              fill="currentColor"
-            />
-            <polyline
-              fill="none"
-              points="0,30 10,20 20,25 30,10 40,15 50,5 60,12 70,8 80,18 90,5 100,15"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-          </svg>
-        </div>
+            <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-950 via-zinc-900 to-emerald-950 text-white flex items-start justify-between gap-4 border border-emerald-800/50 shadow-md">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#2d9d43] flex items-center justify-center shrink-0 mt-0.5">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold font-mono uppercase tracking-wider text-[#8cfa93]">
+                    Autonomous Operations Recommendation
+                  </h4>
+                  <p className="text-xs text-zinc-300 mt-1 leading-relaxed">{aiReport}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setAiReport(null)}
+                className="text-xs text-zinc-400 hover:text-white px-2 py-1 rounded bg-white/10 shrink-0"
+              >
+                Dismiss
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-        {/* Today's Orders */}
-        <div className="glass-card rounded-3xl p-5 flex flex-col justify-between min-h-[140px] border border-surface-variant">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-bold text-on-surface-subtle uppercase tracking-wider">
-              Today&apos;s Orders
-            </span>
-            <div className="bg-secondary/10 p-2 rounded-full text-secondary">
-              <ShoppingBag className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <h2 className="text-3xl font-black text-on-surface">342</h2>
-            <div className="flex items-center gap-1 mt-1.5">
-              <ArrowUpRight className="w-4 h-4 text-status-success" />
-              <span className="text-xs font-bold text-status-success">+5% vs yesterday</span>
-            </div>
-          </div>
-        </div>
+      {/* ─── Executive KPI Cards Grid ─────────────────────────────────────────── */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <AnimatedKpiCard
+          title="Daily Gross Merchandise (GMV)"
+          value={timeframe === 'today' ? 48250 : timeframe === 'week' ? 342000 : 1420000}
+          prefix="₹"
+          changePercent={14.2}
+          changeLabel="+14.2% vs baseline"
+          icon={DollarSign}
+          accentColor="#2d9d43"
+          sparklineData={[32, 36, 38, 41, 45, 48]}
+        />
 
-        {/* Gross Profit */}
-        <div className="glass-card rounded-3xl p-5 flex flex-col justify-between min-h-[140px] border border-surface-variant">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-bold text-on-surface-subtle uppercase tracking-wider">
-              Gross Profit
-            </span>
-            <div className="bg-status-info/10 p-2 rounded-full text-status-info">
-              <Landmark className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <h2 className="text-3xl font-black text-on-surface">$4,120</h2>
-            <div className="flex items-center gap-1 mt-1.5">
-              <Minus className="w-4 h-4 text-status-warning" />
-              <span className="text-xs font-bold text-status-warning">Stable performance</span>
-            </div>
-          </div>
-        </div>
+        <AnimatedKpiCard
+          title="Dispatched Baskets"
+          value={timeframe === 'today' ? 2450 : timeframe === 'week' ? 16800 : 64000}
+          changePercent={8.5}
+          changeLabel="Avg 9.4 min SLA"
+          icon={ShoppingBag}
+          accentColor="#078730"
+          sparklineData={[2100, 2200, 2310, 2390, 2450]}
+        />
 
-        {/* Pending Orders (Attention Required) */}
-        <div className="glass-card rounded-3xl p-5 flex flex-col justify-between min-h-[140px] bg-error-container/20 border border-error-container">
-          <div className="flex justify-between items-start mb-2">
-            <span className="text-xs font-bold text-on-surface-subtle uppercase tracking-wider">
-              Pending Orders
-            </span>
-            <div className="bg-status-error/10 p-2 rounded-full text-status-error">
-              <Clock className="w-4 h-4" />
-            </div>
-          </div>
-          <div>
-            <h2 className="text-3xl font-black text-on-surface">18</h2>
-            <div className="flex items-center gap-1 mt-1.5">
-              <AlertTriangle className="w-4 h-4 text-status-error" />
-              <span className="text-xs font-bold text-status-error">Needs immediate attention</span>
-            </div>
-          </div>
-        </div>
+        <AnimatedKpiCard
+          title="Gross Operating Margin"
+          value={24.8}
+          suffix="%"
+          decimals={1}
+          changePercent={2.3}
+          changeLabel="₹11,960 Net Today"
+          icon={Landmark}
+          accentColor="#0369a1"
+          sparklineData={[22.1, 22.8, 23.4, 24.2, 24.8]}
+        />
+
+        <AnimatedKpiCard
+          title="Fulfillment SLA Score"
+          value={98.8}
+          suffix="%"
+          decimals={1}
+          changePercent={0.4}
+          changeLabel="12 SLA exceptions only"
+          icon={Clock}
+          accentColor="#70dd7a"
+          sparklineData={[97.5, 98.1, 98.4, 98.6, 98.8]}
+        />
       </section>
 
-      {/* ─── Detailed Executive Analytics Grid ─────────────────────────────────── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Hourly Revenue & Order Velocity (Span 8) */}
-        <div className="lg:col-span-8 bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-surface-variant space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Detailed Interactive Chart Section */}
+      <AnalyticsChart />
+
+      {/* ─── Operational Hubs & Low Stock Alerts ─────────────────────────────── */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Hub Dispatch Status (Span 7) */}
+        <div className="lg:col-span-7 bg-white rounded-2xl p-6 shadow-sm border border-zinc-200/80 space-y-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-on-surface">Hourly Order & Revenue Velocity</h2>
-              <p className="text-xs text-on-surface-variant mt-0.5">
-                Real-time 10-minute dispatch throughput across Bangalore hubs
+              <h3 className="text-base font-bold text-zinc-950 font-headline">
+                Micro-Warehouse Real-Time Load
+              </h3>
+              <p className="text-xs text-zinc-500 font-body">
+                SLA compliance and order queuing across Bengaluru
               </p>
             </div>
-            <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-xs text-status-success font-bold bg-status-success/10 px-3 py-1 rounded-full">
-                <Zap className="w-3.5 h-3.5" /> Peak Hour (9.4m SLA)
-              </span>
-            </div>
+            <span className="text-xs text-[#078730] font-bold bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              4 Active Hubs
+            </span>
           </div>
 
-          {/* Simulated Hourly Chart Bars */}
-          <div className="h-64 flex items-end justify-between gap-2 pt-8 pb-2 border-b border-surface-variant">
+          <div className="space-y-3">
             {[
-              { time: '6 AM', val: 40, rev: '$850' },
-              { time: '7 AM', val: 65, rev: '$1,420' },
-              { time: '8 AM', val: 95, rev: '$2,890' },
-              { time: '9 AM', val: 100, rev: '$3,450' },
-              { time: '10 AM', val: 80, rev: '$2,100' },
-              { time: '11 AM', val: 55, rev: '$1,740' },
-              { time: '12 PM', val: 70, rev: '$2,200' },
-            ].map((h, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                <div className="text-[10px] font-bold text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">
-                  {h.rev}
+              {
+                name: 'Koramangala Mega Dark Store #01',
+                status: 'Optimal',
+                time: '9.2 min SLA',
+                load: '88%',
+                riders: '44 EVs',
+              },
+              {
+                name: 'Indiranagar Urban Hub #04',
+                status: 'High Demand',
+                time: '9.6 min SLA',
+                load: '94%',
+                riders: '32 EVs',
+              },
+              {
+                name: 'HSR Layout Sector 2 Hub',
+                status: 'Surge',
+                time: '9.8 min SLA',
+                load: '96%',
+                riders: '28 EVs',
+              },
+              {
+                name: 'Whitefield Tech Hub #08',
+                status: 'Optimal',
+                time: '8.9 min SLA',
+                load: '72%',
+                riders: '24 EVs',
+              },
+            ].map((hub, i) => (
+              <div
+                key={i}
+                className="p-3.5 bg-zinc-50 hover:bg-zinc-100/80 rounded-xl border border-zinc-200/60 flex items-center justify-between text-xs transition-colors"
+              >
+                <div>
+                  <h4 className="font-bold text-zinc-900">{hub.name}</h4>
+                  <div className="flex items-center gap-3 text-zinc-500 text-[11px] mt-0.5">
+                    <span>{hub.time}</span>
+                    <span>•</span>
+                    <span className="text-emerald-700 font-semibold">{hub.riders}</span>
+                  </div>
                 </div>
-                <div
-                  style={{ height: `${h.val}%` }}
-                  className="w-full bg-gradient-to-t from-primary-container to-primary rounded-t-xl group-hover:brightness-110 transition-all cursor-pointer relative"
-                />
-                <span className="text-[11px] font-bold text-on-surface-subtle">{h.time}</span>
+                <div className="text-right">
+                  <span
+                    className={`font-bold ${
+                      hub.status === 'Optimal'
+                        ? 'text-emerald-600'
+                        : hub.status === 'High Demand'
+                        ? 'text-amber-600'
+                        : 'text-rose-600'
+                    }`}
+                  >
+                    {hub.status}
+                  </span>
+                  <p className="text-[10px] text-zinc-400 font-mono">{hub.load} load</p>
+                </div>
               </div>
             ))}
           </div>
-
-          <div className="grid grid-cols-3 gap-4 pt-2">
-            <div className="bg-surface-container-low p-4 rounded-2xl">
-              <span className="text-xs text-on-surface-subtle font-semibold">Average Order Value</span>
-              <p className="text-xl font-bold text-on-surface mt-1">$36.40</p>
-            </div>
-            <div className="bg-surface-container-low p-4 rounded-2xl">
-              <span className="text-xs text-on-surface-subtle font-semibold">Fulfillment SLA Rate</span>
-              <p className="text-xl font-bold text-status-success mt-1">98.4%</p>
-            </div>
-            <div className="bg-surface-container-low p-4 rounded-2xl">
-              <span className="text-xs text-on-surface-subtle font-semibold">Active Riders</span>
-              <p className="text-xl font-bold text-on-surface mt-1">48 On Duty</p>
-            </div>
-          </div>
         </div>
 
-        {/* Operational Hubs & Low Stock Alerts (Span 4) */}
-        <div className="lg:col-span-4 space-y-6">
-          {/* Dark Store Network Status */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-surface-variant space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-on-surface">Hub Dispatch Status</h3>
-              <span className="text-xs text-primary font-bold">12 Active</span>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                { name: 'Indiranagar Hub', status: 'Optimal', time: '8.2 min SLA', load: '88%' },
-                { name: 'Koramangala Hub', status: 'High Traffic', time: '9.5 min SLA', load: '94%' },
-                { name: 'HSR Layout Hub', status: 'Optimal', time: '7.9 min SLA', load: '72%' },
-                { name: 'Whitefield Hub', status: 'Optimal', time: '8.8 min SLA', load: '65%' },
-              ].map((hub, i) => (
-                <div key={i} className="p-3.5 bg-surface-container-low rounded-2xl flex items-center justify-between text-xs">
-                  <div>
-                    <h4 className="font-bold text-on-surface">{hub.name}</h4>
-                    <p className="text-on-surface-variant">{hub.time}</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="font-bold text-status-success">{hub.status}</span>
-                    <p className="text-[10px] text-on-surface-subtle">{hub.load} load</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+        {/* Low Stock Fresh Produce Alerts (Span 5) */}
+        <div className="lg:col-span-5 bg-white rounded-2xl p-6 shadow-sm border border-zinc-200/80 space-y-4">
+          <div className="flex items-center gap-2 text-rose-600">
+            <AlertTriangle className="w-5 h-5" />
+            <h3 className="text-base font-bold text-zinc-950 font-headline">
+              Critical Low Stock SKUs
+            </h3>
           </div>
+          <p className="text-xs text-zinc-500 font-body">
+            Algorithmic safety-stock trigger active for fastest selling items.
+          </p>
 
-          {/* Low Stock Alerts Card */}
-          <div className="bg-white rounded-3xl p-6 shadow-sm border border-error-container/60 space-y-4">
-            <div className="flex items-center gap-2 text-status-error">
-              <AlertTriangle className="w-5 h-5" />
-              <h3 className="text-base font-bold text-on-surface">Critical Low Stock SKUs</h3>
-            </div>
-
-            <div className="space-y-3">
-              {[
-                { name: 'Amul Toned Milk 1L', stock: '4 left', hub: 'Indiranagar' },
-                { name: 'Organic Hass Avocados 2x', stock: '2 left', hub: 'HSR Layout' },
-                { name: 'Fresh Paneer 200g', stock: '5 left', hub: 'Koramangala' },
-              ].map((item, i) => (
-                <div
-                  key={i}
-                  className="p-3 bg-error-container/30 rounded-2xl border border-error-container flex items-center justify-between text-xs"
-                >
-                  <div>
-                    <h4 className="font-bold text-on-surface">{item.name}</h4>
-                    <p className="text-on-surface-variant">{item.hub} Hub</p>
-                  </div>
-                  <span className="font-extrabold text-status-error bg-error-container px-2.5 py-1 rounded-full">
-                    {item.stock}
-                  </span>
+          <div className="space-y-3">
+            {[
+              { name: 'Amul Toned Milk 1L', stock: '4 left', hub: 'Indiranagar' },
+              { name: 'Organic Hass Avocados 2x', stock: '2 left', hub: 'HSR Layout' },
+              { name: 'Fresh Paneer 200g', stock: '5 left', hub: 'Koramangala' },
+              { name: 'Aashirvaad Shudh Chakki Atta 5kg', stock: '3 left', hub: 'Whitefield' },
+            ].map((item, i) => (
+              <div
+                key={i}
+                className="p-3 bg-rose-50/50 rounded-xl border border-rose-100 flex items-center justify-between text-xs"
+              >
+                <div>
+                  <h4 className="font-bold text-zinc-900">{item.name}</h4>
+                  <p className="text-zinc-500 text-[11px]">{item.hub} Hub</p>
                 </div>
-              ))}
-            </div>
+                <span className="font-bold text-rose-700 bg-rose-100 px-2.5 py-1 rounded-full text-[11px]">
+                  {item.stock}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

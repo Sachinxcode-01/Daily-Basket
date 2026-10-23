@@ -125,6 +125,29 @@ export class CartService {
       where: { cartId: cart.id, variantId: dto.variantId },
     });
 
+    // Server-Authoritative Pricing: Fetch canonical variant price from database
+    let authoritativePrice = dto.price;
+    let authoritativeProductName = dto.productName;
+    let authoritativeUnitName = dto.unitName;
+
+    try {
+      const variant = await this.prisma.productVariant.findUnique({
+        where: { id: dto.variantId },
+        include: { product: true },
+      });
+      if (variant) {
+        authoritativePrice = variant.price;
+        if (variant.product?.name) {
+          authoritativeProductName = variant.product.name;
+        }
+        if (variant.unitName) {
+          authoritativeUnitName = variant.unitName;
+        }
+      }
+    } catch {
+      // Keep DTO fallback if database lookup fails
+    }
+
     if (existingItem) {
       const newQty = existingItem.quantity + quantity;
       if (newQty > 10) {
@@ -132,16 +155,20 @@ export class CartService {
       }
       await this.prisma.cartItem.update({
         where: { id: existingItem.id },
-        data: { quantity: newQty, isSavedForLater: false },
+        data: {
+          quantity: newQty,
+          price: authoritativePrice,
+          isSavedForLater: false,
+        },
       });
     } else {
       await this.prisma.cartItem.create({
         data: {
           cartId: cart.id,
           variantId: dto.variantId,
-          productName: dto.productName,
-          unitName: dto.unitName,
-          price: dto.price,
+          productName: authoritativeProductName,
+          unitName: authoritativeUnitName,
+          price: authoritativePrice,
           quantity,
           ...((dto.imageUrl ? { imageUrl: dto.imageUrl } : {}) as any),
         },

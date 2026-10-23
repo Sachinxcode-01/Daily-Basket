@@ -45,17 +45,17 @@ class _AdminSplashScreenState extends State<AdminSplashScreen> with SingleTicker
       backgroundColor: const Color(0xFF1A1C1E),
       body: AnimationLimiter(
         child: Column(
-          children: AnimationConfiguration.toStaggeredList(
-            duration: const Duration(milliseconds: 600),
-            childAnimationBuilder: (widget) => SlideAnimation(
-              verticalOffset: 30.0,
-              child: FadeInAnimation(child: widget),
-            ),
-            children: [
-              Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: AnimationConfiguration.toStaggeredList(
+                    duration: const Duration(milliseconds: 600),
+                    childAnimationBuilder: (widget) => SlideAnimation(
+                      verticalOffset: 30.0,
+                      child: FadeInAnimation(child: widget),
+                    ),
                     children: [
                       // Pulsing Emblem
                       ScaleTransition(
@@ -136,24 +136,24 @@ class _AdminSplashScreenState extends State<AdminSplashScreen> with SingleTicker
                   ),
                 ),
               ),
+            ),
 
-              // Bottom Spinner & Version
-              const SizedBox(
-                width: 28,
-                height: 28,
-                child: CircularProgressIndicator(
-                  color: Color(0xFF8CFA93),
-                  strokeWidth: 2.8,
-                ),
+            // Bottom Spinner & Version
+            const SizedBox(
+              width: 28,
+              height: 28,
+              child: CircularProgressIndicator(
+                color: Color(0xFF8CFA93),
+                strokeWidth: 2.8,
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'v2.0.0 Enterprise Build 512',
-                style: TextStyle(color: Color(0xFF6E7A6C), fontSize: 11),
-              ),
-              const SizedBox(height: 48),
-            ],
-          ),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'v2.0.0 Enterprise Build 512',
+              style: TextStyle(color: Color(0xFF6E7A6C), fontSize: 11),
+            ),
+            const SizedBox(height: 48),
+          ],
         ),
       ),
     );

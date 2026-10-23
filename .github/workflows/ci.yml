@@ -5,15 +5,23 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   lint-and-typecheck:
     name: Lint & Typecheck
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -64,6 +72,8 @@ jobs:
   unit-test:
     name: Run Unit Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -93,6 +103,11 @@ jobs:
   build-verification:
     name: Verify Builds
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      NEXT_TELEMETRY_DISABLED: '1'
+      NODE_ENV: 'production'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -131,7 +146,9 @@ jobs:
   flutter-ci:
     name: Flutter Mobile CI
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -169,10 +186,14 @@ jobs:
         run: |
           echo "### Flutter Test Log Summary" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          tail -n 80 apps/mobile/test_log.txt >> $GITHUB_STEP_SUMMARY || true
+          if [ -f apps/mobile/test_log.txt ]; then
+            tail -n 80 apps/mobile/test_log.txt >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No test log generated." >> $GITHUB_STEP_SUMMARY
+          fi
           echo '```' >> $GITHUB_STEP_SUMMARY
 
-      - name: Post Test Log to Commit Comment
+      - name: Post Test Log to Commit / PR Comment
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -185,3 +206,4 @@ jobs:
         with:
           name: flutter-ci-test-log
           path: apps/mobile/test_log.txt
+          if-no-files-found: ignore

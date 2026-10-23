@@ -10,11 +10,9 @@ export async function GET(req: NextRequest) {
     const tokenToVerify = cookie || authHeader;
 
     if (!tokenToVerify) {
-      // Return default guest or default active role for local dev convenience
       return NextResponse.json({
-        authenticated: true,
-        user: ADMIN_PRESETS.SUPER_ADMIN.user,
-        isGuestFallback: true,
+        authenticated: false,
+        user: null,
       });
     }
 
@@ -56,8 +54,9 @@ export async function GET(req: NextRequest) {
       });
     } catch {
       return NextResponse.json({
-        authenticated: true,
-        user: ADMIN_PRESETS.SUPER_ADMIN.user,
+        authenticated: false,
+        user: null,
+        message: 'Invalid administrative token',
       });
     }
   } catch (error: any) {

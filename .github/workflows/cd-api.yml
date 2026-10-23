@@ -8,15 +8,21 @@ on:
       - 'packages/**'
       - 'infrastructure/docker/Dockerfile.api'
       - '.github/workflows/cd-api.yml'
+  workflow_dispatch:
 
 concurrency:
   group: cd-api-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   build-and-test-api:
     name: Build, Test & Push API Docker Image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4

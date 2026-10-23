@@ -1,4 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException } from '@nestjs/common';
+import { createHmac } from 'crypto';
 import { PaymentsService } from './payments.service';
 import { PrismaService } from '../../database/prisma.service';
 
@@ -52,17 +54,28 @@ describe('PaymentsService Unit Tests', () => {
   });
 
   describe('verifySignature', () => {
-    it('should verify signature and update payment and order status', async () => {
+    it('should verify authentic HMAC signature and update payment and order status', async () => {
       mockPrismaService.payment.findFirst.mockResolvedValue({
         id: 'pay_101',
         orderId: 'ord_101',
         razorpayOrderId: 'rzp_order_123',
       });
 
-      const result = await service.verifySignature('pay_123', 'rzp_order_123', 'sig_test_123');
+      const secret = process.env.RAZORPAY_KEY_SECRET || 'rzp_secret_daily_basket_2026';
+      const validSignature = createHmac('sha256', secret)
+        .update('rzp_order_123|pay_123')
+        .digest('hex');
+
+      const result = await service.verifySignature('pay_123', 'rzp_order_123', validSignature);
       expect(result.success).toBe(true);
       expect(mockPrismaService.payment.update).toHaveBeenCalled();
       expect(mockPrismaService.order.update).toHaveBeenCalled();
+    });
+
+    it('should reject invalid or bypassed test signature', async () => {
+      await expect(
+        service.verifySignature('pay_123', 'rzp_order_123', 'sig_test_bypassed'),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 
@@ -93,7 +106,7 @@ describe('PaymentsService Unit Tests', () => {
   });
 
   describe('handleYoupiWebhook', () => {
-    it('should verify webhook and update order to CONFIRMED and payment to SUCCESS', async () => {
+    it('should verify authentic webhook HMAC and update order to CONFIRMED and payment to SUCCESS', async () => {
       mockPrismaService.payment.findFirst.mockResolvedValue({
         id: 'pay_yp_1',
         orderId: 'ord_youpi_1',
@@ -106,11 +119,13 @@ describe('PaymentsService Unit Tests', () => {
         utr: 'UTR123456789012',
         paymentId: 'youpi_pay_123',
       };
+      const payloadString = JSON.stringify(webhookPayload);
+      const webhookSecret = process.env.YOUPI_WEBHOOK_SECRET || 'yp_whsec_daily_basket_2026';
+      const validSignature =
+        'sha256=' +
+        createHmac('sha256', webhookSecret).update(payloadString).digest('hex');
 
-      const result = await service.handleYoupiWebhook(
-        JSON.stringify(webhookPayload),
-        'sha256=test_signature',
-      );
+      const result = await service.handleYoupiWebhook(payloadString, validSignature);
 
       expect(result.received).toBe(true);
       expect(result.event).toBe('SUCCESS');
@@ -124,6 +139,16 @@ describe('PaymentsService Unit Tests', () => {
           data: expect.objectContaining({ paymentStatus: 'SUCCESS', status: 'CONFIRMED' }),
         }),
       );
+    });
+
+    it('should reject webhook with missing or invalid signature', async () => {
+      await expect(
+        service.handleYoupiWebhook(JSON.stringify({ event: 'SUCCESS' }), 'sha256=invalid_hash'),
+      ).rejects.toThrow(BadRequestException);
+
+      await expect(
+        service.handleYoupiWebhook(JSON.stringify({ event: 'SUCCESS' }), undefined),
+      ).rejects.toThrow(BadRequestException);
     });
   });
 });

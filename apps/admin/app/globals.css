@@ -13,17 +13,31 @@
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.glass-card-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.glass-card-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(45, 157, 67, 0.35);
+  box-shadow: 0 12px 28px -4px rgba(45, 157, 67, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+}
+
+.glow-emerald {
+  box-shadow: 0 0 25px -5px rgba(45, 157, 67, 0.25);
 }
 
 .stagger-enter {
   opacity: 0;
   transform: translateY(20px);
-  animation: staggerIn 0.5s ease-out forwards;
+  animation: staggerIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes staggerIn {
@@ -40,3 +54,4 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+

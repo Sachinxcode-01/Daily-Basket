@@ -18,6 +18,9 @@ describe('CartService Unit & Calculation Tests', () => {
       delete: jest.fn(),
       deleteMany: jest.fn(),
     },
+    productVariant: {
+      findUnique: jest.fn(),
+    },
   };
 
   const mockEventsGateway = {
@@ -76,6 +79,40 @@ describe('CartService Unit & Calculation Tests', () => {
           quantity: 2,
         }),
       ).rejects.toThrow('Maximum purchase limit per item is 10 units.');
+    });
+
+    it('should use server-authoritative price from database rather than client-supplied price', async () => {
+      mockPrismaService.cart.findUnique.mockResolvedValue({ id: 'cart_101', userId: 'user_101' });
+      mockPrismaService.cartItem.findFirst.mockResolvedValue(null);
+      mockPrismaService.productVariant.findUnique.mockResolvedValue({
+        id: 'var_1',
+        price: 99.0,
+        unitName: '1L',
+        product: { name: 'Fresh Organic Farm Milk' },
+      });
+      mockPrismaService.cart.findUnique.mockResolvedValueOnce({ id: 'cart_101', userId: 'user_101' })
+        .mockResolvedValueOnce({
+          id: 'cart_101',
+          userId: 'user_101',
+          items: [{ id: 'item_1', variantId: 'var_1', price: 99.0, quantity: 1, isSavedForLater: false }],
+        });
+
+      await service.addItem('user_101', {
+        variantId: 'var_1',
+        productName: 'Manipulated Milk',
+        unitName: '1L',
+        price: 0.01, // Attacker tries to pay 1 paisa
+        quantity: 1,
+      });
+
+      expect(mockPrismaService.cartItem.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            price: 99.0, // Authoritative price from DB
+            productName: 'Fresh Organic Farm Milk',
+          }),
+        }),
+      );
     });
   });
 });
