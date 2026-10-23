@@ -6,6 +6,11 @@ import AdminShell from '../components/layout/AdminShell';
 export const metadata = {
   title: 'Daily Basket | Store Admin & Quick-Commerce Suite',
   description: 'Inventory management, daily mandi pricing, order dispatch, and rider tracking.',
+  icons: {
+    icon: '/images/daily_basket_logo.png',
+    shortcut: '/images/daily_basket_logo.png',
+    apple: '/images/daily_basket_logo.png',
+  },
 };
 
 export default function AdminLayout({

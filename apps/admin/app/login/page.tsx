@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
   ShieldCheck,
   Lock,
@@ -128,8 +129,15 @@ export default function AdminLoginPage() {
       {/* Top Header Bar */}
       <header className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center font-black text-xs text-white shadow-inner">
-            DB
+          <div className="w-9 h-9 rounded-xl bg-white border border-zinc-800 p-1 flex items-center justify-center shadow-inner overflow-hidden">
+            <Image
+              src="/images/daily_basket_logo.png"
+              alt="Daily Basket Logo"
+              width={32}
+              height={32}
+              className="w-full h-full object-contain"
+              priority
+            />
           </div>
           <div className="flex items-center gap-2">
             <span className="font-semibold text-sm tracking-tight text-white">Daily Basket</span>
@@ -157,9 +165,16 @@ export default function AdminLoginPage() {
           {/* Card Shell */}
           <div className="bg-zinc-950/80 backdrop-blur-xl border border-zinc-800/90 rounded-2xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.6)] space-y-6">
             {/* Title & Security Status */}
-            <div className="text-center space-y-2">
-              <div className="inline-flex p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-emerald-400 mb-1 shadow-inner">
-                <ShieldCheck className="w-6 h-6" />
+            <div className="text-center space-y-3">
+              <div className="inline-flex p-2.5 rounded-2xl bg-white/5 border border-zinc-800 shadow-inner">
+                <Image
+                  src="/images/daily_basket_logo.png"
+                  alt="Daily Basket Logo"
+                  width={42}
+                  height={42}
+                  className="object-contain"
+                  priority
+                />
               </div>
               <h1 className="text-xl font-bold tracking-tight text-white">
                 Administrative Access Control

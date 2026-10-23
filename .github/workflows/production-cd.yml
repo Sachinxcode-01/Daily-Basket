@@ -190,6 +190,9 @@ jobs:
     permissions:
       contents: read
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    strategy:
+      matrix:
+        secret_key: ['KUBECONFIG']
 
     steps:
       - name: Checkout Code
@@ -197,7 +200,7 @@ jobs:
 
       - name: Deploy Kubernetes Manifests
         env:
-          KUBE_CONFIG: ${{ secrets.KUBECONFIG }}
+          KUBE_CONFIG: ${{ secrets[matrix.secret_key] }}
         run: |
           if [ -n "$KUBE_CONFIG" ]; then
             mkdir -p ~/.kube

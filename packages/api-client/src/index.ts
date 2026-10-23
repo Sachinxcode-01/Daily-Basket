@@ -518,6 +518,12 @@ export class ApiClient {
     });
   }
 
+  public async removeFavorite(productId: string, userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`${API_ROUTES.FAVORITES.REMOVE(productId)}?userId=${encodeURIComponent(userId)}`, {
+      method: 'DELETE',
+    });
+  }
+
   // Admin Dashboard Methods
   public async getAdminDashboardSummary(storeId?: string): Promise<any> {
     const query = storeId ? `?storeId=${encodeURIComponent(storeId)}` : '';

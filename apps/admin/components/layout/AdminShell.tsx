@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -22,6 +23,7 @@ import {
   ChevronDown,
   Shield,
   CheckCircle,
+  UserCheck,
   ExternalLink,
   Menu,
   X,
@@ -30,6 +32,7 @@ import {
 import { useAdminAuth } from '../../app/lib/auth-context';
 import Button from '../ui/Button';
 import Badge from '../ui/Badge';
+import CommandPalette from '../ui/CommandPalette';
 
 const availableStores = [
   { name: 'Koramangala Mega Dark Store #01', code: 'BLR-KRM-01', status: 'Optimal' },
@@ -45,6 +48,19 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const [showStoreMenu, setShowStoreMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeStore, setActiveStore] = useState(availableStores[0].name);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+
+  // Global Ctrl+K / Cmd+K shortcut listener
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // If on login page, render children clean and full-screen
   if (pathname?.startsWith('/login')) {
@@ -100,11 +116,25 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       ],
     },
     {
+      group: 'Team & User Management',
+      items: [
+        {
+          href: '/users',
+          label: 'Staff & Team Users',
+          icon: Users,
+          badge: 'STAFF',
+          badgeVariant: 'brand' as const,
+        },
+        { href: '/customers', label: 'Customer Directory', icon: UserCheck },
+        { href: '/roles', label: 'Roles & Permissions', icon: Shield },
+      ],
+    },
+    {
       group: 'Fleet & Growth',
       items: [
         { href: '/riders', label: 'Rider Performance', icon: Bike },
-        { href: '/customers', label: 'Customer Insights', icon: Users },
         { href: '/marketing/coupons', label: 'Coupons & Promos', icon: Megaphone },
+        { href: '/reviews', label: 'Review Moderation', icon: Sparkles },
       ],
     },
     {
@@ -121,10 +151,17 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white">
       {/* Brand Header */}
-      <div className="h-16 px-5 border-b border-zinc-200/80 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-xl bg-[#2d9d43] text-white flex items-center justify-center font-black text-xs shadow-sm group-hover:scale-105 transition-all">
-            DB
+      <div className="h-16 px-4 border-b border-zinc-200/80 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="w-9 h-9 rounded-xl bg-white border border-zinc-200/90 p-1 flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:border-[#2d9d43]/50 transition-all shrink-0">
+            <Image
+              src="/images/daily_basket_logo.png"
+              alt="Daily Basket Logo"
+              width={32}
+              height={32}
+              className="w-full h-full object-contain"
+              priority
+            />
           </div>
           <div>
             <div className="font-bold text-sm tracking-tight text-zinc-950 flex items-center gap-1.5">
@@ -315,16 +352,19 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* Search bar */}
+          {/* Search bar & Command Palette Trigger */}
           <div className="flex items-center gap-3 flex-1 max-w-md">
-            <div className="relative w-full">
-              <Search className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search dark store SKU, produce, rates, or riders..."
-                className="w-full pl-10 pr-4 py-2 bg-zinc-100/70 hover:bg-zinc-100 border border-transparent hover:border-zinc-200/80 rounded-xl text-xs text-zinc-900 placeholder-zinc-400 focus:outline-none focus:border-[#2d9d43] focus:bg-white transition"
-              />
-            </div>
+            <button
+              type="button"
+              onClick={() => setCommandPaletteOpen(true)}
+              className="w-full relative flex items-center justify-between pl-10 pr-3 py-2 bg-zinc-100/70 hover:bg-zinc-100 border border-transparent hover:border-zinc-200/80 rounded-xl text-xs text-zinc-500 hover:text-zinc-800 transition text-left group"
+            >
+              <Search className="w-4 h-4 text-zinc-400 group-hover:text-zinc-600 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <span className="truncate">Search commands, dark stores, SKUs...</span>
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white text-zinc-500 border border-zinc-200 rounded shadow-2xs">
+                <span>⌘</span>K
+              </kbd>
+            </button>
           </div>
 
           {/* Action buttons with unified Button design */}
@@ -424,7 +464,15 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         >
           {children}
         </motion.main>
+
+        {/* Global Command Palette */}
+        <CommandPalette
+          isOpen={commandPaletteOpen}
+          onClose={() => setCommandPaletteOpen(false)}
+        />
       </div>
     </div>
   );
 }
+
+
