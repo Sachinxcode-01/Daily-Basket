@@ -92,7 +92,7 @@ export class PaymentsService {
   }
 
   private get youpiWebhookSecret(): string {
-    return process.env.YOUPI_WEBHOOK_SECRET || 'youpi_dev_webhook_secret_daily_basket';
+    return process.env.YOUPI_WEBHOOK_SECRET || 'yp_whsec_daily_basket_2026';
   }
 
   async initiateYoupiOrder(
