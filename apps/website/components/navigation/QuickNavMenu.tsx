@@ -91,17 +91,31 @@ export default function QuickNavMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const totalScreens = allRoutes.reduce((acc, g) => acc + g.items.length, 0);
 
+  const [isDismissed, setIsDismissed] = useState(false);
+
+  if (isDismissed) return null;
+
   return (
     <>
-      {/* Quick Nav Hub Trigger Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 left-6 z-50 px-4 py-3 bg-[#006b23] hover:bg-[#00531a] active:scale-95 text-white font-bold text-xs sm:text-sm font-outfit rounded-full shadow-2xl border border-emerald-400/40 flex items-center gap-2 transition-all duration-200"
-        aria-label="Open Screen Navigator"
-      >
-        <LayoutGrid className="w-4 h-4" />
-        <span>All Screens ({totalScreens})</span>
-      </button>
+      {/* Quick Nav Hub Discreet Trigger Button */}
+      <div className="fixed bottom-5 right-5 z-40 flex items-center gap-1.5 bg-[#006b23]/95 hover:bg-[#00531a] text-white p-1.5 pl-3.5 pr-2 rounded-full shadow-lg border border-emerald-400/30 backdrop-blur-md transition-all duration-200">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="flex items-center gap-2 font-bold text-xs font-outfit cursor-pointer"
+          aria-label="Open Screen Navigator"
+        >
+          <LayoutGrid className="w-3.5 h-3.5" />
+          <span>Dev Screens ({totalScreens})</span>
+        </button>
+        <button
+          onClick={() => setIsDismissed(true)}
+          className="w-5 h-5 rounded-full hover:bg-black/20 flex items-center justify-center text-white/70 hover:text-white transition cursor-pointer"
+          aria-label="Hide navigation pill"
+          title="Dismiss Navigator"
+        >
+          <X className="w-3 h-3" />
+        </button>
+      </div>
 
       {/* Modal Backdrop */}
       {isOpen && (

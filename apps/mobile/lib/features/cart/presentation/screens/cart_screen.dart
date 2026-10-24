@@ -9,7 +9,8 @@ import 'empty_basket_screen.dart';
 
 /// Your Basket / Cart Screen — Google Stitch Design System Exact Replica
 class CartScreen extends StatefulWidget {
-  const CartScreen({super.key});
+  final bool isEmbedded;
+  const CartScreen({super.key, this.isEmbedded = false});
 
   @override
   State<CartScreen> createState() => _CartScreenState();
@@ -356,10 +357,13 @@ class _CartScreenState extends State<CartScreen> {
         backgroundColor: const Color(0xFFF9F9FC),
         elevation: 0,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        automaticallyImplyLeading: false,
+        leading: widget.isEmbedded || !Navigator.of(context).canPop()
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
+                onPressed: () => Navigator.of(context).maybePop(),
+              ),
         title: Text(
           languageProvider?.translate('cart', 'Cart') ?? 'Cart',
           style: GoogleFonts.outfit(

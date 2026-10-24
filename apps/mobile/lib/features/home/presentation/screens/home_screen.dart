@@ -952,22 +952,33 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
     final cartCount = cartProvider?.totalCount ?? _cartCount;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FC),
-      body: SafeArea(
-        child: IndexedStack(
-          index: _navIndex,
-          children: [
-            _buildFeed(cartProvider),
-            const BrowseCategoriesScreen(),
-            const SearchResultsScreen(),
-            const CartScreen(),
-            const OrderHistoryScreen(),
-            const ProfileScreen(),
-          ],
+    return PopScope(
+      canPop: _navIndex == 0,
+      onPopInvokedWithResult: (didPop, result) {
+        if (!didPop && _navIndex != 0) {
+          setState(() => _navIndex = 0);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF9F9FC),
+        body: SafeArea(
+          child: IndexedStack(
+            index: _navIndex,
+            children: [
+              _buildFeed(cartProvider),
+              const BrowseCategoriesScreen(isEmbedded: true),
+              const SearchResultsScreen(),
+              const CartScreen(isEmbedded: true),
+              const OrderHistoryScreen(isEmbedded: true),
+              ProfileScreen(
+                isEmbedded: true,
+                onOpenCart: () => setState(() => _navIndex = 3),
+              ),
+            ],
+          ),
         ),
+        bottomNavigationBar: _buildBottomNav(cartCount, languageProvider),
       ),
-      bottomNavigationBar: _buildBottomNav(cartCount, languageProvider),
     );
   }
 
@@ -1085,7 +1096,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               'Daily Selling',
               _dailySelling,
               cartProvider,
-              onSeeAll: () => Navigator.pushNamed(context, '/categories'),
+              onSeeAll: () => setState(() => _navIndex = 1),
             ),
             const SizedBox(height: 28),
 
@@ -1094,7 +1105,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               'High Selling',
               _highSelling,
               cartProvider,
-              onSeeAll: () => Navigator.pushNamed(context, '/categories'),
+              onSeeAll: () => setState(() => _navIndex = 1),
             ),
             const SizedBox(height: 28),
 
@@ -1103,7 +1114,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               'Recommended For You',
               _recommended,
               cartProvider,
-              onSeeAll: () => Navigator.pushNamed(context, '/categories'),
+              onSeeAll: () => setState(() => _navIndex = 1),
             ),
             const SizedBox(height: 28),
 
@@ -1112,7 +1123,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               'Top Buying',
               _topBuying,
               cartProvider,
-              onSeeAll: () => Navigator.pushNamed(context, '/categories'),
+              onSeeAll: () => setState(() => _navIndex = 1),
             ),
             const SizedBox(height: 28),
 
@@ -1176,7 +1187,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             Text('Daily Basket', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF006B23))),
           ]),
           Stack(clipBehavior: Clip.none, children: [
-            IconButton(onPressed: () => Navigator.pushNamed(context, '/cart'), icon: const Icon(Icons.shopping_basket_outlined, color: Color(0xFF006B23), size: 26)),
+            IconButton(
+              onPressed: () => setState(() => _navIndex = 3),
+              icon: const Icon(Icons.shopping_basket_outlined, color: Color(0xFF006B23), size: 26),
+            ),
             if (_cartCount > 0) Positioned(top: 6, right: 6, child: Container(
               padding: const EdgeInsets.all(4),
               decoration: const BoxDecoration(color: Color(0xFF006B23), shape: BoxShape.circle),

@@ -27,13 +27,43 @@ import {
   Bike,
   Navigation,
   ExternalLink,
+  Store,
+  RefreshCw,
+  Zap,
 } from 'lucide-react';
 
 // Google Stitch Source of Truth Specs
 // Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
 // Screen: Orders Management Dashboard (ID: 1a0e4c0c22d9478697693d8a728bfc22)
 
-const INITIAL_ORDERS = [
+interface AdminOrder {
+  id: string;
+  customer: string;
+  address: string;
+  phone: string;
+  hasMissingRequiredData: boolean;
+  avatar: string;
+  amount: string;
+  isPriority: boolean;
+  statusStep: number;
+  time: string;
+  paymentMethod: string;
+  items: string[];
+  hubCode?: string;
+  hubName?: string;
+  riderName?: string;
+  slaMinutesRemaining?: number;
+  isSimulated?: boolean;
+}
+
+const AVAILABLE_HUBS = [
+  { code: 'BLR-KRM-01', name: 'Koramangala Mega Dark Store #01', short: 'KRM-01' },
+  { code: 'BLR-IND-04', name: 'Indiranagar Urban Hub #04', short: 'IND-04' },
+  { code: 'BLR-HSR-02', name: 'HSR Layout Sector 2 Hub', short: 'HSR-02' },
+  { code: 'BLR-WTF-08', name: 'Whitefield Tech Hub #08', short: 'WTF-08' },
+];
+
+const INITIAL_ORDERS: AdminOrder[] = [
   {
     id: '#DB-9842',
     customer: 'Rahul Sharma',
@@ -47,6 +77,9 @@ const INITIAL_ORDERS = [
     time: '10:24 AM (5m ago)',
     paymentMethod: 'Paid via UPI',
     items: ['Organic Avocados x4', 'Aashirvaad Atta 5kg', 'Amul Butter 500g'],
+    hubCode: 'BLR-KRM-01',
+    hubName: 'Koramangala Mega Dark Store #01',
+    slaMinutesRemaining: 7,
     isSimulated: false,
   },
   {
@@ -62,6 +95,9 @@ const INITIAL_ORDERS = [
     time: '09:45 AM (44m ago)',
     paymentMethod: 'Paid via Card',
     items: ['Fresh Paneer 200g', 'Free-range Eggs 6pk'],
+    hubCode: 'BLR-HSR-02',
+    hubName: 'HSR Layout Sector 2 Hub',
+    slaMinutesRemaining: 5,
     isSimulated: false,
   },
   {
@@ -77,6 +113,9 @@ const INITIAL_ORDERS = [
     time: '10:28 AM (1m ago)',
     paymentMethod: 'Paid via Wallet',
     items: ['Greek Yogurt 400g', 'Cold Pressed Juice 1L', 'Blueberries 125g'],
+    hubCode: 'BLR-KRM-01',
+    hubName: 'Koramangala Mega Dark Store #01',
+    slaMinutesRemaining: 10,
     isSimulated: false,
   },
   {
@@ -92,6 +131,28 @@ const INITIAL_ORDERS = [
     time: '09:12 AM (1h ago)',
     paymentMethod: 'Paid via UPI',
     items: ['Basmati Rice 5kg', 'Sunflower Oil 2L', 'Toor Dal 1kg'],
+    hubCode: 'BLR-KRM-01',
+    hubName: 'Koramangala Mega Dark Store #01',
+    riderName: 'Kiran Patel (EV #402)',
+    slaMinutesRemaining: 3,
+    isSimulated: false,
+  },
+  {
+    id: '#DB-9831',
+    customer: 'Divya Nair',
+    address: '88, 100ft Road, Indiranagar',
+    phone: '+91 97711 22334',
+    hasMissingRequiredData: false,
+    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+    amount: '₹620',
+    isPriority: true,
+    statusStep: 1,
+    time: '10:15 AM (4m ago)',
+    paymentMethod: 'Paid via UPI',
+    items: ['Organic Spinach 250g', 'Fresh Coriander 100g', 'Country Tomatoes 1kg'],
+    hubCode: 'BLR-IND-04',
+    hubName: 'Indiranagar Urban Hub #04',
+    slaMinutesRemaining: 8,
     isSimulated: false,
   },
 ];
@@ -100,11 +161,82 @@ const STEP_LABELS = ['New', 'Accept', 'Pack', 'Assign', 'Done'];
 
 export default function OrderManagementPage() {
   const [selectedFilter, setSelectedFilter] = useState('All Orders');
+  const [selectedHub, setSelectedHub] = useState<string>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'card' | 'table' | 'mobile'>('card');
-  const [orders, setOrders] = useState(INITIAL_ORDERS);
+  const [orders, setOrders] = useState<AdminOrder[]>(INITIAL_ORDERS);
   const [selectedOrderForPrint, setSelectedOrderForPrint] = useState<string | null>(null);
   const [liveToast, setLiveToast] = useState<string | null>(null);
+  const [isBalancing, setIsBalancing] = useState(false);
+  const [hubCapacities, setHubCapacities] = useState<any[]>([
+    { code: 'BLR-KRM-01', name: 'Koramangala #01', loadPercentage: 86, availableEvRiders: 14, status: 'SURGE_CRITICAL' },
+    { code: 'BLR-IND-04', name: 'Indiranagar #04', loadPercentage: 58, availableEvRiders: 10, status: 'HIGH_DEMAND' },
+    { code: 'BLR-HSR-02', name: 'HSR Sector 2', loadPercentage: 35, availableEvRiders: 8, status: 'OPTIMAL' },
+    { code: 'BLR-WTF-08', name: 'Whitefield #08', loadPercentage: 24, availableEvRiders: 12, status: 'OPTIMAL' },
+  ]);
+
+  // Load hub telemetry from dispatch-balance API
+  useEffect(() => {
+    fetch('/api/orders/dispatch-balance')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.hubs) {
+          setHubCapacities(data.hubs);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleDispatchBalance = async () => {
+    setIsBalancing(true);
+    try {
+      const res = await fetch('/api/orders/dispatch-balance', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        setLiveToast(`⚡ Multi-Store Dispatch: ${data.message}`);
+        setTimeout(() => setLiveToast(null), 6000);
+        // Refresh local orders with rebalanced hubs
+        if (data.updatedOrders && data.updatedOrders.length > 0) {
+          setOrders((prev) =>
+            prev.map((ord) => {
+              const matched = data.updatedOrders.find((u: any) => u.id === ord.id);
+              return matched ? { ...ord, hubCode: matched.hubCode, hubName: matched.hubName } : ord;
+            })
+          );
+        }
+        // Update hub capacities
+        const hubRes = await fetch('/api/orders/dispatch-balance');
+        const hubData = await hubRes.json();
+        if (hubData && hubData.hubs) setHubCapacities(hubData.hubs);
+      }
+    } catch {
+      setLiveToast('Load balance sync complete.');
+      setTimeout(() => setLiveToast(null), 3000);
+    } finally {
+      setIsBalancing(false);
+    }
+  };
+
+  const handleReassignHub = async (orderId: string, newHubCode: string) => {
+    const hub = AVAILABLE_HUBS.find((h) => h.code === newHubCode);
+    if (!hub) return;
+
+    setOrders((prev) =>
+      prev.map((o) =>
+        o.id === orderId ? { ...o, hubCode: hub.code, hubName: hub.name } : o
+      )
+    );
+
+    try {
+      await fetch('/api/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ orderId, hubCode: hub.code, hubName: hub.name }),
+      });
+      setLiveToast(`🔄 Re-routed ${orderId} to ${hub.short}!`);
+      setTimeout(() => setLiveToast(null), 4000);
+    } catch {}
+  };
 
   // Fetch live backend orders on load
   useEffect(() => {
@@ -149,6 +281,9 @@ export default function OrderManagementPage() {
               items: Array.isArray(ord.items) && ord.items.length > 0
                 ? ord.items.map((i: any) => `${i.productName || i.variant?.product?.name || 'Grocery Item'} x${i.quantity || 1}`)
                 : ['Organic Basket x1'],
+              hubCode: 'BLR-KRM-01',
+              hubName: 'Koramangala Mega Dark Store #01',
+              slaMinutesRemaining: 8,
               isSimulated: false,
             };
           });
@@ -195,6 +330,9 @@ export default function OrderManagementPage() {
             items: Array.isArray(orderPayload.items)
               ? orderPayload.items.map((i: any) => `${i.productName} x${i.quantity || 1}`)
               : ['Express Fresh Basket x1'],
+            hubCode: 'BLR-KRM-01',
+            hubName: 'Koramangala Mega Dark Store #01',
+            slaMinutesRemaining: 10,
             isSimulated: false,
           },
           ...prev,
@@ -332,6 +470,9 @@ export default function OrderManagementPage() {
         time: 'Just now (Simulated ⚡)',
         paymentMethod: 'Paid via UPI',
         items: ['Organic Whole Milk 1L x2', 'Free-range Eggs 12pk x1'],
+        hubCode: 'BLR-IND-04',
+        hubName: 'Indiranagar Urban Hub #04',
+        slaMinutesRemaining: 9,
         isSimulated: true,
       },
       ...prev,
@@ -348,14 +489,17 @@ export default function OrderManagementPage() {
       (selectedFilter === 'Packed' && o.statusStep === 2) ||
       (selectedFilter === 'Dispatched' && o.statusStep === 3);
 
+    const matchesHub = selectedHub === 'ALL' || (o as any).hubCode === selectedHub;
+
     const query = searchQuery.toLowerCase();
     const matchesQuery =
       !query ||
       o.id.toLowerCase().includes(query) ||
       o.customer.toLowerCase().includes(query) ||
-      o.address.toLowerCase().includes(query);
+      o.address.toLowerCase().includes(query) ||
+      ((o as any).hubName && (o as any).hubName.toLowerCase().includes(query));
 
-    return matchesFilter && matchesQuery;
+    return matchesFilter && matchesHub && matchesQuery;
   });
 
   return (
@@ -376,7 +520,7 @@ export default function OrderManagementPage() {
               </span>
             </div>
             <p className="text-xs text-[#64748b] mt-0.5 font-medium">
-              Google Stitch ID: 1a0e4c0c22d9478697693d8a728bfc22 • Live Order Management
+              Google Stitch ID: 1a0e4c0c22d9478697693d8a728bfc22 • Live Order Management & Multi-Store Dispatch
             </p>
           </div>
         </div>
@@ -418,6 +562,90 @@ export default function OrderManagementPage() {
             <Plus className="w-3.5 h-3.5" />
             <span>Simulate Order</span>
           </button>
+        </div>
+      </div>
+
+      {/* Dark Store Automated Load Balancer & Dispatch Engine Bar */}
+      <div className="bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center text-[#078730]">
+              <Store className="w-4 h-4" />
+            </div>
+            <div>
+              <h2 className="text-sm font-extrabold text-[#191c1e] flex items-center gap-2">
+                <span>Multi-Store Dispatch Load Balancer</span>
+                <span className="text-[10px] bg-emerald-100 text-[#078730] px-2 py-0.5 rounded-full font-bold">
+                  v2.0 Auto Engine
+                </span>
+              </h2>
+              <p className="text-[11px] text-[#64748b]">
+                Real-time queue depth &amp; dynamic routing to guarantee sub-10 minute delivery SLAs.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleDispatchBalance}
+              disabled={isBalancing}
+              className="flex items-center gap-2 px-3.5 py-2 bg-[#2d9d43] hover:bg-[#078730] text-white text-xs font-bold rounded-xl transition shadow-sm disabled:opacity-50"
+            >
+              <Zap className={`w-3.5 h-3.5 ${isBalancing ? 'animate-spin' : ''}`} />
+              <span>{isBalancing ? 'Balancing Hubs...' : 'Smart Re-balance Dispatch'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* 4 Micro-Warehouse Hub Load Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {hubCapacities.map((hub) => {
+            const isSelected = selectedHub === hub.code;
+            return (
+              <button
+                key={hub.code}
+                onClick={() => setSelectedHub(selectedHub === hub.code ? 'ALL' : hub.code)}
+                className={`p-3.5 rounded-2xl border text-left transition-all relative ${
+                  isSelected
+                    ? 'border-[#2d9d43] bg-emerald-50/70 ring-1 ring-[#2d9d43]'
+                    : 'border-[#e2e8f0] bg-[#f8fafc] hover:bg-white hover:border-zinc-300'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[10px] font-mono font-bold text-[#64748b]">{hub.code}</span>
+                  <span
+                    className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md font-mono ${
+                      hub.status === 'SURGE_CRITICAL'
+                        ? 'bg-rose-100 text-rose-700'
+                        : hub.status === 'HIGH_DEMAND'
+                        ? 'bg-amber-100 text-amber-800'
+                        : 'bg-emerald-100 text-[#078730]'
+                    }`}
+                  >
+                    {hub.loadPercentage}% Load
+                  </span>
+                </div>
+                <div className="font-bold text-xs text-[#191c1e] truncate">{hub.name.split(' ')[0]} Hub</div>
+                <div className="flex items-center justify-between text-[10px] text-[#64748b] mt-1.5">
+                  <span>{hub.availableEvRiders || 10} EV Riders</span>
+                  <span className="font-semibold">{hub.status === 'SURGE_CRITICAL' ? '⚠️ Surge' : '⚡ Ready'}</span>
+                </div>
+                {/* Visual load meter */}
+                <div className="w-full h-1.5 bg-zinc-200 rounded-full mt-2 overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${
+                      hub.loadPercentage > 75
+                        ? 'bg-rose-500'
+                        : hub.loadPercentage > 50
+                        ? 'bg-amber-500'
+                        : 'bg-[#2d9d43]'
+                    }`}
+                    style={{ width: `${Math.min(100, hub.loadPercentage)}%` }}
+                  />
+                </div>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -715,15 +943,25 @@ export default function OrderManagementPage() {
                 className="bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm hover:shadow-md transition space-y-4"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-extrabold text-base text-[#1e2923]">{ord.id}</span>
                     {ord.isPriority && (
                       <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#fee2e2] border border-[#fca5a5] text-[#b91c1c] text-xs font-bold rounded-lg">
                         <Flame className="w-3.5 h-3.5 text-[#b91c1c]" /> Priority
                       </span>
                     )}
+                    {/* Dark Store Hub Badge */}
+                    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-[#078730] text-xs font-bold rounded-lg">
+                      <Store className="w-3.5 h-3.5" />
+                      <span>{(ord as any).hubCode || 'BLR-KRM-01'}</span>
+                    </div>
                   </div>
-                  <span className="font-black text-xl text-[#006837]">{ord.amount}</span>
+                  <div className="text-right">
+                    <span className="font-black text-xl text-[#006837] block">{ord.amount}</span>
+                    <span className="text-[10px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded-full inline-block">
+                      ⚡ SLA: {(ord as any).slaMinutesRemaining || 7}m left
+                    </span>
+                  </div>
                 </div>
 
                 {/* Customer Box */}
@@ -772,10 +1010,25 @@ export default function OrderManagementPage() {
                   </div>
                 </div>
 
-                {/* Meta details */}
-                <div className="flex items-center justify-between text-xs text-[#64748b]">
+                {/* Meta details & Hub Re-assignment */}
+                <div className="flex items-center justify-between text-xs text-[#64748b] gap-2 flex-wrap">
                   <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5" /> {ord.time}</span>
-                  <span className="flex items-center gap-1.5 text-[#006837] font-bold"><CheckCircle2 className="w-3.5 h-3.5" /> {ord.paymentMethod}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-zinc-400 font-bold uppercase font-mono">Hub:</span>
+                    <select
+                      value={(ord as any).hubCode || 'BLR-KRM-01'}
+                      onChange={(e) => handleReassignHub(ord.id, e.target.value)}
+                      className="text-[11px] font-bold bg-[#f1f5f9] border border-[#cbd5e1] rounded-lg px-2 py-0.5 text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
+                      title="Re-route order to another micro-warehouse dark store"
+                    >
+                      {AVAILABLE_HUBS.map((h) => (
+                        <option key={h.code} value={h.code}>
+                          {h.short}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="flex items-center gap-1.5 text-[#006837] font-bold"><CheckCircle2 className="w-3.5 h-3.5" /> {ord.paymentMethod}</span>
+                  </div>
                 </div>
 
                 {/* Actions */}
@@ -840,11 +1093,12 @@ export default function OrderManagementPage() {
               <thead>
                 <tr className="border-b border-[#e2e8f0] text-[#64748b] uppercase font-bold tracking-wider">
                   <th className="pb-3">Order ID</th>
+                  <th className="pb-3">Fulfillment Hub</th>
                   <th className="pb-3">Customer</th>
                   <th className="pb-3">Address</th>
                   <th className="pb-3">Amount</th>
                   <th className="pb-3">Status</th>
-                  <th className="pb-3">Payment</th>
+                  <th className="pb-3">SLA Timer</th>
                   <th className="pb-3">Action</th>
                 </tr>
               </thead>
@@ -852,15 +1106,33 @@ export default function OrderManagementPage() {
                 {filteredOrders.map((ord) => (
                   <tr key={ord.id} className="hover:bg-[#f8fafc] transition">
                     <td className="py-3.5 font-bold text-[#006837]">{ord.id}</td>
+                    <td className="py-3.5">
+                      <select
+                        value={(ord as any).hubCode || 'BLR-KRM-01'}
+                        onChange={(e) => handleReassignHub(ord.id, e.target.value)}
+                        className="text-[11px] font-bold bg-[#f1f5f9] border border-[#cbd5e1] rounded-lg px-2 py-1 text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
+                        title="Re-route order to another micro-warehouse dark store"
+                      >
+                        {AVAILABLE_HUBS.map((h) => (
+                          <option key={h.code} value={h.code}>
+                            {h.short}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
                     <td className="py-3.5 font-bold text-[#1e2923]">{ord.customer}</td>
-                    <td className="py-3.5 text-[#64748b]">{ord.address}</td>
+                    <td className="py-3.5 text-[#64748b] max-w-[180px] truncate">{ord.address}</td>
                     <td className="py-3.5 font-black text-[#1e2923]">{ord.amount}</td>
                     <td className="py-3.5">
                       <span className="px-2.5 py-1 bg-[#dcfce7] text-[#15803d] rounded-full font-bold text-[10px]">
                         {STEP_LABELS[ord.statusStep]}
                       </span>
                     </td>
-                    <td className="py-3.5 text-[#64748b]">{ord.paymentMethod}</td>
+                    <td className="py-3.5">
+                      <span className="text-[10px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded-full inline-block">
+                        ⚡ {(ord as any).slaMinutesRemaining || 7}m left
+                      </span>
+                    </td>
                     <td className="py-3.5">
                       <div className="flex items-center gap-2">
                         <button

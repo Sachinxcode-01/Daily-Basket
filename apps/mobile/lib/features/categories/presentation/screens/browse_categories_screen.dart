@@ -9,7 +9,8 @@ import 'fresh_produce_listing_screen.dart';
 /// Stitch Screen ID: d4a9073676484431a88cd27d2cc1e87a
 /// Project: Daily Basket Quick-Commerce Suite
 class BrowseCategoriesScreen extends StatefulWidget {
-  const BrowseCategoriesScreen({super.key});
+  final bool isEmbedded;
+  const BrowseCategoriesScreen({super.key, this.isEmbedded = false});
 
   @override
   State<BrowseCategoriesScreen> createState() => _BrowseCategoriesScreenState();
@@ -146,7 +147,7 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                     onPressed: () => Navigator.pushNamed(context, '/select-location'),
                   ),
                   Text(
-                    'Daily Basket',
+                    widget.isEmbedded ? 'Categories' : 'Daily Basket',
                     style: GoogleFonts.outfit(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,

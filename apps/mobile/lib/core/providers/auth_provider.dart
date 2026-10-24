@@ -270,7 +270,159 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// 7. Logout and revoke session
+  /// 7. Request Phone OTP
+  Future<Map<String, dynamic>> requestPhoneOtp(String phone, [String type = 'LOGIN']) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final res = await _apiClient.post('/auth/login-otp', {
+        'phone': phone.trim(),
+        'type': type,
+      });
+
+      _isLoading = false;
+      if (res['success'] != true) {
+        _errorMessage = res['error'] ?? res['message'] ?? 'Failed to send OTP.';
+      }
+      notifyListeners();
+      return res;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'error': _errorMessage};
+    }
+  }
+
+  /// 8. Verify Phone OTP code
+  Future<Map<String, dynamic>> verifyPhoneOtp({
+    required String phone,
+    required String otp,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final res = await _apiClient.post('/auth/verify-otp', {
+        'phone': phone.trim(),
+        'otp': otp.trim(),
+        'platform': 'MOBILE_APP',
+      });
+
+      if (res['accessToken'] != null) {
+        _accessToken = res['accessToken'];
+        _refreshToken = res['refreshToken'];
+        _currentUser = res['user'] is Map<String, dynamic>
+            ? Map<String, dynamic>.from(res['user'])
+            : {'phone': phone, 'role': 'CUSTOMER'};
+        _isAuthenticated = true;
+
+        if (_accessToken != null) {
+          await _storageService.saveTokens(
+            accessToken: _accessToken!,
+            refreshToken: _refreshToken,
+          );
+        }
+
+        _isLoading = false;
+        notifyListeners();
+        return {'success': true, ...res};
+      } else {
+        _errorMessage = res['error'] ?? res['message'] ?? 'Invalid OTP code.';
+        _isLoading = false;
+        notifyListeners();
+        return res;
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'error': _errorMessage};
+    }
+  }
+
+  /// 9. Request 6-digit Email OTP
+  Future<Map<String, dynamic>> sendEmailOtp(String email, [String type = 'LOGIN']) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final res = await _apiClient.post('/auth/send-email-otp', {
+        'email': email.trim().toLowerCase(),
+        'type': type,
+      });
+
+      _isLoading = false;
+      if (res['success'] != true) {
+        _errorMessage = res['error'] ?? res['message'] ?? 'Failed to dispatch email OTP.';
+      }
+      notifyListeners();
+      return res;
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'error': _errorMessage};
+    }
+  }
+
+  /// 10. Verify Email 6-digit OTP
+  Future<Map<String, dynamic>> verifyEmailOtp({
+    required String email,
+    required String otp,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final res = await _apiClient.post('/auth/verify-email-otp', {
+        'email': email.trim().toLowerCase(),
+        'otp': otp.trim(),
+        'platform': 'MOBILE_APP',
+      });
+
+      final tokens = res['tokens'] is Map<String, dynamic> ? res['tokens'] : null;
+      final token = res['accessToken'] ?? tokens?['accessToken'];
+      final refresh = res['refreshToken'] ?? tokens?['refreshToken'];
+
+      if (token != null) {
+        _accessToken = token;
+        _refreshToken = refresh;
+        _currentUser = res['user'] is Map<String, dynamic>
+            ? Map<String, dynamic>.from(res['user'])
+            : {'email': email, 'role': 'CUSTOMER'};
+        _isAuthenticated = true;
+
+        if (_accessToken != null) {
+          await _storageService.saveTokens(
+            accessToken: _accessToken!,
+            refreshToken: _refreshToken,
+          );
+        }
+
+        _isLoading = false;
+        notifyListeners();
+        return {'success': true, ...res};
+      } else {
+        _errorMessage = res['error'] ?? res['message'] ?? 'Invalid or expired OTP code.';
+        _isLoading = false;
+        notifyListeners();
+        return res;
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'error': _errorMessage};
+    }
+  }
+
+  /// 11. Logout and revoke session
   Future<void> logout() async {
     await _storageService.clearTokens();
     _accessToken = null;

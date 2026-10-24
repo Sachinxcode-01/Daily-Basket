@@ -71,6 +71,27 @@ export class ApiClient {
     });
   }
 
+  public async sendEmailOtp(
+    email: string,
+    type: string = 'LOGIN',
+  ): Promise<{ success: boolean; message: string; demoOtp?: string; resendCooldownSeconds?: number }> {
+    return this.fetcher('/api/v1/auth/send-email-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, type }),
+    });
+  }
+
+  public async verifyEmailOtp(
+    email: string,
+    otp: string,
+    deviceData?: { deviceId?: string; deviceName?: string; platform?: string },
+  ): Promise<{ token: string; accessToken: string; user: any; success?: boolean }> {
+    return this.fetcher('/api/v1/auth/verify-email-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp, ...deviceData }),
+    });
+  }
+
   public async loginEmail(data: { email: string; pass: string }): Promise<{ token: string; accessToken: string; user: any }> {
     return this.fetcher('/api/v1/auth/login-email', {
       method: 'POST',

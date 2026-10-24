@@ -56,6 +56,11 @@ services/api/public/uploads/
 assets/products/
 graphify-out/
 
+# Archives & Temporary Test Files
+*.tar.gz
+*.zip
+*.tar
+
 
 # Added by code-review-graph
 .code-review-graph/

@@ -9,7 +9,8 @@ import '../../../tracking/presentation/screens/tracking_screen.dart';
 
 /// Order History Screen — Google Stitch Design System Exact Replica
 class OrderHistoryScreen extends StatefulWidget {
-  const OrderHistoryScreen({super.key});
+  final bool isEmbedded;
+  const OrderHistoryScreen({super.key, this.isEmbedded = false});
 
   @override
   State<OrderHistoryScreen> createState() => _OrderHistoryScreenState();
@@ -248,10 +249,13 @@ class _OrderHistoryScreenState extends State<OrderHistoryScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFFF9F9FC),
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
+        automaticallyImplyLeading: false,
+        leading: widget.isEmbedded || !Navigator.of(context).canPop()
+            ? null
+            : IconButton(
+                icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
+                onPressed: () => Navigator.of(context).maybePop(),
+              ),
         title: Text(
           'Orders',
           style: GoogleFonts.outfit(

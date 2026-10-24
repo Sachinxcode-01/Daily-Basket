@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:async';
+import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/providers/user_provider.dart';
 
-/// Mobile Phone OTP Verification Screen — Exact User Mockup Specification
-/// Matches:
-/// - Top white rounded logo badge card with Daily Basket logo
-/// - Title: "Verify Your Identity"
-/// - Subtitle: "Enter the 6-digit code sent to your mobile device."
-/// - 6-Digit OTP Box Grid (Active blue outline box with blinking cursor)
-/// - Sage green "Verify" button
-/// - "Didn't receive a code? Resend Code (28s)" countdown timer
-/// - Custom 3x4 bottom numeric keypad grid (1-9, 0, backspace key)
+/// Mobile Phone & Email OTP Verification Screen — Realtime Verification
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
+  final String email;
+  final bool isEmailOtp;
 
   const OtpScreen({
     super.key,
     this.phoneNumber = '+91 98765 43210',
+    this.email = 'customer@dailybasket.com',
+    this.isEmailOtp = false,
   });
 
   @override
@@ -25,10 +24,11 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  String _otpCode = '1';
+  String _otpCode = '';
   int _countdown = 28;
   Timer? _timer;
   bool _isVerifying = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -48,6 +48,27 @@ class _OtpScreenState extends State<OtpScreen> {
     });
   }
 
+  void _resendCode() async {
+    _startTimer();
+    final auth = context.read<AuthProvider>();
+    if (widget.isEmailOtp) {
+      await auth.sendEmailOtp(widget.email);
+    } else {
+      await auth.requestPhoneOtp(widget.phoneNumber);
+    }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(widget.isEmailOtp
+              ? 'New OTP code sent to ${widget.email}'
+              : 'New OTP code sent to ${widget.phoneNumber}'),
+          backgroundColor: AppColors.primary,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    }
+  }
+
   @override
   void dispose() {
     _timer?.cancel();
@@ -58,6 +79,7 @@ class _OtpScreenState extends State<OtpScreen> {
     if (_otpCode.length < 6) {
       setState(() {
         _otpCode += value;
+        _errorMessage = null;
       });
       if (_otpCode.length == 6) {
         _handleVerify();
@@ -69,18 +91,45 @@ class _OtpScreenState extends State<OtpScreen> {
     if (_otpCode.isNotEmpty) {
       setState(() {
         _otpCode = _otpCode.substring(0, _otpCode.length - 1);
+        _errorMessage = null;
       });
     }
   }
 
   void _handleVerify() async {
     if (_otpCode.length < 6) return;
-    setState(() => _isVerifying = true);
-    await Future.delayed(const Duration(milliseconds: 800));
+    setState(() {
+      _isVerifying = true;
+      _errorMessage = null;
+    });
 
-    if (mounted) {
+    final auth = context.read<AuthProvider>();
+    Map<String, dynamic> res;
+
+    if (widget.isEmailOtp) {
+      res = await auth.verifyEmailOtp(email: widget.email, otp: _otpCode);
+    } else {
+      res = await auth.verifyPhoneOtp(phone: widget.phoneNumber, otp: _otpCode);
+    }
+
+    if (!mounted) return;
+
+    if (res['success'] == true) {
+      final user = res['user'];
+      if (user != null) {
+        context.read<UserProvider>().updatePersonalInfo(
+              name: user['name'] ?? user['fullName'] ?? 'Daily Basket Customer',
+              email: user['email'] ?? widget.email,
+              phone: user['phone'] ?? widget.phoneNumber,
+            );
+      }
       setState(() => _isVerifying = false);
       Navigator.of(context).pushReplacementNamed('/customer/home');
+    } else {
+      setState(() {
+        _isVerifying = false;
+        _errorMessage = res['error'] ?? res['message'] ?? 'Invalid 6-digit OTP code. Try 123456.';
+      });
     }
   }
 
@@ -161,7 +210,9 @@ class _OtpScreenState extends State<OtpScreen> {
 
                         // Subtitle
                         Text(
-                          'Enter the 6-digit code sent to your mobile device.',
+                          widget.isEmailOtp
+                              ? 'Enter the 6-digit code sent to ${widget.email}'
+                              : 'Enter the 6-digit code sent to ${widget.phoneNumber}',
                           style: GoogleFonts.inter(
                             fontSize: 14,
                             color: const Color(0xFF64748B),
@@ -170,7 +221,56 @@ class _OtpScreenState extends State<OtpScreen> {
                           textAlign: TextAlign.center,
                         ),
 
-                        const SizedBox(height: 32),
+                        if (_errorMessage != null) ...[
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFFFEBEE),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: const Color(0xFFFFCDD2)),
+                            ),
+                            child: Text(
+                              _errorMessage!,
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                color: const Color(0xFFD32F2F),
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+
+                        const SizedBox(height: 24),
+
+                        // Quick Fill Demo Pin Pill
+                        GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              _otpCode = widget.isEmailOtp ? '482109' : '123456';
+                              _errorMessage = null;
+                            });
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                            ),
+                            child: Text(
+                              '⚡ Tap to fill Test PIN: ${widget.isEmailOtp ? "482109" : "123456"}',
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
 
                         // 6-Digit OTP Box Grid
                         Row(
@@ -220,9 +320,9 @@ class _OtpScreenState extends State<OtpScreen> {
                           }),
                         ),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 28),
 
-                        // Primary Sage Green Verify Button
+                        // Primary Green Verify Button
                         SizedBox(
                           width: double.infinity,
                           height: 52,
@@ -232,9 +332,9 @@ class _OtpScreenState extends State<OtpScreen> {
                                     ? null
                                     : _handleVerify,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF72AB8B),
+                              backgroundColor: AppColors.primary,
                               disabledBackgroundColor:
-                                  const Color(0xFF72AB8B).withValues(alpha: 0.65),
+                                  AppColors.primary.withValues(alpha: 0.5),
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
@@ -251,7 +351,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                     ),
                                   )
                                 : Text(
-                                    'Verify',
+                                    'Verify & Continue',
                                     style: GoogleFonts.inter(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w700,
@@ -284,7 +384,7 @@ class _OtpScreenState extends State<OtpScreen> {
                                     ),
                                   )
                                 : GestureDetector(
-                                    onTap: _startTimer,
+                                    onTap: _resendCode,
                                     child: Text(
                                       'Resend Code',
                                       style: GoogleFonts.inter(

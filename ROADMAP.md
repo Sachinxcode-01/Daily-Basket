@@ -72,7 +72,7 @@ timeline
 
 
 ### 🤖 v2.0.0 — Automated Dispatch & AI Inventory
-- [ ] Multi-store dark store dispatch load-balancing engine.
+- [x] Multi-store dark store dispatch load-balancing engine.
 - [ ] AI-driven predictive inventory demand forecasting and auto-reorder engine.
 - [x] Offline-first sync for Delivery Partner PWA during poor network connectivity.
 

@@ -6,6 +6,7 @@ import '../../../../core/providers/user_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
+import 'otp_screen.dart';
 
 /// Login Screen — Exact User Mockup Specification
 /// Matches:
@@ -76,6 +77,35 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _isLoading = false;
         _errorMsg = res['error'] ?? res['message'] ?? 'Invalid email address or password.';
+      });
+    }
+  }
+
+  void _handleEmailOtpLogin() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty || !email.contains('@')) {
+      setState(() => _errorMsg = 'Please enter your email above to receive a 6-digit OTP.');
+      return;
+    }
+    setState(() {
+      _isLoading = true;
+      _errorMsg = null;
+    });
+
+    final auth = context.read<AuthProvider>();
+    final res = await auth.sendEmailOtp(email);
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (res['success'] == true) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => OtpScreen(email: email, isEmailOtp: true),
+        ),
+      );
+    } else {
+      setState(() {
+        _errorMsg = res['error'] ?? res['message'] ?? 'Failed to send Email OTP.';
       });
     }
   }
@@ -541,13 +571,51 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 12),
 
+                        // ─── Continue with Email OTP ──────────────────────
+                        SizedBox(
+                          width: double.infinity,
+                          height: 48,
+                          child: OutlinedButton(
+                            onPressed: _isLoading ? null : _handleEmailOtpLogin,
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: AppColors.outlineVariant),
+                              shape: const StadiumBorder(),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.mark_email_read_outlined,
+                                  size: 20,
+                                  color: AppColors.primary,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Continue with Email OTP',
+                                  style: GoogleFonts.inter(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
                         // ─── Continue with Phone OTP ──────────────────────
                         SizedBox(
                           width: double.infinity,
                           height: 48,
                           child: OutlinedButton(
                             onPressed: _isLoading ? null : () {
-                              Navigator.of(context).pushNamed('/auth/otp');
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const OtpScreen(isEmailOtp: false),
+                                ),
+                              );
                             },
                             style: OutlinedButton.styleFrom(
                               side: const BorderSide(color: AppColors.outlineVariant),

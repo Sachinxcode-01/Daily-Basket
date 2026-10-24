@@ -11,7 +11,9 @@ import '../widgets/profile_photo_picker_sheet.dart';
 
 /// Customer Profile / Settings Screen — Google Stitch Design System Exact Replica
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool isEmbedded;
+  final VoidCallback? onOpenCart;
+  const ProfileScreen({super.key, this.isEmbedded = false, this.onOpenCart});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -157,7 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
                         ),
                         Text(
-                          'Daily Basket',
+                          widget.isEmbedded ? 'Profile' : 'Daily Basket',
                           style: GoogleFonts.outfit(
                             fontSize: 22,
                             fontWeight: FontWeight.w700,
@@ -165,7 +167,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ),
                         IconButton(
-                          onPressed: () => Navigator.of(context).pushNamed('/cart'),
+                          onPressed: () {
+                            if (widget.onOpenCart != null) {
+                              widget.onOpenCart!();
+                            } else {
+                              Navigator.of(context).pushNamed('/cart');
+                            }
+                          },
                           icon: const Icon(Icons.shopping_basket_outlined, color: Color(0xFF006B23), size: 24),
                         ),
                       ],
