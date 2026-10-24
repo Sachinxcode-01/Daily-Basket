@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { STORE_ORDERS, OrderItem } from '../route';
+import { STORE_ORDERS, OrderItem } from '../store';
 
-export interface HubCapacity {
+interface HubCapacity {
   code: string;
   name: string;
   maxActiveCapacity: number;
