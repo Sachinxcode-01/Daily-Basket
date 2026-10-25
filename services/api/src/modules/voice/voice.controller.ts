@@ -6,10 +6,19 @@ import {
   Delete,
   Body,
   Query,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  HttpCode,
+  HttpStatus,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiBody } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiTags, ApiOperation, ApiQuery, ApiBody, ApiConsumes, ApiResponse } from '@nestjs/swagger';
 import { VoiceService, ProcessVoicePayload } from './voice.service';
-import { SpeechSynthesisService, TtsOptions } from './services/speech-synthesis.service';
+import { SpeechSynthesisService } from './services/speech-synthesis.service';
+import { OptionalJwtAuthGuard } from '../../common/guards/optional-jwt-auth.guard';
+import { ResolvedUserId } from '../../common/decorators/resolved-user-id.decorator';
+import { VoiceSearchDto, VoiceSearchResponseDto } from './dto/voice-search.dto';
 
 @ApiTags('Voice')
 @Controller('voice')
@@ -18,6 +27,46 @@ export class VoiceController {
     private readonly voiceService: VoiceService,
     private readonly ttsService: SpeechSynthesisService,
   ) {}
+
+  @Post('search')
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(OptionalJwtAuthGuard)
+  @UseInterceptors(FileInterceptor('audio'))
+  @ApiOperation({
+    summary: 'Search Daily Basket Grocery Catalogue via Spoken Natural Audio or Voice Hint',
+    description:
+      'Transcribes audio via configured SpeechProvider (VoiceStudio / Google), normalizes grocery terms, and searches live catalogue.',
+  })
+  @ApiConsumes('multipart/form-data', 'application/json')
+  @ApiResponse({ status: 200, type: VoiceSearchResponseDto })
+  async searchVoice(
+    @ResolvedUserId() userId: string,
+    @Body() body: VoiceSearchDto,
+    @UploadedFile() file?: { buffer: Buffer; mimetype?: string; originalname?: string },
+  ) {
+    const audioBuffer = file?.buffer;
+    const effectiveMime = file?.mimetype || body.mimeType;
+
+    const data = await this.voiceService.searchVoiceProducts(
+      userId || 'customer_guest',
+      {
+        ...body,
+        mimeType: effectiveMime,
+      },
+      audioBuffer,
+    );
+
+    return {
+      success: true,
+      data,
+    };
+  }
+
+  @Get('provider/status')
+  @ApiOperation({ summary: 'Check Active Speech Provider Status, Model, and Capabilities' })
+  async getProviderStatus() {
+    return this.voiceService.getProviderStatus();
+  }
 
   @Post('process')
   @ApiOperation({ summary: 'Process Spoken Voice Command (Audio Base64 or Text Hint)' })
@@ -38,7 +87,7 @@ export class VoiceController {
   }
 
   @Post('synthesize')
-  @ApiOperation({ summary: 'Synthesize Spoken Text to Audio via Google Cloud TTS' })
+  @ApiOperation({ summary: 'Synthesize Spoken Text to Audio via Speech Synthesis' })
   @ApiBody({
     schema: {
       type: 'object',

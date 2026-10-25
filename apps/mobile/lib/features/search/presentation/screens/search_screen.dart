@@ -8,6 +8,7 @@ import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/data/products_catalog_data.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../catalog/presentation/screens/product_details_screen.dart';
+import '../widgets/voice_search_dialog.dart';
 
 /// Search Screen — Google Stitch Exact Screen
 /// Screen ID: 57d6d934e00f42a7be2f9c6f89e3e5cd
@@ -313,11 +314,14 @@ class _SearchScreenState extends State<SearchScreen> {
                       IconButton(
                         icon: const Icon(Icons.mic_outlined, size: 20, color: AppColors.onSurfaceVariant),
                         onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Listening for voice search... Speak now'),
-                              behavior: SnackBarBehavior.floating,
-                            ),
+                          VoiceSearchDialog.show(
+                            context,
+                            onSpeechResult: (recognizedQuery) {
+                              if (recognizedQuery.isNotEmpty) {
+                                _searchController.text = recognizedQuery;
+                                _submitSearch(recognizedQuery);
+                              }
+                            },
                           );
                         },
                       ),

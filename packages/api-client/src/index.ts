@@ -562,6 +562,58 @@ export class ApiClient {
   public async getAdminInventoryAlerts(limit = 10): Promise<any> {
     return this.fetcher(`${API_ROUTES.ADMIN.DASHBOARD_INVENTORY_ALERTS}?limit=${limit}`);
   }
+
+  // Voice Shopping Methods
+  public async voiceSearch(payload: {
+    audio?: Blob | File;
+    transcription?: string;
+    language?: string;
+  }): Promise<{
+    transcription: string;
+    language: string;
+    searchQuery: string;
+    extractedQuantity?: string;
+    extractedPriceConstraint?: number;
+    results: any[];
+    meta: { requestId: string; processingTimeMs: number };
+  }> {
+    if (payload.audio) {
+      const formData = new FormData();
+      formData.append('audio', payload.audio);
+      if (payload.language) formData.append('language', payload.language);
+
+      const headers: Record<string, string> = {};
+      if (this.token) {
+        headers['Authorization'] = `Bearer ${this.token}`;
+      }
+
+      const response = await fetch(`${this.baseUrl}${API_ROUTES.VOICE.SEARCH}`, {
+        method: 'POST',
+        headers,
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Voice search error! status: ${response.status}`);
+      }
+
+      const resJson = await response.json();
+      return resJson?.data || resJson;
+    } else {
+      return this.fetcher(API_ROUTES.VOICE.SEARCH, {
+        method: 'POST',
+        body: JSON.stringify({
+          transcription: payload.transcription,
+          language: payload.language || 'en',
+        }),
+      });
+    }
+  }
+
+  public async getVoiceProviderStatus(): Promise<any> {
+    return this.fetcher(API_ROUTES.VOICE.PROVIDER_STATUS);
+  }
 }
 
 export const apiClient = new ApiClient();

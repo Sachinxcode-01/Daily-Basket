@@ -1,12 +1,21 @@
-import { Injectable, Logger, Optional } from '@nestjs/common';
+import { Injectable, Logger, Inject, BadRequestException, ServiceUnavailableException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import {
+  SpeechProvider,
+  SPEECH_PROVIDER_TOKEN,
+  SpeechTranscriptionResult,
+  ProviderHealthCheckResult,
+  SpeechProviderCapabilities,
+} from '../interfaces/speech-provider.interface';
 import { LanguageDetectionService } from './language-detection.service';
+import { AudioValidationService, ValidatedAudio } from './audio-validation.service';
 
 export interface SttResult {
   transcription: string;
   detectedLanguage: string;
   confidenceScore: number;
   latencyMs: number;
+  provider: string;
 }
 
 @Injectable()
@@ -14,101 +23,92 @@ export class SpeechRecognitionService {
   private readonly logger = new Logger(SpeechRecognitionService.name);
 
   constructor(
+    @Inject(SPEECH_PROVIDER_TOKEN) private speechProvider: SpeechProvider,
     private languageDetector: LanguageDetectionService,
-    @Optional() private configService?: ConfigService,
+    private audioValidator: AudioValidationService,
+    private configService: ConfigService,
   ) {}
 
-  private getApiKey(): string | undefined {
-    return (
-      this.configService?.get<string>('google.cloudApiKey') ||
-      this.configService?.get<string>('GOOGLE_CLOUD_API_KEY') ||
-      this.configService?.get<string>('GOOGLE_TTS_API_KEY') ||
-      process.env.GOOGLE_CLOUD_API_KEY ||
-      process.env.GOOGLE_TTS_API_KEY
-    );
+  getProviderName(): string {
+    return this.speechProvider.name;
   }
 
+  getCapabilities(): SpeechProviderCapabilities {
+    return this.speechProvider.getCapabilities();
+  }
+
+  async healthCheck(): Promise<ProviderHealthCheckResult> {
+    return this.speechProvider.healthCheck();
+  }
+
+  /**
+   * Transcribes audio buffer using the configured SpeechProvider.
+   * If client provides rawTextHint (e.g. from mobile platform on-device STT), validates and uses it.
+   * Never fabricates fake transcriptions.
+   */
   async transcribeAudio(
-    audioBase64?: string,
+    audioBufferOrBase64?: Buffer | string,
     rawTextHint?: string,
     requestedLocale: string = 'en_IN',
+    mimeType?: string,
   ): Promise<SttResult> {
     const startTime = Date.now();
 
-    // If direct raw text hint is provided (e.g. from mobile client STT plugin)
-    if (rawTextHint && rawTextHint.trim() !== '') {
-      const detected = this.languageDetector.detectLanguage(rawTextHint, requestedLocale);
+    // 1. Direct text hint provided by client (e.g., native on-device speech-to-text)
+    if (rawTextHint && rawTextHint.trim().length > 0) {
+      const trimmed = rawTextHint.trim();
+      const detected = this.languageDetector.detectLanguage(trimmed, requestedLocale);
       return {
-        transcription: rawTextHint.trim(),
+        transcription: trimmed,
         detectedLanguage: detected.code,
-        confidenceScore: 98.5,
+        confidenceScore: 98.0,
         latencyMs: Date.now() - startTime,
+        provider: 'client-stt',
       };
     }
 
-    // Google Speech-to-Text audio decoding pipeline
-    this.logger.log(`Transcribing audio payload (base64 length: ${audioBase64?.length || 0})`);
-
-    let liveTranscription: string | null = null;
-    let confidence = 96.8;
-    const apiKey = this.getApiKey();
-
-    if (audioBase64 && apiKey) {
+    // 2. Audio input verification
+    let buffer: Buffer;
+    if (Buffer.isBuffer(audioBufferOrBase64)) {
+      buffer = audioBufferOrBase64;
+    } else if (typeof audioBufferOrBase64 === 'string' && audioBufferOrBase64.trim().length > 0) {
       try {
-        const response = await fetch(
-          `https://speech.googleapis.com/v1/speech:recognize?key=${apiKey}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              config: {
-                languageCode: requestedLocale.replace('_', '-'),
-                enableAutomaticPunctuation: true,
-              },
-              audio: {
-                content: audioBase64,
-              },
-            }),
-          },
-        );
-
-        if (response.ok) {
-          const data = (await response.json()) as any;
-          const alt = data.results?.[0]?.alternatives?.[0];
-          if (alt?.transcript) {
-            liveTranscription = alt.transcript;
-            confidence = Math.round((alt.confidence || 0.95) * 100);
-            this.logger.log(`Google Cloud STT recognized: "${liveTranscription}" (${confidence}%)`);
-          }
-        } else {
-          const errBody = await response.json().catch(() => null);
-          this.logger.warn(
-            `Google Cloud STT responded with HTTP ${response.status}: ${JSON.stringify(errBody?.error?.message || errBody)}. Falling back to fallback speech engine.`,
-          );
-        }
-      } catch (err: any) {
-        this.logger.warn(`Google Cloud STT request failed: ${err?.message || err}`);
+        buffer = Buffer.from(audioBufferOrBase64, 'base64');
+      } catch (e: any) {
+        throw new BadRequestException('Malformed base64 audio payload.');
       }
+    } else {
+      throw new BadRequestException(
+        'No audio or transcription hint provided. Please provide an audio recording or text hint.',
+      );
     }
 
-    // Simulated/Decoded transcription for demonstration & fallback
-    const samplePhrases = [
-      'Find Amul milk 1L',
-      'Show cooking oil under 300 rupees',
-      'Add 5kg Aashirvaad Atta to my cart',
-      'Track my express delivery order',
-      'Open Wallet balance',
-    ];
+    // 3. Audio format and integrity validation
+    const validated: ValidatedAudio = this.audioValidator.validateAudio(buffer, mimeType);
+    this.logger.log(
+      `Transcribing audio via ${this.speechProvider.name}: ${validated.sizeBytes} bytes, format=${validated.detectedFormat}, mime=${validated.mimeType}`,
+    );
 
-    const transcription =
-      liveTranscription || samplePhrases[Math.floor(Math.random() * samplePhrases.length)];
-    const detected = this.languageDetector.detectLanguage(transcription, requestedLocale);
+    // 4. Delegate to the authoritative SpeechProvider (VoiceStudio, Google, etc.)
+    const providerResult: SpeechTranscriptionResult = await this.speechProvider.transcribe(
+      validated.buffer,
+      {
+        languageCode: requestedLocale,
+      },
+    );
+
+    if (!providerResult.text || providerResult.text.trim() === '') {
+      throw new BadRequestException('No speech detected in the audio recording. Please speak clearly and try again.');
+    }
+
+    const detected = this.languageDetector.detectLanguage(providerResult.text, requestedLocale);
 
     return {
-      transcription,
-      detectedLanguage: detected.code,
-      confidenceScore: confidence,
+      transcription: providerResult.text.trim(),
+      detectedLanguage: providerResult.detectedLanguage || detected.code,
+      confidenceScore: providerResult.confidence,
       latencyMs: Date.now() - startTime,
+      provider: providerResult.provider || this.speechProvider.name,
     };
   }
 }

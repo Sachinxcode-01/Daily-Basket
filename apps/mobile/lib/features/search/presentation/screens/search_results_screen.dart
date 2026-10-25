@@ -12,6 +12,7 @@ import '../../../../core/providers/search_history_provider.dart';
 import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/data/products_catalog_data.dart';
 import '../../../catalog/presentation/screens/product_details_screen.dart';
+import '../widgets/voice_search_dialog.dart';
 
 /// Search Results Screen — Exact Google Stitch Specification
 class SearchResultsScreen extends StatefulWidget {
@@ -224,140 +225,13 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   }
 
   void _openVoiceSearchSheet() {
-    String currentLang = 'English';
-    bool isListening = true;
-    String recognizedText = 'Listening... Speak now';
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            Future.delayed(const Duration(milliseconds: 1600), () {
-              if (context.mounted && isListening) {
-                setModalState(() {
-                  isListening = false;
-                  if (currentLang == 'Hindi') {
-                    recognizedText = 'ताज़ा दूध (Fresh Milk)';
-                    _searchCtrl.text = 'Milk';
-                  } else if (currentLang == 'Kannada') {
-                    recognizedText = 'ತಾಜಾ ಹಾಲು (Fresh Milk)';
-                    _searchCtrl.text = 'Milk';
-                  } else {
-                    recognizedText = 'Farm Fresh Tomatoes';
-                    _searchCtrl.text = 'Tomatoes';
-                  }
-                });
-                Future.delayed(const Duration(milliseconds: 800), () {
-                  if (ctx.mounted) Navigator.pop(ctx);
-                });
-              }
-            });
-
-            return Container(
-              padding: const EdgeInsets.all(24),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFBECAB9),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  Text(
-                    'Voice Product Search',
-                    style: GoogleFonts.outfit(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w800,
-                      color: const Color(0xFF1A1C1E),
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Say product names in your preferred language',
-                    style: GoogleFonts.inter(fontSize: 13, color: const Color(0xFF6E7A6C)),
-                  ),
-                  const SizedBox(height: 16),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _buildLangChip('English', currentLang, (l) => setModalState(() => currentLang = l)),
-                      const SizedBox(width: 8),
-                      _buildLangChip('Hindi', currentLang, (l) => setModalState(() => currentLang = l)),
-                      const SizedBox(width: 8),
-                      _buildLangChip('Kannada', currentLang, (l) => setModalState(() => currentLang = l)),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 500),
-                    width: isListening ? 80 : 68,
-                    height: isListening ? 80 : 68,
-                    decoration: BoxDecoration(
-                      color: isListening ? const Color(0xFF006B23) : const Color(0xFFE8F5E9),
-                      shape: BoxShape.circle,
-                      boxShadow: isListening
-                          ? [
-                              BoxShadow(
-                                color: const Color(0xFF006B23).withValues(alpha: 0.3),
-                                blurRadius: 18,
-                                spreadRadius: 4,
-                              ),
-                            ]
-                          : [],
-                    ),
-                    child: Icon(
-                      isListening ? Icons.mic_rounded : Icons.check_circle_rounded,
-                      color: isListening ? Colors.white : const Color(0xFF006B23),
-                      size: 36,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  Text(
-                    recognizedText,
-                    style: GoogleFonts.outfit(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w700,
-                      color: isListening ? const Color(0xFF006B23) : const Color(0xFF1A1C1E),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                ],
-              ),
-            );
-          },
-        );
+    VoiceSearchDialog.show(
+      context,
+      onSpeechResult: (recognizedQuery) {
+        if (recognizedQuery.isNotEmpty) {
+          _searchCtrl.text = recognizedQuery;
+        }
       },
-    );
-  }
-
-  Widget _buildLangChip(String lang, String current, Function(String) onSelect) {
-    final isSelected = lang == current;
-    return ChoiceChip(
-      label: Text(lang),
-      selected: isSelected,
-      selectedColor: const Color(0xFF006B23),
-      backgroundColor: const Color(0xFFF3F3F6),
-      labelStyle: GoogleFonts.inter(
-        fontSize: 12,
-        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-        color: isSelected ? Colors.white : const Color(0xFF1A1C1E),
-      ),
-      onSelected: (_) => onSelect(lang),
     );
   }
 

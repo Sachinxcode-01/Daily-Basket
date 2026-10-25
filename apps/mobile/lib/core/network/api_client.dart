@@ -102,6 +102,30 @@ class ApiClient {
     }
   }
 
+  /// Search products via voice speech or transcription hint through POST /api/v1/voice/search
+  Future<Map<String, dynamic>> voiceSearch({
+    String? queryHint,
+    String? audioBase64,
+    String? mimeType,
+    String? languageHint,
+    String? currentRoute,
+    String? token,
+    Duration timeout = const Duration(seconds: 20),
+  }) async {
+    return post(
+      '/voice/search',
+      {
+        if (queryHint != null && queryHint.isNotEmpty) 'queryHint': queryHint,
+        if (audioBase64 != null && audioBase64.isNotEmpty) 'audioBase64': audioBase64,
+        if (mimeType != null && mimeType.isNotEmpty) 'mimeType': mimeType,
+        if (languageHint != null && languageHint.isNotEmpty) 'languageHint': languageHint,
+        if (currentRoute != null && currentRoute.isNotEmpty) 'currentRoute': currentRoute,
+      },
+      token: token,
+      timeout: timeout,
+    );
+  }
+
   Map<String, dynamic> _parseResponse(http.Response response) {
     final isOk = response.statusCode >= 200 && response.statusCode < 300;
     try {

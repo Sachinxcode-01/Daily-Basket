@@ -53,6 +53,10 @@ export const API_ROUTES = {
     ADD: (id: string) => `/api/v1/favorites/${id}`,
     REMOVE: (id: string) => `/api/v1/favorites/${id}`,
   },
+  VOICE: {
+    SEARCH: '/api/v1/voice/search',
+    PROVIDER_STATUS: '/api/v1/voice/provider/status',
+  },
 };
 
 export const ERROR_CODES = {

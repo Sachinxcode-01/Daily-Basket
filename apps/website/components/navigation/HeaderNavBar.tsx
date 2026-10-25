@@ -23,9 +23,11 @@ import {
   Zap,
   ShieldCheck,
   Compass,
+  Mic,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCart } from '../../store/useCart';
+import { VoiceSearchModal } from '../VoiceSearchModal';
 
 interface HeaderNavBarProps {
   cartCount?: number;
@@ -45,6 +47,7 @@ export default function HeaderNavBar({ cartCount, onSearch, onCartClick }: Heade
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
   // Close profile dropdown on outside click
@@ -123,7 +126,15 @@ export default function HeaderNavBar({ cartCount, onSearch, onCartClick }: Heade
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
+    <>
+      {/* Real-Time Voice Search Modal */}
+      <VoiceSearchModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        onProductSelect={(productId) => router.push(`/product/${productId}`)}
+      />
+
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-xs">
       
       {/* ─── Top Micro-Ticker Announcement Banner ───────────────────────────── */}
       <div className="bg-[#00531a] text-white text-[11px] font-semibold py-1.5 px-4 text-center tracking-wide flex items-center justify-center gap-2">
@@ -209,11 +220,16 @@ export default function HeaderNavBar({ cartCount, onSearch, onCartClick }: Heade
               >
                 <X className="w-3.5 h-3.5" />
               </button>
-            ) : (
-              <span className="hidden xl:inline-block text-[10px] font-bold text-slate-400 bg-slate-200/70 px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">
-                Search
-              </span>
-            )}
+            ) : null}
+            <button
+              type="button"
+              onClick={() => setIsVoiceModalOpen(true)}
+              className="p-1.5 rounded-full text-slate-400 hover:text-[#006b23] hover:bg-emerald-50 transition-colors"
+              title="Search with Voice"
+              aria-label="Voice Search"
+            >
+              <Mic className="w-4 h-4 text-[#006b23]" />
+            </button>
           </div>
         </form>
 
@@ -493,5 +509,6 @@ export default function HeaderNavBar({ cartCount, onSearch, onCartClick }: Heade
         </div>
       )}
     </header>
+    </>
   );
 }

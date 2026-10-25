@@ -8,7 +8,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, Camera, SlidersHorizontal, Plus, Check, ArrowLeft } from 'lucide-react';
+import { Search, Camera, SlidersHorizontal, Plus, Check, ArrowLeft, Mic } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
@@ -23,6 +23,7 @@ import {
   filterAndSortWebsiteProducts,
 } from '../../lib/catalog';
 import { AdvancedFilterModal } from '../../components/AdvancedFilterModal';
+import { VoiceSearchModal } from '../../components/VoiceSearchModal';
 
 interface SearchItem {
   id: string;
@@ -71,6 +72,7 @@ export default function SearchPage() {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [activeQuickChip, setActiveQuickChip] = useState('All');
   const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
+  const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterState>(INITIAL_FILTER_STATE);
   const [scanNotice, setScanNotice] = useState<string | null>(null);
@@ -189,6 +191,15 @@ export default function SearchPage() {
 
   return (
     <div className="min-h-screen bg-slate-900 font-sans pb-24 text-white">
+      {/* Voice Search Modal */}
+      <VoiceSearchModal
+        isOpen={isVoiceModalOpen}
+        onClose={() => setIsVoiceModalOpen(false)}
+        onProductSelect={(productId) => {
+          router.push(`/product/${productId}`);
+        }}
+      />
+
       {/* Advanced Filter Modal */}
       <AdvancedFilterModal
         isOpen={isFilterModalOpen}
@@ -220,16 +231,25 @@ export default function SearchPage() {
               type="text"
               value={query}
               onChange={(e) => { setQuery(e.target.value); if (scanNotice) setScanNotice(null); }}
-              placeholder="Search for groceries, brand or scan camera..."
-              className="w-full h-11 bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-12 text-sm font-medium text-white placeholder:text-slate-400 focus:outline-none focus:border-teal-500 transition"
+              placeholder="Search for groceries, brand or speak..."
+              className="w-full h-11 bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-24 text-sm font-medium text-white placeholder:text-slate-400 focus:outline-none focus:border-teal-500 transition"
             />
-            <button
-              onClick={() => setIsCameraModalOpen(true)}
-              title="Search by Camera"
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-teal-500 text-slate-950 rounded-lg hover:bg-teal-400 transition flex items-center justify-center"
-            >
-              <Camera className="w-4 h-4" />
-            </button>
+            <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+              <button
+                onClick={() => setIsVoiceModalOpen(true)}
+                title="Search with Voice"
+                className="p-2 bg-[#2d9d43] hover:bg-[#258538] text-white rounded-lg transition flex items-center justify-center shadow-xs"
+              >
+                <Mic className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => setIsCameraModalOpen(true)}
+                title="Search by Camera"
+                className="p-2 bg-teal-500 text-slate-950 rounded-lg hover:bg-teal-400 transition flex items-center justify-center"
+              >
+                <Camera className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
           <button
