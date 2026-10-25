@@ -8,10 +8,35 @@ import {
   ConnectedSocket,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { Logger } from '@nestjs/common';
+import { Logger, Optional } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+
+export interface AuthenticatedUser {
+  id: string;
+  role?: string;
+  email?: string;
+}
 
 @WebSocketGateway({
-  cors: { origin: '*' },
+  cors: {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Allow non-browser requests or local development origins
+      if (!origin || process.env.NODE_ENV !== 'production') {
+        return callback(null, true);
+      }
+      const allowedOrigins = [
+        process.env.FRONTEND_URL,
+        process.env.ADMIN_URL,
+        process.env.WEBSITE_URL,
+        process.env.DELIVERY_URL,
+      ].filter(Boolean);
+      if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
+    credentials: true,
+  },
   namespace: '/ws',
   transports: ['websocket', 'polling'],
   pingInterval: 25000,
@@ -24,20 +49,84 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly logger = new Logger(EventsGateway.name);
 
   // In-memory presence tracking store
-  private readonly activeSockets = new Map<string, { userId?: string; connectedAt: number }>();
+  private readonly activeSockets = new Map<string, { userId?: string; role?: string; connectedAt: number }>();
   // Recent event deduplication cache (eventHash -> timestamp)
   private readonly eventDeduplicationMap = new Map<string, number>();
 
-  handleConnection(client: Socket) {
-    const userId = (client.handshake.query.userId as string) || undefined;
-    this.activeSockets.set(client.id, { userId, connectedAt: Date.now() });
+  constructor(@Optional() private readonly jwtService?: JwtService) {}
 
-    if (userId) {
-      client.join(`user_${userId}`);
-      client.join(`customer_${userId}`);
+  handleConnection(client: Socket) {
+    const authUser = this.authenticateClient(client);
+
+    this.activeSockets.set(client.id, {
+      userId: authUser?.id,
+      role: authUser?.role,
+      connectedAt: Date.now(),
+    });
+
+    if (authUser) {
+      client.data = client.data || {};
+      client.data.user = authUser;
+      client.join(`user_${authUser.id}`);
+      client.join(`customer_${authUser.id}`);
+
+      // Auto-join privileged administrative rooms
+      if (['ADMIN', 'SUPER_ADMIN', 'STORE_MANAGER'].includes(authUser.role || '')) {
+        client.join('admin');
+      }
+
+      // Auto-join rider room for delivery partners
+      if (authUser.role === 'DELIVERY_PARTNER') {
+        client.join(`rider_${authUser.id}`);
+      }
+
+      this.logger.log(
+        `⚡ Authenticated client connected to WebSockets: ${client.id} (User: ${authUser.id}, Role: ${authUser.role || 'CUSTOMER'})`,
+      );
+    } else {
+      client.data = client.data || {};
+      client.data.user = null;
+      this.logger.log(`⚡ Anonymous client connected to WebSockets: ${client.id}`);
+    }
+  }
+
+  private authenticateClient(client: Socket): AuthenticatedUser | null {
+    const rawToken =
+      client.handshake.auth?.token ||
+      (client.handshake.headers?.authorization?.startsWith('Bearer ')
+        ? client.handshake.headers.authorization.slice(7)
+        : undefined) ||
+      (client.handshake.query?.token as string) ||
+      undefined;
+
+    if (rawToken && this.jwtService) {
+      try {
+        const payload = this.jwtService.verify(rawToken);
+        const userId = payload.sub || payload.userId || payload.id;
+        if (userId) {
+          return {
+            id: userId,
+            role: payload.role || 'CUSTOMER',
+            email: payload.email,
+          };
+        }
+      } catch (err: any) {
+        this.logger.warn(`Failed to verify socket token on ${client.id}: ${err.message}`);
+      }
     }
 
-    this.logger.log(`⚡ Client connected to WebSockets: ${client.id} (User: ${userId || 'anonymous'})`);
+    // In non-production testing, allow query.userId fallback if explicit token was not passed
+    if (process.env.NODE_ENV !== 'production' && !rawToken) {
+      const queryUserId = (client.handshake.query?.userId as string) || undefined;
+      if (queryUserId) {
+        return {
+          id: queryUserId,
+          role: (client.handshake.query?.role as string) || 'CUSTOMER',
+        };
+      }
+    }
+
+    return null;
   }
 
   handleDisconnect(client: Socket) {
@@ -47,6 +136,20 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('join_room')
   handleJoinRoom(@ConnectedSocket() client: Socket, @MessageBody() room: string) {
+    if (!room || typeof room !== 'string') {
+      return { status: 'error', message: 'Invalid room name' };
+    }
+
+    const user: AuthenticatedUser | undefined = client.data?.user;
+    const isAuthorized = this.authorizeRoomAccess(user, room);
+
+    if (!isAuthorized) {
+      this.logger.warn(
+        `Unauthorized room join attempt: Socket ${client.id} (User: ${user?.id || 'anonymous'}) -> ${room}`,
+      );
+      return { status: 'error', code: 'UNAUTHORIZED', message: `Access denied to room ${room}` };
+    }
+
     client.join(room);
     this.logger.debug(`Client ${client.id} joined room: ${room}`);
     return { status: 'joined', room };
@@ -57,6 +160,48 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.leave(room);
     this.logger.debug(`Client ${client.id} left room: ${room}`);
     return { status: 'left', room };
+  }
+
+  private authorizeRoomAccess(user: AuthenticatedUser | undefined, room: string): boolean {
+    // 1. Public catalog/inventory update rooms open to all
+    const publicRooms = ['public', 'catalog', 'inventory', 'store_updates', 'deals'];
+    if (publicRooms.includes(room) || (room.startsWith('store_') && room.endsWith('_public'))) {
+      return true;
+    }
+
+    // All protected rooms require authentication
+    if (!user) {
+      return false;
+    }
+
+    const isAdmin = ['ADMIN', 'SUPER_ADMIN', 'STORE_MANAGER'].includes(user.role || '');
+
+    // 2. Admin rooms
+    if (room === 'admin' || room.startsWith('admin_')) {
+      return isAdmin;
+    }
+
+    // 3. Customer personal rooms (user_${id}, customer_${id})
+    if (room.startsWith('user_') || room.startsWith('customer_')) {
+      const targetUserId = room.replace(/^(user_|customer_)/, '');
+      return user.id === targetUserId || isAdmin;
+    }
+
+    // 4. Rider rooms (rider_${id}, fleet)
+    if (room.startsWith('rider_')) {
+      const targetRiderId = room.replace(/^rider_/, '');
+      return user.id === targetRiderId || isAdmin;
+    }
+    if (room === 'fleet' || room.startsWith('fleet_')) {
+      return user.role === 'DELIVERY_PARTNER' || isAdmin;
+    }
+
+    // 5. Order rooms (order_${id}) & ticket rooms (ticket_${id})
+    if (room.startsWith('order_') || room.startsWith('ticket_')) {
+      return true;
+    }
+
+    return true;
   }
 
   @SubscribeMessage('typing_indicator')
@@ -73,8 +218,14 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('rider_gps_tick')
   handleRiderGpsTick(
+    @ConnectedSocket() client: Socket,
     @MessageBody() payload: { orderId: string; riderId: string; lat: number; lng: number },
   ) {
+    const user: AuthenticatedUser | undefined = client.data?.user;
+    if (user && user.role !== 'DELIVERY_PARTNER' && !['ADMIN', 'SUPER_ADMIN'].includes(user.role || '')) {
+      this.logger.warn(`Non-rider socket ${client.id} attempted to emit rider_gps_tick`);
+      return { status: 'rejected', error: 'Forbidden' };
+    }
     this.broadcastLiveLocation(payload.orderId, payload.riderId, payload.lat, payload.lng);
     return { status: 'acknowledged' };
   }
