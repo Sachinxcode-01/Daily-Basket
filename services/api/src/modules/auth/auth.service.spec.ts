@@ -10,6 +10,7 @@ jest.mock('firebase-admin/auth', () => ({
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
+import * as crypto from 'crypto';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../../database/prisma.service';
 import { EmailService } from '../email/email.service';
@@ -95,7 +96,7 @@ describe('AuthService Enterprise Security Tests', () => {
 
 
   describe('Phone OTP Authentication', () => {
-    it('should request OTP successfully and return cooldown metadata', async () => {
+    it('should request OTP successfully and return cooldown metadata without leaking demoOtp', async () => {
       mockPrismaService.otpVerification.findFirst.mockResolvedValue(null);
       mockPrismaService.otpVerification.create.mockResolvedValue({ id: 'otp_1' });
 
@@ -103,7 +104,18 @@ describe('AuthService Enterprise Security Tests', () => {
 
       expect(result.success).toBe(true);
       expect(result.phone).toBe('9876543210');
-      expect(result.demoOtp).toBe('123456');
+      expect((result as any).demoOtp).toBeUndefined();
+      expect(result.resendCooldownSeconds).toBe(60);
+      expect(mockPrismaService.otpVerification.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            identifier: '9876543210',
+            type: 'LOGIN',
+            attempts: 0,
+            maxAttempts: 3,
+          }),
+        }),
+      );
     });
 
     it('should throw BadRequestException if cooldown period has not elapsed', async () => {
@@ -117,10 +129,13 @@ describe('AuthService Enterprise Security Tests', () => {
     });
 
     it('should verify correct OTP and issue JWT access token', async () => {
+      const otpCode = '847291';
+      const otpHash = crypto.createHash('sha256').update(otpCode).digest('hex');
+
       mockPrismaService.otpVerification.findFirst.mockResolvedValue({
         id: 'otp_1',
         identifier: '9876543210',
-        otpHash: 'd404559f602eab6fd602ac7680dacbfaadd13630335e951f097af3900e9de176', // sha256 of 123456
+        otpHash,
         expiresAt: new Date(Date.now() + 300000),
         attempts: 0,
         maxAttempts: 3,
@@ -136,11 +151,35 @@ describe('AuthService Enterprise Security Tests', () => {
 
       mockPrismaService.deviceSession.create.mockResolvedValue({ id: 'sess_1' });
 
-      const result = await service.verifyOtp({ phone: '9876543210', otp: '123456' });
+      const result = await service.verifyOtp({ phone: '9876543210', otp: otpCode });
 
       expect(result.accessToken).toBe('mock_jwt_access_token_123');
       expect(result.refreshToken).toBeDefined();
       expect(result.user.phone).toBe('9876543210');
+    });
+
+    it('should reject invalid OTP code and throw UnauthorizedException', async () => {
+      const otpCode = '847291';
+      const otpHash = crypto.createHash('sha256').update(otpCode).digest('hex');
+
+      mockPrismaService.otpVerification.findFirst.mockResolvedValue({
+        id: 'otp_1',
+        identifier: '9876543210',
+        otpHash,
+        expiresAt: new Date(Date.now() + 300000),
+        attempts: 0,
+        maxAttempts: 3,
+      });
+      mockPrismaService.otpVerification.update.mockResolvedValue({});
+
+      await expect(
+        service.verifyOtp({ phone: '9876543210', otp: '000000' }),
+      ).rejects.toThrow(UnauthorizedException);
+
+      expect(mockPrismaService.otpVerification.update).toHaveBeenCalledWith({
+        where: { id: 'otp_1' },
+        data: { attempts: 1 },
+      });
     });
   });
 
@@ -237,9 +276,33 @@ describe('AuthService Enterprise Security Tests', () => {
     });
 
     it('should verify email OTP code', async () => {
-      const result = await service.verifyEmailOtp('admin@dailybasket.com', '482109');
+      const email = 'admin@dailybasket.com';
+      const otpCode = '482109';
+      const otpHash = crypto.createHash('sha256').update(otpCode).digest('hex');
+
+      mockPrismaService.otpVerification.findFirst.mockResolvedValue({
+        id: 'otp_email_1',
+        identifier: email,
+        otpHash,
+        expiresAt: new Date(Date.now() + 300000),
+        attempts: 0,
+        maxAttempts: 3,
+      });
+      mockPrismaService.otpVerification.update.mockResolvedValue({});
+
+      mockPrismaService.user.findFirst.mockResolvedValue({
+        id: 'usr_admin_01',
+        email,
+        fullName: 'Ananya R.',
+        role: 'SUPER_ADMIN',
+        profileComplete: true,
+      });
+      mockPrismaService.deviceSession.create.mockResolvedValue({ id: 'sess_admin_1' });
+
+      const result = await service.verifyEmailOtp(email, otpCode);
       expect(result.success).toBe(true);
       expect(result.tokens).toBeDefined();
+      expect(result.user.email).toBe(email);
     });
 
     it('should evaluate device security risk score', async () => {

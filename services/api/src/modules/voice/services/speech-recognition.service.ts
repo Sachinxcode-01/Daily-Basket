@@ -18,14 +18,13 @@ export class SpeechRecognitionService {
     @Optional() private configService?: ConfigService,
   ) {}
 
-  private getApiKey(): string {
+  private getApiKey(): string | undefined {
     return (
       this.configService?.get<string>('google.cloudApiKey') ||
       this.configService?.get<string>('GOOGLE_CLOUD_API_KEY') ||
       this.configService?.get<string>('GOOGLE_TTS_API_KEY') ||
       process.env.GOOGLE_CLOUD_API_KEY ||
-      process.env.GOOGLE_TTS_API_KEY ||
-      'AIzaSyChVTlWQwcHFIVcJqx4XsqGBOpv_doZvuc'
+      process.env.GOOGLE_TTS_API_KEY
     );
   }
 

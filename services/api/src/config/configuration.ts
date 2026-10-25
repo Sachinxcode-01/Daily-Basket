@@ -19,8 +19,8 @@ export default () => ({
     region: process.env.AWS_REGION || 'ap-south-1',
   },
   google: {
-    ttsApiKey: process.env.GOOGLE_TTS_API_KEY || 'AIzaSyChVTlWQwcHFIVcJqx4XsqGBOpv_doZvuc',
-    cloudApiKey: process.env.GOOGLE_CLOUD_API_KEY || 'AIzaSyChVTlWQwcHFIVcJqx4XsqGBOpv_doZvuc',
-    mapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+    ttsApiKey: process.env.GOOGLE_TTS_API_KEY || '',
+    cloudApiKey: process.env.GOOGLE_CLOUD_API_KEY || '',
+    mapsApiKey: process.env.GOOGLE_MAPS_API_KEY || '',
   },
 });

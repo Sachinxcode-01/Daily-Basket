@@ -3,11 +3,13 @@ import {
   UnauthorizedException,
   BadRequestException,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
 import { PrismaService } from '../../database/prisma.service';
 import { EmailService } from '../email/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { PasswordPolicyService } from './password-policy.service';
 import { TotpService } from './totp.service';
 import { FirebaseAuthService } from './firebase-auth.service';
@@ -29,6 +31,7 @@ export class AuthService {
     private totpService: TotpService,
     private jwtService: JwtService,
     private firebaseAuth: FirebaseAuthService,
+    @Optional() private notificationsService?: NotificationsService,
   ) {}
 
 
@@ -116,8 +119,9 @@ export class AuthService {
       throw new BadRequestException(`Please wait ${waitSecs} seconds before requesting another OTP.`);
     }
 
-    const demoOtp = '123456';
-    const otpHash = crypto.createHash('sha256').update(demoOtp).digest('hex');
+    // Generate cryptographically random 6-digit OTP
+    const randomOtp = crypto.randomInt(100000, 1000000).toString();
+    const otpHash = crypto.createHash('sha256').update(randomOtp).digest('hex');
     const expiresAt = new Date(now.getTime() + 5 * 60 * 1000); // 5 mins
     const resendAfter = new Date(now.getTime() + 60 * 1000); // 60s cooldown
 
@@ -133,11 +137,20 @@ export class AuthService {
       },
     });
 
+    if (this.notificationsService) {
+      await this.notificationsService.sendSms({
+        phoneNumber: phone,
+        message: `Your Daily Basket verification code is ${randomOtp}. Valid for 5 minutes. Do not share this OTP with anyone.`,
+        type: 'otp',
+      });
+    }
+
     return {
       success: true,
       phone,
       message: 'OTP verification code sent to your mobile number.',
-      demoOtp,
+      resendCooldownSeconds: 60,
+      expiresInMinutes: 5,
     };
   }
 
@@ -168,8 +181,12 @@ export class AuthService {
       throw new BadRequestException('Maximum OTP verification attempts exceeded. Please request a new code.');
     }
 
-    const inputHash = crypto.createHash('sha256').update(otp).digest('hex');
-    if (inputHash !== otpRecord.otpHash && otp !== '123456' && otp !== '4821') {
+    const inputHash = crypto.createHash('sha256').update(otp.trim()).digest('hex');
+    const isHashMatch =
+      inputHash.length === otpRecord.otpHash.length &&
+      crypto.timingSafeEqual(Buffer.from(inputHash, 'utf-8'), Buffer.from(otpRecord.otpHash, 'utf-8'));
+
+    if (!isHashMatch) {
       await this.prisma.otpVerification.update({
         where: { id: otpRecord.id },
         data: { attempts: otpRecord.attempts + 1 },
@@ -551,7 +568,6 @@ export class AuthService {
     return {
       success: true,
       email: normalizedEmail,
-      demoOtp: otpCode,
       message: 'A 6-digit verification code has been dispatched to your email address.',
     };
   }
@@ -571,10 +587,7 @@ export class AuthService {
     }
 
     const code = (otp || '').trim();
-    const isValid =
-      user.passwordResetToken === code ||
-      code === '482109' ||
-      code === '123456';
+    const isValid = user.passwordResetToken === code;
 
     if (!isValid || !user.passwordResetExpires || user.passwordResetExpires < now) {
       throw new BadRequestException('Invalid or expired 6-digit verification code.');
@@ -630,10 +643,7 @@ export class AuthService {
       throw new BadRequestException('Unable to locate account for password reset.');
     }
 
-    const isValidCode =
-      user.passwordResetToken === code ||
-      code === '482109' ||
-      code === '123456';
+    const isValidCode = user.passwordResetToken === code;
 
     if (!isValidCode || !user.passwordResetExpires || user.passwordResetExpires < now) {
       throw new BadRequestException('Verification code is invalid or has expired. Please request a new code.');
@@ -950,19 +960,32 @@ export class AuthService {
    * Enterprise Email OTP request with 60s resend timer & 5m expiration.
    */
   async sendEmailOtp(email: string, type: string = 'ADMIN_LOGIN') {
-    const otpCode = '482109'; // Simulated / generated secure 6-digit PIN
+    const otpCode = crypto.randomInt(100000, 1000000).toString();
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+    const otpHash = crypto.createHash('sha256').update(otpCode).digest('hex');
 
-    // Save to DB / Audit log
-    await (this.prisma as any).oTPCode?.create({
+    // Save to otpVerifications
+    await (this.prisma as any).otpVerification?.create({
       data: {
-        identifier: email,
-        code: otpCode,
+        identifier: email.trim().toLowerCase(),
+        otpHash,
+        type: type || 'ADMIN_LOGIN',
         expiresAt,
-        type,
+        resendAfter: new Date(Date.now() + 60 * 1000),
+        attempts: 0,
+        maxAttempts: 3,
       },
     }).catch(() => null);
 
+    await this.emailService.sendEmail({
+      to: email,
+      subject: 'Daily Basket - 6-Digit Verification PIN',
+      template: 'WELCOME',
+      data: {
+        customerName: email,
+        message: `Your verification code is ${otpCode}. Valid for 5 minutes. Do not share this OTP with anyone.`,
+      },
+    }).catch(() => null);
 
     await this.auditLog('usr_admin', 'EMAIL_OTP_DISPATCHED', { email, type, expiresAt: expiresAt.toISOString() });
 
@@ -979,29 +1002,58 @@ export class AuthService {
    * Enterprise Email OTP verification & token generation.
    */
   async verifyEmailOtp(email: string, otp: string, deviceData?: { deviceId?: string; deviceName?: string; platform?: string }) {
-    if (otp !== '482109' && otp !== '123456') {
-      throw new BadRequestException('Invalid or expired 6-digit OTP code.');
+    const normalizedEmail = (email || '').trim().toLowerCase();
+    const now = new Date();
+
+    const otpRecord = await this.prisma.otpVerification.findFirst({
+      where: {
+        identifier: normalizedEmail,
+        consumedAt: null,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!otpRecord) {
+      throw new BadRequestException('No active verification request found for this email. Please request a new code.');
     }
 
-    let user: any = null;
-    try {
-      user = await this.prisma.user.findFirst({ where: { email } });
-    } catch {
-      user = null;
+    if (otpRecord.expiresAt < now) {
+      throw new BadRequestException('Verification code has expired. Please request a new code.');
     }
+
+    if (otpRecord.attempts >= otpRecord.maxAttempts) {
+      throw new BadRequestException('Maximum verification attempts exceeded. Please request a new code.');
+    }
+
+    const inputHash = crypto.createHash('sha256').update(otp.trim()).digest('hex');
+    const isHashMatch =
+      inputHash.length === otpRecord.otpHash.length &&
+      crypto.timingSafeEqual(Buffer.from(inputHash, 'utf-8'), Buffer.from(otpRecord.otpHash, 'utf-8'));
+
+    if (!isHashMatch) {
+      await this.prisma.otpVerification.update({
+        where: { id: otpRecord.id },
+        data: { attempts: otpRecord.attempts + 1 },
+      }).catch(() => null);
+      throw new UnauthorizedException('Invalid OTP code. Please try again.');
+    }
+
+    await this.prisma.otpVerification.update({
+      where: { id: otpRecord.id },
+      data: { consumedAt: now },
+    }).catch(() => null);
+
+    const user = await this.prisma.user.findFirst({
+      where: { email: { equals: normalizedEmail, mode: 'insensitive' } },
+    });
+
     if (!user) {
-      user = {
-        id: 'usr_admin_01',
-        email: email || 'admin@dailybasket.com',
-        fullName: 'Ananya R.',
-        role: 'SUPER_ADMIN',
-        profileComplete: true,
-      };
+      throw new NotFoundException('No account found for this email address.');
     }
 
     const tokens = await this.generateTokens(user as any);
     await this.createOrUpdateDeviceSession(user.id, tokens.refreshToken, deviceData);
-    await this.auditLog(user.id, 'EMAIL_OTP_VERIFIED', { email, deviceId: deviceData?.deviceId });
+    await this.auditLog(user.id, 'EMAIL_OTP_VERIFIED', { email: normalizedEmail, deviceId: deviceData?.deviceId });
 
     return {
       success: true,
@@ -1009,7 +1061,7 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        fullName: (user as any).fullName || 'Ananya R.',
+        fullName: (user as any).fullName || 'Daily Basket User',
         role: user.role,
         profileComplete: (user as any).profileComplete ?? true,
       },
