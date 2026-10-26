@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -85,14 +86,22 @@ class VisualSearchResultsScreen extends StatelessWidget {
                     // Captured Thumbnail Preview
                     ClipRRect(
                       borderRadius: BorderRadius.circular(14),
-                      child: Image.network(
-                        matches.isNotEmpty
-                            ? matches.first.imageUrl
-                            : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
-                        width: 70,
-                        height: 70,
-                        fit: BoxFit.cover,
-                      ),
+                      child: provider.capturedImagePath != null &&
+                              File(provider.capturedImagePath!).existsSync()
+                          ? Image.file(
+                              File(provider.capturedImagePath!),
+                              width: 70,
+                              height: 70,
+                              fit: BoxFit.cover,
+                            )
+                          : Image.network(
+                              matches.isNotEmpty
+                                  ? matches.first.imageUrl
+                                  : 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=400',
+                              width: 70,
+                              height: 70,
+                              fit: BoxFit.cover,
+                            ),
                     ),
                     const SizedBox(width: 14),
                     Expanded(
