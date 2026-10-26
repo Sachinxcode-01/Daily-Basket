@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/widgets/app_network_image.dart';
 import 'category_products_screen.dart';
 import 'fresh_produce_listing_screen.dart';
 
@@ -32,7 +33,35 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
       'subtitle': '154 farm fresh veggies & greens',
       'slug': 'fresh-vegetables',
       'imageUrl':
-          'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+          'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=700&auto=format&fit=crop&q=80',
+    },
+    {
+      'title': 'Bread, Pav & Bakery',
+      'subtitle': '248 fresh baked items & morning pav',
+      'slug': 'bread-pav',
+      'imageUrl':
+          'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=700&auto=format&fit=crop&q=80',
+    },
+    {
+      'title': 'Fresh Dairy & Milk',
+      'subtitle': '41 pure farm milk & dairy essentials',
+      'slug': 'milk',
+      'imageUrl':
+          'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=700&auto=format&fit=crop&q=80',
+    },
+    {
+      'title': 'Curd & Yogurt',
+      'subtitle': '78 fresh probiotic dahi & yogurts',
+      'slug': 'curd-yogurt',
+      'imageUrl':
+          'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=700&auto=format&fit=crop&q=80',
+    },
+    {
+      'title': 'Flakes & Cereals',
+      'subtitle': '53 healthy morning breakfast bowls',
+      'slug': 'flakes-kids-cereals',
+      'imageUrl':
+          'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=700&auto=format&fit=crop&q=80',
     },
   ];
 
@@ -49,49 +78,49 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
       'itemCount': '248 items',
       'slug': 'bread-pav',
       'imageUrl':
-          'assets/products/bread-pav/007ea008-b857-4dd5-9005-fb6c4d98601b.png',
+          'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&auto=format&fit=crop&q=80',
     },
     {
       'title': 'Fresh Vegetables',
       'itemCount': '154 items',
       'slug': 'fresh-vegetables',
       'imageUrl':
-          'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+          'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=600&auto=format&fit=crop&q=80',
     },
     {
       'title': 'Curd & Yogurt',
       'itemCount': '78 items',
       'slug': 'curd-yogurt',
       'imageUrl':
-          'assets/products/curd-yogurt/01278ea4-9aef-4263-8ea8-6a3eab2bd076.png',
+          'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&auto=format&fit=crop&q=80',
     },
     {
       'title': 'Flakes & Cereals',
       'itemCount': '53 items',
       'slug': 'flakes-kids-cereals',
       'imageUrl':
-          'assets/products/flakes-kids-cereals/01e92a08-b40b-4d6f-aca7-8537cd382447.png',
+          'https://images.unsplash.com/photo-1599490659213-e2b9527bd087?w=600&auto=format&fit=crop&q=80',
     },
     {
       'title': 'Fresh Milk',
       'itemCount': '41 items',
       'slug': 'milk',
       'imageUrl':
-          'assets/products/milk/1ded64a0-9f20-4a1d-8211-156f221b377b.png',
+          'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=600&auto=format&fit=crop&q=80',
     },
     {
       'title': 'Poha, Daliya & Grains',
       'itemCount': '17 items',
       'slug': 'poha-daliya-grains',
       'imageUrl':
-          'assets/products/poha-daliya-grains/1092_1643384330629.png',
+          'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=600&auto=format&fit=crop&q=80',
     },
     {
       'title': 'Vermicelli & Sevai',
       'itemCount': '16 items',
       'slug': 'vermicelli',
       'imageUrl':
-          'assets/products/vermicelli/3da21b8f-16e5-4727-9899-c5ef3e1db668.png',
+          'https://images.unsplash.com/photo-1612927601601-6638404737ce?w=600&auto=format&fit=crop&q=80',
     },
   ];
 
@@ -238,10 +267,12 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                           child: Stack(
                             children: [
                               Positioned.fill(
-                                child: Image.network(
-                                  item['imageUrl']!,
+                                child: AppNetworkImage(
+                                  imageUrl: item['imageUrl']!,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(color: AppColors.surfaceContainerHigh),
+                                  borderRadius: BorderRadius.circular(16),
+                                  fallbackBgColor: AppColors.surfaceContainerHigh,
+                                  fallbackIcon: Icons.storefront_rounded,
                                 ),
                               ),
                               Positioned.fill(
@@ -342,10 +373,14 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 clipBehavior: Clip.antiAlias,
-                                child: Image.network(
-                                  cat['imageUrl']!,
+                                child: AppNetworkImage(
+                                  imageUrl: cat['imageUrl']!,
+                                  width: double.infinity,
+                                  height: double.infinity,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(color: AppColors.surfaceContainerHigh),
+                                  borderRadius: BorderRadius.circular(8),
+                                  fallbackBgColor: AppColors.surfaceContainerHigh,
+                                  fallbackIcon: Icons.shopping_basket_rounded,
                                 ),
                               ),
                             ),

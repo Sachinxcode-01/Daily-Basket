@@ -3,6 +3,7 @@ import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/favorites_provider.dart';
 import '../../../../core/providers/cart_provider.dart';
+import '../../../../core/theme/app_theme.dart';
 import '../../../../shared/widgets/favorite_button.dart';
 import '../../../../shared/widgets/staggered_animated_card.dart';
 
@@ -152,14 +153,14 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     child: ChoiceChip(
                       label: Text(cat['name']!),
                       selected: isSelected,
-                      selectedColor: const Color(0xFF0F766E),
+                      selectedColor: AppColors.primary,
                       backgroundColor: const Color(0xFF1E293B),
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : const Color(0xFF94A3B8),
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                         fontSize: 12,
                       ),
-                      side: BorderSide(color: isSelected ? const Color(0xFF14B8A6) : const Color(0xFF334155)),
+                      side: BorderSide(color: isSelected ? AppColors.primary : const Color(0xFF334155)),
                       onSelected: (_) => favProvider.setCategory(cat['id']!),
                     ),
                   );
@@ -232,7 +233,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     const Spacer(),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0F766E),
+                        backgroundColor: AppColors.primary,
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
@@ -253,7 +254,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text('Added ${_selectedItems.length} favorite items to cart! 🛒'),
-                            backgroundColor: const Color(0xFF0F766E),
+                            backgroundColor: AppColors.primary,
                           ),
                         );
                         setState(() {
@@ -278,7 +279,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF0F766E), Color(0xFF0D9488), Color(0xFF14B8A6)],
+          colors: [AppColors.primary, AppColors.primaryContainer],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -326,7 +327,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text('Added all ${items.length} favorites to cart (₹${totalPrice.toStringAsFixed(0)}) 🛒'),
-                  backgroundColor: const Color(0xFF0F766E),
+                  backgroundColor: AppColors.primary,
                 ),
               );
             },
@@ -334,7 +335,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF0F766E), Color(0xFF14B8A6)],
+                  colors: [AppColors.primary, AppColors.primaryContainer],
                 ),
                 borderRadius: BorderRadius.circular(12),
                 boxShadow: const [
@@ -519,7 +520,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                             height: 34,
                             child: ElevatedButton.icon(
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF0F766E),
+                                backgroundColor: AppColors.primary,
                                 padding: EdgeInsets.zero,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                               ),
@@ -538,7 +539,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                                   SnackBar(
                                     content: Text('Added "${item['name']}" to cart 🛒'),
                                     duration: const Duration(seconds: 1),
-                                    backgroundColor: const Color(0xFF0F766E),
+                                    backgroundColor: AppColors.primary,
                                   ),
                                 );
                               },
@@ -597,7 +598,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Text('₹${(item['price'] as double).toStringAsFixed(0)}', style: const TextStyle(color: Color(0xFF2DD4BF), fontWeight: FontWeight.bold, fontSize: 15)),
+                          Text('₹${(item['price'] as double).toStringAsFixed(0)}', style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 15)),
                           const SizedBox(width: 6),
                           if ((item['mrp'] as double) > (item['price'] as double))
                             Text('₹${(item['mrp'] as double).toStringAsFixed(0)}', style: const TextStyle(color: Color(0xFF64748B), fontSize: 11, decoration: TextDecoration.lineThrough)),
@@ -611,7 +612,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     FavoriteButton(productId: id, productDetails: item),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF0F766E),
+                        backgroundColor: AppColors.primary,
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
@@ -664,7 +665,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           const SizedBox(height: 24),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF0F766E),
+              backgroundColor: AppColors.primary,
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),

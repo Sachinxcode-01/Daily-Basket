@@ -506,23 +506,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
-
-            // ─── 7. Persistent Bottom Navigation Bar ────────────────────────
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                border: Border(top: BorderSide(color: Color(0xFFEEEEF0), width: 1)),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  _buildBottomNavItem(context, 0, Icons.storefront_rounded, languageProvider?.translate('shop', 'Shop') ?? 'Shop', route: '/customer/home'),
-                  _buildBottomNavItem(context, 1, Icons.search_rounded, languageProvider?.translate('search', 'Search') ?? 'Search', route: '/search'),
-                  _buildBottomNavItem(context, 2, Icons.person_rounded, languageProvider?.translate('account', 'Account') ?? 'Account', isSelected: true, route: '/profile'),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -578,44 +561,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             trailing,
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNavItem(BuildContext context, int index, IconData icon, String label, {bool isSelected = false, String? route}) {
-    return InkWell(
-      onTap: () {
-        if (!isSelected && route != null) {
-          Navigator.of(context).pushReplacementNamed(route);
-        }
-      },
-      borderRadius: BorderRadius.circular(9999),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE8F5E9) : Colors.transparent,
-          borderRadius: BorderRadius.circular(9999),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
-              size: 20,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: GoogleFonts.inter(
-                color: isSelected ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
-              ),
-            ),
           ],
         ),
       ),

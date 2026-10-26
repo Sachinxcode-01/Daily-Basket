@@ -13,7 +13,6 @@ class ReferralHistoryScreen extends StatefulWidget {
 
 class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
   int _selectedTabIndex = 0; // 0: All, 1: Successful, 2: Pending
-  int _bottomNavIndex = 3; // Rewards active
 
   void _showReferralDetailSheet(BuildContext context, Map<String, dynamic> item) {
     final isCompleted = item['status'] == 'COMPLETED';
@@ -440,23 +439,6 @@ class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
             ),
           ),
 
-          // ─── 4. Persistent Bottom Navigation Bar ──────────────────────────
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Color(0xFFEEEEF0), width: 1)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildBottomNavItem(0, Icons.storefront_rounded, 'Shop'),
-                _buildBottomNavItem(1, Icons.search_rounded, 'Search'),
-                _buildBottomNavItem(2, Icons.receipt_long_outlined, 'Orders'),
-                _buildBottomNavItem(3, Icons.card_giftcard_rounded, 'Rewards'),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -492,39 +474,4 @@ class _ReferralHistoryScreenState extends State<ReferralHistoryScreen> {
     );
   }
 
-  Widget _buildBottomNavItem(int index, IconData icon, String label) {
-    final isSelected = _bottomNavIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _bottomNavIndex = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE8F5E9) : Colors.transparent,
-          borderRadius: BorderRadius.circular(9999),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
-              size: 20,
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF006B23),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
 }

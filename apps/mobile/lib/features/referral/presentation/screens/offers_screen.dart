@@ -16,7 +16,6 @@ class OffersScreen extends StatefulWidget {
 class _OffersScreenState extends State<OffersScreen> {
   final TextEditingController _searchController = TextEditingController();
   int _selectedCategoryIndex = 0; // 0: All, 1: Grocery, 2: Fruits, 3: Dairy, 4: Snacks
-  int _bottomNavIndex = 2; // Offers active
 
   final List<String> _categories = [
     'All Offers',
@@ -433,64 +432,9 @@ class _OffersScreenState extends State<OffersScreen> {
             ),
           ),
 
-          // ─── 5. Persistent Bottom Navigation Bar ──────────────────────────
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(
-                  top: BorderSide(color: Color(0xFFEEEEF0), width: 1)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildBottomNavItem(0, Icons.home_rounded, 'Home'),
-                _buildBottomNavItem(1, Icons.grid_view_rounded, 'Categories'),
-                _buildBottomNavItem(2, Icons.local_offer_rounded, 'Offers'),
-                _buildBottomNavItem(3, Icons.receipt_long_outlined, 'Orders'),
-                _buildBottomNavItem(4, Icons.person_outline_rounded, 'Profile'),
-              ],
-            ),
-          ),
         ],
       ),
     );
   }
 
-  Widget _buildBottomNavItem(int index, IconData icon, String label) {
-    final isSelected = _bottomNavIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _bottomNavIndex = index),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE8F5E9) : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              size: 20,
-              color: isSelected
-                  ? const Color(0xFF006B23)
-                  : const Color(0xFF6E7A6C),
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: GoogleFonts.outfit(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF006B23),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
 }

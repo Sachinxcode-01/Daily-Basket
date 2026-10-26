@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../core/providers/favorites_provider.dart';
+import '../../core/theme/app_theme.dart';
 
 class FavoriteButton extends StatefulWidget {
   final String productId;
@@ -56,12 +58,16 @@ class _FavoriteButtonState extends State<FavoriteButton> with SingleTickerProvid
       SnackBar(
         content: Text(
           isNowFav ? 'Added to Favorites ❤️' : 'Removed from Favorites 💔',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: GoogleFonts.outfit(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+            color: isNowFav ? AppColors.onPrimary : AppColors.inverseOnSurface,
+          ),
         ),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: isNowFav ? const Color(0xFF0F766E) : const Color(0xFF334155),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        backgroundColor: isNowFav ? AppColors.primary : AppColors.inverseSurface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -82,8 +88,8 @@ class _FavoriteButtonState extends State<FavoriteButton> with SingleTickerProvid
             isFav ? Icons.favorite_rounded : Icons.favorite_border_rounded,
             size: widget.size,
             color: isFav
-                ? (widget.activeColor ?? const Color(0xFFEF4444))
-                : (widget.inactiveColor ?? const Color(0xFF94A3B8)),
+                ? (widget.activeColor ?? AppColors.error)
+                : (widget.inactiveColor ?? AppColors.outlineVariant),
           ),
         ),
       ),

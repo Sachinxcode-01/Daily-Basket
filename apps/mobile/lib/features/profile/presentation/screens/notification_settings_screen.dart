@@ -181,24 +181,6 @@ class NotificationSettingsScreen extends StatelessWidget {
               ),
             ),
           ),
-
-          // 4. Persistent Bottom Navigation Bar
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: Color(0xFFEEEEF0), width: 1)),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildBottomNavItem(context, 0, Icons.home_outlined, 'Home', route: '/customer/home'),
-                _buildBottomNavItem(context, 1, Icons.search_rounded, 'Search', route: '/search'),
-                _buildBottomNavItem(context, 2, Icons.notifications_none_rounded, 'Notifications', route: '/notifications'),
-                _buildBottomNavItem(context, 3, Icons.person_rounded, 'Account', isSelected: true, route: '/profile'),
-              ],
-            ),
-          ),
         ],
       ),
     );
@@ -291,45 +273,6 @@ class NotificationSettingsScreen extends StatelessWidget {
           onChanged: onChanged,
         ),
       ],
-    );
-  }
-
-  Widget _buildBottomNavItem(BuildContext context, int index, IconData icon, String label, {bool isSelected = false, String? route}) {
-    return GestureDetector(
-      onTap: () {
-        if (!isSelected && route != null) {
-          Navigator.of(context).pushReplacementNamed(route);
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFE8F5E9) : Colors.transparent,
-          borderRadius: BorderRadius.circular(9999),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
-              size: 20,
-            ),
-            if (isSelected) ...[
-              const SizedBox(width: 6),
-              Text(
-                label,
-                style: GoogleFonts.inter(
-                  color: const Color(0xFF006B23),
-                  fontWeight: FontWeight.w700,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
     );
   }
 }
