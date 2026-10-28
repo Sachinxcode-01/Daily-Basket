@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import { Controller, Get, Post, Put, Patch, Delete, Body, Param } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { MarketingService } from './marketing.service';
 
@@ -22,7 +22,43 @@ export class MarketingController {
   @Get('banners')
   @ApiOperation({ summary: 'Get homepage marketing promotional banners' })
   async getBanners() {
-    return this.marketingService.getBanners();
+    return this.marketingService.getBanners(false);
+  }
+
+  @Get('banners/admin')
+  @ApiOperation({ summary: 'Admin get all banners including inactive' })
+  async getAdminBanners() {
+    return this.marketingService.getBanners(true);
+  }
+
+  @Post('banners')
+  @ApiOperation({ summary: 'Admin create new promotional banner' })
+  async createBanner(@Body() body: any) {
+    return this.marketingService.createBanner(body);
+  }
+
+  @Put('banners/:id')
+  @ApiOperation({ summary: 'Admin update existing banner' })
+  async updateBanner(@Param('id') id: string, @Body() body: any) {
+    return this.marketingService.updateBanner(id, body);
+  }
+
+  @Patch('banners/:id/toggle')
+  @ApiOperation({ summary: 'Admin toggle banner active status' })
+  async toggleBannerStatus(@Param('id') id: string, @Body() body: { isActive: boolean }) {
+    return this.marketingService.toggleBannerStatus(id, body.isActive);
+  }
+
+  @Delete('banners/:id')
+  @ApiOperation({ summary: 'Admin delete banner' })
+  async deleteBanner(@Param('id') id: string) {
+    return this.marketingService.deleteBanner(id);
+  }
+
+  @Post('banners/reorder')
+  @ApiOperation({ summary: 'Admin reorder banner positions' })
+  async reorderBanners(@Body() body: { orderedIds: string[] }) {
+    return this.marketingService.reorderBanners(body.orderedIds);
   }
 
   @Post('push-broadcast')

@@ -23,11 +23,140 @@ export class MarketingService {
     };
   }
 
-  async getBanners() {
-    return [
-      { id: 'b_01', imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80', title: 'Fresh Vegetables 20% Off', targetRoute: '/categories/vegetables' },
-      { id: 'b_02', imageUrl: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=800&q=80', title: 'Daily Milk Delivery Special', targetRoute: '/categories/dairy' },
-    ];
+  async getBanners(includeInactive = false) {
+    try {
+      const banners = await (this.prisma as any).banner.findMany({
+        where: includeInactive ? {} : { isActive: true },
+        orderBy: { position: 'asc' },
+      });
+
+      if (banners.length > 0) {
+        return banners;
+      }
+
+      // Seed default promotional Kirana banners if table empty
+      const defaults = [
+        {
+          title: 'Farm Fresh Organic Vegetables',
+          subtitle: 'Direct from local farms with 10-minute ultrafast delivery',
+          imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&q=80',
+          targetType: 'CATEGORY',
+          targetValue: 'fresh-vegetables',
+          badge: 'UP TO 30% OFF',
+          position: 0,
+          isActive: true,
+        },
+        {
+          title: 'Daily Pure Farm Milk & Dairy',
+          subtitle: 'Fresh pasteurized & whole milk delivered before 7 AM',
+          imageUrl: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=1200&q=80',
+          targetType: 'CATEGORY',
+          targetValue: 'dairy-bread-eggs',
+          badge: 'MORNING SPECIAL',
+          position: 1,
+          isActive: true,
+        },
+        {
+          title: 'Bakery Fresh Artisan Bread & Pav',
+          subtitle: 'Warm 100% whole wheat bread & soft pav baked daily',
+          imageUrl: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1200&q=80',
+          targetType: 'CATEGORY',
+          targetValue: 'bread-pav',
+          badge: 'FRESH BATCH',
+          position: 2,
+          isActive: true,
+        },
+      ];
+
+      for (const b of defaults) {
+        await (this.prisma as any).banner.create({ data: b });
+      }
+
+      return (this.prisma as any).banner.findMany({
+        where: includeInactive ? {} : { isActive: true },
+        orderBy: { position: 'asc' },
+      });
+    } catch {
+      // Memory fallback
+      return [
+        {
+          id: 'b_01',
+          title: 'Farm Fresh Organic Vegetables',
+          subtitle: 'Direct from local farms with 10-minute ultrafast delivery',
+          imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=1200&q=80',
+          targetType: 'CATEGORY',
+          targetValue: 'fresh-vegetables',
+          badge: 'UP TO 30% OFF',
+          position: 0,
+          isActive: true,
+        },
+        {
+          id: 'b_02',
+          title: 'Daily Pure Farm Milk & Dairy',
+          subtitle: 'Fresh pasteurized & whole milk delivered before 7 AM',
+          imageUrl: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=1200&q=80',
+          targetType: 'CATEGORY',
+          targetValue: 'dairy-bread-eggs',
+          badge: 'MORNING SPECIAL',
+          position: 1,
+          isActive: true,
+        },
+      ];
+    }
+  }
+
+  async createBanner(data: {
+    title: string;
+    subtitle?: string;
+    imageUrl: string;
+    targetType?: string;
+    targetValue?: string;
+    badge?: string;
+    position?: number;
+    isActive?: boolean;
+  }) {
+    const count = await (this.prisma as any).banner.count();
+    return (this.prisma as any).banner.create({
+      data: {
+        title: data.title,
+        subtitle: data.subtitle || null,
+        imageUrl: data.imageUrl,
+        targetType: data.targetType || 'CATEGORY',
+        targetValue: data.targetValue || 'fresh-vegetables',
+        badge: data.badge || null,
+        position: data.position !== undefined ? data.position : count,
+        isActive: data.isActive !== undefined ? data.isActive : true,
+      },
+    });
+  }
+
+  async updateBanner(id: string, data: any) {
+    return (this.prisma as any).banner.update({
+      where: { id },
+      data,
+    });
+  }
+
+  async toggleBannerStatus(id: string, isActive: boolean) {
+    return (this.prisma as any).banner.update({
+      where: { id },
+      data: { isActive },
+    });
+  }
+
+  async deleteBanner(id: string) {
+    await (this.prisma as any).banner.delete({ where: { id } });
+    return { success: true, message: 'Banner deleted successfully', id };
+  }
+
+  async reorderBanners(orderedIds: string[]) {
+    for (let index = 0; index < orderedIds.length; index++) {
+      await (this.prisma as any).banner.update({
+        where: { id: orderedIds[index] },
+        data: { position: index },
+      });
+    }
+    return { success: true, message: 'Banners reordered successfully' };
   }
 
   async triggerPushBroadcast(title: string, body: string, segment?: string) {

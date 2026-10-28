@@ -4,9 +4,185 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_network_image.dart';
 
 /// Reviews & Recommendations Screen — Google Stitch Specification (ID: c6a5b7dc5a8c45249003dc69571be238)
-/// Features rating breakdown chart (4.8 rating), verified buyer photo gallery (+42 photos), review cards, and recommendations.
-class ReviewsRecommendationsScreen extends StatelessWidget {
-  const ReviewsRecommendationsScreen({super.key});
+/// Features rating breakdown chart, verified buyer reviews, and category recommendations.
+class ReviewsRecommendationsScreen extends StatefulWidget {
+  final String productId;
+  final String productName;
+  final String category;
+  final double rating;
+  final int reviewCount;
+  final String productImage;
+
+  const ReviewsRecommendationsScreen({
+    super.key,
+    this.productId = 'prod_001',
+    this.productName = 'Fresh Grocery Item',
+    this.category = 'Fresh Produce',
+    this.rating = 4.8,
+    this.reviewCount = 142,
+    this.productImage = '',
+  });
+
+  @override
+  State<ReviewsRecommendationsScreen> createState() => _ReviewsRecommendationsScreenState();
+}
+
+class _ReviewsRecommendationsScreenState extends State<ReviewsRecommendationsScreen> {
+  late List<Map<String, dynamic>> _userReviews;
+
+  @override
+  void initState() {
+    super.initState();
+    _userReviews = [
+      {
+        'name': 'Pooja Iyer',
+        'verified': true,
+        'time': 'Yesterday',
+        'rating': 5,
+        'title': 'Delivered fresh in 10 mins! Superb quality',
+        'body': 'Loved the crispness and packaging of ${widget.productName}. Daily Basket delivery was ultra-fast and exactly as promised.',
+      },
+      {
+        'name': 'Rahul Sharma',
+        'verified': true,
+        'time': '3 days ago',
+        'rating': 5,
+        'title': 'Original quality & great value',
+        'body': 'Been ordering this regularly. The freshness is unmatched compared to local stores.',
+      },
+      {
+        'name': 'Ananya Sen',
+        'verified': true,
+        'time': '1 week ago',
+        'rating': 4,
+        'title': 'Very good packaging and hygiene',
+        'body': 'Seal was intact, fresh batch with good shelf life. Recommended!',
+      },
+    ];
+  }
+
+  void _openWriteReviewSheet() {
+    int selectedRating = 5;
+    final nameCtrl = TextEditingController(text: 'Customer');
+    final titleCtrl = TextEditingController();
+    final bodyCtrl = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                left: 20,
+                right: 20,
+                top: 20,
+                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    'Write a Review',
+                    style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                  ),
+                  Text(
+                    widget.productName,
+                    style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+                  ),
+                  const SizedBox(height: 14),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(5, (idx) {
+                      final star = idx + 1;
+                      return IconButton(
+                        icon: Icon(
+                          star <= selectedRating ? Icons.star_rounded : Icons.star_outline_rounded,
+                          color: Colors.amber,
+                          size: 32,
+                        ),
+                        onPressed: () {
+                          setModalState(() => selectedRating = star);
+                        },
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: titleCtrl,
+                    decoration: InputDecoration(
+                      labelText: 'Review Title',
+                      hintText: 'e.g. Excellent fresh quality!',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: bodyCtrl,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      labelText: 'Detailed Feedback',
+                      hintText: 'Tell other buyers about freshness, taste, and packaging...',
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 48,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (titleCtrl.text.trim().isEmpty) return;
+                        setState(() {
+                          _userReviews.insert(0, {
+                            'name': nameCtrl.text.trim().isEmpty ? 'Customer' : nameCtrl.text.trim(),
+                            'verified': true,
+                            'time': 'Just now',
+                            'rating': selectedRating,
+                            'title': titleCtrl.text.trim(),
+                            'body': bodyCtrl.text.trim().isEmpty ? 'Great product, verified purchase.' : bodyCtrl.text.trim(),
+                          });
+                        });
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('✓ Thank you! Your review has been published.'),
+                            backgroundColor: AppColors.primary,
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text('Submit Review', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white)),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,36 +331,41 @@ class ReviewsRecommendationsScreen extends StatelessWidget {
 
               const SizedBox(height: 24),
 
-              // 3. Customer Reviews List
-              Text(
-                'Customer Reviews (1,284)',
-                style: GoogleFonts.outfit(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.onSurface,
+              // 3. Customer Reviews List Header with Write Review action
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Customer Reviews (${_userReviews.length + widget.reviewCount})',
+                    style: GoogleFonts.outfit(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.onSurface,
+                    ),
+                  ),
+                  TextButton.icon(
+                    onPressed: _openWriteReviewSheet,
+                    icon: const Icon(Icons.edit_note_rounded, size: 18, color: AppColors.primary),
+                    label: Text(
+                      'Write Review',
+                      style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+
+              ..._userReviews.map((rev) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: _buildReviewCard(
+                  name: rev['name'] as String,
+                  verified: rev['verified'] as bool,
+                  time: rev['time'] as String,
+                  rating: rev['rating'] as int,
+                  title: rev['title'] as String,
+                  body: rev['body'] as String,
                 ),
-              ),
-              const SizedBox(height: 12),
-
-              _buildReviewCard(
-                name: 'Jane Doe',
-                verified: true,
-                time: '2 days ago',
-                rating: 5,
-                title: 'Perfectly ripe upon arrival',
-                body: 'These avocados were exactly what I was hoping for. Firm but yielded slightly to gentle pressure. Perfect for my morning toast!',
-              ),
-
-              const SizedBox(height: 12),
-
-              _buildReviewCard(
-                name: 'Rahul Sharma',
-                verified: true,
-                time: '4 days ago',
-                rating: 5,
-                title: 'Great quality organic produce',
-                body: 'Super fresh, creamy texture and delivered in just 10 minutes. Will definitely reorder!',
-              ),
+              )),
 
               const SizedBox(height: 24),
 
@@ -205,19 +386,24 @@ class ReviewsRecommendationsScreen extends StatelessWidget {
                   scrollDirection: Axis.horizontal,
                   children: [
                     _buildProductCard(
-                      name: 'Organic Lime (250g)',
-                      price: '₹35',
-                      imageUrl: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=300',
+                      name: 'Amul Taaza Milk (1 L)',
+                      price: '₹68',
+                      imageUrl: 'assets/products/milk/milk_001.webp',
                     ),
                     _buildProductCard(
-                      name: 'Fresh Coriander (100g)',
-                      price: '₹18',
-                      imageUrl: 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=300',
+                      name: 'Whole Wheat Bread (400g)',
+                      price: '₹48',
+                      imageUrl: 'assets/products/bread-pav/bread-pav_001.webp',
                     ),
                     _buildProductCard(
-                      name: 'Extra Virgin Avocado Oil',
-                      price: '₹380',
-                      imageUrl: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=300',
+                      name: 'Fresh Hybrid Tomatoes (500g)',
+                      price: '₹28',
+                      imageUrl: 'assets/products/fresh-vegetables/fresh-vegetables_001.webp',
+                    ),
+                    _buildProductCard(
+                      name: "Kellogg's Corn Flakes (500g)",
+                      price: '₹189',
+                      imageUrl: 'assets/products/flakes-kids-cereals/flakes-kids-cereals_001.webp',
                     ),
                   ],
                 ),

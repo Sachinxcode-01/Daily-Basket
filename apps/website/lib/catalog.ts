@@ -12,12 +12,20 @@ export interface WebsiteProduct {
   rating?: number;
   reviews?: number;
   category: string;
+  subCategory?: string;
   categorySlug: string;
   tag?: string;
   image: string;
   images: string[];
   isOrganic: boolean;
+  isVeg: boolean;
   description: string;
+  ingredients?: string;
+  storage?: string;
+  shelfLife?: string;
+  nutrition?: Record<string, string>;
+  keyBenefits?: string[];
+  chefTip?: string;
   inStock: boolean;
 }
 
@@ -67,10 +75,16 @@ export const ALL_WEBSITE_PRODUCTS: WebsiteProduct[] = (() => {
     const mrp = Number(p.mrp) || price;
     const discount = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
     const isOrganic = Boolean(
-      p.badge?.toLowerCase().includes('organic') ||
-        p.category?.toLowerCase() === 'organic' ||
-        p.name?.toLowerCase().includes('organic'),
+      p.isOrganic ?? (
+        p.badge?.toLowerCase().includes('organic') ||
+        p.category?.toLowerCase().includes('organic') ||
+        p.name?.toLowerCase().includes('organic')
+      )
     );
+    const isVeg = p.isVeg ?? (!p.name?.toLowerCase().includes('egg') && !p.name?.toLowerCase().includes('chicken') && !p.name?.toLowerCase().includes('sausage'));
+
+    const description = p.description ||
+      `${p.name} (${p.unit || p.subtitle || 'Standard Pack'}). Fresh farm-to-table quality guaranteed by Daily Basket. Delivered in 10 minutes.`;
 
     return {
       id: p.id,
@@ -81,15 +95,23 @@ export const ALL_WEBSITE_PRODUCTS: WebsiteProduct[] = (() => {
       price,
       mrp,
       discount,
-      rating: p.rating || 4.6,
-      reviews: parseInt(p.reviews, 10) || 128,
+      rating: Number(p.rating) || 4.7,
+      reviews: parseInt(p.reviews, 10) || 320,
       category: meta.name,
+      subCategory: p.sub || meta.name,
       categorySlug: meta.slug,
       tag: p.badge || (discount > 0 ? `${discount}% OFF` : undefined),
       image: webImage,
       images: [webImage],
       isOrganic,
-      description: `${p.name} (${p.subtitle || p.unit || 'Standard Pack'}). Fresh quality guaranteed by Daily Basket. Delivered in 10 minutes.`,
+      isVeg,
+      description,
+      ingredients: p.ingredients,
+      storage: p.storage || 'Store in a cool and dry place away from direct sunlight.',
+      shelfLife: p.shelfLife || 'Fresh Harvest / Packed Fresh Daily',
+      nutrition: p.nutrition,
+      keyBenefits: Array.isArray(p.keyBenefits) ? p.keyBenefits : undefined,
+      chefTip: p.chefTip,
       inStock: p.inStock ?? true,
     };
   };
@@ -211,6 +233,7 @@ export function searchProducts(query: string, categoryFilter?: string): WebsiteP
     const brand = norm(p.brand);
     const unit = norm(p.unitName);
     const cat = norm(p.category);
+    const sub = norm(p.subCategory || '');
     const slug = norm(p.categorySlug);
     const tag = norm(p.tag || '');
 
@@ -219,7 +242,7 @@ export function searchProducts(query: string, categoryFilter?: string): WebsiteP
       synonyms += ' vegetable vegetables veggie veggies sabzi greens ';
     }
     if (slug.includes('bread') || cat.includes('bakery') || name.includes('bread') || name.includes('pav')) {
-      synonyms += ' bread bakery pav bun toast rusk ';
+      synonyms += ' bread bakery pav bun toast rusk loaf sourdough ';
     }
     if (slug.includes('milk') || cat.includes('milk')) {
       synonyms += ' milk dairy doodh ';
@@ -237,9 +260,314 @@ export function searchProducts(query: string, categoryFilter?: string): WebsiteP
       synonyms += ' vermicelli seviyan sevai semiya upma noodles pasta ';
     }
 
-    const fullText = `${name} ${brand} ${unit} ${cat} ${slug} ${tag} ${synonyms}`;
+    const fullText = `${name} ${brand} ${unit} ${cat} ${sub} ${slug} ${tag} ${synonyms}`;
     return tokens.every((token) => fullText.includes(token));
   });
+}
+
+// ─── Recommendation Engine: Similar & Related Products ──────────────────
+
+export function getSimilarProducts(productId: string, limit = 6): WebsiteProduct[] {
+  const current = getProductById(productId);
+  if (!current) return ALL_WEBSITE_PRODUCTS.slice(0, limit);
+
+  // 1. Same subcategory, excluding current
+  const sameSub = ALL_WEBSITE_PRODUCTS.filter(
+    (p) => p.id !== current.id && p.subCategory && p.subCategory === current.subCategory,
+  );
+
+  // 2. Same category
+  const sameCategory = ALL_WEBSITE_PRODUCTS.filter(
+    (p) => p.id !== current.id && p.categorySlug === current.categorySlug && (!p.subCategory || p.subCategory !== current.subCategory),
+  );
+
+  // Sort by rating & discount
+  const sorted = [...sameSub, ...sameCategory].sort((a, b) => {
+    return (b.rating || 0) - (a.rating || 0);
+  });
+
+  return sorted.slice(0, limit);
+}
+
+// ─── Recommendation Engine: Customers Also Viewed ──────────────────────
+
+export function getCustomersAlsoViewed(productId: string, limit = 6): WebsiteProduct[] {
+  const current = getProductById(productId);
+  if (!current) return ALL_WEBSITE_PRODUCTS.slice(0, limit);
+
+  const slug = current.categorySlug;
+  let targetAffinitySlugs: string[] = [];
+
+  if (slug === 'bread-pav') {
+    targetAffinitySlugs = ['milk', 'curd-yogurt', 'fresh-vegetables'];
+  } else if (slug === 'fresh-vegetables') {
+    targetAffinitySlugs = ['curd-yogurt', 'bread-pav', 'poha-daliya-grains'];
+  } else if (slug === 'milk') {
+    targetAffinitySlugs = ['bread-pav', 'flakes-kids-cereals', 'vermicelli'];
+  } else if (slug === 'curd-yogurt') {
+    targetAffinitySlugs = ['poha-daliya-grains', 'vermicelli', 'fresh-vegetables'];
+  } else if (slug === 'flakes-kids-cereals') {
+    targetAffinitySlugs = ['milk', 'curd-yogurt'];
+  } else if (slug === 'vermicelli' || slug === 'poha-daliya-grains') {
+    targetAffinitySlugs = ['milk', 'fresh-vegetables', 'curd-yogurt'];
+  } else {
+    targetAffinitySlugs = CANONICAL_CATEGORIES.filter((c) => c !== slug);
+  }
+
+  const affinityMatches = ALL_WEBSITE_PRODUCTS.filter(
+    (p) => p.id !== current.id && targetAffinitySlugs.includes(p.categorySlug),
+  ).sort((a, b) => (b.reviews || 0) - (a.reviews || 0));
+
+  return affinityMatches.slice(0, limit);
+}
+
+// ─── Recommendation Engine: Trending & Bestsellers ─────────────────────
+
+export function getTrendingProducts(categorySlug?: string, limit = 8): WebsiteProduct[] {
+  let pool = ALL_WEBSITE_PRODUCTS;
+  if (categorySlug && categorySlug !== 'All') {
+    pool = pool.filter((p) => p.categorySlug === categorySlug || p.category.toLowerCase() === categorySlug.toLowerCase());
+  }
+
+  return [...pool]
+    .sort((a, b) => {
+      const scoreA = (a.rating || 4.5) * 1000 + (a.reviews || 100);
+      const scoreB = (b.rating || 4.5) * 1000 + (b.reviews || 100);
+      return scoreB - scoreA;
+    })
+    .slice(0, limit);
+}
+
+// ─── Recommendation Engine: Personalized Recommendations ────────────────
+
+export function getPersonalizedRecommendations(historyIds: string[] = [], limit = 8): WebsiteProduct[] {
+  if (!historyIds || historyIds.length === 0) {
+    return getTrendingProducts(undefined, limit);
+  }
+
+  const viewedProducts = historyIds
+    .map((id) => getProductById(id))
+    .filter((p): p is WebsiteProduct => Boolean(p));
+
+  if (viewedProducts.length === 0) {
+    return getTrendingProducts(undefined, limit);
+  }
+
+  // Count category and brand preferences
+  const categoryScores: Record<string, number> = {};
+  const brandScores: Record<string, number> = {};
+  const viewedIdSet = new Set(historyIds.map((id) => id.toLowerCase()));
+
+  viewedProducts.forEach((p, idx) => {
+    const recencyWeight = (historyIds.length - idx) / historyIds.length + 1; // More recent views get higher weight
+    categoryScores[p.categorySlug] = (categoryScores[p.categorySlug] || 0) + 3 * recencyWeight;
+    if (p.brand) {
+      brandScores[p.brand] = (brandScores[p.brand] || 0) + 2 * recencyWeight;
+    }
+  });
+
+  // Score candidate catalog products
+  const scored = ALL_WEBSITE_PRODUCTS.filter((p) => !viewedIdSet.has(p.id.toLowerCase())).map((p) => {
+    let score = (p.rating || 4.5) * 2;
+    if (categoryScores[p.categorySlug]) {
+      score += categoryScores[p.categorySlug] * 4;
+    }
+    if (p.brand && brandScores[p.brand]) {
+      score += brandScores[p.brand] * 3;
+    }
+    if (p.isOrganic) score += 1.5;
+    if (p.inStock) score += 5;
+
+    return { product: p, score };
+  });
+
+  scored.sort((a, b) => b.score - a.score);
+  return scored.slice(0, limit).map((s) => s.product);
+}
+
+// ─── Recommendation Engine: Cart-Based Addons ──────────────────────────
+
+export function getCartRecommendations(cartVariantOrProductIds: string[] = [], limit = 6): WebsiteProduct[] {
+  const cartIdsClean = new Set(
+    cartVariantOrProductIds.map((id) => id.replace(/^var_/, '').toLowerCase()),
+  );
+
+  // Essential impulse items common in quick commerce (milk, curd, bread, lemons, coriander)
+  const impulseKeywords = ['milk', 'bread', 'curd', 'lemon', 'coriander', 'butter', 'tomatoes'];
+
+  const candidates = ALL_WEBSITE_PRODUCTS.filter((p) => {
+    if (cartIdsClean.has(p.id.toLowerCase())) return false;
+    const nameLow = p.name.toLowerCase();
+    return impulseKeywords.some((kw) => nameLow.includes(kw));
+  });
+
+  // Sort by reviews and affordability (under ₹100 preferred for impulse cross-sell)
+  candidates.sort((a, b) => {
+    const priceWeightA = a.price <= 80 ? 20 : 0;
+    const priceWeightB = b.price <= 80 ? 20 : 0;
+    return (b.rating || 0) * 10 + priceWeightB - ((a.rating || 0) * 10 + priceWeightA);
+  });
+
+  return candidates.slice(0, limit);
+}
+
+// ─── Recommendation Engine: Wishlist-Based Discovery ───────────────────
+
+export function getWishlistRecommendations(wishlistProductIds: string[] = [], limit = 6): WebsiteProduct[] {
+  if (!wishlistProductIds || wishlistProductIds.length === 0) {
+    return getTrendingProducts('fresh-vegetables', limit);
+  }
+
+  const wishlistProducts = wishlistProductIds
+    .map((id) => getProductById(id))
+    .filter((p): p is WebsiteProduct => Boolean(p));
+
+  const favoredCategories = Array.from(new Set(wishlistProducts.map((p) => p.categorySlug)));
+  const savedIdSet = new Set(wishlistProductIds.map((id) => id.toLowerCase()));
+
+  const matches = ALL_WEBSITE_PRODUCTS.filter(
+    (p) => !savedIdSet.has(p.id.toLowerCase()) && favoredCategories.includes(p.categorySlug),
+  ).sort((a, b) => (b.discount || 0) - (a.discount || 0) || (b.rating || 0) - (a.rating || 0));
+
+  return matches.slice(0, limit);
+}
+
+// ─── Recommendation Engine: Product Comparison ─────────────────────────
+
+export interface ProductComparisonItem {
+  id: string;
+  variantId: string;
+  name: string;
+  brand: string;
+  unitName: string;
+  price: number;
+  mrp: number;
+  discount: number;
+  rating: number;
+  reviews: number;
+  imageUrl: string;
+  inStock: boolean;
+  isOrganic: boolean;
+  isVeg: boolean;
+  calories: string;
+  protein: string;
+  shelfLife: string;
+  deliveryTime: string;
+  isCurrent: boolean;
+  badge?: string;
+}
+
+export interface ProductComparisonData {
+  currentProduct: ProductComparisonItem;
+  competitors: ProductComparisonItem[];
+  categoryName: string;
+}
+
+export function getProductComparison(productId: string): ProductComparisonData | null {
+  const current = getProductById(productId);
+  if (!current) return null;
+
+  // Find 2 closest competing alternatives in the same category/subcategory
+  const alternatives = ALL_WEBSITE_PRODUCTS.filter(
+    (p) => p.id !== current.id && p.categorySlug === current.categorySlug,
+  ).sort((a, b) => Math.abs(a.price - current.price) - Math.abs(b.price - current.price));
+
+  const competitorsList = alternatives.slice(0, 2);
+
+  const mapToComparisonItem = (p: WebsiteProduct, isCurrent: boolean): ProductComparisonItem => {
+    return {
+      id: p.id,
+      variantId: p.variantId,
+      name: p.name,
+      brand: p.brand,
+      unitName: p.unitName,
+      price: p.price,
+      mrp: p.mrp,
+      discount: p.discount,
+      rating: p.rating || 4.6,
+      reviews: p.reviews || 240,
+      imageUrl: p.image,
+      inStock: p.inStock,
+      isOrganic: p.isOrganic,
+      isVeg: p.isVeg,
+      calories: p.nutrition?.Calories || '140 kcal',
+      protein: p.nutrition?.Protein || '4.0g',
+      shelfLife: p.shelfLife || 'Fresh Daily',
+      deliveryTime: '10 Mins',
+      isCurrent,
+      badge: isCurrent ? 'Viewing Now' : (p.price < current.price ? 'Best Value' : 'Top Alternative'),
+    };
+  };
+
+  return {
+    currentProduct: mapToComparisonItem(current, true),
+    competitors: competitorsList.map((c) => mapToComparisonItem(c, false)),
+    categoryName: current.category,
+  };
+}
+
+// ─── Recommendation Engine: Smart Search Suggestions ───────────────────
+
+export interface SearchSuggestionsResult {
+  query: string;
+  trendingSearches: string[];
+  suggestedPhrases: string[];
+  matchingCategories: { name: string; slug: string; count: number }[];
+  matchedProducts: WebsiteProduct[];
+}
+
+export const TRENDING_SEARCH_KEYWORDS = [
+  'Amul Gold Milk',
+  'English Oven Whole Wheat Bread',
+  'Fresh Country Tomatoes',
+  'Epigamia Greek Yogurt',
+  'MTR Roasted Vermicelli',
+  'Organic Baby Spinach',
+  'Rajdhani Thick Poha',
+  'Double Choco Brownies',
+];
+
+export function getSmartSearchSuggestions(query: string): SearchSuggestionsResult {
+  const qClean = query.trim().toLowerCase();
+
+  if (!qClean) {
+    return {
+      query: '',
+      trendingSearches: TRENDING_SEARCH_KEYWORDS,
+      suggestedPhrases: [],
+      matchingCategories: STATIC_CATEGORIES.map((c) => ({
+        name: c.name,
+        slug: c.slug,
+        count: c.itemCount || 0,
+      })),
+      matchedProducts: ALL_WEBSITE_PRODUCTS.slice(0, 4),
+    };
+  }
+
+  const matchedProducts = searchProducts(qClean).slice(0, 4);
+
+  // Extract unique suggestions from matching product names and brands
+  const phrases = new Set<string>();
+  searchProducts(qClean).slice(0, 8).forEach((p) => {
+    phrases.add(p.name);
+    phrases.add(`${p.brand} ${p.subCategory || ''}`);
+  });
+
+  const matchingCategories = STATIC_CATEGORIES.filter(
+    (c) => c.name.toLowerCase().includes(qClean) || c.slug.toLowerCase().includes(qClean),
+  ).map((c) => ({
+    name: c.name,
+    slug: c.slug,
+    count: c.itemCount || 0,
+  }));
+
+  return {
+    query: qClean,
+    trendingSearches: TRENDING_SEARCH_KEYWORDS,
+    suggestedPhrases: Array.from(phrases).slice(0, 5),
+    matchingCategories,
+    matchedProducts,
+  };
 }
 
 // ─── Feature 2: Frequently Bought Together & Smart Bundles ──────────────
@@ -275,17 +603,16 @@ export function getProductBundle(productId: string): ProductBundle | null {
   let bundleDesc = 'Add the full set to your cart and save extra.';
 
   const slug = current.categorySlug.toLowerCase();
-  const name = current.name.toLowerCase();
 
   if (slug.includes('milk')) {
     bundleTitle = 'Morning Breakfast Combo';
-    bundleDesc = 'Fresh milk paired with wholesome breakfast staples.';
+    bundleDesc = 'Fresh milk paired with bakery-fresh bread and breakfast staples.';
     companionCandidates = ALL_WEBSITE_PRODUCTS.filter(
       (p) => p.id !== current.id && (p.categorySlug === 'bread-pav' || p.categorySlug === 'flakes-kids-cereals'),
     );
   } else if (slug.includes('bread')) {
     bundleTitle = 'Tea & Toast Pair';
-    bundleDesc = 'Bakery-fresh loaf with farm milk for your daily morning routine.';
+    bundleDesc = 'Bakery-fresh loaf with pasteurized farm milk for your daily morning routine.';
     companionCandidates = ALL_WEBSITE_PRODUCTS.filter(
       (p) => p.id !== current.id && (p.categorySlug === 'milk' || p.categorySlug === 'curd-yogurt'),
     );
@@ -303,7 +630,7 @@ export function getProductBundle(productId: string): ProductBundle | null {
     );
   } else if (slug.includes('curd')) {
     bundleTitle = 'Probiotic Daily Bowl';
-    bundleDesc = 'Creamy fresh curd with grains and healthy breakfast companions.';
+    bundleDesc = 'Creamy fresh curd with wholesome breakfast companions.';
     companionCandidates = ALL_WEBSITE_PRODUCTS.filter(
       (p) => p.id !== current.id && (p.categorySlug === 'poha-daliya-grains' || p.categorySlug === 'vermicelli'),
     );
@@ -311,7 +638,7 @@ export function getProductBundle(productId: string): ProductBundle | null {
     companionCandidates = ALL_WEBSITE_PRODUCTS.filter((p) => p.id !== current.id);
   }
 
-  // Pick 1 or 2 distinct companion items
+  // Pick 2 distinct companion items
   const companions = companionCandidates.slice(0, 2);
   if (companions.length === 0) return null;
 
@@ -379,7 +706,6 @@ export function getProductSubstitutes(productId: string): ProductSubstitute[] {
     (p) => p.id !== current.id && p.inStock,
   );
 
-  // Score candidate relevance
   const scored = candidates.map((p) => {
     let score = 50;
     let reason = 'Popular pantry item in this price range';
@@ -464,13 +790,13 @@ export function filterAndSortWebsiteProducts(
         case 'organic':
           return p.isOrganic;
         case 'vegan':
-          return !slugLow.includes('milk') && !slugLow.includes('curd') && !nameLow.includes('ghee') && !nameLow.includes('butter');
+          return p.isVeg && !slugLow.includes('milk') && !slugLow.includes('curd') && !nameLow.includes('ghee') && !nameLow.includes('butter');
         case 'gluten_free':
           return !slugLow.includes('bread') && !slugLow.includes('vermicelli') && !nameLow.includes('wheat');
         case 'sugar_free':
-          return slugLow.includes('vegetables') || slugLow.includes('grain') || nameLow.includes('unsweetened');
+          return slugLow.includes('vegetables') || slugLow.includes('grain') || nameLow.includes('unsweetened') || nameLow.includes('zero sugar');
         case 'high_protein':
-          return slugLow.includes('curd') || slugLow.includes('milk') || nameLow.includes('oats') || nameLow.includes('soya');
+          return slugLow.includes('curd') || slugLow.includes('milk') || nameLow.includes('protein') || nameLow.includes('egg');
         default:
           return true;
       }
@@ -522,5 +848,3 @@ export function filterAndSortWebsiteProducts(
 
   return list;
 }
-
-

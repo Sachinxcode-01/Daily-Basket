@@ -51,6 +51,46 @@ export class ProductsController {
     return product;
   }
 
+  @Get('recommendations')
+  @ApiOperation({ summary: 'Get smart recommendations (similar, frequently_bought_together, customers_also_viewed, best_sellers, popular, cart_addons)' })
+  @ApiQuery({ name: 'type', required: false })
+  @ApiQuery({ name: 'productId', required: false })
+  @ApiQuery({ name: 'categoryId', required: false })
+  @ApiQuery({ name: 'limit', required: false })
+  async getRecommendations(
+    @Query('type') type?: string,
+    @Query('productId') productId?: string,
+    @Query('categoryId') categoryId?: string,
+    @Query('limit') limit?: number,
+  ) {
+    return this.productsService.getRecommendations(type, productId, categoryId, limit);
+  }
+
+  @Get('substitutes')
+  @ApiOperation({ summary: 'Get smart 1:1 substitutes for an out-of-stock product' })
+  @ApiQuery({ name: 'productId', required: true })
+  async getSubstitutes(@Query('productId') productId: string) {
+    return this.productsService.getSubstitutes(productId);
+  }
+
+  @Get('audit-catalog')
+  @ApiOperation({ summary: 'Catalog Quality & Integrity Audit (broken images, duplicate SKUs, price anomalies)' })
+  async auditCatalog() {
+    return this.productsService.auditEntireCatalog();
+  }
+
+  @Post('auto-fix-catalog')
+  @ApiOperation({ summary: 'Admin Action: Auto-fix catalog quality issues (assign fallback images, fix prices)' })
+  async autoFixCatalog() {
+    return this.productsService.autoFixCatalog();
+  }
+
+  @Get(':id/substitutes')
+  @ApiOperation({ summary: 'Get smart 1:1 substitutes for a specific product' })
+  async getProductSubstitutes(@Param('id') id: string) {
+    return this.productsService.getSubstitutes(id);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get single product details with variants' })
   async findOne(@Param('id') id: string) {

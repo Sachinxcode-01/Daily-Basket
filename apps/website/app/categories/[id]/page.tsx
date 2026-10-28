@@ -105,6 +105,7 @@ export default function CategoryDetailPage({ params }: { params: { id: string } 
           image: normalizeImagePath(rawImage),
           images: [normalizeImagePath(rawImage)],
           isOrganic: Boolean(p?.isOrganic),
+          isVeg: p?.isVeg !== false,
           description: p?.description || '',
           inStock: variant?.isAvailable ?? true,
         };

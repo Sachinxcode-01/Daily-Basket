@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
 import { RedisService } from '../redis/redis.service';
 import { EventsGateway } from '../events/events.gateway';
@@ -293,6 +293,105 @@ export class FavoritesService {
         { day: 'Sun', favoritesCount: 390 },
       ],
       conversionRate: 64.2, // 64.2% of users who favorite a product buy it within 7 days
+    };
+  }
+
+  async getFavoritesCount(userId: string = this.DEFAULT_USER_ID): Promise<number> {
+    return this.prisma.favorite.count({
+      where: { userId },
+    });
+  }
+
+  async syncGuestWishlist(userId: string = this.DEFAULT_USER_ID, productIds: string[]) {
+    if (!productIds || productIds.length === 0) {
+      return { syncedCount: 0 };
+    }
+
+    let syncedCount = 0;
+    for (const pid of productIds) {
+      try {
+        const product = await this.prisma.product.findUnique({ where: { id: pid } });
+        if (product) {
+          const exists = await this.prisma.favorite.findUnique({
+            where: { userId_productId: { userId, productId: pid } },
+          });
+          if (!exists) {
+            await this.prisma.favorite.create({
+              data: { userId, productId: pid },
+            });
+            syncedCount++;
+          }
+        }
+      } catch {
+        // Skip invalid item
+      }
+    }
+
+    await this.redis.delByPattern(`favorites:${userId}:*`);
+    return { syncedCount };
+  }
+
+  async moveToCart(userId: string = this.DEFAULT_USER_ID, productId: string) {
+    // 1. Get product variant
+    const product = await this.prisma.product.findUnique({
+      where: { id: productId },
+      include: {
+        variants: { where: { isAvailable: true } },
+      },
+    });
+
+    if (!product || product.variants.length === 0) {
+      throw new NotFoundException('Product or available variant not found.');
+    }
+
+    const variant = product.variants[0];
+
+    // 2. Find or create user cart
+    let cart = await this.prisma.cart.findUnique({
+      where: { userId },
+    });
+
+    if (!cart) {
+      cart = await this.prisma.cart.create({
+        data: { userId },
+      });
+    }
+
+    // 3. Add to cart
+    const existingCartItem = await this.prisma.cartItem.findFirst({
+      where: {
+        cartId: cart.id,
+        variantId: variant.id,
+      },
+    });
+
+    if (existingCartItem) {
+      await this.prisma.cartItem.update({
+        where: { id: existingCartItem.id },
+        data: { quantity: existingCartItem.quantity + 1 },
+      });
+    } else {
+      await this.prisma.cartItem.create({
+        data: {
+          cartId: cart.id,
+          variantId: variant.id,
+          productName: product.name,
+          unitName: variant.unitName,
+          price: variant.price,
+          quantity: 1,
+          imageUrl: product.images?.[0] || null,
+        } as any,
+      });
+    }
+
+    // 4. Remove from favorites
+    await this.removeFavorite(userId, productId);
+
+    return {
+      success: true,
+      message: `${product.name} moved from wishlist to cart!`,
+      productId,
+      variantId: variant.id,
     };
   }
 }

@@ -120,6 +120,7 @@ model User {
   personalizedOffers      PersonalizedOffer[]
   cart                    Cart?
   couponRedemptions       CouponRedemption[]
+  notifications           InAppNotification[]
 
   @@map("users")
 }
@@ -251,6 +252,9 @@ model Order {
   paymentMethod        PaymentMethod
   paymentStatus        PaymentStatus @default(PENDING)
   estimatedArrivalMins Int           @default(10)
+  deliveryNotes        String?
+  cancellationReason   String?
+  cancelledAt          DateTime?
   createdAt            DateTime      @default(now())
   updatedAt            DateTime      @updatedAt
   payments             Payment[]
@@ -344,16 +348,20 @@ model WalletTransaction {
 }
 
 model Review {
-  id        String   @id @default(uuid())
-  productId String
-  product   Product  @relation(fields: [productId], references: [id])
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  rating    Int
-  comment   String?
-  createdAt DateTime @default(now())
+  id                 String   @id @default(uuid())
+  productId          String
+  product            Product  @relation(fields: [productId], references: [id])
+  userId             String
+  user               User     @relation(fields: [userId], references: [id])
+  rating             Int
+  comment            String?
+  isVerifiedPurchase Boolean  @default(false)
+  status             String   @default("APPROVED") // PENDING, APPROVED, REJECTED
+  helpfulCount       Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @default(now()) @updatedAt
 
-  @@index([productId, rating])
+  @@index([productId, status, rating])
   @@index([userId])
   @@map("reviews")
 }
@@ -1301,6 +1309,43 @@ model CouponRedemption {
   @@index([userId])
   @@map("coupon_redemptions")
 }
+
+model Banner {
+  id          String    @id @default(uuid())
+  title       String
+  subtitle    String?
+  imageUrl    String
+  targetType  String    @default("CATEGORY") // CATEGORY, PRODUCT, OFFER, EXTERNAL
+  targetValue String    // slug or product id or coupon code
+  position    Int       @default(0)
+  isActive    Boolean   @default(true)
+  startDate   DateTime  @default(now())
+  endDate     DateTime?
+  badge       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([isActive, position])
+  @@map("banners")
+}
+
+model InAppNotification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("ORDER") // ORDER, PROMO, SYSTEM, DELIVERY
+  orderId   String?
+  isRead    Boolean  @default(false)
+  data      Json?
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("in_app_notifications")
+}
+
 
 
 

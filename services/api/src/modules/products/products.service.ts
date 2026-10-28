@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../database/prisma.service';
+import { ProductValidatorService } from './product-validator.service';
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private productValidator: ProductValidatorService,
+  ) {}
 
   private static customProducts: Map<string, any> = new Map();
   private static deletedProductIds: Set<string> = new Set();
@@ -723,6 +727,129 @@ export class ProductsService {
     }
 
     return { id, isAvailable, status: 'UPDATED' };
+  }
+
+  async auditEntireCatalog() {
+    return this.productValidator.auditEntireCatalog();
+  }
+
+  async autoFixCatalog() {
+    return this.productValidator.autoFixCatalogQuality();
+  }
+
+  async getRecommendations(
+    type: string = 'similar',
+    productId?: string,
+    categoryId?: string,
+    limit: number = 6,
+  ) {
+    const all = await this.findAll();
+    const currentProduct = productId ? all.find((p: any) => p.id === productId || p.slug === productId) : null;
+    const targetCatId = categoryId || currentProduct?.categoryId || currentProduct?.category?.id;
+
+    let results: any[] = [];
+
+    switch (type) {
+      case 'similar':
+        results = all.filter((p: any) => {
+          if (currentProduct && p.id === currentProduct.id) return false;
+          return targetCatId ? (p.categoryId === targetCatId || p.category?.id === targetCatId || p.category?.slug === targetCatId) : true;
+        });
+        break;
+
+      case 'frequently_bought_together':
+        results = all.filter((p: any) => {
+          if (currentProduct && p.id === currentProduct.id) return false;
+          const name = (p.name || '').toLowerCase();
+          return name.includes('bread') || name.includes('egg') || name.includes('milk') || name.includes('butter') || name.includes('curd') || name.includes('tea') || name.includes('tomato');
+        });
+        if (results.length < limit) {
+          results = all.filter((p: any) => !currentProduct || p.id !== currentProduct.id);
+        }
+        break;
+
+      case 'customers_also_viewed':
+        results = all
+          .filter((p: any) => {
+            if (currentProduct && p.id === currentProduct.id) return false;
+            return targetCatId ? (p.categoryId === targetCatId || p.category?.slug === targetCatId) : true;
+          })
+          .sort((a: any, b: any) => (b.reviews?.length || b.rating || 0) - (a.reviews?.length || a.rating || 0));
+        break;
+
+      case 'best_sellers':
+        results = [...all].sort((a: any, b: any) => {
+          const aDiscount = (a.variants?.[0]?.mrp || 0) - (a.variants?.[0]?.price || 0);
+          const bDiscount = (b.variants?.[0]?.mrp || 0) - (b.variants?.[0]?.price || 0);
+          return bDiscount - aDiscount;
+        });
+        break;
+
+      case 'popular':
+        results = [...all].sort((a: any, b: any) => (b.rating || 4.8) - (a.rating || 4.8));
+        break;
+
+      case 'new_arrivals':
+        results = [...all].reverse();
+        break;
+
+      case 'cart_addons':
+        results = all.filter((p: any) => {
+          const price = p.variants?.[0]?.price ?? p.price ?? 999;
+          return price <= 99;
+        });
+        break;
+
+      default:
+        results = all;
+    }
+
+    if (results.length === 0) {
+      results = all.filter((p: any) => !currentProduct || p.id !== currentProduct.id);
+    }
+
+    return results.slice(0, Number(limit) || 6);
+  }
+
+  async getSubstitutes(productId: string) {
+    const all = await this.findAll();
+    const target = all.find((p: any) => p.id === productId || p.slug === productId);
+    if (!target) return [];
+
+    const targetPrice = target.variants?.[0]?.price ?? target.price ?? 50;
+    const targetCat = target.categoryId || target.category?.id;
+
+    const candidates = all.filter((p: any) => {
+      if (p.id === target.id) return false;
+      return targetCat && (p.categoryId === targetCat || p.category?.id === targetCat);
+    });
+
+    const fallbackCandidates = candidates.length > 0 ? candidates : all.filter((p: any) => p.id !== target.id);
+
+    return fallbackCandidates
+      .map((p: any) => {
+        const v = p.variants?.[0] || {};
+        const price = v.price ?? p.price ?? 50;
+        const mrp = v.mrp ?? p.mrp ?? price;
+        const priceDiff = Math.abs(price - targetPrice);
+        const matchScore = Math.max(60, Math.min(99, Math.round(95 - (priceDiff / Math.max(1, targetPrice)) * 30)));
+        return {
+          id: p.id,
+          variantId: v.id || `var_${p.id}`,
+          name: p.name,
+          brand: p.brand || 'Daily Basket Select',
+          unitName: v.unitName || p.unitName || '1 pack',
+          price,
+          mrp,
+          imageUrl: p.images?.[0] || ProductValidatorService.FALLBACK_IMAGE_URL,
+          rating: p.rating || 4.7,
+          inStock: v.isAvailable !== false && (v.stockQuantity === undefined || v.stockQuantity > 0),
+          matchScore,
+          similarityReason: `Same category (${p.category?.name || 'Produce'}) & price range`,
+        };
+      })
+      .sort((a, b) => b.matchScore - a.matchScore)
+      .slice(0, 5);
   }
 }
 

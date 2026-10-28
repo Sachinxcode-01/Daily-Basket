@@ -4,11 +4,10 @@
 
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
-
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, Camera, SlidersHorizontal, Plus, Check, ArrowLeft, Mic } from 'lucide-react';
+import { Search, Camera, SlidersHorizontal, Plus, Check, ArrowLeft, Mic, Clock, Sparkles, X, ChevronRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
@@ -21,6 +20,9 @@ import {
   AdvancedFilterState,
   INITIAL_FILTER_STATE,
   filterAndSortWebsiteProducts,
+  getSmartSearchSuggestions,
+  TRENDING_SEARCH_KEYWORDS,
+  STATIC_CATEGORIES,
 } from '../../lib/catalog';
 import { AdvancedFilterModal } from '../../components/AdvancedFilterModal';
 import { VoiceSearchModal } from '../../components/VoiceSearchModal';
@@ -40,6 +42,8 @@ interface SearchItem {
   inStock: boolean;
   image: string;
 }
+
+const RECENT_SEARCHES_KEY = 'daily_basket_recent_searches';
 
 function mapItem(p: any): SearchItem {
   const variant =
@@ -68,6 +72,7 @@ function mapItem(p: any): SearchItem {
 
 export default function SearchPage() {
   const router = useRouter();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [activeQuickChip, setActiveQuickChip] = useState('All');
@@ -76,9 +81,61 @@ export default function SearchPage() {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [advancedFilters, setAdvancedFilters] = useState<AdvancedFilterState>(INITIAL_FILTER_STATE);
   const [scanNotice, setScanNotice] = useState<string | null>(null);
+  const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+
   const { activeItems, addItem, updateItem } = useCart();
 
-  // Barcode scan: look up the catalog and open the product; otherwise fall back to text search.
+  // Load recent searches from localStorage
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) setRecentSearches(parsed.slice(0, 6));
+      }
+    } catch {
+      // Ignore
+    }
+  }, []);
+
+  const saveRecentSearch = (term: string) => {
+    const trimmed = term.trim();
+    if (!trimmed) return;
+    setRecentSearches((prev) => {
+      const updated = [trimmed, ...prev.filter((t) => t.toLowerCase() !== trimmed.toLowerCase())].slice(0, 6);
+      try {
+        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+      } catch {
+        // Ignore
+      }
+      return updated;
+    });
+  };
+
+  const removeRecentSearch = (term: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setRecentSearches((prev) => {
+      const updated = prev.filter((t) => t !== term);
+      try {
+        localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(updated));
+      } catch {
+        // Ignore
+      }
+      return updated;
+    });
+  };
+
+  const clearAllRecentSearches = () => {
+    setRecentSearches([]);
+    try {
+      localStorage.removeItem(RECENT_SEARCHES_KEY);
+    } catch {
+      // Ignore
+    }
+  };
+
+  // Barcode scan
   const handleScan = async (code: string) => {
     setIsCameraModalOpen(false);
     const c = code.trim();
@@ -95,6 +152,7 @@ export default function SearchPage() {
     }
     setScanNotice(`No product matched barcode "${c}". Showing search results instead.`);
     setQuery(c);
+    saveRecentSearch(c);
   };
 
   const quickChips = [
@@ -105,9 +163,13 @@ export default function SearchPage() {
     { label: 'In-Stock ⚡', inStockOnly: true },
   ];
 
-  // Debounce the query so we don't hit the API on every keystroke.
+  // Debounce the query
   useEffect(() => {
-    const t = setTimeout(() => setDebouncedQuery(query.trim()), 350);
+    const t = setTimeout(() => {
+      const trimmed = query.trim();
+      setDebouncedQuery(trimmed);
+      if (trimmed) saveRecentSearch(trimmed);
+    }, 350);
     return () => clearTimeout(t);
   }, [query]);
 
@@ -148,6 +210,7 @@ export default function SearchPage() {
           image: item.image,
           images: [item.image],
           isOrganic: item.isOrganic,
+          isVeg: (p as any).isVeg ?? true,
           description: p.description || '',
           inStock: item.inStock,
         };
@@ -160,6 +223,11 @@ export default function SearchPage() {
     const filtered = filterAndSortWebsiteProducts(baseResults, advancedFilters);
     return filtered.map(mapItem);
   }, [baseResults, advancedFilters]);
+
+  // Smart Search Typeahead Suggestions
+  const searchSuggestions = useMemo(() => {
+    return getSmartSearchSuggestions(query);
+  }, [query]);
 
   const availableBrands = useMemo(() => {
     const brands = new Set<string>();
@@ -185,9 +253,15 @@ export default function SearchPage() {
       addItem.mutate({ variantId: item.variantId, productName: item.name, unitName: item.weight, price: item.price, quantity: 1 });
     }
   };
-  const qtyFor = (variantId: string) => activeItems.find((i) => i.variantId === variantId)?.quantity ?? 0;
 
+  const qtyFor = (variantId: string) => activeItems.find((i) => i.variantId === variantId)?.quantity ?? 0;
   const loading = isLoading || isFetching;
+
+  const handleSelectSearchTerm = (term: string) => {
+    setQuery(term);
+    saveRecentSearch(term);
+    setIsSearchFocused(false);
+  };
 
   return (
     <div className="min-h-screen bg-slate-900 font-sans pb-24 text-white">
@@ -207,7 +281,6 @@ export default function SearchPage() {
         filters={advancedFilters}
         onFilterChange={(newFilters) => {
           setAdvancedFilters(newFilters);
-          // Sync quick chip
           if (newFilters.dietary === 'all' && newFilters.priceBracket === 'all' && !newFilters.inStockOnly) {
             setActiveQuickChip('All');
           } else {
@@ -219,7 +292,7 @@ export default function SearchPage() {
       />
 
       {/* Sticky Search Header */}
-      <header className="sticky top-0 z-40 bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 px-4 sm:px-8 py-3">
+      <header className="sticky top-0 z-40 bg-slate-800/95 backdrop-blur-md border-b border-slate-700/80 px-4 sm:px-8 py-3">
         <div className="max-w-7xl mx-auto flex items-center gap-3">
           <Link href="/" className="p-2 text-teal-400 hover:bg-slate-700 rounded-full transition">
             <ArrowLeft className="w-6 h-6" />
@@ -228,13 +301,30 @@ export default function SearchPage() {
           <div className="relative flex-1">
             <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
+              ref={searchInputRef}
               type="text"
               value={query}
-              onChange={(e) => { setQuery(e.target.value); if (scanNotice) setScanNotice(null); }}
-              placeholder="Search for groceries, brand or speak..."
+              onFocus={() => setIsSearchFocused(true)}
+              onChange={(e) => {
+                setQuery(e.target.value);
+                if (scanNotice) setScanNotice(null);
+              }}
+              placeholder="Search for groceries, brand, category or speak..."
               className="w-full h-11 bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-24 text-sm font-medium text-white placeholder:text-slate-400 focus:outline-none focus:border-teal-500 transition"
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1.5">
+              {query && (
+                <button
+                  onClick={() => {
+                    setQuery('');
+                    searchInputRef.current?.focus();
+                  }}
+                  className="p-1 text-slate-400 hover:text-white rounded transition"
+                  title="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
               <button
                 onClick={() => setIsVoiceModalOpen(true)}
                 title="Search with Voice"
@@ -250,6 +340,171 @@ export default function SearchPage() {
                 <Camera className="w-4 h-4" />
               </button>
             </div>
+
+            {/* Smart Search Typeahead Dropdown */}
+            {isSearchFocused && (
+              <div
+                className="absolute left-0 right-0 top-13 bg-slate-800 border border-slate-700 rounded-2xl p-4 shadow-2xl z-50 animate-in fade-in zoom-in-95 duration-150"
+                onMouseDown={(e) => e.preventDefault()} // Prevents blur before click
+              >
+                {/* 1. When query has characters: show matching suggestions & quick product cards */}
+                {query.trim().length > 0 ? (
+                  <div className="space-y-4">
+                    {/* Suggested Keywords */}
+                    {searchSuggestions.suggestedPhrases.length > 0 && (
+                      <div>
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5 mb-2">
+                          <Sparkles className="w-3.5 h-3.5" /> Matching Suggestions
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {searchSuggestions.suggestedPhrases.map((phrase) => (
+                            <button
+                              key={phrase}
+                              onClick={() => handleSelectSearchTerm(phrase)}
+                              className="text-xs bg-slate-900 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5"
+                            >
+                              <Search className="w-3 h-3 text-slate-400" />
+                              <span>{phrase}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Matching Categories */}
+                    {searchSuggestions.matchingCategories.length > 0 && (
+                      <div className="pt-2 border-t border-slate-700/60">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 block">
+                          Categories
+                        </span>
+                        <div className="flex flex-wrap gap-2">
+                          {searchSuggestions.matchingCategories.map((cat) => (
+                            <Link
+                              key={cat.slug}
+                              href={`/categories?slug=${cat.slug}`}
+                              onClick={() => setIsSearchFocused(false)}
+                              className="text-xs bg-teal-950/40 text-teal-300 border border-teal-800/60 hover:bg-teal-900/40 px-3 py-1.5 rounded-lg transition flex items-center gap-1.5"
+                            >
+                              <span>{cat.name}</span>
+                              <span className="text-[10px] text-teal-500 font-bold">({cat.count})</span>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Quick Product Hits */}
+                    {searchSuggestions.matchedProducts.length > 0 && (
+                      <div className="pt-2 border-t border-slate-700/60">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 block">
+                          Products
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {searchSuggestions.matchedProducts.map((p) => (
+                            <Link
+                              key={p.id}
+                              href={`/product/${p.id}`}
+                              onClick={() => {
+                                saveRecentSearch(p.name);
+                                setIsSearchFocused(false);
+                              }}
+                              className="flex items-center gap-3 p-2 rounded-xl bg-slate-900/60 hover:bg-slate-700/70 border border-slate-700/50 transition group"
+                            >
+                              <img src={p.image} alt={p.name} className="w-10 h-10 object-contain rounded-lg bg-white p-0.5" />
+                              <div className="flex-1 min-w-0">
+                                <h4 className="text-xs font-bold text-white group-hover:text-teal-400 truncate">
+                                  {p.name}
+                                </h4>
+                                <div className="flex items-center gap-2 text-[11px] text-slate-400">
+                                  <span>{p.unitName}</span>
+                                  <span className="text-teal-400 font-bold">{formatCurrency(p.price)}</span>
+                                </div>
+                              </div>
+                              <ChevronRight className="w-4 h-4 text-slate-500 group-hover:text-teal-400" />
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  /* 2. When query is empty: show Recent Searches & Trending Searches */
+                  <div className="space-y-4">
+                    {/* Recent Searches */}
+                    {recentSearches.length > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                            <Clock className="w-3.5 h-3.5" /> Recent Searches
+                          </span>
+                          <button
+                            onClick={clearAllRecentSearches}
+                            className="text-[11px] text-slate-400 hover:text-rose-400 font-semibold"
+                          >
+                            Clear All
+                          </button>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {recentSearches.map((term) => (
+                            <div
+                              key={term}
+                              onClick={() => handleSelectSearchTerm(term)}
+                              className="cursor-pointer text-xs bg-slate-900 hover:bg-slate-700 text-slate-200 pl-3 pr-2 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-2"
+                            >
+                              <span>{term}</span>
+                              <button
+                                onClick={(e) => removeRecentSearch(term, e)}
+                                className="text-slate-400 hover:text-white p-0.5 rounded"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Trending Searches */}
+                    <div className={recentSearches.length > 0 ? 'pt-3 border-t border-slate-700/60' : ''}>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-teal-400 flex items-center gap-1.5 mb-2">
+                        <Sparkles className="w-3.5 h-3.5" /> Trending in Quick Commerce
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {TRENDING_SEARCH_KEYWORDS.map((kw) => (
+                          <button
+                            key={kw}
+                            onClick={() => handleSelectSearchTerm(kw)}
+                            className="text-xs bg-slate-900 hover:bg-teal-950/60 hover:border-teal-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5"
+                          >
+                            <span className="text-teal-400">🔥</span>
+                            <span>{kw}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Quick Category Jump */}
+                    <div className="pt-3 border-t border-slate-700/60">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 block">
+                        Browse Departments
+                      </span>
+                      <div className="flex flex-wrap gap-2">
+                        {STATIC_CATEGORIES.map((cat) => (
+                          <Link
+                            key={cat.slug}
+                            href={`/categories?slug=${cat.slug}`}
+                            onClick={() => setIsSearchFocused(false)}
+                            className="text-xs bg-slate-900 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition"
+                          >
+                            {cat.name}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <button
@@ -314,6 +569,7 @@ export default function SearchPage() {
             {scanNotice}
           </div>
         )}
+
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm font-medium text-slate-400 font-inter">
             {debouncedQuery
@@ -352,12 +608,23 @@ export default function SearchPage() {
 
         {/* Empty */}
         {!loading && (baseResults.length === 0 ? !isError : true) && results.length === 0 && (
-          <div className="text-center py-16 space-y-2">
+          <div className="text-center py-16 space-y-3">
             <div className="text-4xl">🔍</div>
             <p className="font-bold text-white">No products found</p>
             <p className="text-xs text-slate-400">
-              {debouncedQuery ? 'Try a different search term or filter.' : 'Start typing to search the catalog.'}
+              {debouncedQuery ? 'Try checking your spelling or trying a broader term.' : 'Start typing to search the catalog.'}
             </p>
+            <div className="pt-4 flex flex-wrap justify-center gap-2 max-w-md mx-auto">
+              {TRENDING_SEARCH_KEYWORDS.slice(0, 4).map((kw) => (
+                <button
+                  key={kw}
+                  onClick={() => handleSelectSearchTerm(kw)}
+                  className="text-xs bg-slate-800 text-teal-300 border border-slate-700 px-3 py-1.5 rounded-lg"
+                >
+                  Search &ldquo;{kw}&rdquo;
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -375,7 +642,7 @@ export default function SearchPage() {
                   <div>
                     <Link href={`/product/${item.id}`} className="relative block aspect-square rounded-xl overflow-hidden mb-3 bg-slate-900">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                      <img src={item.image} alt={item.name} className="w-full h-full object-contain p-2" />
                       {item.isOrganic && (
                         <span className="absolute top-2 left-2 bg-emerald-500 text-white text-[10px] font-extrabold px-2 py-0.5 rounded shadow">
                           Organic

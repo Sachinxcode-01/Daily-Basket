@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/language_provider.dart';
 import '../../../../core/providers/cart_provider.dart';
+import '../../../../core/data/products_catalog_data.dart';
+import '../../../../core/widgets/app_network_image.dart';
 import '../../../referral/providers/coupon_provider.dart';
 import '../../../wallet/providers/wallet_provider.dart';
 import 'empty_basket_screen.dart';
@@ -675,6 +677,153 @@ color: Color(0xFF6E7A6C),
                           }),
                         ),
                       ),
+
+                // Before You Checkout / Impulse Add-ons (Flipkart / Blinkit pattern)
+                const SizedBox(height: 18),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.bolt_rounded, color: Color(0xFF006B23), size: 20),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Before You Checkout',
+                          style: GoogleFonts.outfit(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: const Color(0xFF1A1C1E),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F5E9),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        'Essentials',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF006B23),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  height: 175,
+                  child: ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: (kAllCatalogProducts['bread-pav'] ?? []).take(6).length,
+                    itemBuilder: (ctx, i) {
+                      final item = (kAllCatalogProducts['bread-pav'] ?? [])[i];
+                      final pName = item['name']?.toString() ?? 'Daily Bread';
+                      final pPrice = (item['price'] as num?)?.round() ?? 45;
+                      final pUnit = (item['unit'] ?? item['subtitle'] ?? '1 Pack').toString();
+                      final pImg = item['image']?.toString() ?? '';
+                      final pId = item['id']?.toString() ?? 'rec_$i';
+
+                      return Container(
+                        width: 130,
+                        margin: const EdgeInsets.only(right: 12),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: const Color(0xFFBECAB9).withValues(alpha: 0.3),
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.02),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: AppNetworkImage(
+                                imageUrl: pImg,
+                                height: 75,
+                                width: double.infinity,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Text(
+                              pName,
+                              style: GoogleFonts.outfit(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF1A1C1E),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              pUnit,
+                              style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C)),
+                            ),
+                            const Spacer(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  '₹$pPrice',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: const Color(0xFF006B23),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    if (cartProvider != null) {
+                                      cartProvider.updateQuantityById(
+                                        id: pId,
+                                        name: pName,
+                                        subtitle: pUnit,
+                                        price: pPrice.toDouble(),
+                                        image: pImg,
+                                        delta: 1,
+                                      );
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Added $pName to cart'),
+                                          duration: const Duration(seconds: 1),
+                                          backgroundColor: const Color(0xFF006B23),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFF006B23),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: const Icon(Icons.add_rounded, size: 16, color: Colors.white),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
 
                 if (cartProvider != null && cartProvider.savedForLater.isNotEmpty) ...[
                   const SizedBox(height: 20),

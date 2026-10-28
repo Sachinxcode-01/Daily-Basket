@@ -126,6 +126,32 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     return "${widget.productName} ($_effectiveUnit). Premium quality $sub sourced fresh and quality tested by $_effectiveBrand. Delivered in 10-15 minutes.";
   }
 
+  bool get _isOrganic => (_catalogProduct?['isOrganic'] as bool?) ?? false;
+
+  String get _effectiveStorage =>
+      (_catalogProduct?['storage'] as String?) ?? 'Store in a cool & dry place';
+
+  String get _effectiveShelfLife =>
+      (_catalogProduct?['shelfLife'] as String?) ?? '2-3 Days';
+
+  String get _effectiveChefTip =>
+      (_catalogProduct?['chefTip'] as String?) ??
+      'Best enjoyed fresh within 48 hours for optimal flavor and nutrient retention.';
+
+  Map<String, String> get _catalogNutrition {
+    final raw = _catalogProduct?['nutrition'];
+    if (raw is Map) {
+      return raw.map((k, v) => MapEntry(k.toString(), v.toString()));
+    }
+    return {
+      'Calories': '135 kcal',
+      'Protein': '4.2 g',
+      'Total Fat': '2.1 g',
+      'Carbohydrates': '22.0 g',
+      'Dietary Fiber': '3.5 g',
+    };
+  }
+
   List<String> get _galleryImages {
     final primary = widget.imageUrl.isNotEmpty
         ? widget.imageUrl
@@ -230,7 +256,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                         ),
                         Text(
-                          'Get instant recipes & nutrition hacks for ${widget.productName}',
+                          'Instant tips & culinary insights for ${widget.productName}',
                           style: GoogleFonts.inter(
                             fontSize: 12,
                             color: AppColors.onSurfaceVariant,
@@ -243,21 +269,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
               const SizedBox(height: 20),
               _aiSuggestionTile(
-                icon: Icons.restaurant_menu_rounded,
-                title: 'Classic Guacamole Recipe',
-                subtitle: 'Mash 2 avocados with lime juice, cilantro, red onion, & sea salt.',
+                icon: Icons.lightbulb_rounded,
+                title: 'Master Chef Pro Tip',
+                subtitle: _effectiveChefTip,
               ),
               const SizedBox(height: 12),
               _aiSuggestionTile(
                 icon: Icons.health_and_safety_rounded,
-                title: 'Ripening Hack',
-                subtitle: 'Store in a brown paper bag with a banana for 24 hours to accelerate ripening.',
+                title: 'Storage & Freshness',
+                subtitle: '$_effectiveStorage. Shelf life is $_effectiveShelfLife under standard conditions.',
               ),
               const SizedBox(height: 12),
               _aiSuggestionTile(
-                icon: Icons.fitness_center_rounded,
-                title: 'Keto Nutritional Pairing',
-                subtitle: 'Pair with poached eggs & whole grain sourdough for high-protein breakfast.',
+                icon: Icons.restaurant_menu_rounded,
+                title: 'Pairing Suggestions',
+                subtitle: 'Pairs exceptionally well with daily breakfast essentials and fresh ingredients.',
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -404,31 +430,32 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 ),
                               ),
                       ),
-                      Positioned(
-                        top: 12,
-                        left: 12,
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(20),
+                      if (_isOrganic)
+                        Positioned(
+                          top: 12,
+                          left: 12,
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.eco_rounded, color: Colors.white, size: 14),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Certified Organic',
+                                      style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                                    ),
+                                  ],
+                                ),
                               ),
-                              child: Row(
-                                children: [
-                                  const Icon(Icons.eco_rounded, color: Colors.white, size: 14),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'Certified Organic',
-                                    style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
                       Positioned(
                         bottom: 12,
                         left: 0,
@@ -705,11 +732,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _nutritionPill('160 kcal', 'ENERGY'),
-                      _nutritionPill('2.0 g', 'PROTEIN'),
-                      _nutritionPill('14.7 g', 'FAT'),
-                      _nutritionPill('8.5 g', 'CARBS'),
-                      _nutritionPill('6.7 g', 'FIBER'),
+                      _nutritionPill(_catalogNutrition['Calories'] ?? '135 kcal', 'ENERGY'),
+                      _nutritionPill(_catalogNutrition['Protein'] ?? '4.2 g', 'PROTEIN'),
+                      _nutritionPill(_catalogNutrition['Total Fat'] ?? _catalogNutrition['Fat'] ?? '2.1 g', 'FAT'),
+                      _nutritionPill(_catalogNutrition['Carbohydrates'] ?? _catalogNutrition['Carbs'] ?? '22.0 g', 'CARBS'),
+                      _nutritionPill(_catalogNutrition['Dietary Fiber'] ?? _catalogNutrition['Fiber'] ?? '3.5 g', 'FIBER'),
                     ],
                   ),
                 ),
@@ -720,7 +747,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 InkWell(
                   onTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const ReviewsRecommendationsScreen()),
+                      MaterialPageRoute(
+                        builder: (_) => ReviewsRecommendationsScreen(
+                          productId: widget.productId,
+                          productName: widget.productName,
+                          category: _effectiveCategory,
+                          rating: 4.8,
+                          reviewCount: 142,
+                          productImage: widget.imageUrl,
+                        ),
+                      ),
                     );
                   },
                   borderRadius: BorderRadius.circular(16),
@@ -739,7 +775,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '4.8 Star Rating (128 Verified Reviews)',
+                              '4.8 Star Rating (142 Verified Reviews)',
                               style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.onSurface),
                             ),
                             Text(

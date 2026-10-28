@@ -1,14 +1,43 @@
-import { Controller, Get, Post, Delete, Param, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { Controller, Get, Post, Delete, Param, Query, Body } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { FavoritesService } from './favorites.service';
 
 @ApiTags('Favorites & Wishlist')
-@Controller('favorites')
+@Controller(['favorites', 'wishlist'])
 export class FavoritesController {
   constructor(private readonly favoritesService: FavoritesService) {}
 
+  @Get('count')
+  @ApiOperation({ summary: 'Get total wishlist/favorite count for user' })
+  @ApiQuery({ name: 'userId', required: false })
+  async getFavoritesCount(@Query('userId') userId?: string) {
+    const count = await this.favoritesService.getFavoritesCount(userId);
+    return { count };
+  }
+
+  @Post('sync')
+  @ApiOperation({ summary: 'Batch sync guest wishlist/favorites to authenticated user account' })
+  @ApiQuery({ name: 'userId', required: false })
+  @ApiBody({ schema: { type: 'object', properties: { productIds: { type: 'array', items: { type: 'string' } } } } })
+  async syncGuestWishlist(
+    @Query('userId') userId: string,
+    @Body('productIds') productIds: string[],
+  ) {
+    return this.favoritesService.syncGuestWishlist(userId, productIds);
+  }
+
+  @Post(':productId/move-to-cart')
+  @ApiOperation({ summary: 'Atomically move product from wishlist/favorites into cart' })
+  @ApiQuery({ name: 'userId', required: false })
+  async moveToCart(
+    @Query('userId') userId: string,
+    @Param('productId') productId: string,
+  ) {
+    return this.favoritesService.moveToCart(userId, productId);
+  }
+
   @Get()
-  @ApiOperation({ summary: 'Get user favorite products with search, category filter, and sorting' })
+  @ApiOperation({ summary: 'Get user favorite/wishlist products with search, category filter, and sorting' })
   @ApiQuery({ name: 'userId', required: false })
   @ApiQuery({ name: 'query', required: false })
   @ApiQuery({ name: 'categoryId', required: false })

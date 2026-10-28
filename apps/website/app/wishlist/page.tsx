@@ -5,11 +5,15 @@
 'use client';
 
 import React, { useState } from 'react';
-
 import Link from 'next/link';
+import { formatCurrency } from '@daily-basket/shared-utils';
+import { useCart } from '../../store/useCart';
+import { ALL_WEBSITE_PRODUCTS, getWishlistRecommendations } from '../../lib/catalog';
+import { ProductRecommendationsCarousel } from '../../components/ProductRecommendationsCarousel';
 
 interface FavoriteProduct {
   id: string;
+  variantId: string;
   name: string;
   brand: string;
   weight: string;
@@ -22,58 +26,63 @@ interface FavoriteProduct {
   imageUrl: string;
 }
 
+// Seed with authentic catalog items from bread, milk, vegetables, cereals
 const INITIAL_FAVORITES: FavoriteProduct[] = [
   {
-    id: 'prod-001',
-    name: 'Organic Farm Fresh Tomatoes',
-    brand: 'Organic India',
+    id: 'prod_veg_001',
+    variantId: 'var_veg_001',
+    name: 'Fresh Hybrid Tomatoes',
+    brand: 'Farm Fresh',
     weight: '500g',
-    mrp: 55,
-    price: 45,
-    discountPercent: 18,
+    mrp: 35,
+    price: 28,
+    discountPercent: 20,
     category: 'Fresh Vegetables',
-    categoryId: 'cat-veg',
+    categoryId: 'fresh-vegetables',
     stockStatus: 'IN_STOCK',
-    imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=400',
+    imageUrl: '/products/fresh-vegetables/fresh-vegetables_001.webp',
   },
   {
-    id: 'prod-003',
-    name: 'Amul Taaza Toned Fresh Milk',
+    id: 'prod_milk_001',
+    variantId: 'var_milk_001',
+    name: 'Amul Taaza Homogenised Toned Milk',
     brand: 'Amul',
     weight: '1 L',
     mrp: 75,
     price: 68,
     discountPercent: 9,
-    category: 'Dairy & Eggs',
-    categoryId: 'cat-dairy',
+    category: 'Fresh Milk',
+    categoryId: 'milk',
     stockStatus: 'IN_STOCK',
-    imageUrl: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400',
+    imageUrl: '/products/milk/milk_001.webp',
   },
   {
-    id: 'prod-005',
-    name: 'Aashirvaad Shuddh Chakki Atta',
-    brand: 'Aashirvaad',
-    weight: '5 kg',
-    mrp: 310,
-    price: 265,
-    discountPercent: 15,
-    category: 'Atta, Rice & Dal',
-    categoryId: 'cat-staples',
+    id: 'prod_bread_001',
+    variantId: 'var_bread_001',
+    name: 'English Oven 100% Whole Wheat Bread',
+    brand: 'English Oven',
+    weight: '400g',
+    mrp: 55,
+    price: 48,
+    discountPercent: 12,
+    category: 'Bread & Pav',
+    categoryId: 'bread-pav',
     stockStatus: 'IN_STOCK',
-    imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?w=400',
+    imageUrl: '/products/bread-pav/bread-pav_001.webp',
   },
   {
-    id: 'prod-007',
-    name: 'Cold-Pressed Almond Oil',
-    brand: 'Banyan Botanicals',
-    weight: '500 ml',
-    mrp: 699,
-    price: 599,
+    id: 'prod_flakes_001',
+    variantId: 'var_flakes_001',
+    name: "Kellogg's Real Almond & Honey Corn Flakes",
+    brand: "Kellogg's",
+    weight: '500g',
+    mrp: 220,
+    price: 189,
     discountPercent: 14,
-    category: 'Oils & Ghee',
-    categoryId: 'cat-oils',
-    stockStatus: 'LOW_STOCK',
-    imageUrl: 'https://images.unsplash.com/photo-1474979266404-7eaacbcd87c5?w=400',
+    category: 'Flakes & Cereals',
+    categoryId: 'flakes-kids-cereals',
+    stockStatus: 'IN_STOCK',
+    imageUrl: '/products/flakes-kids-cereals/flakes-kids-cereals_001.webp',
   },
 ];
 
@@ -82,6 +91,7 @@ export default function WishlistPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [sortBy, setSortBy] = useState('RECENTLY_ADDED');
+  const { addItem } = useCart();
 
   const removeFavorite = (id: string) => {
     setFavorites((prev) => prev.filter((item) => item.id !== id));
@@ -159,16 +169,17 @@ export default function WishlistPage() {
               className="bg-slate-800 border border-slate-700 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-teal-500"
             >
               <option value="ALL">All Categories</option>
-              <option value="cat-veg">Fresh Vegetables</option>
-              <option value="cat-dairy">Dairy & Eggs</option>
-              <option value="cat-staples">Atta, Rice & Dal</option>
-              <option value="cat-oils">Oils & Ghee</option>
+              <option value="fresh-vegetables">Fresh Vegetables</option>
+              <option value="milk">Fresh Milk</option>
+              <option value="bread-pav">Bread & Pav</option>
+              <option value="curd-yogurt">Curd & Yogurt</option>
+              <option value="flakes-kids-cereals">Flakes & Cereals</option>
             </select>
 
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="bg-slate-800 border border-slate-700 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-teal-500"
+              className="bg-slate-800 border border-slate-700 rounded-xl py-3 px-4 text-sm text-white focus:outline-none focus:border-emerald-500"
             >
               <option value="RECENTLY_ADDED">Recently Added</option>
               <option value="PRICE_LOW_HIGH">Price: Low → High</option>
@@ -192,7 +203,7 @@ export default function WishlistPage() {
             </p>
             <Link
               href="/"
-              className="inline-block px-6 py-3 bg-teal-600 hover:bg-teal-500 text-white font-bold rounded-xl transition"
+              className="inline-block px-6 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition"
             >
               Browse Products
             </Link>
@@ -202,23 +213,25 @@ export default function WishlistPage() {
             {filteredFavorites.map((product) => (
               <div
                 key={product.id}
-                className="bg-slate-800 border border-slate-700/60 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-teal-500/50 transition duration-300"
+                className="bg-slate-800 border border-slate-700/60 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-emerald-500/50 transition duration-300"
               >
                 <div className="relative">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-48 object-cover"
-                  />
+                  <Link href={`/product/${product.id}`} className="block">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={product.imageUrl}
+                      alt={product.name}
+                      className="w-full h-48 object-cover hover:scale-105 transition duration-300"
+                    />
+                  </Link>
                   {product.discountPercent > 0 && (
-                    <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md">
+                    <span className="absolute top-3 left-3 bg-rose-500 text-white text-xs font-bold px-2 py-1 rounded-md">
                       {product.discountPercent}% OFF
                     </span>
                   )}
                   <button
                     onClick={() => removeFavorite(product.id)}
-                    className="absolute top-3 right-3 p-2 bg-slate-900/80 hover:bg-red-500/20 text-red-500 rounded-full backdrop-blur-sm transition"
+                    className="absolute top-3 right-3 p-2 bg-slate-900/80 hover:bg-rose-500/20 text-rose-500 rounded-full backdrop-blur-sm transition"
                     title="Remove from favorites"
                   >
                     ❤️
@@ -227,17 +240,21 @@ export default function WishlistPage() {
 
                 <div className="p-4 flex-1 flex flex-col justify-between">
                   <div>
-                    <span className="text-xs font-semibold text-teal-400">{product.brand}</span>
-                    <h4 className="text-sm font-bold text-white mt-1 line-clamp-2">{product.name}</h4>
+                    <span className="text-xs font-semibold text-emerald-400">{product.brand}</span>
+                    <Link href={`/product/${product.id}`}>
+                      <h4 className="text-sm font-bold text-white mt-1 line-clamp-2 hover:text-emerald-300 transition">
+                        {product.name}
+                      </h4>
+                    </Link>
                     <p className="text-xs text-slate-400 mt-1">{product.weight}</p>
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-slate-700/50">
                     <div className="flex items-baseline justify-between mb-3">
                       <div>
-                        <span className="text-lg font-bold text-teal-400">₹{product.price}</span>
+                        <span className="text-lg font-bold text-emerald-400">{formatCurrency(product.price)}</span>
                         {product.mrp > product.price && (
-                          <span className="text-xs text-slate-500 line-through ml-2">₹{product.mrp}</span>
+                          <span className="text-xs text-slate-500 line-through ml-2">{formatCurrency(product.mrp)}</span>
                         )}
                       </div>
                       <span
@@ -252,8 +269,16 @@ export default function WishlistPage() {
                     </div>
 
                     <button
-                      onClick={() => alert(`Added "${product.name}" to cart!`)}
-                      className="w-full py-2.5 bg-teal-600 hover:bg-teal-500 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2"
+                      onClick={() =>
+                        addItem.mutate({
+                          variantId: product.variantId,
+                          productName: product.name,
+                          unitName: product.weight,
+                          price: product.price,
+                          quantity: 1,
+                        })
+                      }
+                      className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition flex items-center justify-center gap-2 shadow-md shadow-emerald-900/30"
                     >
                       🛒 Add to Cart
                     </button>
@@ -263,6 +288,16 @@ export default function WishlistPage() {
             ))}
           </div>
         )}
+
+        {/* Wishlist-based Recommendations */}
+        <div className="mt-14 pt-8 border-t border-slate-800">
+          <ProductRecommendationsCarousel
+            title="Recommended For You Based on Your Wishlist"
+            subtitle="Curated picks matching your favorite taste profile and top categories"
+            products={getWishlistRecommendations(favorites.map((f) => f.id), 8)}
+            badge="Personalized Picks"
+          />
+        </div>
       </div>
     </div>
   );

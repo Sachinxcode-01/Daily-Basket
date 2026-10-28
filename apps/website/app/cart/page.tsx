@@ -7,14 +7,15 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, ShoppingBag, Plus, Minus, Tag, ChevronRight, Zap, Loader2 } from 'lucide-react';
+import { ArrowLeft, ShoppingBag, Plus, Minus, Tag, ChevronRight, Zap, Loader2, Sparkles, Check } from 'lucide-react';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../store/useCart';
+import { getCartRecommendations, WebsiteProduct } from '../../lib/catalog';
 
 export default function CartPage() {
   const router = useRouter();
-  const { activeItems, summary, isLoading, isError, refetch, updateItem, clear, userId } = useCart();
+  const { activeItems, summary, isLoading, isError, refetch, addItem, updateItem, clear, userId } = useCart();
 
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
@@ -144,6 +145,79 @@ export default function CartPage() {
               </div>
             ))}
           </div>
+
+          {/* Before You Checkout / Frequently Bought Together Essentials */}
+          {(() => {
+            const recommended = getCartRecommendations(activeItems.map((i) => i.variantId || i.id), 8);
+            if (!recommended || recommended.length === 0) return null;
+            return (
+              <div className="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-amber-400" />
+                    <div>
+                      <h3 className="text-sm font-extrabold text-white">Before You Checkout</h3>
+                      <p className="text-xs text-slate-400">Frequently bought together with items in your cart</p>
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+                    Quick Add
+                  </span>
+                </div>
+
+                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none pt-1">
+                  {recommended.map((prod) => (
+                    <div
+                      key={prod.id}
+                      className="min-w-[150px] max-w-[150px] bg-slate-900 border border-slate-700/80 rounded-xl p-2.5 flex flex-col justify-between hover:border-emerald-500/50 transition group flex-shrink-0"
+                    >
+                      <Link href={`/product/${prod.id}`} className="block">
+                        <div className="w-full h-24 bg-slate-950 rounded-lg overflow-hidden flex items-center justify-center mb-2">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={prod.image}
+                            alt={prod.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                          />
+                        </div>
+                        <h4 className="text-xs font-bold text-white line-clamp-2 leading-tight">
+                          {prod.name}
+                        </h4>
+                        <p className="text-[11px] text-slate-400 mt-0.5">{prod.unitName}</p>
+                      </Link>
+
+                      <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between">
+                        <div>
+                          <span className="text-xs font-black text-emerald-400">{formatCurrency(prod.price)}</span>
+                          {prod.mrp > prod.price && (
+                            <span className="text-[10px] text-slate-500 line-through block leading-none">
+                              {formatCurrency(prod.mrp)}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => {
+                            addItem.mutate({
+                              variantId: prod.variantId,
+                              productName: prod.name,
+                              unitName: prod.unitName,
+                              price: prod.price,
+                              quantity: 1,
+                            });
+                          }}
+                          disabled={addItem.isPending}
+                          className="w-7 h-7 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white rounded-lg flex items-center justify-center font-bold text-xs shadow-md transition"
+                          title="Add to cart"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
 
           {/* Coupon Code Section */}
           <div className="bg-slate-800/80 border border-slate-700/60 p-4 rounded-2xl space-y-3">
