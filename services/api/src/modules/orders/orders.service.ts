@@ -718,4 +718,190 @@ export class OrdersService {
 
     return { success: true, orderId: cleanId, status: newStatus };
   }
+
+  /**
+   * One-click Reorder Purchase: clones past order items into active basket
+   */
+  async reorderPurchase(orderId: string, userId: string) {
+    const order = await this.findOne(orderId);
+    if (!order) {
+      throw new NotFoundException(`Order #${orderId} not found.`);
+    }
+
+    const reorderedItems = [];
+    const unavailableItems = [];
+
+    for (const item of order.items || []) {
+      const variant = await this.prisma.productVariant.findUnique({
+        where: { id: item.variantId },
+        include: { product: true },
+      });
+
+      if (variant && variant.isAvailable) {
+        reorderedItems.push({
+          productId: variant.productId,
+          variantId: variant.id,
+          productName: item.productName || variant.product?.name,
+          unitName: item.unitName || variant.unitName,
+          price: variant.price,
+          mrp: variant.mrp,
+          quantity: item.quantity || 1,
+          imageUrl: variant.product?.images?.[0] || null,
+        });
+      } else {
+        unavailableItems.push({
+          productName: item.productName,
+          reason: 'Currently out of stock',
+        });
+      }
+    }
+
+    return {
+      success: true,
+      orderNumber: order.orderNumber,
+      reorderedItems,
+      unavailableItems,
+      message: `Successfully prepared ${reorderedItems.length} items for instant reorder.`,
+    };
+  }
+
+  /**
+   * Detailed GST Tax Invoice Generation & Printable Template
+   */
+  async getInvoice(orderId: string) {
+    const order = await this.findOne(orderId);
+    if (!order) {
+      throw new NotFoundException(`Order #${orderId} not found.`);
+    }
+
+    const invoiceNumber = `INV-${order.orderNumber || order.id.slice(0, 8).toUpperCase()}`;
+    const invoiceDate = new Date(order.createdAt || Date.now()).toLocaleDateString('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+
+    const subtotal = Number(order.subtotal) || 0;
+    const cgst = Math.round((subtotal * 0.025) * 100) / 100;
+    const sgst = Math.round((subtotal * 0.025) * 100) / 100;
+    const deliveryFee = Number(order.deliveryFee) || 0;
+    const discount = Number(order.discount) || 0;
+    const totalAmount = Number(order.totalAmount) || 0;
+
+    const htmlInvoice = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Tax Invoice - ${invoiceNumber}</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 40px; color: #1a1c1e; }
+    .header { display: flex; justify-content: space-between; border-bottom: 2px solid #2d9d43; padding-bottom: 16px; margin-bottom: 24px; }
+    .brand { font-size: 24px; font-weight: bold; color: #2d9d43; }
+    .meta { text-align: right; font-size: 13px; color: #555; }
+    .address-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; font-size: 13px; margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+    th { background: #f3f3f6; text-align: left; padding: 10px; font-size: 12px; border-bottom: 1px solid #ddd; }
+    td { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
+    .totals { width: 300px; margin-left: auto; font-size: 13px; }
+    .totals div { display: flex; justify-content: space-between; padding: 4px 0; }
+    .grand-total { font-weight: bold; font-size: 16px; border-top: 1px solid #1a1c1e; padding-top: 8px; margin-top: 8px; color: #2d9d43; }
+    .footer { text-align: center; margin-top: 40px; font-size: 12px; color: #888; border-top: 1px dashed #ccc; padding-top: 16px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <div class="brand">DAILY BASKET</div>
+      <div style="font-size: 12px; color: #666; margin-top: 4px;">Ultrafast Kirana & Fresh Produce</div>
+      <div style="font-size: 11px; color: #888;">FSSAI Lic No: 11224334000189 | GSTIN: 29AABCU9603R1ZM</div>
+    </div>
+    <div class="meta">
+      <strong>TAX INVOICE</strong><br/>
+      Invoice No: ${invoiceNumber}<br/>
+      Order No: ${order.orderNumber}<br/>
+      Date: ${invoiceDate}
+    </div>
+  </div>
+
+  <div class="address-grid">
+    <div>
+      <strong>Sold By:</strong><br/>
+      Daily Basket Dark Store #01<br/>
+      100ft Road, Koramangala 4th Block<br/>
+      Bengaluru, Karnataka - 560034
+    </div>
+    <div>
+      <strong>Delivered To:</strong><br/>
+      ${order.address?.streetAddress || order.address?.street || 'Customer Address'}<br/>
+      ${order.address?.city || 'Bengaluru'} - ${order.address?.pincode || '560034'}<br/>
+      Phone: ${order.address?.phoneNumber || '+91 Verified Shopper'}
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item Description</th>
+        <th>HSN</th>
+        <th>Qty</th>
+        <th>Rate</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${(order.items || []).map((it: any, idx: number) => `
+        <tr>
+          <td>${idx + 1}</td>
+          <td>${it.productName || 'Grocery Item'}</td>
+          <td>0801</td>
+          <td>${it.quantity || 1}</td>
+          <td>₹${it.price || 0}</td>
+          <td>₹${(it.quantity || 1) * (it.price || 0)}</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <div><span>Subtotal:</span><span>₹${subtotal}</span></div>
+    <div><span>CGST (2.5%):</span><span>₹${cgst}</span></div>
+    <div><span>SGST (2.5%):</span><span>₹${sgst}</span></div>
+    <div><span>Delivery Fee:</span><span>${deliveryFee === 0 ? 'FREE' : `₹${deliveryFee}`}</span></div>
+    ${discount > 0 ? `<div><span>Discount Applied:</span><span style="color:#2d9d43;">-₹${discount}</span></div>` : ''}
+    <div class="grand-total"><span>Total Paid:</span><span>₹${totalAmount}</span></div>
+  </div>
+
+  <div class="footer">
+    Thank you for shopping local with Daily Basket! 💚<br/>
+    This is a computer generated invoice and requires no physical signature.
+  </div>
+</body>
+</html>
+    `;
+
+    return {
+      invoiceNumber,
+      orderNumber: order.orderNumber,
+      invoiceDate,
+      store: {
+        name: 'Daily Basket Dark Store #01',
+        gstin: '29AABCU9603R1ZM',
+        fssai: '11224334000189',
+        address: '100ft Road, Koramangala 4th Block, Bengaluru, 560034',
+      },
+      customer: {
+        address: order.address,
+      },
+      items: order.items,
+      subtotal,
+      cgst,
+      sgst,
+      deliveryFee,
+      discount,
+      totalAmount,
+      htmlInvoice,
+    };
+  }
 }

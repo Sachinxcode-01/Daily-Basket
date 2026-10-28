@@ -545,6 +545,145 @@ export class ApiClient {
     });
   }
 
+  public async getWishlistCount(userId = 'usr_default'): Promise<{ count: number }> {
+    return this.fetcher(`/api/v1/wishlist/count?userId=${encodeURIComponent(userId)}`);
+  }
+
+  public async syncWishlist(productIds: string[], userId = 'usr_default'): Promise<{ syncedCount: number }> {
+    return this.fetcher(`/api/v1/wishlist/sync?userId=${encodeURIComponent(userId)}`, {
+      method: 'POST',
+      body: JSON.stringify({ productIds }),
+    });
+  }
+
+  public async moveToCartFromWishlist(productId: string, userId = 'usr_default'): Promise<any> {
+    return this.fetcher(`/api/v1/wishlist/${encodeURIComponent(productId)}/move-to-cart?userId=${encodeURIComponent(userId)}`, {
+      method: 'POST',
+    });
+  }
+
+  // Recommendations & Substitutions
+  public async getRecommendations(
+    type: 'similar' | 'frequently_bought_together' | 'customers_also_viewed' | 'best_sellers' | 'popular' | 'new_arrivals' | 'cart_addons' = 'similar',
+    productId?: string,
+    categoryId?: string,
+    limit: number = 6,
+  ): Promise<any[]> {
+    const params = new URLSearchParams();
+    if (type) params.set('type', type);
+    if (productId) params.set('productId', productId);
+    if (categoryId) params.set('categoryId', categoryId);
+    if (limit) params.set('limit', String(limit));
+    return this.fetcher(`/api/v1/products/recommendations?${params.toString()}`);
+  }
+
+  public async getProductSubstitutes(productId: string): Promise<any[]> {
+    return this.fetcher(`/api/v1/products/${encodeURIComponent(productId)}/substitutes`);
+  }
+
+  public async auditCatalog(): Promise<any> {
+    return this.fetcher('/api/v1/products/audit-catalog');
+  }
+
+  public async autoFixCatalog(): Promise<any> {
+    return this.fetcher('/api/v1/products/auto-fix-catalog', { method: 'POST' });
+  }
+
+  // Product Reviews & Ratings
+  public async getProductReviews(productId: string, page = 1, limit = 20): Promise<any> {
+    return this.fetcher(`/api/v1/reviews/${encodeURIComponent(productId)}?page=${page}&limit=${limit}`);
+  }
+
+  public async submitProductReview(data: { productId: string; rating: number; comment?: string }): Promise<any> {
+    return this.fetcher('/api/v1/reviews', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async voteReviewHelpful(reviewId: string): Promise<any> {
+    return this.fetcher(`/api/v1/reviews/${encodeURIComponent(reviewId)}/helpful`, {
+      method: 'POST',
+    });
+  }
+
+  // Banner Management
+  public async getBanners(includeInactive = false): Promise<any[]> {
+    const endpoint = includeInactive ? '/api/v1/marketing/banners/admin' : '/api/v1/marketing/banners';
+    return this.fetcher(endpoint);
+  }
+
+  public async createBanner(data: {
+    title: string;
+    subtitle?: string;
+    imageUrl: string;
+    targetType?: string;
+    targetValue?: string;
+    badge?: string;
+    position?: number;
+    isActive?: boolean;
+  }): Promise<any> {
+    return this.fetcher('/api/v1/marketing/banners', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async updateBanner(id: string, data: any): Promise<any> {
+    return this.fetcher(`/api/v1/marketing/banners/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+  }
+
+  public async toggleBannerStatus(id: string, isActive: boolean): Promise<any> {
+    return this.fetcher(`/api/v1/marketing/banners/${encodeURIComponent(id)}/toggle`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isActive }),
+    });
+  }
+
+  public async deleteBanner(id: string): Promise<any> {
+    return this.fetcher(`/api/v1/marketing/banners/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
+  }
+
+  public async reorderBanners(orderedIds: string[]): Promise<any> {
+    return this.fetcher('/api/v1/marketing/banners/reorder', {
+      method: 'POST',
+      body: JSON.stringify({ orderedIds }),
+    });
+  }
+
+  // Order Enhancements: Reorder & Invoices
+  public async reorderPurchase(orderId: string): Promise<any> {
+    return this.fetcher(`/api/v1/orders/${encodeURIComponent(orderId)}/reorder`, {
+      method: 'POST',
+    });
+  }
+
+  public async getOrderInvoice(orderId: string): Promise<any> {
+    return this.fetcher(`/api/v1/orders/${encodeURIComponent(orderId)}/invoice`);
+  }
+
+  // In-App Notifications
+  public async getUserNotifications(page = 1, limit = 20): Promise<any> {
+    return this.fetcher(`/api/v1/notifications?page=${page}&limit=${limit}`);
+  }
+
+  public async markNotificationRead(notificationId: string): Promise<any> {
+    return this.fetcher(`/api/v1/notifications/${encodeURIComponent(notificationId)}/read`, {
+      method: 'PATCH',
+    });
+  }
+
+  public async markAllNotificationsRead(): Promise<any> {
+    return this.fetcher('/api/v1/notifications/mark-all-read', {
+      method: 'POST',
+    });
+  }
+
   // Admin Dashboard Methods
   public async getAdminDashboardSummary(storeId?: string): Promise<any> {
     const query = storeId ? `?storeId=${encodeURIComponent(storeId)}` : '';

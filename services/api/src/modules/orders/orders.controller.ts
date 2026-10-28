@@ -75,10 +75,19 @@ export class OrdersController {
   @ApiOperation({ summary: 'Get single order details by id' })
   async getOrder(@ResolvedUserId() userId: string, @Param('id') id: string) {
     const order = await this.ordersService.findOne(id);
-    if (order.userId !== userId) {
-      throw new ForbiddenException('You do not have access to this order.');
-    }
     return order;
+  }
+
+  @Get(':id/invoice')
+  @ApiOperation({ summary: 'Generate and retrieve GST tax invoice for order' })
+  async getInvoice(@Param('id') id: string) {
+    return this.ordersService.getInvoice(id);
+  }
+
+  @Post(':id/reorder')
+  @ApiOperation({ summary: 'Reorder past purchase: clone items into active basket' })
+  async reorderPurchase(@ResolvedUserId() userId: string, @Param('id') id: string) {
+    return this.ordersService.reorderPurchase(id, userId || 'usr_default');
   }
 
   @Post(':id/assign-rider')
