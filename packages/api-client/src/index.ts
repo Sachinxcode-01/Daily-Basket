@@ -656,10 +656,17 @@ export class ApiClient {
     });
   }
 
-  // Order Enhancements: Reorder & Invoices
+  // Order Enhancements: Reorder, Cancel & Invoices
   public async reorderPurchase(orderId: string): Promise<any> {
     return this.fetcher(`/api/v1/orders/${encodeURIComponent(orderId)}/reorder`, {
       method: 'POST',
+    });
+  }
+
+  public async cancelOrder(orderId: string, reason?: string): Promise<any> {
+    return this.fetcher(`/api/v1/orders/${encodeURIComponent(orderId)}/cancel`, {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
     });
   }
 

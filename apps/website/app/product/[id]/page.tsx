@@ -3,16 +3,18 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import {
   ArrowLeft, Search, Heart, Share2, ChevronDown, Sparkles, Send, Leaf,
   Star, Clock, Minus, Plus, Loader2, ShieldCheck, Bell, AlertTriangle,
-  PackageCheck, CheckCircle2, Layers, Check, Info, Award
+  PackageCheck, CheckCircle2, Layers, Check, Info, Award, ZoomIn, X, Zap
 } from 'lucide-react';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../../store/useCart';
+import { useWishlist } from '../../../store/useWishlist';
+import { useAuthStore } from '../../../store/useAuthStore';
 import {
   getProductById,
   normalizeImagePath,
@@ -44,13 +46,16 @@ export default function ProductDetailsPage({ params }: { params?: { id?: string 
     }
   }, [rawId]);
 
+  const router = useRouter();
+  const { user } = useAuthStore();
   const { addItem } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
   const { viewedIds, addViewedProduct, clearRecentlyViewed } = useRecentlyViewed();
 
   const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [activeThumb, setActiveThumb] = useState(0);
-  const [isFavorited, setIsFavorited] = useState(false);
+  const [isZoomOpen, setIsZoomOpen] = useState(false);
   const [detailsOpen, setDetailsOpen] = useState(true);
   const [nutritionOpen, setNutritionOpen] = useState(true);
   const [added, setAdded] = useState(false);
@@ -279,15 +284,15 @@ export default function ProductDetailsPage({ params }: { params?: { id?: string 
           </span>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setIsFavorited(!isFavorited)}
-              className={`p-2 rounded-full border transition ${
-                isFavorited
-                  ? 'bg-rose-50 border-rose-200 text-rose-500'
-                  : 'bg-white border-[#e2e2e5] text-slate-500 hover:text-slate-800'
+              onClick={() => toggleWishlist(p.id, user?.id)}
+              className={`p-2 rounded-full border transition flex items-center justify-center ${
+                isWishlisted(p.id)
+                  ? 'bg-rose-50 border-rose-200 text-rose-500 shadow-xs'
+                  : 'bg-white border-[#e2e2e5] text-slate-500 hover:text-rose-500 hover:border-rose-200'
               }`}
-              title="Save to Wishlist"
+              title={isWishlisted(p.id) ? 'Remove from Wishlist' : 'Save to Wishlist'}
             >
-              <Heart className={`w-4 h-4 ${isFavorited ? 'fill-rose-500' : ''}`} />
+              <Heart className={`w-4 h-4 ${isWishlisted(p.id) ? 'fill-rose-500 text-rose-500' : ''}`} />
             </button>
             <button
               onClick={() => {
@@ -313,12 +318,23 @@ export default function ProductDetailsPage({ params }: { params?: { id?: string 
         <section className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
           {/* Left: Gallery */}
           <div className="space-y-4">
-            <div className="relative w-full aspect-square bg-white border border-[#e2e2e5] rounded-3xl overflow-hidden p-6 flex items-center justify-center shadow-xs">
+            <div className="relative w-full aspect-square bg-white border border-[#e2e2e5] rounded-3xl overflow-hidden p-6 flex items-center justify-center shadow-xs group">
               <img
                 src={images[activeThumb] || images[0]}
                 alt={p.name}
-                className="w-full h-full object-contain hover:scale-105 transition-transform duration-300"
+                className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300 cursor-zoom-in"
+                onClick={() => setIsZoomOpen(true)}
               />
+
+              {/* Zoom Action Trigger Overlay */}
+              <button
+                onClick={() => setIsZoomOpen(true)}
+                className="absolute bottom-4 right-4 bg-white/90 hover:bg-white text-slate-700 p-2 rounded-full border border-[#e2e2e5] shadow-xs flex items-center gap-1.5 text-xs font-semibold backdrop-blur-xs transition hover:scale-105"
+                title="Click to zoom image"
+              >
+                <ZoomIn className="w-4 h-4 text-[#2d9d43]" />
+                <span className="text-[11px] font-bold hidden sm:inline">Zoom</span>
+              </button>
 
               {/* Top Left Badges */}
               <div className="absolute top-4 left-4 flex flex-col gap-1.5">
@@ -622,6 +638,14 @@ export default function ProductDetailsPage({ params }: { params?: { id?: string 
                     <span className="font-medium text-[#191c1e]">India 🇮🇳</span>
                   </div>
                   <div className="flex justify-between p-2.5 bg-[#f9f9fc]">
+                    <span className="text-[#64748b]">SKU Code</span>
+                    <span className="font-mono text-[11px] font-bold text-[#191c1e]">{selectedVariant?.sku || `SKU-DB-${p.id.toUpperCase().slice(0, 12)}`}</span>
+                  </div>
+                  <div className="flex justify-between p-2.5">
+                    <span className="text-[#64748b]">Availability</span>
+                    <span className="font-bold text-[#15803d]">{isAvailable ? 'In Stock (10-Min Fast Delivery)' : 'Out of Stock'}</span>
+                  </div>
+                  <div className="flex justify-between p-2.5 bg-[#f9f9fc]">
                     <span className="text-[#64748b]">FSSAI License</span>
                     <span className="font-medium text-[#191c1e]">10018043002345 (Certified)</span>
                   </div>
@@ -749,9 +773,28 @@ export default function ProductDetailsPage({ params }: { params?: { id?: string 
                       { onSuccess: () => { setAdded(true); setTimeout(() => setAdded(false), 2000); } },
                     );
                   }}
-                  className="bg-[#2d9d43] hover:bg-[#078730] disabled:opacity-50 text-white font-bold text-sm sm:text-base px-6 sm:px-8 rounded-xl h-12 flex items-center justify-center gap-2 shadow-md active:scale-95 transition"
+                  className="bg-white hover:bg-slate-50 border-2 border-[#2d9d43] text-[#2d9d43] font-bold text-xs sm:text-sm px-4 sm:px-6 rounded-xl h-12 flex items-center justify-center gap-1.5 shadow-xs active:scale-95 transition"
                 >
-                  {addItem.isPending ? 'Adding…' : added ? '✓ Added to Cart!' : `Add to Cart`}
+                  {addItem.isPending ? 'Adding…' : added ? '✓ Added!' : `Add to Cart`}
+                </button>
+
+                <button
+                  disabled={!selectedVariant || addItem.isPending}
+                  onClick={() => {
+                    if (!selectedVariant) return;
+                    addItem.mutate(
+                      { variantId: selectedVariant.id, productName: p.name, unitName: selectedVariant.unitName, price: selectedVariant.price, quantity },
+                      {
+                        onSuccess: () => {
+                          router.push('/checkout');
+                        },
+                      },
+                    );
+                  }}
+                  className="bg-[#2d9d43] hover:bg-[#078730] text-white font-bold text-xs sm:text-sm px-5 sm:px-7 rounded-xl h-12 flex items-center justify-center gap-1.5 shadow-md active:scale-95 transition"
+                >
+                  <Zap className="w-4 h-4 fill-white" />
+                  <span>Buy Now</span>
                 </button>
               </>
             ) : (
@@ -771,6 +814,59 @@ export default function ProductDetailsPage({ params }: { params?: { id?: string 
           </div>
         </div>
       </div>
+
+      {/* Full-Screen Zoom Lightbox Modal */}
+      {isZoomOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 animate-[fadeIn_0.15s_ease-out]"
+          onClick={() => setIsZoomOpen(false)}
+        >
+          <div
+            className="relative max-w-4xl max-h-[90vh] bg-white rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-center shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setIsZoomOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition"
+              title="Close image zoom"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="w-full h-full flex items-center justify-center overflow-hidden">
+              <img
+                src={images[activeThumb] || images[0]}
+                alt={p.name}
+                className="max-w-full max-h-[70vh] object-contain select-none"
+              />
+            </div>
+
+            <div className="mt-4 flex items-center justify-between w-full pt-4 border-t border-slate-100">
+              <div>
+                <p className="text-sm font-extrabold text-[#191c1e]" style={{ fontFamily: 'Outfit' }}>{p.name}</p>
+                <p className="text-xs text-[#64748b]">{p.unitName} • {p.brand}</p>
+              </div>
+              {images.length > 1 && (
+                <div className="flex gap-2">
+                  {images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setActiveThumb(idx)}
+                      className={`w-12 h-12 rounded-lg border-2 overflow-hidden p-1 transition ${
+                        activeThumb === idx ? 'border-[#2d9d43]' : 'border-slate-200 opacity-60'
+                      }`}
+                    >
+                      <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-contain" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

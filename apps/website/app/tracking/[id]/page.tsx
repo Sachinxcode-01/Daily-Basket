@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   ArrowLeft,
   Phone,
@@ -24,27 +24,41 @@ import {
   Pause,
   RotateCcw,
   FastForward,
+  Printer,
+  RefreshCw,
+  AlertTriangle,
+  FileText,
+  X,
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@daily-basket/api-client';
 import { getSocket, joinRoom, leaveRoom } from '../../../lib/socket';
-import { useCurrentUserId } from '../../../store/useCart';
+import { useCurrentUserId, useCart } from '../../../store/useCart';
 
 const STAGE: Record<string, number> = {
   CREATED: 0,
-  CONFIRMED: 0,
-  PACKING: 1,
-  READY_FOR_PICKUP: 1,
-  ASSIGNED: 1,
-  OUT_FOR_DELIVERY: 2,
-  PICKED_UP: 2,
-  ARRIVED: 2,
-  DELIVERED: 3,
+  ORDER_PLACED: 0,
+  CONFIRMED: 1,
+  PACKING: 2,
+  READY_FOR_PICKUP: 2,
+  ASSIGNED: 2,
+  OUT_FOR_DELIVERY: 3,
+  PICKED_UP: 3,
+  ARRIVED: 3,
+  DELIVERED: 4,
 };
 
-const STEP_LABELS = ['Order Placed', 'Packed at Store', 'Out for Delivery', 'Delivered to Doorstep'];
+const STEP_LABELS = [
+  'Order Placed',
+  'Order Confirmed',
+  'Store Packing',
+  'Out for Delivery',
+  'Delivered',
+];
 
 export default function DeliveryTrackingPage() {
+  const router = useRouter();
+  const { addItem } = useCart();
   const params = useParams();
   const rawId = (params?.id as string) || '';
   const orderId = decodeURIComponent(rawId);
@@ -52,6 +66,13 @@ export default function DeliveryTrackingPage() {
 
   // Local fallback order if backend is offline or mock order
   const [localFallbackOrder, setLocalFallbackOrder] = useState<any>(null);
+
+  // Order Experience & Cancellation states
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState('Changed mind / Placed order by mistake');
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [isReordering, setIsReordering] = useState(false);
+  const [isInvoiceLoading, setIsInvoiceLoading] = useState(false);
 
   // Live real-time socket overrides
   const [liveStatus, setLiveStatus] = useState<string | null>(null);
@@ -105,6 +126,67 @@ export default function DeliveryTrackingPage() {
     setDeliveryProgressRatio(0.35);
     setLiveRiderCoords({ lat: 12.9352, lng: 77.6245 });
     setLastTelemetryUpdate('Reset to dark store');
+  };
+
+  const handleCancelOrder = async () => {
+    setIsCancelling(true);
+    try {
+      if ((apiClient as any).cancelOrder) {
+        await (apiClient as any).cancelOrder(orderId, cancelReason);
+      }
+      setLiveStatus('CANCELLED');
+      setIsCancelModalOpen(false);
+      refetch();
+    } catch {
+      // Local state fallback update
+      setLiveStatus('CANCELLED');
+      setIsCancelModalOpen(false);
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
+  const handleReorder = async () => {
+    setIsReordering(true);
+    try {
+      const itemsToReorder = order?.items || [];
+      itemsToReorder.forEach((it: any) => {
+        addItem.mutate({
+          variantId: it.variantId || `var_${it.productId || it.id}`,
+          productName: it.productName,
+          unitName: it.unitName || '1 pack',
+          price: it.price || 50,
+          quantity: it.quantity || 1,
+        });
+      });
+      router.push('/cart');
+    } catch {
+      router.push('/cart');
+    } finally {
+      setIsReordering(false);
+    }
+  };
+
+  const handleDownloadInvoice = async () => {
+    setIsInvoiceLoading(true);
+    try {
+      const invoiceData = await apiClient.getOrderInvoice(orderId);
+      if (invoiceData?.html) {
+        const printWindow = window.open('', '_blank');
+        if (printWindow) {
+          printWindow.document.write(invoiceData.html);
+          printWindow.document.close();
+          printWindow.focus();
+          printWindow.print();
+        }
+      } else {
+        window.print();
+      }
+    } catch {
+      window.print();
+    } finally {
+      setIsInvoiceLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -598,7 +680,127 @@ export default function DeliveryTrackingPage() {
             </div>
           </div>
         )}
+
+        {/* 7. Delivery Notes & Special Instructions */}
+        {order?.deliveryNotes && (
+          <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-emerald-50 text-[#006b23] flex items-center justify-center shrink-0">
+              <FileText className="w-4 h-4" />
+            </div>
+            <div>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 font-outfit">
+                Delivery Instructions for Rider
+              </h4>
+              <p className="text-xs font-medium text-slate-800 mt-0.5">{order.deliveryNotes}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 8. Order Experience Actions: Invoice, Reorder, Cancel */}
+        <div className="bg-white rounded-3xl p-5 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button
+              onClick={handleDownloadInvoice}
+              disabled={isInvoiceLoading}
+              className="flex-1 sm:flex-initial px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition flex items-center justify-center gap-2"
+              title="Download or Print GST Tax Invoice"
+            >
+              <Printer className="w-4 h-4 text-[#006b23]" />
+              <span>{isInvoiceLoading ? 'Loading…' : 'GST Invoice'}</span>
+            </button>
+
+            <button
+              onClick={handleReorder}
+              disabled={isReordering}
+              className="flex-1 sm:flex-initial px-5 py-2.5 bg-[#006b23] hover:bg-[#00531a] text-white text-xs font-bold rounded-xl shadow-xs transition flex items-center justify-center gap-2 active:scale-95"
+            >
+              <RefreshCw className="w-4 h-4" />
+              <span>{isReordering ? 'Adding…' : 'Reorder Items'}</span>
+            </button>
+          </div>
+
+          {!isDelivered && !isCancelled && (
+            <button
+              onClick={() => setIsCancelModalOpen(true)}
+              className="w-full sm:w-auto px-4 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 rounded-xl transition flex items-center justify-center gap-1.5"
+            >
+              <AlertTriangle className="w-3.5 h-3.5" />
+              <span>Cancel Order</span>
+            </button>
+          )}
+
+          {isCancelled && (
+            <span className="text-xs font-extrabold text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1.5 rounded-xl">
+              Order Cancelled
+            </span>
+          )}
+        </div>
       </main>
+
+      {/* Cancel Order Confirmation Modal */}
+      {isCancelModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-4 animate-[fadeIn_0.15s_ease-out]"
+          onClick={() => setIsCancelModalOpen(false)}
+        >
+          <div
+            className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2 text-rose-600">
+                <AlertTriangle className="w-5 h-5" />
+                <h3 className="text-base font-bold font-outfit text-slate-900">Cancel Order #{orderId}</h3>
+              </div>
+              <button
+                onClick={() => setIsCancelModalOpen(false)}
+                className="p-1 rounded-full text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-600">
+              Are you sure you want to cancel this delivery? If payment was made via UPI or DB Wallet, a full instant refund will be credited to your account.
+            </p>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 font-outfit uppercase tracking-wider">
+                Reason for cancellation
+              </label>
+              <select
+                value={cancelReason}
+                onChange={(e) => setCancelReason(e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:border-[#006b23]"
+              >
+                <option value="Changed mind / Placed order by mistake">Changed mind / Placed order by mistake</option>
+                <option value="Delivery address incorrect">Delivery address incorrect</option>
+                <option value="Forgot to apply coupon code">Forgot to apply coupon code</option>
+                <option value="Items no longer needed">Items no longer needed</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                onClick={() => setIsCancelModalOpen(false)}
+                className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition"
+              >
+                Keep Order
+              </button>
+              <button
+                onClick={handleCancelOrder}
+                disabled={isCancelling}
+                className="px-5 py-2 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl shadow-xs transition"
+              >
+                {isCancelling ? 'Cancelling…' : 'Confirm Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

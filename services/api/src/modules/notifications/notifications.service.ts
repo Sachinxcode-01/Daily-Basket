@@ -219,6 +219,26 @@ export class NotificationsService {
     });
   }
 
+  async sendOrderStatusNotification(
+    userId: string,
+    phone: string,
+    orderNumber: string,
+    status: string,
+    etaMins: number = 10,
+  ) {
+    const pushResult = await this.sendPushNotification({
+      userId,
+      title: `Order #${orderNumber} Status: ${status}`,
+      body: `Your order is currently ${status}. Expected in ${etaMins} mins.`,
+      data: { orderNumber, status, etaMins: String(etaMins) },
+    });
+    const smsResult = await this.sendSms({
+      phoneNumber: phone,
+      message: `Daily Basket: Order #${orderNumber} is ${status}. ETA: ${etaMins} mins.`,
+    });
+    return { pushResult, smsResult };
+  }
+
   // ─── USER IN-APP NOTIFICATION INBOX ────────────────────────────────────────
 
   async getUserNotifications(userId: string, page: number = 1, limit: number = 20) {

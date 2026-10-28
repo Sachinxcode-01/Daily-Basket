@@ -18,7 +18,7 @@ The **Daily Basket Mobile App** is a production-grade, cross-platform Flutter ap
 
 The application follows strict **Clean Architecture** principles:
 
-```
+```text
 apps/mobile/lib/
 ├── core/                           # Core utilities, theme, network & providers
 │   ├── navigation/                 # Navigation drawer & route handlers

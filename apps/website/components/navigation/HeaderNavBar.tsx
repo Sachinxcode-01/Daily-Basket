@@ -24,9 +24,11 @@ import {
   ShieldCheck,
   Compass,
   Mic,
+  Heart,
 } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { useCart } from '../../store/useCart';
+import { useWishlist } from '../../store/useWishlist';
 import { VoiceSearchModal } from '../VoiceSearchModal';
 
 interface HeaderNavBarProps {
@@ -42,6 +44,8 @@ export default function HeaderNavBar({ cartCount, onSearch, onCartClick }: Heade
   const queryClient = useQueryClient();
   const { user, isAuthenticated, logout } = useAuthStore();
   const { itemCount } = useCart();
+  const wishlistProductIds = useWishlist((s) => s.productIds);
+  const wishlistCount = wishlistProductIds.length;
   const effectiveCartCount = cartCount !== undefined ? cartCount : itemCount;
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -292,6 +296,13 @@ export default function HeaderNavBar({ cartCount, onSearch, onCartClick }: Heade
                     <span>My Profile & Addresses</span>
                   </Link>
                   <Link
+                    href="/wishlist"
+                    className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-[#006b23] transition-colors"
+                  >
+                    <Heart className="w-4 h-4 text-rose-500" />
+                    <span>My Wishlist ({wishlistCount})</span>
+                  </Link>
+                  <Link
                     href="/tracking"
                     className="flex items-center gap-2.5 px-4 py-2.5 text-xs font-semibold text-slate-700 hover:bg-emerald-50 hover:text-[#006b23] transition-colors"
                   >
@@ -332,6 +343,22 @@ export default function HeaderNavBar({ cartCount, onSearch, onCartClick }: Heade
               <span>Login</span>
             </Link>
           )}
+
+          {/* Wishlist Button (Strictly h-10 w-10 = 40px circle or pill with badge) */}
+          <Link
+            href="/wishlist"
+            className="h-10 px-3 rounded-full bg-white hover:bg-rose-50 border border-slate-200/90 hover:border-rose-300 text-slate-700 hover:text-rose-600 font-bold text-xs flex items-center gap-1.5 transition-all shrink-0 relative"
+            aria-label="View Saved Wishlist"
+            title="My Wishlist"
+          >
+            <Heart className="w-4 h-4 text-rose-500" />
+            <span className="hidden lg:inline text-xs font-semibold">Wishlist</span>
+            {wishlistCount > 0 && (
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-rose-500 text-white text-[10px] font-extrabold flex items-center justify-center shadow-xs">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
 
           {/* Shopping Basket Button (Strictly h-10 = 40px) */}
           {onCartClick ? (

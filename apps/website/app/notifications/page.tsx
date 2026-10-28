@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Bell, ShoppingBag, Tag, AlertCircle, CheckCheck } from 'lucide-react';
+import { apiClient } from '@daily-basket/api-client';
 
 interface Notification {
   id: string;
@@ -44,8 +45,35 @@ export default function NotificationsPage() {
   const [filter, setFilter] = useState('All');
   const [notifications, setNotifications] = useState(initialNotifications);
 
-  const markAllRead = () => {
+  useEffect(() => {
+    async function loadNotifications() {
+      try {
+        const res = await apiClient.getUserNotifications();
+        if (Array.isArray(res?.notifications) && res.notifications.length > 0) {
+          const mapped: Notification[] = res.notifications.map((n: any) => ({
+            id: n.id,
+            title: n.title,
+            message: n.message,
+            time: new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            category: n.type === 'OFFER' ? 'Offers' : n.type === 'ORDER' ? 'Orders' : 'System',
+            unread: !n.isRead,
+          }));
+          setNotifications(mapped);
+        }
+      } catch {
+        // Fallback to initial notifications
+      }
+    }
+    loadNotifications();
+  }, []);
+
+  const markAllRead = async () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+    try {
+      await apiClient.markAllNotificationsRead();
+    } catch {
+      // Ignored
+    }
   };
 
   const filtered = filter === 'All'

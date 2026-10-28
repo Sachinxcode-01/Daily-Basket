@@ -722,7 +722,7 @@ export class OrdersService {
   /**
    * One-click Reorder Purchase: clones past order items into active basket
    */
-  async reorderPurchase(orderId: string, userId: string) {
+  async reorderPurchase(orderId: string, _userId?: string) {
     const order = await this.findOne(orderId);
     if (!order) {
       throw new NotFoundException(`Order #${orderId} not found.`);
@@ -833,9 +833,9 @@ export class OrdersService {
     </div>
     <div>
       <strong>Delivered To:</strong><br/>
-      ${order.address?.streetAddress || order.address?.street || 'Customer Address'}<br/>
+      ${(order.address as any)?.houseNo ? `${(order.address as any).houseNo}, ` : ''}${order.address?.street || 'Customer Address'}<br/>
       ${order.address?.city || 'Bengaluru'} - ${order.address?.pincode || '560034'}<br/>
-      Phone: ${order.address?.phoneNumber || '+91 Verified Shopper'}
+      Phone: ${(order as any).user?.phone || '+91 Verified Shopper'}
     </div>
   </div>
 
