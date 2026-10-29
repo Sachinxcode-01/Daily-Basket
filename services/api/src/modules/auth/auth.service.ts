@@ -48,6 +48,20 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
     const refreshToken = `ref_${crypto.randomBytes(32).toString('hex')}`;
+    const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+
+    await this.prisma.deviceSession.create({
+      data: {
+        userId: user.id,
+        deviceId: `dev_${crypto.randomBytes(8).toString('hex')}`,
+        deviceName: 'Mobile App / Browser',
+        platform: 'Standard Web / Flutter Client',
+        refreshTokenHash,
+        isActive: true,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        lastActive: new Date(),
+      },
+    }).catch(() => null);
 
     return { accessToken, refreshToken };
   }
@@ -58,6 +72,7 @@ export class AuthService {
   private async createOrUpdateDeviceSession(
     userId: string,
     refreshToken: string,
+    refreshTokenHash: string,
     deviceData?: { deviceId?: string; deviceName?: string; platform?: string },
   ) {
     const deviceId = deviceData?.deviceId || `dev_${crypto.randomBytes(8).toString('hex')}`;
@@ -71,7 +86,7 @@ export class AuthService {
         deviceId,
         deviceName,
         platform,
-        refreshToken,
+        refreshTokenHash,
         isActive: true,
         expiresAt,
         lastActive: new Date(),
@@ -104,6 +119,10 @@ export class AuthService {
     const { phone, type = 'LOGIN' } = dto;
     const now = new Date();
 
+    // Per-IP rate limiting — reject early if over threshold
+    const ipAddress = dto.ipAddress || (this.getRequestContext(dto) as any)?.ipAddress || 'unknown';
+    await this.checkOtpRateLimit(phone, ipAddress);
+
     const existingOtp = await this.prisma.otpVerification.findFirst({
       where: {
         identifier: phone,
@@ -124,6 +143,9 @@ export class AuthService {
     const otpHash = crypto.createHash('sha256').update(randomOtp).digest('hex');
     const expiresAt = new Date(now.getTime() + 5 * 60 * 1000); // 5 mins
     const resendAfter = new Date(now.getTime() + 60 * 1000); // 60s cooldown
+
+    // Increment atomic counters for per-hour and per-day rate limiting
+    await this.recordOtpAttempt(phone, ipAddress);
 
     await this.prisma.otpVerification.create({
       data: {
@@ -228,7 +250,8 @@ export class AuthService {
     });
 
     const { accessToken, refreshToken } = await this.generateTokens(user);
-    await this.createOrUpdateDeviceSession(user.id, refreshToken, { deviceId, deviceName, platform });
+    const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    await this.createOrUpdateDeviceSession(user.id, refreshToken, refreshTokenHash, { deviceId, deviceName, platform });
     await this.auditLog(user.id, 'LOGIN_OTP', { phone, platform });
 
     return {
@@ -285,7 +308,8 @@ export class AuthService {
     }
 
     const { accessToken, refreshToken } = await this.generateTokens(user);
-    await this.createOrUpdateDeviceSession(user.id, refreshToken, { deviceId, deviceName, platform });
+    const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    await this.createOrUpdateDeviceSession(user.id, refreshToken, refreshTokenHash, { deviceId, deviceName, platform });
     await this.auditLog(user.id, 'LOGIN_GOOGLE_OAUTH', {
       email: googleEmail,
       provider: verifiedGoogleUser.provider,
@@ -472,7 +496,8 @@ export class AuthService {
     });
 
     const { accessToken, refreshToken } = await this.generateTokens(user);
-    await this.createOrUpdateDeviceSession(user.id, refreshToken, { deviceId, deviceName, platform });
+    const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    await this.createOrUpdateDeviceSession(user.id, refreshToken, refreshTokenHash, { deviceId, deviceName, platform });
     await this.auditLog(user.id, 'LOGIN_SUCCESS', { email });
 
     return {
@@ -493,8 +518,9 @@ export class AuthService {
    * Refresh token rotation endpoint.
    */
   async refreshTokens(refreshToken: string) {
+    const refreshTokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
     const session = await this.prisma.deviceSession.findUnique({
-      where: { refreshToken },
+      where: { refreshTokenHash },
       include: { user: true },
     });
 
@@ -503,13 +529,14 @@ export class AuthService {
     }
 
     const { accessToken, refreshToken: newRefreshToken } = await this.generateTokens(session.user);
+    const newHash = crypto.createHash('sha256').update(newRefreshToken).digest('hex');
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    // Rotate refresh token
+    // Rotate refresh token — hash replaces old hash atomically
     await this.prisma.deviceSession.update({
       where: { id: session.id },
       data: {
-        refreshToken: newRefreshToken,
+        refreshTokenHash: newHash,
         lastActive: new Date(),
         expiresAt,
       },
@@ -902,38 +929,21 @@ export class AuthService {
     };
   }
 
-  async getPasskeyRegisterOptions(email: string) {
-    const challenge = crypto.randomBytes(32).toString('base64url');
-    return {
-      challenge,
-      rp: { name: 'Daily Basket', id: 'dailybasket.com' },
-      user: { id: crypto.randomBytes(16).toString('hex'), name: email, displayName: email },
-      pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
-      timeout: 60000,
-      attestation: 'direct',
-    };
+  // PASSKEY WEBAUTHN ENDPOINTS — DISABLED FOR PRODUCTION
+  // Full FIDO2/WebAuthn flow requires integration with firebase-functions/identity-web-authn
+  // This remains disabled to prevent partially-implemented security features from shipping.
+  // Re-enable when a complete implementation PR is merged.
+
+  async getPasskeyRegisterOptions(_email: string) {
+    throw new BadRequestException('Passkey registration is disabled. Not yet implemented.');
   }
 
-  async verifyPasskeyRegistration(email: string, credential: any) {
-    await this.auditLog('usr_demo', 'PASSKEY_REGISTERED', { email, id: credential?.id });
-    return {
-      success: true,
-      email,
-      credentialId: credential?.id || 'cred_webauthn_01',
-      message: 'FIDO2 / WebAuthn Passkey registered successfully.',
-    };
+  async verifyPasskeyRegistration(_email: string, _credential: any) {
+    throw new BadRequestException('Passkey registration is disabled. Not yet implemented.');
   }
 
-  async authenticatePasskey(credentialId: string, signature: string) {
-    return {
-      success: true,
-      credentialId,
-      signatureVerified: !!signature,
-      user: { id: 'usr_demo', fullName: 'Ananya Sharma', email: 'ananya@dailybasket.com' },
-      accessToken: 'pk_jwt_access_token_demo',
-      refreshToken: 'pk_jwt_refresh_token_demo',
-      message: 'Biometric Passkey login successful.',
-    };
+  async authenticatePasskey(_credentialId: string, _signature: string) {
+    throw new BadRequestException('Passkey authentication is disabled. Not yet implemented.');
   }
 
   async evaluateDeviceRisk(userId: string, deviceId: string, ipAddress: string, platform: string) {
@@ -964,7 +974,6 @@ export class AuthService {
     const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
     const otpHash = crypto.createHash('sha256').update(otpCode).digest('hex');
 
-    // Save to otpVerifications
     await (this.prisma as any).otpVerification?.create({
       data: {
         identifier: email.trim().toLowerCase(),
@@ -987,7 +996,7 @@ export class AuthService {
       },
     }).catch(() => null);
 
-    await this.auditLog('usr_admin', 'EMAIL_OTP_DISPATCHED', { email, type, expiresAt: expiresAt.toISOString() });
+    await this.auditLog(email, 'EMAIL_OTP_DISPATCHED', { email, type, expiresAt: expiresAt.toISOString() });
 
     return {
       success: true,
@@ -996,6 +1005,54 @@ export class AuthService {
       resendCooldownSeconds: 60,
       expiresInMinutes: 5,
     };
+  }
+
+  /**
+   * Per-identifier OTP rate limiting helper. Enforces max OTP requests per hour and per day
+   * to prevent abuse attacks. Returns a boolean indicating whether the request should proceed.
+   */
+  private async checkOtpRateLimit(identifier: string, ipAddress: string) {
+    const ipHourStart = new Date(Date.now() - 60 * 60 * 1000);
+    const identDayStart = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+    const ipHourCount = await this.prisma.otpVerification.count({
+      where: { identifier: `__ip__${ipAddress}__`, createdAt: { gte: ipHourStart }, type: 'LOGIN' },
+    });
+    if (ipHourCount >= 10) {
+      throw new BadRequestException('Too many OTP requests from this IP. Please try again later.');
+    }
+
+    const identDayCount = await this.prisma.otpVerification.count({
+      where: { identifier, createdAt: { gte: identDayStart }, type: 'LOGIN' },
+    });
+    if (identDayCount >= 50) {
+      throw new BadRequestException('Too many OTP requests today. Please try again later.');
+    }
+  }
+
+  /**
+   * Atomically increment OTP counters for both identifier and IP within an isolated transaction.
+   * Prevents race conditions when concurrent requests hit rate limits simultaneously.
+   */
+  private async recordOtpAttempt(identifier: string, ipAddress: string) {
+    try {
+      await this.prisma.$transaction([
+        this.prisma.otpVerification.update({
+          where: { identifier: `__ip__${ipAddress}__` },
+          data: { otpCountThisHour: { increment: 1 } },
+        }),
+        this.prisma.otpVerification.update({
+          where: { identifier: `__ip__${ipAddress}__` },
+          data: { otpCountToday: { increment: 1 } },
+        }),
+        this.prisma.otpVerification.update({
+          where: { identifier },
+          data: { otpCountToday: { increment: 1 } },
+        }),
+      ]);
+    } catch {
+      // Fallback: best-effort counter update — does not block auth flow
+    }
   }
 
   /**
@@ -1052,7 +1109,8 @@ export class AuthService {
     }
 
     const tokens = await this.generateTokens(user as any);
-    await this.createOrUpdateDeviceSession(user.id, tokens.refreshToken, deviceData);
+    const refreshTokenHash = crypto.createHash('sha256').update(tokens.refreshToken).digest('hex');
+    await this.createOrUpdateDeviceSession(user.id, tokens.refreshToken, refreshTokenHash, deviceData);
     await this.auditLog(user.id, 'EMAIL_OTP_VERIFIED', { email: normalizedEmail, deviceId: deviceData?.deviceId });
 
     return {
@@ -1111,9 +1169,10 @@ export class AuthService {
    */
   async logout(userId: string, refreshToken?: string) {
     if (refreshToken) {
-      await this.prisma.deviceSession.deleteMany({ where: { refreshToken } }).catch(() => null);
+      const hash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+      await this.prisma.deviceSession.deleteMany({ where: { refreshTokenHash: hash } }).catch(() => null);
     }
-    await this.auditLog(userId, 'USER_LOGOUT', { refreshToken });
+    await this.auditLog(userId, 'USER_LOGOUT', { refreshTokenPresent: !!refreshToken });
     return { success: true, message: 'Logged out successfully.' };
   }
 }

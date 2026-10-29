@@ -63,79 +63,49 @@ export class FirebaseAuthService implements OnModuleInit {
         this.isConfigured = true;
         this.logger.log(`Firebase Admin configured via environment credentials for project: ${this.projectId}`);
       } else {
-        this.projectId = 'daily-basket-8b266';
-        this.clientEmail = 'firebase-adminsdk-fbsvc@daily-basket-8b266.iam.gserviceaccount.com';
-        this.logger.warn('Firebase service account file not located at runtime path; using project credential defaults.');
+        // Development only — should never happen in production with zero defaults
+        this.isConfigured = false;
+        this.logger.error('Firebase not configured: no service account file or env vars present');
       }
     } catch (err: any) {
+      this.isConfigured = false;
       this.logger.error(`Failed to initialize Firebase Admin: ${err?.message}`);
     }
   }
 
   getStatus() {
+    const isDev = process.env.NODE_ENV !== 'production';
     return {
-      configured: this.isConfigured,
-      projectId: this.projectId || process.env.FIREBASE_PROJECT_ID || 'daily-basket-8b266',
-      clientEmail:
-        this.clientEmail ||
-        process.env.FIREBASE_CLIENT_EMAIL ||
-        'firebase-adminsdk-fbsvc@daily-basket-8b266.iam.gserviceaccount.com',
-      serviceAccountPresent: fs.existsSync(
-        process.env.FIREBASE_SERVICE_ACCOUNT_PATH || path.join(process.cwd(), 'firebase-service-account.json'),
-      ),
-      authProvider: 'FIREBASE_GOOGLE_AUTH',
-      status: 'HEALTHY',
+      configured: isDev ? false : this.isConfigured,
+      projectId: this.projectId,
+      clientEmail: this.clientEmail,
+      serviceAccountPresent: this.isConfigured,
+      authProvider: this.isConfigured ? 'FIREBASE_GOOGLE_USER' : 'NOT_CONFIGURED',
+      status: this.isConfigured ? 'READY' : 'NOT_CONFIGURED',
+      devOnlyBypass: isDev,
       timestamp: new Date().toISOString(),
     };
   }
 
   async verifyIdToken(idToken: string): Promise<VerifiedGoogleUser> {
-    // 1. Attempt verification with Firebase Admin SDK if token is realistic
-    if (this.firebaseAuth && idToken && !idToken.startsWith('mock_') && !idToken.startsWith('test_')) {
-      try {
-        const decoded: DecodedIdToken = await this.firebaseAuth.verifyIdToken(idToken);
-        return {
-          uid: decoded.uid,
-          email: decoded.email || `${decoded.uid}@gmail.com`,
-          name: decoded.name || (decoded.email ? decoded.email.split('@')[0] : 'Daily Basket User'),
-          picture: decoded.picture || 'https://lh3.googleusercontent.com/a/default-user',
-          emailVerified: !!decoded.email_verified,
-          provider: 'FIREBASE_ADMIN',
-        };
-      } catch (tokenErr: any) {
-        this.logger.warn(`Firebase token verification fallback invoked: ${tokenErr?.message}`);
-      }
+    // Reject mock/development tokens outright — no fallback
+    if (!this.firebaseAuth || !idToken || idToken.startsWith('mock_') || idToken.startsWith('test_')) {
+      throw new Error('Authentication token verification unavailable or not configured');
     }
 
-    // 2. Decode standard JWT structure (header.payload.signature) if present
-    if (idToken && idToken.includes('.')) {
-      try {
-        const parts = idToken.split('.');
-        if (parts.length >= 2) {
-          const payloadJson = Buffer.from(parts[1], 'base64').toString('utf8');
-          const payload = JSON.parse(payloadJson);
-          if (payload.email) {
-            return {
-              uid: payload.user_id || payload.sub || 'usr_google_jwt',
-              email: payload.email,
-              name: payload.name || payload.displayName || payload.email.split('@')[0],
-              picture: payload.picture || payload.avatar_url || 'https://lh3.googleusercontent.com/a/default-user',
-              emailVerified: payload.email_verified !== false,
-              provider: 'GOOGLE_JWT_DECODED',
-            };
-          }
-        }
-      } catch (_) {}
+    try {
+      const decoded: DecodedIdToken = await this.firebaseAuth.verifyIdToken(idToken);
+      return {
+        uid: decoded.uid,
+        email: decoded.email || `${decoded.uid}@gmail.com`,
+        name: decoded.name || (decoded.email ? decoded.email.split('@')[0] : 'Daily Basket User'),
+        picture: decoded.picture || 'https://lh3.googleusercontent.com/a/default-user',
+        emailVerified: !!decoded.email_verified,
+        provider: 'FIREBASE_GOOGLE_USER',
+      };
+    } catch (tokenErr: any) {
+      this.logger.error(`Firebase token verification failed for token of length ${idToken.length}: ${tokenErr?.message}`);
+      throw new Error('Token verification failed');
     }
-
-    // 3. Fallback for mock/development environment with the configured project credentials
-    return {
-      uid: 'usr_firebase_sachin_8827',
-      email: 'sachiii8827@gmail.com',
-      name: 'Sachin Kumar',
-      picture: 'https://lh3.googleusercontent.com/a/default-user',
-      emailVerified: true,
-      provider: 'FIREBASE_CREDENTIAL_VERIFIED',
-    };
   }
 }

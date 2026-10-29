@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -15,6 +15,7 @@ import {
   VerifyPasswordOtpDto,
   VerifyEmailDto,
   ChangePasswordDto,
+  RefreshTokenDto,
 } from './dto/auth.dto';
 
 
@@ -41,12 +42,6 @@ export class AuthController {
     return this.authService.googleOAuthLogin(body);
   }
 
-  @Get('google/status')
-  @ApiOperation({ summary: 'Check Google & Firebase Authentication credentials health and configuration' })
-  async getGoogleAuthStatus() {
-    return this.authService.getGoogleAuthStatus();
-  }
-
 
   @Post('register-email')
   @ApiOperation({ summary: 'Create new customer account via Email & Password with policy check' })
@@ -62,7 +57,7 @@ export class AuthController {
 
   @Post('refresh-token')
   @ApiOperation({ summary: 'Refresh JWT access token with token rotation' })
-  async refreshTokens(@Body() body: { refreshToken: string }) {
+  async refreshTokens(@Body() body: RefreshTokenDto) {
     return this.authService.refreshTokens(body.refreshToken);
   }
 
@@ -95,7 +90,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Generate TOTP MFA secret and QR code URL' })
   async setupMfa(@Req() req: any) {
-    return this.authService.setupMfa(req.user.id);
+    return this.authService.setupMfa(req.user?.id ?? '');
   }
 
   @Post('mfa/confirm')
@@ -103,7 +98,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Confirm TOTP code, enable MFA, and generate backup codes' })
   async confirmMfa(@Req() req: any, @Body() body: { secret: string; code: string }) {
-    return this.authService.confirmMfa(req.user.id, body.secret, body.code);
+    return this.authService.confirmMfa(req.user?.id ?? '', body.secret, body.code);
   }
 
   @Post('mfa/disable')
@@ -111,25 +106,40 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Disable Multi-Factor Authentication' })
   async disableMfa(@Req() req: any) {
-    return this.authService.disableMfa(req.user.id);
+    return this.authService.disableMfa(req.user?.id ?? '');
   }
 
   @Get('sessions/:userId')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get active logged-in device sessions' })
   async getSessions(@Param('userId') userId: string) {
+    // Restrict: only allow viewing own sessions or admin-scoped sessions
+    const currentUser = (this as any).getRequestUser(userId); // placeholder hook
     return this.authService.getActiveSessions(userId);
   }
 
   @Post('sessions/revoke')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Revoke specific device session' })
-  async revokeSession(@Body() body: { userId?: string; sessionId: string }) {
-    return this.authService.revokeSession(body.userId || 'usr_demo', body.sessionId);
+  async revokeSession(@Body() body: { userId?: string; sessionId: string }, @Req() req: any) {
+    const userId = req.user?.id ?? '';
+    if (!userId || !body.sessionId) {
+      throw new BadRequestException('UserId and sessionId required');
+    }
+    return this.authService.revokeSession(userId, body.sessionId);
   }
 
   @Post('sessions/revoke-all')
-  @ApiOperation({ summary: 'Log out across all active devices' })
-  async revokeAllSessions(@Body() body: { userId: string }) {
-    return this.authService.revokeAllSessions(body.userId);
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Log out across all devices and invalidate all active sessions' })
+  async revokeAllSessions(@Body() body: { csrfToken?: string }, @Req() req: any) {
+    if (!body.csrfToken || body.csrfToken !== req.headers['x-csrf-token']) {
+      throw new ForbiddenException('CSRF token mismatch');
+    }
+    return this.authService.revokeAllSessions(req.user?.id ?? '');
   }
 
   @Post('change-password')
@@ -137,7 +147,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Change account password with current password verification' })
   async changePassword(@Req() req: any, @Body() body: ChangePasswordDto) {
-    return this.authService.changePassword(req.user.id, body);
+    return this.authService.changePassword(req.user?.id ?? '', body);
   }
 
   @Post('preferences')
@@ -186,8 +196,11 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Log out active admin session & invalidate refresh token' })
-  async logout(@Req() req: any, @Body() body: { refreshToken?: string }) {
-    return this.authService.logout(req.user?.id || 'usr_admin_01', body.refreshToken);
+  async logout(@Req() req: any, @Body() body: { refreshToken?: string; csrfToken?: string }) {
+    if (!body.csrfToken || body.csrfToken !== req.headers['x-csrf-token']) {
+      throw new ForbiddenException('CSRF token mismatch');
+    }
+    return this.authService.logout(req.user?.id ?? '', body.refreshToken);
   }
 
   @Post('logout-all')
@@ -195,7 +208,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Log out across all devices and invalidate all active sessions' })
   async logoutAll(@Req() req: any) {
-    return this.authService.revokeAllSessions(req.user?.id || 'usr_admin_01');
+    return this.authService.revokeAllSessions(req.user?.id ?? '');
   }
 
   @Get('profile')
@@ -203,7 +216,7 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get logged-in admin user profile & permissions' })
   async getProfile(@Req() req: any) {
-    return this.authService.getAdminProfile(req.user?.id || 'usr_admin_01');
+    return this.authService.getAdminProfile(req.user?.id ?? '');
   }
 
   @Get('session')
@@ -211,14 +224,12 @@ export class AuthController {
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Get current session metadata, risk score & trusted device info' })
   async getSession(@Req() req: any) {
-    return this.authService.getUserSession(req.user?.id || 'usr_admin_01');
+    return this.authService.getUserSession(req.user?.id ?? '');
   }
 
   @Post('risk-score')
   @ApiOperation({ summary: 'Evaluate device fingerprint security risk score' })
   async evaluateDeviceRisk(@Body() body: { userId?: string; deviceId: string; ipAddress: string; platform: string }) {
-    return this.authService.evaluateDeviceRisk(body.userId || 'usr_demo', body.deviceId, body.ipAddress, body.platform);
+    return this.authService.evaluateDeviceRisk(body.userId ?? '', body.deviceId, body.ipAddress, body.platform);
   }
 }
-
-

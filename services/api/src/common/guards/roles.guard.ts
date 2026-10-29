@@ -22,6 +22,10 @@ export class RolesGuard implements CanActivate {
       return false;
     }
 
-    return requiredRoles.includes(user.role);
+    // Normalize: trim whitespace and compare case-insensitively to handle frontend/backend role mismatch
+    const userRole = String(user.role).trim().toLowerCase();
+    const normalizedRequired = requiredRoles.map((r) => String(r).trim().toLowerCase());
+
+    return normalizedRequired.includes(userRole);
   }
 }

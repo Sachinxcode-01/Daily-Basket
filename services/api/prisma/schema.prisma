@@ -537,7 +537,7 @@ model DeviceSession {
   osVersion    String?
   ipAddress    String?
   location     String?
-  refreshToken String   @unique
+  refreshTokenHash String @unique // SHA-256 hashed, never store raw
   isActive     Boolean  @default(true)
   lastActive   DateTime @default(now())
   expiresAt    DateTime @default(now())
@@ -556,6 +556,9 @@ model OtpVerification {
   expiresAt    DateTime
   resendAfter  DateTime
   consumedAt   DateTime?
+  ipAddress    String?   // Track requesting IP for abuse detection
+  otpCountThisHour Int   @default(0) // Per-IP per-hour counter
+  otpCountToday  Int      @default(0) // Per-IP per-day counter
   userId       String?
   user         User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt    DateTime  @default(now())

@@ -7,9 +7,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest(err: any, user: any) {
+  handleRequest(err: any, user: any, info: any) {
     if (err || !user) {
-      throw err || new UnauthorizedException('Authentication token required or expired.');
+      // Classify errors to give users clearer feedback without revealing internals
+      if (info?.name === 'TokenExpiredError' || (info as any)?.name === 'TokenExpiredError') {
+        throw new UnauthorizedException('Authentication token has expired. Please sign in again.');
+      }
+      throw new UnauthorizedException('Invalid authentication token.');
     }
     return user;
   }
