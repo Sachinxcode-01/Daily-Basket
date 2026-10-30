@@ -25,6 +25,11 @@ import '../../../catalog/presentation/screens/product_listing_screen.dart';
 import '../widgets/quick_services_section.dart';
 import '../widgets/recently_viewed_section.dart';
 import '../widgets/buy_again_section.dart';
+import '../widgets/hero_banner_carousel.dart';
+import '../widgets/flash_deals_banner.dart';
+import '../widgets/offers_carousel_section.dart';
+import '../widgets/product_spotlight_section.dart';
+import '../widgets/refer_and_earn_banner.dart';
 
 class _Product {
   final String id, name, brand, unit, price, mrp, imageUrl, category;
@@ -1076,11 +1081,37 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 _buildSearchBar(), const SizedBox(height: 16),
               ]),
             ),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _buildBanner()),
-            const SizedBox(height: 20),
-            // ─── Premium Quick Services Section ──────────────────────────────────
+
+            // ─── 1. Multi-Banner Hero Carousel ──────────────────────────────────
+            HeroBannerCarousel(
+              onOffersTap: () => Navigator.pushNamed(context, '/coupons'),
+              onCategoriesTap: () => setState(() => _navIndex = 1),
+            ),
+            const SizedBox(height: 22),
+
+            // ─── 2. Best Offers Cards Carousel ──────────────────────────────────
+            OffersCarouselSection(
+              onViewAll: () => Navigator.pushNamed(context, '/coupons'),
+            ),
+            const SizedBox(height: 26),
+
+            // ─── 3. Flash Deals Live Countdown Banner & Rail ────────────────────
+            FlashDealsBanner(
+              onViewAll: () => setState(() => _navIndex = 1),
+            ),
+            const SizedBox(height: 26),
+
+            // ─── 4. Premium Quick Services Section ──────────────────────────────
             const QuickServicesSection(),
             const SizedBox(height: 24),
+
+            // ─── 5. Deal of the Day / Product Spotlight Bento ───────────────────
+            ProductSpotlightSection(
+              onDetailsTap: () => Navigator.pushNamed(context, '/catalog/favorites'),
+            ),
+            const SizedBox(height: 26),
+
+            // ─── 6. Categories ──────────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1091,16 +1122,22 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             ),
             const SizedBox(height: 24),
 
-            // ─── 1. Daily Selling Section ──────────────────────────────────────
+            // ─── 7. Daily Selling Section ──────────────────────────────────────
             _buildHorizontalProductSection(
               'Daily Selling',
               _dailySelling,
               cartProvider,
               onSeeAll: () => setState(() => _navIndex = 1),
             ),
+            const SizedBox(height: 24),
+
+            // ─── 8. Refer & Earn Reward Banner ──────────────────────────────────
+            ReferAndEarnBanner(
+              onInviteTap: () => Navigator.pushNamed(context, '/referral'),
+            ),
             const SizedBox(height: 28),
 
-            // ─── 2. High Selling Section ───────────────────────────────────────
+            // ─── 9. High Selling Section ───────────────────────────────────────
             _buildHorizontalProductSection(
               'High Selling',
               _highSelling,
@@ -1109,7 +1146,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             ),
             const SizedBox(height: 28),
 
-            // ─── 3. Recommended Section ────────────────────────────────────────
+            // ─── 10. Recommended Section ────────────────────────────────────────
             _buildHorizontalProductSection(
               'Recommended For You',
               _recommended,
@@ -1118,7 +1155,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             ),
             const SizedBox(height: 28),
 
-            // ─── 4. Top Buying Section ─────────────────────────────────────────
+            // ─── 11. Top Buying Section ─────────────────────────────────────────
             _buildHorizontalProductSection(
               'Top Buying',
               _topBuying,
@@ -1181,19 +1218,19 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             Container(
               width: 28, height: 28, padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.black12)),
-              child: Image.asset('assets/images/daily_basket_logo.png', fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Icon(Icons.shopping_bag_rounded, size: 18, color: Color(0xFF006B23))),
+              child: Image.asset('assets/images/daily_basket_logo.png', fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Icon(Icons.shopping_bag_rounded, size: 18, color: Color(0xFF2D9D43))),
             ),
             const SizedBox(width: 8),
-            Text('Daily Basket', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF006B23))),
+            Text('Daily Basket', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF2D9D43))),
           ]),
           Stack(clipBehavior: Clip.none, children: [
             IconButton(
               onPressed: () => setState(() => _navIndex = 3),
-              icon: const Icon(Icons.shopping_basket_outlined, color: Color(0xFF006B23), size: 26),
+              icon: const Icon(Icons.shopping_basket_outlined, color: Color(0xFF2D9D43), size: 26),
             ),
             if (_cartCount > 0) Positioned(top: 6, right: 6, child: Container(
               padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(color: Color(0xFF006B23), shape: BoxShape.circle),
+              decoration: const BoxDecoration(color: Color(0xFF2D9D43), shape: BoxShape.circle),
               constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
               child: Text('$_cartCount', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
             )),
@@ -1237,7 +1274,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             decoration: BoxDecoration(
               color: const Color(0xFFE8F5E9),
               borderRadius: BorderRadius.circular(9999),
-              border: Border.all(color: const Color(0xFF006B23).withValues(alpha: 0.2)),
+              border: Border.all(color: const Color(0xFF2D9D43).withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
@@ -1245,7 +1282,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                    color: Color(0xFF006B23),
+                    color: Color(0xFF2D9D43),
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -1255,7 +1292,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   style: GoogleFonts.inter(
                     fontSize: 10,
                     fontWeight: FontWeight.w700,
-                    color: const Color(0xFF006B23),
+                    color: const Color(0xFF2D9D43),
                   ),
                 ),
               ],
@@ -1271,12 +1308,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-            colors: [Color(0xFF006B23), Color(0xFF078730)],
+            colors: [Color(0xFF2D9D43), Color(0xFF078730)],
           ),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF006B23).withValues(alpha: 0.25),
+              color: const Color(0xFF2D9D43).withValues(alpha: 0.25),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -1293,7 +1330,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     color: Colors.white,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.bolt_rounded, color: Color(0xFF006B23), size: 20),
+                  child: const Icon(Icons.bolt_rounded, color: Color(0xFF2D9D43), size: 20),
                 ),
                 const SizedBox(width: 10),
                 Column(
@@ -1330,7 +1367,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(color: const Color(0xFFF3F3F6), borderRadius: BorderRadius.circular(9999)),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.location_on_outlined, color: Color(0xFF006B23), size: 20),
+            const Icon(Icons.location_on_outlined, color: Color(0xFF2D9D43), size: 20),
             const SizedBox(width: 8),
             Text('123 Main St, New York', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: const Color(0xFF1A1C1E))),
             const SizedBox(width: 4),
@@ -1371,7 +1408,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 ),
                 child: const Icon(
                   Icons.mic_rounded,
-                  color: Color(0xFF006B23),
+                  color: Color(0xFF2D9D43),
                   size: 20,
                 ),
               ),
@@ -1384,7 +1421,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               child: Container(
                 padding: const EdgeInsets.all(6),
                 decoration: const BoxDecoration(
-                  color: Color(0xFF006B23),
+                  color: Color(0xFF2D9D43),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -1395,46 +1432,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               ),
             ),
           ],
-        ),
-      );
-
-  Widget _buildBanner() => ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: SizedBox(
-          width: double.infinity,
-          height: 180,
-          child: Stack(fit: StackFit.expand, children: [
-            Image.asset('assets/illustrations/fresharrivalbg.png', fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: const Color(0xFF006B23))),
-            Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft, end: Alignment.centerRight,
-                  colors: [const Color(0xFF006B23).withValues(alpha: 0.92), const Color(0xFF006B23).withValues(alpha: 0.50), Colors.transparent],
-                  stops: const [0.0, 0.55, 1.0],
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text('Fresh Arrivals', style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white)),
-                const SizedBox(height: 4),
-                ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 190),
-                  child: Text('Up to 20% off organic vegetables this weekend.', style: GoogleFonts.inter(fontSize: 12, color: Colors.white.withValues(alpha: 0.95), height: 1.3), maxLines: 2, overflow: TextOverflow.ellipsis),
-                ),
-                const SizedBox(height: 10),
-                GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, '/categories'),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(9999)),
-                    child: Text('Shop Now', style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.w600, color: const Color(0xFF006B23))),
-                  ),
-                ),
-              ]),
-            ),
-          ]),
         ),
       );
 
@@ -1452,7 +1449,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (onAll != null) TextButton(onPressed: onAll, child: Text('See All', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF006B23)))),
+          if (onAll != null) TextButton(onPressed: onAll, child: Text('See All', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF2D9D43)))),
         ],
       );
 
@@ -1508,9 +1505,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
               decoration: BoxDecoration(
-                color: sel ? const Color(0xFF006B23) : Colors.white,
+                color: sel ? const Color(0xFF2D9D43) : Colors.white,
                 borderRadius: BorderRadius.circular(9999),
-                border: Border.all(color: sel ? const Color(0xFF006B23) : const Color(0xFFBECAB9)),
+                border: Border.all(color: sel ? const Color(0xFF2D9D43) : const Color(0xFFBECAB9)),
               ),
               child: Text(cat, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: sel ? Colors.white : const Color(0xFF3F4A3D))),
             ),
@@ -1598,7 +1595,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                       borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
                       fallbackIcon: _getCategoryIcon(p.category),
                       fallbackBgColor: const Color(0xFFF3F3F6),
-                      fallbackIconColor: const Color(0xFF006B23),
+                      fallbackIconColor: const Color(0xFF2D9D43),
                     ),
                   ),
                 ),
@@ -1655,7 +1652,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(p.brand, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF006B23)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(p.brand, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF2D9D43)), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 2),
                 Text(p.name, style: GoogleFonts.outfit(fontSize: 12.5, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E), height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 1),
@@ -1673,7 +1670,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    Text(p.price, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF006B23))),
+                    Text(p.price, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF2D9D43))),
                     const SizedBox(width: 5),
                     Text(p.mrp, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C), decoration: TextDecoration.lineThrough)),
                     if (disc.isNotEmpty) ...[
@@ -1699,14 +1696,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                           width: double.infinity, height: 32,
                           child: ElevatedButton(
                             onPressed: () => _updateProductQty(p, 1, cartProvider),
-                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF006B23), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: EdgeInsets.zero),
+                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2D9D43), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: EdgeInsets.zero),
                             child: Text('Add', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600)),
                           ),
                         ),
                       )
                     : Container(
                         height: 32,
-                        decoration: BoxDecoration(color: const Color(0xFF006B23), borderRadius: BorderRadius.circular(8)),
+                        decoration: BoxDecoration(color: const Color(0xFF2D9D43), borderRadius: BorderRadius.circular(8)),
                         child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
                           AppPressable(
                             onTap: () => _updateProductQty(p, -1, cartProvider),
@@ -1745,7 +1742,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(color: active ? const Color(0xFF006B23) : Colors.transparent, borderRadius: BorderRadius.circular(9999)),
+        decoration: BoxDecoration(color: active ? const Color(0xFF2D9D43) : Colors.transparent, borderRadius: BorderRadius.circular(9999)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Stack(clipBehavior: Clip.none, children: [
             Icon(icon, color: active ? Colors.white : const Color(0xFF6E7A6C), size: 22),
