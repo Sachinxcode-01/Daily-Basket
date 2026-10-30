@@ -16,8 +16,8 @@ export class RecentlyViewedService {
       include: {
         product: {
           include: {
-            variants: { include: { inventories: true } },
             category: true,
+            variants: { include: { inventories: true } },
           },
         },
       },
