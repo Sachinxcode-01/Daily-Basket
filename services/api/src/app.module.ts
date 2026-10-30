@@ -56,6 +56,11 @@ import { ObservabilityModule } from './modules/observability/observability.modul
 import { RetailOsModule } from './modules/retail-os/retail-os.module';
 import { FeatureFlagsModule } from './modules/feature-flags/feature-flags.module';
 import { CartModule } from './modules/cart/cart.module';
+import { BannersModule } from './modules/banners/banner.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { RecentlyViewedModule } from './modules/recently-viewed/recently-viewed.module';
+import { RecommendationModule } from './modules/recommendations/recommendation.module';
+import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { AdminDashboardModule } from './modules/admin/dashboard/admin-dashboard.module';
 import { BotDetectionMiddleware } from './common/middleware/bot-detection.middleware';
 
@@ -112,6 +117,11 @@ import { BotDetectionMiddleware } from './common/middleware/bot-detection.middle
     FinanceModule,
     MarketingModule,
     AdminDashboardModule,
+    BannersModule,
+    DashboardModule,
+    RecentlyViewedModule,
+    RecommendationModule,
+    WishlistModule,
   ],
 
   providers: [
