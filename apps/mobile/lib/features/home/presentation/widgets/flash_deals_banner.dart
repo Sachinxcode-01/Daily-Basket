@@ -159,68 +159,75 @@ class _FlashDealsBannerState extends State<FlashDealsBanner> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(
-                            Icons.bolt_rounded,
-                            size: 16,
-                            color: Color(0xFFEAB308),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Flash Deals',
-                          style: GoogleFonts.outfit(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Text(
-                          'Ends in ',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.9),
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 2,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withValues(alpha: 0.25),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            _formatDuration(_remainingTime),
-                            style: GoogleFonts.jetBrainsMono(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF8CFA93),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.bolt_rounded,
+                              size: 16,
+                              color: Color(0xFFEAB308),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              'Flash Deals',
+                              style: GoogleFonts.outfit(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                color: Colors.white,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          Text(
+                            'Ends in ',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withValues(alpha: 0.25),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              _formatDuration(_remainingTime),
+                              style: GoogleFonts.jetBrainsMono(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF8CFA93),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
+                const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {
                     HapticFeedback.lightImpact();
@@ -234,6 +241,8 @@ class _FlashDealsBannerState extends State<FlashDealsBanner> {
                     backgroundColor: Colors.white,
                     foregroundColor: const Color(0xFF2D9D43),
                     elevation: 0,
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(9999),
                     ),
@@ -443,6 +452,8 @@ class _FlashDealsBannerState extends State<FlashDealsBanner> {
                                 backgroundColor: const Color(0xFF2D9D43),
                                 foregroundColor: Colors.white,
                                 elevation: 0,
+                                minimumSize: Size.zero,
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                                 shape: const CircleBorder(),
                                 padding: EdgeInsets.zero,
                               ),

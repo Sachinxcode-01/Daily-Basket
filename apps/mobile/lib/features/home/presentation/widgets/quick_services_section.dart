@@ -151,14 +151,19 @@ class _QuickServicesSectionState extends State<QuickServicesSection>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Quick Services',
-                style: GoogleFonts.outfit(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: const Color(0xFF1A1C1E),
+              Flexible(
+                child: Text(
+                  'Quick Services',
+                  style: GoogleFonts.outfit(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF1A1C1E),
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 8),
               Text(
                 'All Features',
                 style: GoogleFonts.inter(
@@ -213,7 +218,7 @@ class _QuickServicesSectionState extends State<QuickServicesSection>
       },
       onTapCancel: () => _pressControllers[index].reverse(),
       child: Container(
-        width: 126,
+        width: 142,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: cfg.gradient,
@@ -284,7 +289,13 @@ class _QuickServicesSectionState extends State<QuickServicesSection>
                               Icon(cfg.icon!, size: 22, color: Colors.white),
                         ),
                       ),
-                      if (cfg.badge != null) cfg.badge!,
+                      if (cfg.badge != null)
+                        Flexible(
+                          child: Align(
+                            alignment: Alignment.topRight,
+                            child: cfg.badge!,
+                          ),
+                        ),
                     ],
                   ),
                   const Spacer(),

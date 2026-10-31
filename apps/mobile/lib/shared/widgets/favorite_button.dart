@@ -74,11 +74,18 @@ class _FavoriteButtonState extends State<FavoriteButton> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
-    final favProvider = context.watch<FavoritesProvider>();
-    final isFav = favProvider.isFavorite(widget.productId);
+    FavoritesProvider? favProvider;
+    try {
+      favProvider = context.watch<FavoritesProvider>();
+    } catch (_) {}
+    final isFav = favProvider?.isFavorite(widget.productId) ?? false;
 
     return InkWell(
-      onTap: () => _onTap(favProvider),
+      onTap: () {
+        if (favProvider != null) {
+          _onTap(favProvider);
+        }
+      },
       borderRadius: BorderRadius.circular(20),
       child: Padding(
         padding: widget.padding,

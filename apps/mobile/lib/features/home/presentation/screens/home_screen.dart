@@ -1214,15 +1214,19 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(onPressed: () => AppNavigationDrawer.show(context), icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26)),
-          Row(mainAxisSize: MainAxisSize.min, children: [
-            Container(
-              width: 28, height: 28, padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.black12)),
-              child: Image.asset('assets/images/daily_basket_logo.png', fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Icon(Icons.shopping_bag_rounded, size: 18, color: Color(0xFF2D9D43))),
-            ),
-            const SizedBox(width: 8),
-            Text('Daily Basket', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF2D9D43))),
-          ]),
+          Flexible(
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Container(
+                width: 28, height: 28, padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.black12)),
+                child: Image.asset('assets/images/daily_basket_logo.png', fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Icon(Icons.shopping_bag_rounded, size: 18, color: Color(0xFF2D9D43))),
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text('Daily Basket', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF2D9D43)), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ),
+            ]),
+          ),
           Stack(clipBehavior: Clip.none, children: [
             IconButton(
               onPressed: () => setState(() => _navIndex = 3),
@@ -1255,20 +1259,27 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Icon(timeIcon, color: const Color(0xFFEAB308), size: 20),
-              const SizedBox(width: 8),
-              Text(
-                '$greeting, Sachinxcode! 👋',
-                style: GoogleFonts.outfit(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1A1C1E),
+          Expanded(
+            child: Row(
+              children: [
+                Icon(timeIcon, color: const Color(0xFFEAB308), size: 20),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    '$greeting, Sachinxcode! 👋',
+                    style: GoogleFonts.outfit(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF1A1C1E),
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
+          const SizedBox(width: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
@@ -1322,40 +1333,49 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
+            Expanded(
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.bolt_rounded, color: Color(0xFF2D9D43), size: 20),
                   ),
-                  child: const Icon(Icons.bolt_rounded, color: Color(0xFF2D9D43), size: 20),
-                ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '⚡ 10 MINS DELIVERY GUARANTEE',
-                      style: GoogleFonts.outfit(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w800,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '⚡ 10 MINS DELIVERY GUARANTEE',
+                          style: GoogleFonts.outfit(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: 0.5,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          'Delivering to 123 Main St, New York',
+                          style: GoogleFonts.inter(
+                            fontSize: 11,
+                            color: Colors.white.withValues(alpha: 0.9),
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
-                    Text(
-                      'Delivering to 123 Main St, New York',
-                      style: GoogleFonts.inter(
-                        fontSize: 11,
-                        color: Colors.white.withValues(alpha: 0.9),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(width: 6),
             const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
           ],
         ),
@@ -1369,7 +1389,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           child: Row(mainAxisSize: MainAxisSize.min, children: [
             const Icon(Icons.location_on_outlined, color: Color(0xFF2D9D43), size: 20),
             const SizedBox(width: 8),
-            Text('123 Main St, New York', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: const Color(0xFF1A1C1E))),
+            Flexible(
+              child: Text(
+                '123 Main St, New York',
+                style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: const Color(0xFF1A1C1E)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             const SizedBox(width: 4),
             const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF6E7A6C), size: 20),
           ]),
@@ -1387,7 +1414,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 child: Row(children: [
                   const Icon(Icons.search_rounded, color: Color(0xFF6E7A6C), size: 22),
                   const SizedBox(width: 10),
-                  Text('Search products...', style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF6E7A6C))),
+                  Expanded(
+                    child: Text(
+                      'Search products...',
+                      style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF6E7A6C)),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                 ]),
               ),
             ),

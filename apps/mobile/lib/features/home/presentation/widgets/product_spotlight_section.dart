@@ -78,20 +78,27 @@ class _ProductSpotlightSectionState extends State<ProductSpotlightSection> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Text(
-                    'Deal of the Day',
-                    style: GoogleFonts.outfit(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF191C1E),
+              Expanded(
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        'Deal of the Day',
+                        style: GoogleFonts.outfit(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: const Color(0xFF191C1E),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 6),
-                  const Text('⭐', style: TextStyle(fontSize: 18)),
-                ],
+                    const SizedBox(width: 6),
+                    const Text('⭐', style: TextStyle(fontSize: 18)),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
