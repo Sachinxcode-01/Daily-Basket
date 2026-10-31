@@ -30,6 +30,8 @@ import '../widgets/flash_deals_banner.dart';
 import '../widgets/offers_carousel_section.dart';
 import '../widgets/product_spotlight_section.dart';
 import '../widgets/refer_and_earn_banner.dart';
+import '../widgets/store_status_banner_widget.dart';
+import '../widgets/smart_weekly_basket_card.dart';
 
 class _Product {
   final String id, name, brand, unit, price, mrp, imageUrl, category;
@@ -1077,6 +1079,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 _buildHeader(), const SizedBox(height: 12),
                 _buildGreetingHeader(),
                 _buildDeliveryEtaWidget(),
+                const SizedBox(height: 8),
+                const StoreStatusBannerWidget(isOpen: true, closingTime: '11:00 PM'),
+                const SizedBox(height: 8),
                 _buildAddressBar(), const SizedBox(height: 12),
                 _buildSearchBar(), const SizedBox(height: 16),
               ]),
@@ -1109,6 +1114,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             ProductSpotlightSection(
               onDetailsTap: () => Navigator.pushNamed(context, '/catalog/favorites'),
             ),
+            const SizedBox(height: 20),
+
+            // ─── 5b. Smart Weekly Basket (Predictive Staples Reorder) ───────────
+            const SmartWeeklyBasketCard(),
             const SizedBox(height: 26),
 
             // ─── 6. Categories ──────────────────────────────────────────────────

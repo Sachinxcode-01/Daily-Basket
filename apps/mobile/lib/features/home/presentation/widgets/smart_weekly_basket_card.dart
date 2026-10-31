@@ -8,7 +8,14 @@ class SmartWeeklyBasketCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final cartProvider = context.read<CartProvider>();
+    CartProvider? cartProvider;
+    try {
+      cartProvider = context.watch<CartProvider>();
+    } catch (_) {
+      try {
+        cartProvider = context.read<CartProvider>();
+      } catch (_) {}
+    }
 
     final List<Map<String, dynamic>> predictedStaples = [
       {
@@ -60,40 +67,41 @@ class SmartWeeklyBasketCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(10),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: const Icon(Icons.auto_awesome, color: Color(0xFF34D399), size: 18),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Your Smart Weekly Basket',
+                      style: GoogleFonts.outfit(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    child: const Icon(Icons.auto_awesome, color: Color(0xFF34D399), size: 18),
-                  ),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Your Smart Weekly Basket',
-                        style: GoogleFonts.outfit(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+                    Text(
+                      'AI predicted staples based on your order patterns',
+                      style: GoogleFonts.inter(
+                        fontSize: 11,
+                        color: const Color(0xFF94A3B8),
                       ),
-                      Text(
-                        'AI predicted staples based on your order patterns',
-                        style: GoogleFonts.inter(
-                          fontSize: 11,
-                          color: const Color(0xFF94A3B8),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -113,6 +121,12 @@ class SmartWeeklyBasketCard extends StatelessWidget {
                         width: 36,
                         height: 36,
                         fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => Container(
+                          width: 36,
+                          height: 36,
+                          color: Colors.white12,
+                          child: const Icon(Icons.shopping_basket_rounded, size: 18, color: Colors.white70),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -158,17 +172,19 @@ class SmartWeeklyBasketCard extends StatelessWidget {
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () {
-                for (var item in predictedStaples) {
-                  cartProvider.addItem(
-                    CartItem(
-                      id: item['id'],
-                      name: item['name'],
-                      subtitle: item['unit'],
-                      price: item['price'],
-                      qty: 1,
-                      image: item['image'],
-                    ),
-                  );
+                if (cartProvider != null) {
+                  for (var item in predictedStaples) {
+                    cartProvider.addItem(
+                      CartItem(
+                        id: item['id'],
+                        name: item['name'],
+                        subtitle: item['unit'],
+                        price: item['price'],
+                        qty: 1,
+                        image: item['image'],
+                      ),
+                    );
+                  }
                 }
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

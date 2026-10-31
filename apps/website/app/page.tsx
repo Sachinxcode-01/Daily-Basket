@@ -11,6 +11,10 @@ import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
+import WebOffersCarousel from '../components/home/WebOffersCarousel';
+import WebFlashDealsBanner from '../components/home/WebFlashDealsBanner';
+import WebProductSpotlight from '../components/home/WebProductSpotlight';
+import WebReferAndEarnBanner from '../components/home/WebReferAndEarnBanner';
 import HeaderNavBar from '../components/navigation/HeaderNavBar';
 import Footer from '../components/navigation/Footer';
 import { useCart } from '../store/useCart';
@@ -266,6 +270,18 @@ export default function HomePage() {
 
           </div>
         </section>
+
+        {/* ─── 1. Best Offers & Coupons Carousel ──────────────────────────── */}
+        <WebOffersCarousel />
+
+        {/* ─── 2. Lightning Deals of the Hour (Live Flash Countdown) ─────── */}
+        <WebFlashDealsBanner />
+
+        {/* ─── 3. Deal of the Day Spotlight Bento ─────────────────────────── */}
+        <WebProductSpotlight />
+
+        {/* ─── 4. Refer & Earn Cashback Banner ────────────────────────────── */}
+        <WebReferAndEarnBanner />
 
         {/* ─── My Impact & Sustainability Section ────────────────────────────── */}
         <section className="relative overflow-hidden bg-[#042618] text-white rounded-[28px] p-6 sm:p-8 md:p-9 shadow-xl border border-[#0d4a32] transition-all">
