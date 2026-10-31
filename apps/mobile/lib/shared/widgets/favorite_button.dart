@@ -26,7 +26,8 @@ class FavoriteButton extends StatefulWidget {
   State<FavoriteButton> createState() => _FavoriteButtonState();
 }
 
-class _FavoriteButtonState extends State<FavoriteButton> with SingleTickerProviderStateMixin {
+class _FavoriteButtonState extends State<FavoriteButton>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
@@ -66,7 +67,8 @@ class _FavoriteButtonState extends State<FavoriteButton> with SingleTickerProvid
         ),
         duration: const Duration(seconds: 1),
         behavior: SnackBarBehavior.floating,
-        backgroundColor: isNowFav ? AppColors.primary : AppColors.inverseSurface,
+        backgroundColor:
+            isNowFav ? AppColors.primary : AppColors.inverseSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
