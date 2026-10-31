@@ -1,12 +1,23 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationsService } from './notifications.service';
+import { PrismaService } from '../../database/prisma.service';
 
 describe('NotificationsService', () => {
   let service: NotificationsService;
 
+  const mockPrisma = {
+    notification: {
+      create: jest.fn(),
+      findMany: jest.fn(),
+    },
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [NotificationsService],
+      providers: [
+        NotificationsService,
+        { provide: PrismaService, useValue: mockPrisma },
+      ],
     }).compile();
 
     service = module.get<NotificationsService>(NotificationsService);

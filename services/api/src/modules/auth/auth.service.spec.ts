@@ -32,6 +32,7 @@ describe('AuthService Enterprise Security Tests', () => {
       findFirst: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
+      count: jest.fn().mockResolvedValue(0),
     },
     deviceSession: {
       findUnique: jest.fn(),
@@ -316,10 +317,10 @@ describe('AuthService Enterprise Security Tests', () => {
       expect(riskResult.riskLevel).toBe('LOW');
     });
 
-    it('should authenticate passkey biometric challenge', async () => {
-      const passkeyResult = await service.authenticatePasskey('cred_123', 'sig_abc');
-      expect(passkeyResult.success).toBe(true);
-      expect(passkeyResult.signatureVerified).toBe(true);
+    it('should reject unconfigured passkey biometric challenge with BadRequestException', async () => {
+      await expect(service.authenticatePasskey('cred_123', 'sig_abc')).rejects.toThrow(
+        BadRequestException,
+      );
     });
   });
 

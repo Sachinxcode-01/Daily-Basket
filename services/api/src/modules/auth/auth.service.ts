@@ -120,7 +120,7 @@ export class AuthService {
     const now = new Date();
 
     // Per-IP rate limiting — reject early if over threshold
-    const ipAddress = dto.ipAddress || (this.getRequestContext(dto) as any)?.ipAddress || 'unknown';
+    const ipAddress = dto.ipAddress || 'unknown';
     await this.checkOtpRateLimit(phone, ipAddress);
 
     const existingOtp = await this.prisma.otpVerification.findFirst({

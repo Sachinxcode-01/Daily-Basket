@@ -142,11 +142,10 @@ export default function WebOffersCarousel() {
 
                 <button
                   onClick={() => handleCopy(offer.code)}
-                  className={`text-xs font-bold px-3.5 py-1.5 rounded-full transition-all duration-200 active:scale-95 shadow-sm ${
-                    isCopied
-                      ? 'bg-white text-emerald-900 font-extrabold'
-                      : 'bg-white/20 hover:bg-white/30 text-white border border-white/25 backdrop-blur-md'
-                  }`}
+                  className={`text-xs font-bold px-3.5 py-1.5 rounded-full transition-all duration-200 active:scale-95 shadow-sm ${isCopied
+                    ? 'bg-white text-emerald-900 font-extrabold'
+                    : 'bg-white/20 hover:bg-white/30 text-white border border-white/25 backdrop-blur-md'
+                    }`}
                 >
                   {isCopied ? '✓ Copied' : 'Apply'}
                 </button>
@@ -158,3 +157,4 @@ export default function WebOffersCarousel() {
     </section>
   );
 }
+
