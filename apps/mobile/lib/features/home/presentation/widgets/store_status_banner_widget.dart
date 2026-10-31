@@ -22,12 +22,17 @@ class StoreStatusBannerWidget extends StatelessWidget {
         color: const Color(0xFFEF4444),
         child: Row(
           children: [
-            const Icon(Icons.storefront_outlined, color: Colors.white, size: 18),
+            const Icon(Icons.storefront_outlined,
+                color: Colors.white, size: 18),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
-                maintenanceMessage ?? 'Store is currently closed. Pre-orders open for tomorrow morning!',
-                style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                maintenanceMessage ??
+                    'Store is currently closed. Pre-orders open for tomorrow morning!',
+                style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
             ),
           ],
