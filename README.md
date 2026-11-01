@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="apps/mobile/assets/images/Daily-Basket.png" alt="Daily Basket App Icon" width="120" height="120" style="border-radius: 24px;" />
+</p>
+
 # 🛒 Daily Basket — Enterprise 10-Minute Grocery Delivery Platform
 
 ![Daily Basket Banner](assets/banner.png)
