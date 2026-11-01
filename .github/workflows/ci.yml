@@ -40,13 +40,13 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build Shared Packages
+        run: pnpm --filter "@daily-basket/*" run build
+
       - name: Generate Prisma Client
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daily_basket?schema=public"
         run: pnpm --filter api run prisma:generate
-
-      - name: Build Workspace Packages
-        run: pnpm --filter "@daily-basket/*" run build
 
       - name: Lint Website
         run: pnpm --filter website run lint
@@ -95,13 +95,13 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build Shared Packages
+        run: pnpm --filter "@daily-basket/*" run build
+
       - name: Generate Prisma Client
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daily_basket?schema=public"
         run: pnpm --filter api run prisma:generate
-
-      - name: Build Workspace Packages
-        run: pnpm --filter "@daily-basket/*" run build
 
       - name: Run API Unit Tests
         run: pnpm --filter api run test
@@ -131,13 +131,13 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build Shared Packages
+        run: pnpm --filter "@daily-basket/*" run build
+
       - name: Generate Prisma Client
         env:
           DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/daily_basket?schema=public"
         run: pnpm --filter api run prisma:generate
-
-      - name: Build Workspace Packages
-        run: pnpm --filter "@daily-basket/*" run build
 
       - name: Build API
         run: pnpm --filter api run build
