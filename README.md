@@ -12,17 +12,18 @@
 [![Prisma](https://img.shields.io/badge/Prisma-5.10-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://prisma.io)
 [![Redis](https://img.shields.io/badge/Redis-7.2-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io)
 [![Socket.IO](https://img.shields.io/badge/Socket.IO-4.8-black?style=for-the-badge&logo=socketdotio&logoColor=white)](https://socket.io)
+[![WCAG 2.1 AA](https://img.shields.io/badge/Accessibility-WCAG%202.1%20AA-006b23?style=for-the-badge&logo=w3c&logoColor=white)](https://www.w3.org/WAI/standards-guidelines/wcag/)
 [![CI/CD Status](https://img.shields.io/badge/CI%2FCD-Passing-22c55e?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/Sachinxcode-01/Daily-Basket/actions)
 ![Production Ready](https://img.shields.io/badge/Production-Ready-006b23?style=for-the-badge)
 
-> **Daily Basket** is an enterprise-grade, hyper-local 10-minute quick-commerce platform delivering fresh groceries, vegetables, dairy, and household essentials. Built as a clean-architecture monorepo, it powers cross-platform Flutter customer and store admin mobile apps, three Next.js 14 web portals (Customer Storefront, Dark Store Admin, Delivery Partner PWA), and a 44-module NestJS microservices backend with real-time WebSockets, Redis caching, BullMQ job queues, end-to-end database persistence, and multi-provider AI engine.
+> **Daily Basket** is an enterprise-grade, hyper-local 10-minute quick-commerce platform delivering fresh groceries, vegetables, dairy, and household essentials. Built as a clean-architecture monorepo, it powers cross-platform Flutter customer and store admin mobile apps, three Next.js 14 web portals (Customer Storefront, Dark Store Admin, Delivery Partner PWA), and a 44-module NestJS microservices backend with real-time WebSockets, Redis caching, BullMQ job queues, end-to-end database persistence, and a multi-provider AI engine.
 
 ---
 
 ## 📋 Table of Contents
 
 - [Platform Overview](#platform-overview)
-- [Single Source of Truth (Google Stitch)](#single-source-of-truth-google-stitch)
+- [Single Source of Truth (`design.md` & Google Stitch)](#single-source-of-truth-designmd--google-stitch)
 - [System Architecture](#system-architecture)
 - [Monorepo Directory Structure](#monorepo-directory-structure)
 - [Feature Matrix](#feature-matrix)
@@ -51,23 +52,29 @@ Daily Basket seamlessly integrates local Kirana dark store hubs with real-time c
 
 | Application | Platform | Key Capabilities | Directory |
 | :--- | :--- | :--- | :--- |
-| **📱 Customer App** | Flutter 3.19 (Android / iOS) | 10-min delivery, live GPS tracking, phone OTP, Google OAuth SSO, address CRUD, 1-click reorder, Razorpay, Wallet, AI assistant | [`apps/mobile`](apps/mobile) |
-| **🌐 Customer Website** | Next.js 14 (React 18 + Tailwind) | Flash deals, full catalog explorer, dark theme, address CRUD, 1-click reorder, Razorpay checkout, live tracking map | [`apps/website`](apps/website) |
-| **🏢 Store Admin Web** | Next.js 14 (Zustand + Lucide) | Real-time fulfillment queue (`NEW` → `CONFIRMED` → `PACKING` → `DISPATCHED`), live rider assignment modal, fleet GPS map, KPIs | [`apps/admin`](apps/admin) |
+| **📱 Customer App** | Flutter 3.19 (Android / iOS) | 10-min delivery, live GPS tracking, Smart Weekly Basket, Wishlist, phone OTP, Google OAuth SSO, address CRUD, 1-click reorder, Razorpay, Wallet, AI voice search | [`apps/mobile`](apps/mobile) |
+| **🌐 Customer Website** | Next.js 14 (React 18 + Tailwind) | Flash deals, full catalog explorer, dark theme, Wishlist sync, address CRUD, 1-click reorder, Razorpay checkout, live tracking map | [`apps/website`](apps/website) |
+| **🏢 Store Admin Web** | Next.js 14 (Zustand + Lucide) | Real-time fulfillment queue (`NEW` → `CONFIRMED` → `PACKING` → `DISPATCHED`), live rider assignment modal, fleet GPS map, store KPIs | [`apps/admin`](apps/admin) |
 | **📱 Store Admin App** | Flutter 3.19 (Android / iOS) | Mobile store manager companion for on-the-go order status inspection and inventory management | [`apps/daily_basket_admin`](apps/daily_basket_admin) |
 | **🛵 Delivery Partner** | Next.js 14 PWA | Duty switch (`ONLINE`/`OFFLINE`), turn-by-turn map navigation, live telemetry broadcast, doorstep OTP verification | [`apps/delivery`](apps/delivery) |
 | **⚙️ Backend API** | NestJS 10 + Prisma + Redis | 44 domain modules, JWT rotation, RBAC, WebSockets, BullMQ queues, multi-provider AI fallback, PostgreSQL persistence | [`services/api`](services/api) |
 
 ---
 
-## Single Source of Truth (Google Stitch)
 
-All user interface components, layouts, typography hierarchies, design tokens, color palettes, micro-animations, and visual flows are strictly anchored to the **Google Stitch Design Project**.
+## Single Source of Truth (`design.md` & Google Stitch)
 
-- Visual consistency is maintained across Flutter, Next.js web applications, and shared UI component packages.
-- Shared design tokens are distributed via `@daily-basket/design-system` and `@daily-basket/theme`.
-- Zero duplicate design tokens across apps: re-exports adhere to approved Stitch layouts, spacing, and atomic styling.
-- Detailed UI guidelines are available in [`docs/GOOGLE_STITCH.md`](docs/GOOGLE_STITCH.md) and [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md).
+The **`design.md` file (in project root) is the single source of truth** for all UI/UX tokens, typography hierarchies (`Outfit`), colors, corner radii (8px/16px/24px/9999px), and layout rules, strictly anchored to the **Google Stitch Design Project**.
+
+- **Brand Tone**: Fresh, Reliable, Ultrafast, Premium, Friendly, Trustworthy.
+- **Color Tokens**:
+  - `primary`: `#2d9d43` (Main brand color, primary CTA buttons, active tab indicators, high-contrast badges)
+  - `primary-contrast`: `#006b23` (WCAG 2.1 AA compliant dark green with 6.82:1 contrast ratio against white text)
+  - `surface`: `#f9f9fc` (Base app background canvas)
+  - `surface-container-lowest`: `#ffffff` (Card surfaces, modal sheets, product cards)
+- **Visual Consistency**: Maintained across Flutter, Next.js web applications, and shared UI component packages (`@daily-basket/design-system` and `@daily-basket/theme`).
+- **Zero Duplicate Design Tokens**: Monorepo shared packages re-export approved Stitch layouts, spacing, and atomic styling.
+- **Detailed Specifications**: See [`design.md`](design.md), [`docs/GOOGLE_STITCH.md`](docs/GOOGLE_STITCH.md), and [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md).
 
 ---
 
@@ -97,6 +104,7 @@ graph TD
         PaymentsModule["💳 Payments Service\n(Razorpay, HMAC Verification, Wallet)"]
         DeliveryModule["📍 Delivery & Fleet Service\n(GPS Tracking, Rider Assignment, Telemetry)"]
         AiEngine["🤖 Multi-Provider AI Engine\n(Gemini, Grok, OpenRouter, Local AI)"]
+        VoiceModule["🎙️ Voice & Audio Service\n(Voice Shopping, Transcription & Normalization)"]
     end
 
     subgraph Persistence & Infrastructure
@@ -122,6 +130,7 @@ graph TD
     NestGateway --> PaymentsModule
     NestGateway --> DeliveryModule
     NestGateway --> AiEngine
+    NestGateway --> VoiceModule
 
     AuthModule --> PostgresDB
     UsersModule --> PostgresDB
@@ -130,6 +139,7 @@ graph TD
     OrdersModule --> PostgresDB
     PaymentsModule --> PostgresDB
     DeliveryModule --> PostgresDB
+    VoiceModule --> PostgresDB
 
     NestGateway --> RedisCache
     NestGateway --> BullMQWorkers
@@ -157,6 +167,8 @@ daily-basket/
 │   ├── DATABASE.md                 # PostgreSQL Database Schema & Prisma Models
 │   ├── AI.md                       # AI Engine Architecture & Provider Fallbacks
 │   ├── DEPLOYMENT.md               # Production Deployment Specs (Docker, Compose, NGINX, K8s)
+│   ├── VOICE_SHOPPING.md           # Voice Shopping & Audio Pipeline
+│   ├── RELEASE_NOTES.md            # Release Notes and Version Tracking
 │   └── ...                         # Dedicated engineering, security & operations docs
 ├── infrastructure/
 │   ├── docker/                     # Multi-stage production Dockerfiles
@@ -178,6 +190,7 @@ daily-basket/
 │       ├── prisma/                 # Database schema definitions & migrations
 │       ├── src/                    # Domain modules, controllers, guards & services
 │       └── firebase-service-account.json # Firebase Admin credentials
+├── design.md                       # 🎨 Single Source of Truth for UI/UX Tokens & Layouts
 ├── pnpm-workspace.yaml             # Monorepo workspace configuration
 └── package.json                    # Workspace scripts & tooling
 ```
@@ -188,22 +201,26 @@ daily-basket/
 
 ### Customer Mobile App
 
+- **Smart Weekly Basket (AI Replenishment)**: Personalized weekly staple recommendations (e.g. Milk, Bread, Eggs, Atta) with contextual restock badges, dynamic savings calculations, flexible overflow-proof reason tags, and 1-click bundle add-to-cart.
+- **Store Status & 10-Minute SLA Guarantee**: Real-time dark store operating hours banner, live Kirana store status (open/closed), and delivery time guarantee indicator.
+- **PDP Wishlist & Instant Favorites**: Quick-favorite toggle on product cards and product detail pages (PDP), optimistic UI updates, and synchronized favorites list.
+- **Hero Banner Carousel**: Responsive banner carousel showcasing flash deals, seasonal promotions, and category shortcuts with fluid micro-interactions.
+- **Accessibility & Contrast Hardening**: Strict WCAG 2.1 AA compliance with 6.82:1 high-contrast primary CTA buttons (`#006B23`), scalable typography hierarchy (`Outfit`), and overflow-resistant flexible tags.
 - **High-Performance Architecture**: 60–120 FPS high refresh-rate animation pipeline built on Flutter Clean Architecture and Provider state management.
 - **Authentication**: Phone OTP verification, Email/Password login, Google OAuth 2.0 / Firebase SSO, TOTP MFA, and secure token caching with Biometrics.
-- **Home Feed**: Live delivery ETA timer badge (10-minute guarantee), dynamic category feed, Kirana flash deals carousel, and store availability indicator.
 - **Smart Catalog & Search**: Debounced instant catalog search with trending queries, brand alias matching, and category filtering.
 - **Cart & Database Sync**: Real-time cart synchronization with backend database, free delivery progress meter, and instant coupon validation (`DAILY100`).
 - **End-to-End Address Management**: Add, edit, delete, and set default delivery addresses (Home, Work, Other) backed by Prisma PostgreSQL database with coordinates and floor details.
 - **Live GPS Order Tracking**: Animated step-by-step order progress timeline (`CONFIRMED` → `PACKING` → `OUT_FOR_DELIVERY` → `DELIVERED`), interactive Google Maps live telemetry with rider vehicle icon, and driver contact trigger.
 - **Order History & 1-Click Reorder**: Complete order history fetched from Prisma database, interactive order details, GST breakdown, and 1-click reorder flow adding items straight back to cart.
-- **Razorpay Payments**: Seamless Razorpay checkout (UPI, Credit/Debit Cards, NetBanking, COD) with cryptographic HMAC SHA-256 verification.
-- **Daily Basket Wallet**: In-app digital wallet balance, instant checkout, transaction ledger, and Daily Basket Plus VIP perks.
+- **Razorpay Payments & Wallet**: Seamless Razorpay checkout (UPI, Credit/Debit Cards, NetBanking, COD) with cryptographic HMAC SHA-256 verification and in-app Daily Basket Wallet balance.
 - **AI Voice & Visual Search**: Voice search interface and camera image recognition powered by backend multi-provider AI engine.
 
 ### Customer Web Portal
 
-- **Responsive Web Experience**: Built on Next.js 14 App Router, React 18, and TailwindCSS with Google Stitch dark-mode design system.
+- **Responsive Web Experience**: Built on Next.js 14 App Router, React 18, and TailwindCSS with Google Stitch design system tokens.
 - **Google & Firebase SSO**: Single-click sign-in and sign-up with automatic anonymous guest cart merging upon authentication.
+- **Wishlist & Favorites Synchronization**: Cross-platform synchronized product wishlist with instant cart additions.
 - **Address CRUD Management**: Comprehensive address management (`/profile`, `/add-address`) with full Prisma database persistence, edit and delete actions, and default selection.
 - **Order History & 1-Click Reorder**: Detailed order history, real-time live order tracking map, and instant 1-click reorder into cart.
 - **Checkout & Razorpay**: Multi-step checkout with coupon code application, wallet balance toggle, and secure payment processing.
@@ -238,6 +255,7 @@ daily-basket/
 - **Firebase Admin SDK**: Cryptographic token verification for Google OAuth tokens using project credentials (`daily-basket-8b266`).
 - **Queues & Real-time**: BullMQ job processing for notifications and email triggers alongside Socket.IO live telemetry gateways.
 - **Multi-Provider AI Engine**: Primary Google Gemini 1.5 Flash with automated failover to xAI Grok, OpenRouter, and local Ollama models.
+- **Voice & Audio Pipeline**: Voice studio transcription, speech normalization, and keyword audio extraction.
 
 ---
 
@@ -376,6 +394,8 @@ Below is a summary of the primary API endpoints. For full details, see [`docs/AP
 | **Addresses** | `POST` | `/api/v1/addresses` | Create new delivery address (with lat/lng coordinates) | Optional JWT |
 | **Addresses** | `PUT` | `/api/v1/addresses/:id` | Update existing delivery address | Optional JWT |
 | **Addresses** | `DELETE` | `/api/v1/addresses/:id` | Delete delivery address | Optional JWT |
+| **Favorites** | `GET` | `/api/v1/favorites` | Fetch authenticated user's bookmarked products | Optional JWT |
+| **Favorites** | `POST` | `/api/v1/favorites/:productId` | Toggle product bookmark status | Optional JWT |
 | **Cart** | `GET` | `/api/v1/cart` | Get current user's active cart items and subtotal | Optional JWT |
 | **Cart** | `POST` | `/api/v1/cart/items` | Add or update item quantity in cart | Optional JWT |
 | **Cart** | `DELETE` | `/api/v1/cart/items/:id` | Remove specific item from cart | Optional JWT |
@@ -392,6 +412,7 @@ Below is a summary of the primary API endpoints. For full details, see [`docs/AP
 | **Payments** | `POST` | `/api/v1/payments/initiate` | Create Razorpay payment order intent | Optional JWT |
 | **Payments** | `POST` | `/api/v1/payments/verify` | Verify Razorpay HMAC SHA-256 signature | Optional JWT |
 | **Delivery** | `GET` | `/api/v1/delivery/track/:id` | Fetch real-time GPS telemetry & ETA | Customer |
+| **Voice** | `POST` | `/api/v1/voice/transcribe` | Transcribe audio stream and normalize search intent | Public |
 | **Analytics** | `GET` | `/api/v1/analytics/:storeId` | Dark Store revenue, packing time & dispatch KPIs | Admin / Store Manager |
 
 ---
@@ -417,7 +438,7 @@ graph LR
     ToolReg --> Execute["Execute Store Actions\n(Check Stock / Track Order / Apply Coupon)"]
 ```
 
-See [`docs/AI.md`](docs/AI.md) for full provider failover and tool registration details.
+See [`docs/AI.md`](docs/AI.md) and [`docs/VOICE_SHOPPING.md`](docs/VOICE_SHOPPING.md) for full provider failover and tool registration details.
 
 ---
 
@@ -429,17 +450,30 @@ See [`docs/AI.md`](docs/AI.md) for full provider failover and tool registration 
 - **Payment Security**: Strict HMAC SHA-256 signature validation on Razorpay payments and webhooks.
 - **Throttling & Helmet**: NestJS Throttler protects endpoints from brute force and DDoS attacks.
 - **Database Safety**: Prisma ORM enforces parameterized SQL queries, eliminating SQL injection vulnerabilities.
-- **Detailed Security Specs**: See [`docs/SECURITY_ARCHITECTURE.md`](docs/SECURITY_ARCHITECTURE.md) and [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md).
+- **Detailed Security Specs**: See [`docs/SECURITY_ARCHITECTURE.md`](docs/SECURITY_ARCHITECTURE.md), [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md), and [`docs/AUTHENTICATION_HARDENING_AUDIT.md`](docs/AUTHENTICATION_HARDENING_AUDIT.md).
 
 ---
 
 ## Testing & Quality Assurance
 
+Daily Basket maintains comprehensive automated test coverage across mobile, web, and microservices layers:
+
+- **Flutter Customer Journey Test Suite**: [`runtime_customer_journey_test.dart`](apps/mobile/test/runtime_customer_journey_test.dart) executes 6 complete end-to-end customer journey scenarios:
+  1. Catalog browsing, store status banner, and banner carousel interactions.
+  2. Instant search with debounce and category filtering.
+  3. Cart operations, real-time recalculation, and coupon validation.
+  4. Checkout order summary, address selection, and provider guards.
+  5. Live GPS order tracking and itemized invoice details.
+  6. Customer profile, addresses CRUD, and preferences management.
+- **Component & Widget Testing**:
+  - [`smart_weekly_basket_card_test.dart`](apps/mobile/test/smart_weekly_basket_card_test.dart): Validates WCAG 2.1 AA 4.5:1+ contrast ratio, staple asset resolution, flex reason tag constraints, and add-all cart item propagation.
+  - [`checkout_render_test.dart`](apps/mobile/test/checkout_render_test.dart): Validates screen layout constraints and zero blank screen render regressions.
+  - [`live_support_chat_screen_test.dart`](apps/mobile/test/live_support_chat_screen_test.dart): Verifies real-time customer support interactions.
+  - [`voice_search_dialog_test.dart`](apps/mobile/test/voice_search_dialog_test.dart): Validates speech-to-text recording states and query normalization.
 - **Flutter Static Analysis**: `flutter analyze` — **0 Errors, 0 Warnings** across customer and admin mobile apps.
-- **Flutter Unit & Widget Tests**: `flutter test` — Comprehensive test suites covering providers, services, and core UI widgets.
-- **NestJS Unit Tests**: `pnpm --filter api test` — Jest test suites covering authentication, product catalog, cart calculation, address management, and AI fallback managers.
+- **NestJS Unit & Service Tests**: Over 30 service and controller test specs covering Auth, Cart, Products, Orders, Payments, Delivery, Geofencing, Timed Dispatch, Substitutions, Favorites, Notifications, BullMQ Queue, WebSockets, and Multi-Provider AI Fallback.
 - **Type Checking & Linting**: `pnpm --recursive run lint` & `tsc --noEmit` across all apps and shared packages.
-- **Comprehensive Guide**: See [`docs/TESTING.md`](docs/TESTING.md).
+- **Comprehensive Guide**: See [`docs/TESTING.md`](docs/TESTING.md) and [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md).
 
 ---
 
@@ -460,7 +494,7 @@ Pipeline Workflow:
      - Multi-stage Docker build for NGINX, API, Website, Admin, and Delivery apps
 ```
 
-See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) and [`docs/DEVOPS.md`](docs/DEVOPS.md) for deployment runbooks.
+See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md), [`docs/DEVOPS.md`](docs/DEVOPS.md), [`docs/MONITORING.md`](docs/MONITORING.md), and [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) for deployment runbooks.
 
 ---
 
@@ -478,7 +512,8 @@ Every document in the Daily Basket repository is fully detailed and maintained:
 | **Database & ERD** | [`docs/DATABASE.md`](docs/DATABASE.md) / [`docs/ERD.md`](docs/ERD.md) | PostgreSQL Prisma models, constraints & ER diagrams |
 | **Product Specs (PRD)** | [`docs/PRD.md`](docs/PRD.md) | Product vision, personas, features & user stories |
 | **Technical Specs (TRD)** | [`docs/TRD.md`](docs/TRD.md) | SLA benchmarks, tech stack specs & quality targets |
-| **Google Stitch UI** | [`docs/GOOGLE_STITCH.md`](docs/GOOGLE_STITCH.md) | Single source of truth design system & assets |
+| **Single Source of Truth** | [`design.md`](design.md) | Core UI/UX design tokens, colors, typography & corner radii |
+| **Google Stitch UI** | [`docs/GOOGLE_STITCH.md`](docs/GOOGLE_STITCH.md) | Stitch visual design system & components source of truth |
 | **Design Tokens** | [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md) | Color palettes, typography, icons, & shared components |
 | **Backend API Spec** | [`docs/BACKEND.md`](docs/BACKEND.md) | NestJS microservices, controllers, & ORM layer |
 | **Frontend Architecture** | [`docs/FRONTEND.md`](docs/FRONTEND.md) | Next.js App Router, SSR/ISR, Zustand, & packages |
@@ -487,16 +522,20 @@ Every document in the Daily Basket repository is fully detailed and maintained:
 | **Admin Dashboard** | [`docs/ADMIN_APP.md`](docs/ADMIN_APP.md) | Dark Store Admin Dashboard fulfillment queue & fleet map |
 | **Delivery PWA** | [`docs/DELIVERY_APP.md`](docs/DELIVERY_APP.md) | Rider PWA, GPS tracking, & doorstep OTP logic |
 | **Auth & Security** | [`docs/AUTHENTICATION.md`](docs/AUTHENTICATION.md) | Phone OTP, JWT rotation, TOTP MFA, & OAuth |
+| **Auth Hardening Audit** | [`docs/AUTHENTICATION_HARDENING_AUDIT.md`](docs/AUTHENTICATION_HARDENING_AUDIT.md) | Security audit, WebAuthn review, & SSO hardening |
 | **Security Architecture** | [`docs/SECURITY_ARCHITECTURE.md`](docs/SECURITY_ARCHITECTURE.md) | Security safeguards, RBAC, Helmet, & auditing |
 | **AI Integration** | [`docs/AI.md`](docs/AI.md) | Gemini/Grok multi-provider AI engine & tools |
+| **Voice Shopping** | [`docs/VOICE_SHOPPING.md`](docs/VOICE_SHOPPING.md) | Voice search architecture, transcription & audio pipelines |
 | **Realtime Engine** | [`docs/REALTIME.md`](docs/REALTIME.md) / [`docs/SOCKETS.md`](docs/SOCKETS.md) | Socket.IO event dictionary & WebSocket gateways |
 | **Cache & Redis** | [`docs/REDIS.md`](docs/REDIS.md) | Redis key namespaces, caching policies, & Pub/Sub |
 | **Queue Workers** | [`docs/BULLMQ.md`](docs/BULLMQ.md) | BullMQ background jobs & notification processors |
 | **DevOps & Containers** | [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) / [`docs/DEVOPS.md`](docs/DEVOPS.md) | Docker, Docker Compose, NGINX proxy, & K8s |
+| **Observability & Health** | [`docs/OBSERVABILITY.md`](docs/OBSERVABILITY.md) / [`docs/MONITORING.md`](docs/MONITORING.md) | Prometheus metrics, log aggregation, & health checks |
 | **Installation & Setup** | [`docs/INSTALLATION.md`](docs/INSTALLATION.md) / [`docs/SETUP.md`](docs/SETUP.md) | Environment setup, database seeding, & execution |
 | **Getting Started** | [`docs/GETTING_STARTED.md`](docs/GETTING_STARTED.md) | Onboarding guide for new developers |
 | **Environment Vars** | [`docs/ENVIRONMENT.md`](docs/ENVIRONMENT.md) | Complete environment variable specification |
 | **Testing & Quality** | [`docs/TESTING.md`](docs/TESTING.md) / [`docs/PERFORMANCE.md`](docs/PERFORMANCE.md) | Unit tests, static analysis, & load testing specs |
+| **Release Notes** | [`docs/RELEASE_NOTES.md`](docs/RELEASE_NOTES.md) | Version history, changelogs, & upgrade notes |
 | **Operations Runbook** | [`docs/GO_LIVE_RUNBOOK.md`](docs/GO_LIVE_RUNBOOK.md) / [`docs/OPERATIONS.md`](docs/OPERATIONS.md) | Deployment runbook, monitoring, & on-call rules |
 | **Disaster Recovery** | [`docs/DISASTER_RECOVERY.md`](docs/DISASTER_RECOVERY.md) / [`docs/BACKUP_STRATEGY.md`](docs/BACKUP_STRATEGY.md) | Backup automation, recovery RTO/RPO SLAs |
 | **Troubleshooting & FAQ** | [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) / [`docs/FAQ.md`](docs/FAQ.md) | Common errors, solutions, & architectural FAQs |
@@ -530,6 +569,13 @@ Every document in the Daily Basket repository is fully detailed and maintained:
   - Admin live dispatching modal with rider assignment and fleet live map tracking
   - Flutter Store Admin companion application (`apps/daily_basket_admin`)
   - High refresh-rate 60–120 FPS authentication workflow
+- [x] **v1.3.0 (Smart Basket, Accessibility & Store Operations)**
+  - Smart Weekly Basket AI staple replenishment card with 1-click bundle add-to-cart
+  - Store Status Banner with real-time dark store operating hours & 10-minute SLA guarantee
+  - PDP Wishlist & Favorites system with real-time cross-platform synchronization
+  - Strict WCAG 2.1 AA Accessibility & Contrast hardening (`#006B23` buttons, flexible text bounds)
+  - Responsive Hero Banner Carousel with category and deal deep links
+  - Comprehensive 6-suite Customer Journey runtime test suite (`runtime_customer_journey_test.dart`)
 - [ ] **v2.0.0 (Planned)**
   - Automated multi-dark store clustering and intelligent cross-store routing
   - Predictive AI inventory demand forecasting and kirana restocking alerts
