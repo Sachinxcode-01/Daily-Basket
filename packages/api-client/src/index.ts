@@ -313,7 +313,7 @@ export class ApiClient {
     });
   }
 
-  // Payment Methods (Razorpay & YouPI PG V2)
+  // Payment Methods (Razorpay)
   public async initiatePayment(orderId: string, amount: number): Promise<{ success: boolean; razorpayOrderId: string; amount: number; currency: string; keyId: string }> {
     return this.fetcher(API_ROUTES.PAYMENTS.INITIATE, {
       method: 'POST',
@@ -326,39 +326,6 @@ export class ApiClient {
       method: 'POST',
       body: JSON.stringify(payload),
     });
-  }
-
-  public async initiateYoupiPayment(
-    orderId: string,
-    amount: number,
-    customer?: { phoneNumber?: string; fullName?: string },
-  ): Promise<{
-    success: boolean;
-    gateway: string;
-    paymentId: string;
-    checkoutUrl: string;
-    amount: number;
-    currency: string;
-    vpa: string;
-  }> {
-    return this.fetcher(API_ROUTES.PAYMENTS.YOUPI_INITIATE, {
-      method: 'POST',
-      body: JSON.stringify({
-        orderId,
-        amount,
-        phoneNumber: customer?.phoneNumber,
-        fullName: customer?.fullName,
-      }),
-    });
-  }
-
-  public async getYoupiPaymentStatus(paymentId: string): Promise<{
-    paymentId: string;
-    orderId?: string;
-    status: 'PENDING' | 'SUCCESS' | 'FAILED' | 'EXPIRED' | string;
-    amount?: number;
-  }> {
-    return this.fetcher(API_ROUTES.PAYMENTS.YOUPI_STATUS(paymentId));
   }
 
   public async getOrderTracking(orderId: string): Promise<{

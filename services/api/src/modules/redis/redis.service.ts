@@ -24,7 +24,14 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     const port = this.configService.get<number>('redis.port', 6379);
 
     this.client = new Redis({ host, port, lazyConnect: true, retryStrategy: (times) => Math.min(times * 100, 3000) });
+    this.client.on('error', (err) => {
+      this.logger.debug(`Redis offline: ${err.message}`);
+    });
+
     this.subscriberClient = new Redis({ host, port, lazyConnect: true });
+    this.subscriberClient.on('error', (err) => {
+      this.logger.debug(`Redis subscriber offline: ${err.message}`);
+    });
 
     this.client.connect().then(() => {
       this.logger.log(`⚡ Production Redis Connected at ${host}:${port}`);

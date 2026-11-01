@@ -12,9 +12,25 @@ export class RedisIoAdapter extends IoAdapter {
     const host = process.env.REDIS_HOST || 'localhost';
     const port = parseInt(process.env.REDIS_PORT || '6379', 10);
 
-    const pubClient = new Redis({ host, port });
-    const subClient = pubClient.duplicate();
+    const pubClient = new Redis({
+      host,
+      port,
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+      retryStrategy: () => null,
+    });
+    pubClient.on('error', () => {});
 
+    const subClient = new Redis({
+      host,
+      port,
+      lazyConnect: true,
+      maxRetriesPerRequest: 1,
+      retryStrategy: () => null,
+    });
+    subClient.on('error', () => {});
+
+    await Promise.all([pubClient.connect(), subClient.connect()]);
     await Promise.all([pubClient.ping(), subClient.ping()]);
 
     this.adapterConstructor = createAdapter(pubClient, subClient);
