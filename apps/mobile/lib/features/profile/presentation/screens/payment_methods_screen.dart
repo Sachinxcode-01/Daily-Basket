@@ -10,7 +10,7 @@ class PaymentMethodsScreen extends StatefulWidget {
 }
 
 class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
-  String _primaryMethodId = 'upi_gpay';
+  String _primaryMethodId = 'cod';
 
   final List<Map<String, dynamic>> _savedMethods = [
     {
@@ -19,7 +19,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       'title': 'Google Pay UPI',
       'subtitle': 'aarav.sharma@okaxis',
       'icon': Icons.bolt_rounded,
-      'badge': 'PRIMARY',
+      'badge': null,
       'color': const Color(0xFF006B23),
     },
     {
@@ -55,7 +55,7 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
       'title': 'Cash on Delivery',
       'subtitle': 'Pay cash or UPI at delivery doorstep',
       'icon': Icons.payments_rounded,
-      'badge': null,
+      'badge': 'PRIMARY',
       'color': const Color(0xFF2E7D32),
     },
   ];

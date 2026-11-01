@@ -95,7 +95,7 @@ export class OrderPricingService {
   async calculatePricing(dto: CalculatePricingDto): Promise<OrderPricingResult> {
     const items = dto.items || [];
     const userWalletBalance = dto.userWalletBalance ?? 150.0;
-    const selectedPaymentMethod = dto.paymentMethod || 'UPI';
+    const selectedPaymentMethod = dto.paymentMethod || 'COD';
 
     // 1. Calculate Subtotal & Item Savings
     let subtotal = 0;
@@ -277,63 +277,15 @@ export class OrderPricingService {
     // 12. Final Payable Amount
     const finalPayable = Math.max(0, +(grandTotal - walletDeducted).toFixed(2));
 
-    // 13. Supported Payment Methods List
+    // 13. Supported Payment Methods List (Only Cash on Delivery)
     const paymentMethods = [
-      {
-        id: 'UPI',
-        name: 'UPI (Instant)',
-        badge: 'FASTEST',
-        subtitle: 'Google Pay, PhonePe, Paytm, BHIM',
-        iconName: 'bolt',
-        isAvailable: true,
-      },
-      {
-        id: 'CREDIT_CARD',
-        name: 'Credit Card',
-        badge: 'OFFERS',
-        subtitle: 'Visa, Mastercard, AMEX, RuPay',
-        iconName: 'credit_card',
-        isAvailable: true,
-      },
-      {
-        id: 'DEBIT_CARD',
-        name: 'Debit Card',
-        badge: null,
-        subtitle: 'All Indian bank debit cards',
-        iconName: 'credit_card',
-        isAvailable: true,
-      },
-      {
-        id: 'NETBANKING',
-        name: 'Net Banking',
-        badge: null,
-        subtitle: 'HDFC, SBI, ICICI, Axis & 50+ Banks',
-        iconName: 'account_balance',
-        isAvailable: true,
-      },
-      {
-        id: 'WALLET',
-        name: 'Daily Basket Wallet',
-        badge: '₹150 BALANCE',
-        subtitle: 'Instant 1-click checkout',
-        iconName: 'account_balance_wallet',
-        isAvailable: userWalletBalance > 0,
-      },
       {
         id: 'COD',
         name: 'Cash on Delivery',
-        badge: null,
+        badge: 'ACTIVE',
         subtitle: 'Pay cash or UPI at delivery doorstep',
         iconName: 'payments',
         isAvailable: true,
-      },
-      {
-        id: 'EMI',
-        name: 'Easy EMI',
-        badge: '3-12 MONTHS',
-        subtitle: 'Credit Card EMI & No Cost EMI',
-        iconName: 'calendar_month',
-        isAvailable: grandTotal >= 1999,
       },
     ];
 

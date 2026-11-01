@@ -194,13 +194,14 @@ export class OrdersService {
       const store = dispatchResult.selectedStore;
 
       // 4. Resolve Payment Method Enum
-      let resolvedPaymentMethod: PaymentMethod = PaymentMethod.UPI;
-      const rawMethod = (typeof data.paymentMethod === 'string' ? data.paymentMethod : data.paymentMethod?.id || 'UPI').toUpperCase();
-      if (rawMethod.includes('CARD')) resolvedPaymentMethod = PaymentMethod.CARD;
+      let resolvedPaymentMethod: PaymentMethod = PaymentMethod.CASH_ON_DELIVERY;
+      const rawMethod = (typeof data.paymentMethod === 'string' ? data.paymentMethod : data.paymentMethod?.id || 'COD').toUpperCase();
+      if (rawMethod.includes('COD') || rawMethod.includes('CASH')) resolvedPaymentMethod = PaymentMethod.CASH_ON_DELIVERY;
+      else if (rawMethod.includes('CARD')) resolvedPaymentMethod = PaymentMethod.CARD;
       else if (rawMethod.includes('WALLET')) resolvedPaymentMethod = PaymentMethod.WALLET;
-      else if (rawMethod.includes('COD') || rawMethod.includes('CASH')) resolvedPaymentMethod = PaymentMethod.CASH_ON_DELIVERY;
       else if (rawMethod.includes('NET')) resolvedPaymentMethod = PaymentMethod.NET_BANKING;
-      else resolvedPaymentMethod = PaymentMethod.UPI;
+      else if (rawMethod.includes('UPI')) resolvedPaymentMethod = PaymentMethod.UPI;
+      else resolvedPaymentMethod = PaymentMethod.CASH_ON_DELIVERY;
 
       const pricing = await this.orderPricingService.calculatePricing({
         items: (data.items || []).map((i) => ({

@@ -48,7 +48,7 @@ class PricingBreakdown {
       grandTotal: (map['grandTotal'] as num?)?.toDouble() ?? 0.0,
       walletDeducted: (map['walletDeducted'] as num?)?.toDouble() ?? 0.0,
       finalPayable: (map['finalPayable'] as num?)?.toDouble() ?? 0.0,
-      selectedPaymentMethod: (map['selectedPaymentMethod'] as String?) ?? 'UPI',
+      selectedPaymentMethod: (map['selectedPaymentMethod'] as String?) ?? 'COD',
       appliedCoupon: map['appliedCoupon'] as String?,
     );
   }
@@ -58,7 +58,7 @@ class PricingBreakdown {
 class CheckoutProvider extends ChangeNotifier {
   final String baseUrl;
 
-  String _selectedPaymentMethod = 'UPI';
+  String _selectedPaymentMethod = 'COD';
   bool _useWallet = false;
   final double _userWalletBalance = 150.0;
   String? _appliedCouponCode;

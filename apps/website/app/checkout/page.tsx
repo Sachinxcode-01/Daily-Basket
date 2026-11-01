@@ -7,18 +7,16 @@
 import React, { useMemo, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ArrowLeft, MapPin, CreditCard, ShieldCheck, CheckCircle2, Zap, Clock, Loader2 } from 'lucide-react';
+import { ArrowLeft, MapPin, CheckCircle2, Zap, Clock, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { formatCurrency } from '@daily-basket/shared-utils';
 import { apiClient } from '@daily-basket/api-client';
 import { useCart } from '../../store/useCart';
 
-type PaymentChoice = 'UPI' | 'CARD' | 'COD';
+type PaymentChoice = 'COD';
 
 // Map the UI payment choice to the backend PaymentMethod enum.
 const PAYMENT_ENUM: Record<PaymentChoice, string> = {
-  UPI: 'UPI',
-  CARD: 'CARD',
   COD: 'CASH_ON_DELIVERY',
 };
 
@@ -28,7 +26,7 @@ function CheckoutInner() {
   const couponCode = searchParams?.get('coupon') || undefined;
 
   const { activeItems, userId, clear } = useCart();
-  const [selectedPayment, setSelectedPayment] = useState<PaymentChoice>('UPI');
+  const [selectedPayment] = useState<PaymentChoice>('COD');
   const [isPlacing, setIsPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,7 +93,7 @@ function CheckoutInner() {
     try {
       let orderId = '';
       try {
-        // 1. Create the order (server recomputes totals + generates delivery OTP).
+        // 1. Create the order with Cash on Delivery (server recomputes totals + generates delivery OTP).
         const order = await apiClient.createOrder({
           userId,
           addressId: address.id,
@@ -104,48 +102,13 @@ function CheckoutInner() {
           couponCode,
         });
         orderId = order?.id || '';
-
-        // 2. Online payment:
-        if (selectedPayment === 'UPI' && orderId) {
-          try {
-            const youpiSession = await apiClient.initiateYoupiPayment(order.id, payable || order.totalAmount);
-            if (typeof window !== 'undefined' && (window as any).Youpi) {
-              (window as any).Youpi.pay({
-                order_id: order.id,
-                amount: payable || order.totalAmount,
-                currency: 'INR',
-                name: 'Daily Basket',
-                description: 'Instant 10-Minute Grocery Delivery',
-                handler: async function (response: any) {
-                  await clear.mutateAsync().catch(() => {});
-                  router.push(`/order-success?orderId=${orderId}&utr=${response?.utr || ''}`);
-                },
-                onClose: function () {
-                  setIsPlacing(false);
-                },
-              });
-              return;
-            }
-          } catch {
-            // Local preview fallback if YouPI server is connecting
-          }
-        } else if (selectedPayment === 'CARD' && orderId) {
-          try {
-            const init = await apiClient.initiatePayment(order.id, order.totalAmount);
-            await apiClient.verifyPayment({
-              paymentId: `pay_test_${Date.now()}`,
-              razorpayOrderId: init?.razorpayOrderId || `order_${Date.now()}`,
-              razorpaySignature: 'sig_test_demo',
-            });
-          } catch {}
-        }
       } catch {
         // Offline preview order placement fallback
         orderId = `ord_db_${Date.now().toString().slice(-6)}`;
       }
 
-      // 3. Clear the cart and go to the confirmation screen.
-      await clear.mutateAsync().catch(() => {});
+      // 2. Clear the cart and navigate to the order confirmation screen.
+      await clear.mutateAsync().catch(() => { });
       router.push(`/order-success?orderId=${orderId}`);
     } catch (err: any) {
       setError(err?.message || 'Could not place your order. Please try again.');
@@ -214,59 +177,24 @@ function CheckoutInner() {
             </div>
           </div>
 
-          {/* Payment Methods */}
+          {/* Payment Method */}
           <div className="bg-slate-800/80 border border-slate-700/60 p-5 rounded-2xl space-y-3">
-            <h3 className="text-sm font-bold text-white mb-2">Select Payment Method</h3>
+            <h3 className="text-sm font-bold text-white mb-2">Payment Method</h3>
 
             <div
-              onClick={() => setSelectedPayment('UPI')}
-              className={`p-4 rounded-xl border cursor-pointer flex items-center justify-between transition ${
-                selectedPayment === 'UPI' ? 'bg-emerald-500/10 border-emerald-500' : 'bg-slate-900/60 border-slate-700'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm font-bold text-white">Direct UPI (0% Fee Instant)</p>
-                    <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">⚡ YouPI</span>
-                  </div>
-                  <p className="text-xs text-slate-400">Google Pay, PhonePe, Paytm, CRED with Instant Settlement</p>
-                </div>
-              </div>
-              {selectedPayment === 'UPI' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-            </div>
-
-            <div
-              onClick={() => setSelectedPayment('CARD')}
-              className={`p-4 rounded-xl border cursor-pointer flex items-center justify-between transition ${
-                selectedPayment === 'CARD' ? 'bg-emerald-500/10 border-emerald-500' : 'bg-slate-900/60 border-slate-700'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <CreditCard className="w-5 h-5 text-sky-400" />
-                <div>
-                  <p className="text-sm font-bold text-white">Credit / Debit Card (Razorpay)</p>
-                  <p className="text-xs text-slate-400">Visa, Mastercard, RuPay</p>
-                </div>
-              </div>
-              {selectedPayment === 'CARD' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-            </div>
-
-            <div
-              onClick={() => setSelectedPayment('COD')}
-              className={`p-4 rounded-xl border cursor-pointer flex items-center justify-between transition ${
-                selectedPayment === 'COD' ? 'bg-emerald-500/10 border-emerald-500' : 'bg-slate-900/60 border-slate-700'
-              }`}
+              className="p-4 rounded-xl border flex items-center justify-between transition bg-emerald-500/10 border-emerald-500"
             >
               <div className="flex items-center gap-3">
                 <Zap className="w-5 h-5 text-amber-400" />
                 <div>
-                  <p className="text-sm font-bold text-white">Cash on Delivery (COD)</p>
-                  <p className="text-xs text-slate-400">Pay cash upon 10-min arrival</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-bold text-white">Cash on Delivery (COD)</p>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">DEFAULT</span>
+                  </div>
+                  <p className="text-xs text-slate-400">Pay cash or UPI to rider upon 10-min arrival</p>
                 </div>
               </div>
-              {selectedPayment === 'COD' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
+              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
             </div>
           </div>
 
@@ -305,7 +233,7 @@ function CheckoutInner() {
               disabled={isPlacing || pricingLoading || !address}
               className="flex-1 max-w-xs py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold rounded-xl shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2 transition"
             >
-              {isPlacing ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>{selectedPayment === 'COD' ? 'Place 10-Min Order' : `Pay ${formatCurrency(payable)}`}</span>}
+              {isPlacing ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Place Cash on Delivery Order</span>}
             </button>
           </div>
         </div>

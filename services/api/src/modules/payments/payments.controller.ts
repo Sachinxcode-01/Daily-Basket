@@ -5,7 +5,7 @@ import { PaymentsService } from './payments.service';
 @ApiTags('Payments')
 @Controller('payments')
 export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+  constructor(private readonly paymentsService: PaymentsService) { }
 
   @Post('initiate')
   @ApiOperation({ summary: 'Initiate Razorpay checkout payment intent' })

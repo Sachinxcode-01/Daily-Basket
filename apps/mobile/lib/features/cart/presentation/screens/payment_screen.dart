@@ -27,53 +27,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   final List<Map<String, dynamic>> _methods = [
     {
-      'id': 'UPI',
-      'title': 'Direct UPI (Instant)',
-      'badge': '0% FEE • YOUPI',
-      'subtitle': 'Google Pay, PhonePe, Paytm, CRED',
-      'icon': Icons.bolt_rounded,
-    },
-    {
-      'id': 'CREDIT_CARD',
-      'title': 'Credit Card',
-      'badge': 'OFFERS',
-      'subtitle': 'Visa, Mastercard, AMEX, RuPay',
-      'icon': Icons.credit_card_rounded,
-    },
-    {
-      'id': 'DEBIT_CARD',
-      'title': 'Debit Card',
-      'badge': null,
-      'subtitle': 'All major Indian bank debit cards',
-      'icon': Icons.credit_card_rounded,
-    },
-    {
-      'id': 'NETBANKING',
-      'title': 'Net Banking',
-      'badge': null,
-      'subtitle': 'HDFC, SBI, ICICI, Axis & 50+ Banks',
-      'icon': Icons.account_balance_rounded,
-    },
-    {
-      'id': 'WALLET',
-      'title': 'Daily Basket Wallet',
-      'badge': '₹150 BALANCE',
-      'subtitle': '1-Click instant checkout',
-      'icon': Icons.account_balance_wallet_rounded,
-    },
-    {
       'id': 'COD',
       'title': 'Cash on Delivery',
-      'badge': null,
+      'badge': 'RECOMMENDED',
       'subtitle': 'Pay cash or UPI at delivery doorstep',
       'icon': Icons.payments_rounded,
-    },
-    {
-      'id': 'EMI',
-      'title': 'Easy EMI',
-      'badge': 'NO COST',
-      'subtitle': '3-12 Month Credit Card EMI',
-      'icon': Icons.calendar_month_rounded,
     },
   ];
 
@@ -111,20 +69,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
         token: auth.accessToken,
       );
 
-      // Trigger 0% fee YouPI payment session for UPI orders
-      final createdOrderId = res['id'] ?? res['orderNumber'];
-      if (checkoutProvider.selectedPaymentMethod == 'UPI' && createdOrderId != null) {
-        try {
-          await auth.apiClient.post(
-            '/payments/youpi/initiate',
-            {
-              'orderId': createdOrderId,
-              'amount': widget.totalAmount > 0 ? widget.totalAmount : 60.0,
-            },
-            token: auth.accessToken,
-          );
-        } catch (_) {}
-      }
+      
     } catch (_) {}
 
     if (!mounted) return;
