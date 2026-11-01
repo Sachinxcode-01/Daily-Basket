@@ -9,13 +9,11 @@ class ApiClient {
   final String baseUrl;
   final http.Client _httpClient;
 
-  /// Default API Base URL resolving automatically for Android Emulator vs Web/iOS/Desktop
+  /// Default API Base URL resolving to Cloudflare Tunnel or environment override
   static String get defaultBaseUrl {
-    if (kIsWeb) return 'http://localhost:4000/api/v1';
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://10.0.2.2:4000/api/v1';
-    }
-    return 'http://localhost:4000/api/v1';
+    const customApiUrl = String.fromEnvironment('API_BASE_URL');
+    if (customApiUrl.isNotEmpty) return customApiUrl;
+    return 'https://produced-fed-supervisors-mounted.trycloudflare.com/api/v1';
   }
 
   ApiClient({String? baseUrl, http.Client? client})
@@ -27,7 +25,8 @@ class ApiClient {
     return {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
-      if (effectiveToken != null && effectiveToken.isNotEmpty) 'Authorization': 'Bearer $effectiveToken',
+      if (effectiveToken != null && effectiveToken.isNotEmpty)
+        'Authorization': 'Bearer $effectiveToken',
     };
   }
 
@@ -35,14 +34,20 @@ class ApiClient {
     if (endpoint.startsWith('http://') || endpoint.startsWith('https://')) {
       return Uri.parse(endpoint);
     }
-    final cleanEndpoint = endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
-    final cleanBase = baseUrl.endsWith('/') ? baseUrl.substring(0, baseUrl.length - 1) : baseUrl;
+    final cleanEndpoint =
+        endpoint.startsWith('/') ? endpoint.substring(1) : endpoint;
+    final cleanBase = baseUrl.endsWith('/')
+        ? baseUrl.substring(0, baseUrl.length - 1)
+        : baseUrl;
     return Uri.parse('$cleanBase/$cleanEndpoint');
   }
 
-  Future<Map<String, dynamic>> get(String endpoint, {String? token, Duration timeout = const Duration(seconds: 15)}) async {
+  Future<Map<String, dynamic>> get(String endpoint,
+      {String? token, Duration timeout = const Duration(seconds: 15)}) async {
     try {
-      final response = await _httpClient.get(_resolveUri(endpoint), headers: _headers(token)).timeout(timeout);
+      final response = await _httpClient
+          .get(_resolveUri(endpoint), headers: _headers(token))
+          .timeout(timeout);
       return _parseResponse(response);
     } catch (e) {
       debugPrint('ApiClient GET $endpoint error: $e');
@@ -50,13 +55,16 @@ class ApiClient {
     }
   }
 
-  Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> body, {String? token, Duration timeout = const Duration(seconds: 15)}) async {
+  Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> body,
+      {String? token, Duration timeout = const Duration(seconds: 15)}) async {
     try {
-      final response = await _httpClient.post(
-        _resolveUri(endpoint),
-        headers: _headers(token),
-        body: jsonEncode(body),
-      ).timeout(timeout);
+      final response = await _httpClient
+          .post(
+            _resolveUri(endpoint),
+            headers: _headers(token),
+            body: jsonEncode(body),
+          )
+          .timeout(timeout);
       return _parseResponse(response);
     } catch (e) {
       debugPrint('ApiClient POST $endpoint error: $e');
@@ -64,13 +72,16 @@ class ApiClient {
     }
   }
 
-  Future<Map<String, dynamic>> put(String endpoint, Map<String, dynamic> body, {String? token, Duration timeout = const Duration(seconds: 15)}) async {
+  Future<Map<String, dynamic>> put(String endpoint, Map<String, dynamic> body,
+      {String? token, Duration timeout = const Duration(seconds: 15)}) async {
     try {
-      final response = await _httpClient.put(
-        _resolveUri(endpoint),
-        headers: _headers(token),
-        body: jsonEncode(body),
-      ).timeout(timeout);
+      final response = await _httpClient
+          .put(
+            _resolveUri(endpoint),
+            headers: _headers(token),
+            body: jsonEncode(body),
+          )
+          .timeout(timeout);
       return _parseResponse(response);
     } catch (e) {
       debugPrint('ApiClient PUT $endpoint error: $e');
@@ -78,13 +89,16 @@ class ApiClient {
     }
   }
 
-  Future<Map<String, dynamic>> patch(String endpoint, Map<String, dynamic> body, {String? token, Duration timeout = const Duration(seconds: 15)}) async {
+  Future<Map<String, dynamic>> patch(String endpoint, Map<String, dynamic> body,
+      {String? token, Duration timeout = const Duration(seconds: 15)}) async {
     try {
-      final response = await _httpClient.patch(
-        _resolveUri(endpoint),
-        headers: _headers(token),
-        body: jsonEncode(body),
-      ).timeout(timeout);
+      final response = await _httpClient
+          .patch(
+            _resolveUri(endpoint),
+            headers: _headers(token),
+            body: jsonEncode(body),
+          )
+          .timeout(timeout);
       return _parseResponse(response);
     } catch (e) {
       debugPrint('ApiClient PATCH $endpoint error: $e');
@@ -92,9 +106,12 @@ class ApiClient {
     }
   }
 
-  Future<Map<String, dynamic>> delete(String endpoint, {String? token, Duration timeout = const Duration(seconds: 15)}) async {
+  Future<Map<String, dynamic>> delete(String endpoint,
+      {String? token, Duration timeout = const Duration(seconds: 15)}) async {
     try {
-      final response = await _httpClient.delete(_resolveUri(endpoint), headers: _headers(token)).timeout(timeout);
+      final response = await _httpClient
+          .delete(_resolveUri(endpoint), headers: _headers(token))
+          .timeout(timeout);
       return _parseResponse(response);
     } catch (e) {
       debugPrint('ApiClient DELETE $endpoint error: $e');
@@ -116,10 +133,13 @@ class ApiClient {
       '/voice/search',
       {
         if (queryHint != null && queryHint.isNotEmpty) 'queryHint': queryHint,
-        if (audioBase64 != null && audioBase64.isNotEmpty) 'audioBase64': audioBase64,
+        if (audioBase64 != null && audioBase64.isNotEmpty)
+          'audioBase64': audioBase64,
         if (mimeType != null && mimeType.isNotEmpty) 'mimeType': mimeType,
-        if (languageHint != null && languageHint.isNotEmpty) 'languageHint': languageHint,
-        if (currentRoute != null && currentRoute.isNotEmpty) 'currentRoute': currentRoute,
+        if (languageHint != null && languageHint.isNotEmpty)
+          'languageHint': languageHint,
+        if (currentRoute != null && currentRoute.isNotEmpty)
+          'currentRoute': currentRoute,
       },
       token: token,
       timeout: timeout,
@@ -134,7 +154,9 @@ class ApiClient {
         if (!decoded.containsKey('success')) {
           decoded['success'] = isOk;
         }
-        if (!isOk && !decoded.containsKey('error') && decoded.containsKey('message')) {
+        if (!isOk &&
+            !decoded.containsKey('error') &&
+            decoded.containsKey('message')) {
           final msg = decoded['message'];
           decoded['error'] = msg is List ? msg.join(', ') : msg.toString();
         }

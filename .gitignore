@@ -70,3 +70,7 @@ graphify-out/
 # YouPI-PG Local Gateway Service
 youpi-pg/
 
+# Local Tools & Tunnel Binaries
+tools/
+*.exe
+

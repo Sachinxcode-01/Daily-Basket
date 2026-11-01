@@ -1,19 +1,17 @@
 import 'dart:convert';
-import 'dart:io' show Platform;
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
 class AdminApiClient {
   static String get baseUrl {
-    if (kIsWeb) return 'http://localhost:4000/api/v1';
-    try {
-      if (Platform.isAndroid) return 'http://10.0.2.2:4000/api/v1';
-    } catch (_) {}
-    return 'http://localhost:4000/api/v1';
+    const customApiUrl = String.fromEnvironment('API_BASE_URL');
+    if (customApiUrl.isNotEmpty) return customApiUrl;
+    return 'https://produced-fed-supervisors-mounted.trycloudflare.com/api/v1';
   }
+
   static String? authToken;
 
-  static Future<Map<String, dynamic>> post(String path, Map<String, dynamic> body) async {
+  static Future<Map<String, dynamic>> post(
+      String path, Map<String, dynamic> body) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl$path'),
@@ -25,7 +23,10 @@ class AdminApiClient {
       );
       return jsonDecode(response.body);
     } catch (_) {
-      return {'success': false, 'message': 'Network offline or server unreachable.'};
+      return {
+        'success': false,
+        'message': 'Network offline or server unreachable.'
+      };
     }
   }
 
@@ -40,7 +41,10 @@ class AdminApiClient {
       );
       return jsonDecode(response.body);
     } catch (_) {
-      return {'success': false, 'message': 'Network offline or server unreachable.'};
+      return {
+        'success': false,
+        'message': 'Network offline or server unreachable.'
+      };
     }
   }
 }
