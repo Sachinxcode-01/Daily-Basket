@@ -68,7 +68,8 @@ class CheckoutProvider extends ChangeNotifier {
 
   PricingBreakdown? _pricing;
 
-  CheckoutProvider({String? baseUrl}) : baseUrl = baseUrl ?? ApiClient.defaultBaseUrl;
+  CheckoutProvider({String? baseUrl})
+      : baseUrl = baseUrl ?? ApiClient.defaultBaseUrl;
 
   // Getters
   String get selectedPaymentMethod => _selectedPaymentMethod;
@@ -130,7 +131,9 @@ class CheckoutProvider extends ChangeNotifier {
       try {
         final client = HttpClient();
         client.connectionTimeout = const Duration(seconds: 2);
-        final request = await client.postUrl(Uri.parse('$baseUrl/orders/calculate')).timeout(const Duration(seconds: 2));
+        final request = await client
+            .postUrl(Uri.parse('$baseUrl/orders/calculate'))
+            .timeout(const Duration(seconds: 2));
         request.headers.set('content-type', 'application/json');
         request.write(jsonEncode({
           'items': itemsPayload,
@@ -140,7 +143,8 @@ class CheckoutProvider extends ChangeNotifier {
           'deliverySlot': _selectedSlot,
           'userWalletBalance': _userWalletBalance,
         }));
-        final response = await request.close().timeout(const Duration(seconds: 2));
+        final response =
+            await request.close().timeout(const Duration(seconds: 2));
 
         if (response.statusCode == 200) {
           final bodyStr = await response.transform(utf8.decoder).join();
@@ -179,7 +183,12 @@ class CheckoutProvider extends ChangeNotifier {
     final taxable = (subtotal - couponDiscount).clamp(0.0, double.infinity);
     final totalGst = double.parse((taxable * 0.05).toStringAsFixed(2));
 
-    final grandTotal = (subtotal + deliveryFee + platformFee + packagingFee + totalGst - couponDiscount)
+    final grandTotal = (subtotal +
+            deliveryFee +
+            platformFee +
+            packagingFee +
+            totalGst -
+            couponDiscount)
         .clamp(0.0, double.infinity);
 
     double walletDeducted = 0.0;

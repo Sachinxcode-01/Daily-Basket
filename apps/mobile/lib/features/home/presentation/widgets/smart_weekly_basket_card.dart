@@ -25,7 +25,8 @@ class SmartWeeklyBasketCard extends StatelessWidget {
         'name': 'Amul Taaza Milk 1L',
         'price': 56.0,
         'unit': '1L',
-        'image': 'assets/products/milk/1ded64a0-9f20-4a1d-8211-156f221b377b.png',
+        'image':
+            'assets/products/milk/1ded64a0-9f20-4a1d-8211-156f221b377b.png',
         'reason': 'Purchased every 2 days',
       },
       {
@@ -33,7 +34,8 @@ class SmartWeeklyBasketCard extends StatelessWidget {
         'name': 'Aashirvaad Chakki Atta 5kg',
         'price': 280.0,
         'unit': '5kg',
-        'image': 'assets/products/poha-daliya-grains/1092_1643384330629.png',
+        'image':
+            'assets/products/poha-daliya-grains/aashirvaad_chakki_atta_5kg.png',
         'reason': 'Reorder interval (14 days)',
       },
       {
@@ -54,9 +56,11 @@ class SmartWeeklyBasketCard extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white, // surface-container-lowest: #ffffff per design.md
-        borderRadius: BorderRadius.circular(16), // rounded-2xl bento card per design.md
+        borderRadius:
+            BorderRadius.circular(16), // rounded-2xl bento card per design.md
         border: Border.all(
-          color: const Color(0xFF2D9D43).withValues(alpha: 0.35), // primary outline per design.md
+          color: const Color(0xFF2D9D43)
+              .withValues(alpha: 0.35), // primary outline per design.md
           width: 1.2,
         ),
         boxShadow: [
@@ -94,7 +98,8 @@ class SmartWeeklyBasketCard extends StatelessWidget {
                       style: GoogleFonts.outfit(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
-                        color: const Color(0xFF191C1E), // on-surface: #191c1e per design.md
+                        color: const Color(
+                            0xFF191C1E), // on-surface: #191c1e per design.md
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -104,7 +109,8 @@ class SmartWeeklyBasketCard extends StatelessWidget {
                       'AI predicted staples based on your order patterns',
                       style: GoogleFonts.inter(
                         fontSize: 11,
-                        color: const Color(0xFF64748B), // on-surface-subtle: #64748b per design.md
+                        color: const Color(
+                            0xFF64748B), // on-surface-subtle: #64748b per design.md
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -139,10 +145,12 @@ class SmartWeeklyBasketCard extends StatelessWidget {
                   margin: const EdgeInsets.only(bottom: 8.0),
                   padding: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFF9F9FC), // surface: #f9f9fc per design.md
+                    color: const Color(
+                        0xFFF9F9FC), // surface: #f9f9fc per design.md
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: const Color(0xFFBECAB9).withValues(alpha: 0.35), // outline-variant/30
+                      color: const Color(0xFFBECAB9)
+                          .withValues(alpha: 0.35), // outline-variant/30
                     ),
                   ),
                   child: Row(
@@ -152,7 +160,8 @@ class SmartWeeklyBasketCard extends StatelessWidget {
                         child: Container(
                           width: 40,
                           height: 40,
-                          color: const Color(0xFFF3F3F6), // surface-container-low
+                          color:
+                              const Color(0xFFF3F3F6), // surface-container-low
                           padding: const EdgeInsets.all(3),
                           child: AppNetworkImage(
                             imageUrl: item['image'],
@@ -182,9 +191,11 @@ class SmartWeeklyBasketCard extends StatelessWidget {
                               children: [
                                 Flexible(
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF2D9D43).withValues(alpha: 0.1),
+                                      color: const Color(0xFF2D9D43)
+                                          .withValues(alpha: 0.1),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
@@ -194,7 +205,8 @@ class SmartWeeklyBasketCard extends StatelessWidget {
                                       style: GoogleFonts.inter(
                                         fontSize: 10,
                                         fontWeight: FontWeight.w600,
-                                        color: const Color(0xFF2D9D43), // primary: #2d9d43
+                                        color: const Color(
+                                            0xFF2D9D43), // primary: #2d9d43
                                       ),
                                     ),
                                   ),
@@ -252,12 +264,16 @@ class SmartWeeklyBasketCard extends StatelessWidget {
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF2D9D43), // primary: #2d9d43 per design.md Section 2 & 5.4
-                foregroundColor: Colors.white, // on-primary: #ffffff per design.md
+                backgroundColor: const Color(
+                    0xFF006B23), // Darker green providing >= 4.5:1 (6.82:1) contrast with white
+                foregroundColor:
+                    Colors.white, // on-primary: #ffffff per design.md
                 elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
-              icon: const Icon(Icons.shopping_bag_outlined, size: 18, color: Colors.white),
+              icon: const Icon(Icons.shopping_bag_outlined,
+                  size: 18, color: Colors.white),
               label: Text(
                 'Add All ${predictedStaples.length} Staples to Basket (₹${totalStaplesAmount.toStringAsFixed(0)})',
                 style: GoogleFonts.outfit(
