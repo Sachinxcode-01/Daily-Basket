@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import '../../providers/tracking_provider.dart';
 
@@ -17,6 +19,7 @@ class OrderTrackingScreen extends StatefulWidget {
 }
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
+  final MapController _mapController = MapController();
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -92,184 +95,286 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               physics: const BouncingScrollPhysics(),
               child: Column(
                 children: [
-                  // ─── 1. Map Header Section with Moving Driver Marker ──────────────
-                  SizedBox(
-                    height: 240,
+                  // ─── 1. Live Interactive OpenStreetMap (100% Free • No API Key) ──────
+                  Container(
+                    height: 290,
                     width: double.infinity,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF3F3F6),
+                    ),
                     child: Stack(
                       children: [
-                        // Vector Map Canvas Simulation
-                        Container(
-                          width: double.infinity,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFE5ECE5),
+                        FlutterMap(
+                          mapController: _mapController,
+                          options: MapOptions(
+                            initialCenter: tracking.driverLocation,
+                            initialZoom: 15.0,
+                            minZoom: 11.0,
+                            maxZoom: 18.5,
+                            interactionOptions: const InteractionOptions(
+                              flags: InteractiveFlag.pinchZoom |
+                                  InteractiveFlag.drag |
+                                  InteractiveFlag.doubleTapZoom,
+                            ),
                           ),
-                          child: CustomPaint(
-                            painter: _MapCanvasPainter(progressRatio: tracking.progressRatio),
-                            child: const SizedBox.expand(),
-                          ),
-                        ),
+                          children: [
+                            // 100% Free OpenStreetMap Tile Layer
+                            TileLayer(
+                              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              userAgentPackageName: 'com.example.daily_basket_mobile',
+                            ),
 
-                        // Store Hub Marker (Start Point)
-                        Positioned(
-                          top: 45,
-                          left: 40,
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 34,
-                                height: 34,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF1A1C1E),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2.5),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withValues(alpha: 0.15),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.store_mall_directory_rounded,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  'Hub Store #01',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w700,
-                                    color: const Color(0xFF1A1C1E),
+                            // Real road-following route polylines (OSRM geometry)
+                            if (tracking.routePoints.isNotEmpty) ...[
+                              PolylineLayer(
+                                polylines: [
+                                  Polyline(
+                                    points: tracking.routePoints,
+                                    color: const Color(0xFF078730).withValues(alpha: 0.3),
+                                    strokeWidth: 8.0,
                                   ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Customer Destination Pin (End Point)
-                        Positioned(
-                          bottom: 25,
-                          right: 45,
-                          child: Column(
-                            children: [
-                              Container(
-                                width: 34,
-                                height: 34,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF006B23),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2.5),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: const Color(0xFF006B23).withValues(alpha: 0.3),
-                                      blurRadius: 8,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: const Icon(
-                                  Icons.location_on_rounded,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: Text(
-                                  'Doorstep',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w700,
-                                    color: const Color(0xFF006B23),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        // Moving Driver Pin Icon based on progressRatio
-                        LayoutBuilder(
-                          builder: (context, constraints) {
-                            final w = constraints.maxWidth;
-                            final start = Offset(w * 0.22, 60);
-                            final end = Offset(w * 0.82, 175);
-                            final x = start.dx + (end.dx - start.dx) * tracking.progressRatio;
-                            final y = start.dy + (end.dy - start.dy) * tracking.progressRatio;
-
-                            return Positioned(
-                              left: x - 24,
-                              top: y - 24,
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(9999),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.black.withValues(alpha: 0.12),
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 2),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Text(
-                                      isDelivered
-                                          ? 'Arrived!'
-                                          : 'Ramesh • ${tracking.speedKmh} km/h',
-                                      style: GoogleFonts.inter(
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w700,
-                                        color: const Color(0xFF006B23),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Container(
-                                    width: 48,
-                                    height: 48,
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFF006B23),
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white, width: 2.5),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: const Color(0xFF006B23).withValues(alpha: 0.4),
-                                          blurRadius: 10,
-                                          offset: const Offset(0, 4),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Icon(
-                                      isDelivered
-                                          ? Icons.check_circle_rounded
-                                          : Icons.directions_bike_rounded,
-                                      color: Colors.white,
-                                      size: 24,
-                                    ),
+                                  Polyline(
+                                    points: tracking.routePoints,
+                                    color: const Color(0xFF2D9D43),
+                                    strokeWidth: 4.5,
                                   ),
                                 ],
                               ),
-                            );
-                          },
+                            ],
+
+                            // Interactive Markers Layer
+                            MarkerLayer(
+                              markers: [
+                                // 1. Dark Store Hub Marker (Start)
+                                Marker(
+                                  point: tracking.storeLocation,
+                                  width: 90,
+                                  height: 56,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(6),
+                                          boxShadow: const [
+                                            BoxShadow(color: Colors.black12, blurRadius: 4),
+                                          ],
+                                        ),
+                                        child: Text(
+                                          'Hub Store #01',
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFF191C1E),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF191C1E),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white, width: 2),
+                                          boxShadow: const [
+                                            BoxShadow(color: Colors.black26, blurRadius: 4),
+                                          ],
+                                        ),
+                                        child: const Icon(
+                                          Icons.storefront_rounded,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // 2. Customer Destination Marker (End)
+                                Marker(
+                                  point: tracking.customerLocation,
+                                  width: 80,
+                                  height: 56,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(6),
+                                          boxShadow: const [
+                                            BoxShadow(color: Colors.black12, blurRadius: 4),
+                                          ],
+                                        ),
+                                        child: Text(
+                                          'Doorstep',
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFF2D9D43),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF2D9D43),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white, width: 2),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: const Color(0xFF2D9D43).withValues(alpha: 0.4),
+                                              blurRadius: 6,
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Icon(
+                                          Icons.home_rounded,
+                                          color: Colors.white,
+                                          size: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
+                                // 3. Real-Time Moving Rider / Scooter Marker with Heading
+                                Marker(
+                                  point: tracking.driverLocation,
+                                  width: 140,
+                                  height: 70,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          borderRadius: BorderRadius.circular(9999),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black.withValues(alpha: 0.15),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Text(
+                                          isDelivered
+                                              ? 'Arrived!'
+                                              : 'Ramesh • ${tracking.speedKmh} km/h',
+                                          style: GoogleFonts.outfit(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFF2D9D43),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Transform.rotate(
+                                        angle: (tracking.driverBearing * pi / 180.0),
+                                        child: Container(
+                                          width: 44,
+                                          height: 44,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF2D9D43),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: Colors.white, width: 2.5),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: const Color(0xFF2D9D43).withValues(alpha: 0.5),
+                                                blurRadius: 10,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Icon(
+                                            isDelivered
+                                                ? Icons.check_circle_rounded
+                                                : Icons.navigation_rounded,
+                                            color: Colors.white,
+                                            size: 22,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        // Floating Live GPS Badge (Top-Left)
+                        Positioned(
+                          top: 14,
+                          left: 14,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.95),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: const [
+                                BoxShadow(color: Colors.black12, blurRadius: 6),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 7,
+                                  height: 7,
+                                  decoration: const BoxDecoration(
+                                    color: Color(0xFF2D9D43),
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Live Express GPS (OSM)',
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: const Color(0xFF191C1E),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Recenter on Rider Button (Top-Right)
+                        Positioned(
+                          top: 14,
+                          right: 14,
+                          child: InkWell(
+                            onTap: () {
+                              _mapController.move(tracking.driverLocation, 15.5);
+                            },
+                            borderRadius: BorderRadius.circular(9999),
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.95),
+                                shape: BoxShape.circle,
+                                boxShadow: const [
+                                  BoxShadow(color: Colors.black12, blurRadius: 6),
+                                ],
+                              ),
+                              child: const Icon(
+                                Icons.my_location_rounded,
+                                size: 19,
+                                color: Color(0xFF2D9D43),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -759,50 +864,4 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       ],
     );
   }
-}
-
-/// Custom painter to render clean vector streets & animated dashed route line on map header
-class _MapCanvasPainter extends CustomPainter {
-  final double progressRatio;
-
-  _MapCanvasPainter({required this.progressRatio});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final streetPaint = Paint()
-      ..color = Colors.white
-      ..strokeWidth = 14
-      ..style = PaintingStyle.stroke;
-
-    final dashPaint = Paint()
-      ..color = const Color(0xFF006B23)
-      ..strokeWidth = 3.5
-      ..style = PaintingStyle.stroke;
-
-    // Grid of streets
-    canvas.drawLine(Offset(0, size.height * 0.3), Offset(size.width, size.height * 0.3), streetPaint);
-    canvas.drawLine(Offset(0, size.height * 0.75), Offset(size.width, size.height * 0.75), streetPaint);
-    canvas.drawLine(Offset(size.width * 0.35, 0), Offset(size.width * 0.35, size.height), streetPaint);
-    canvas.drawLine(Offset(size.width * 0.7, 0), Offset(size.width * 0.7, size.height), streetPaint);
-
-    // Dashed route path connecting driver start to customer destination pin
-    final start = Offset(size.width * 0.22, 60);
-    final end = Offset(size.width * 0.82, 175);
-
-    double dashWidth = 8, dashSpace = 6;
-    double totalDist = (end - start).distance;
-    Offset dir = (end - start) / totalDist;
-
-    double d = 0;
-    while (d < totalDist) {
-      final p1 = start + dir * d;
-      final p2 = start + dir * (d + dashWidth).clamp(0, totalDist);
-      canvas.drawLine(p1, p2, dashPaint);
-      d += dashWidth + dashSpace;
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant _MapCanvasPainter oldDelegate) =>
-      oldDelegate.progressRatio != progressRatio;
 }

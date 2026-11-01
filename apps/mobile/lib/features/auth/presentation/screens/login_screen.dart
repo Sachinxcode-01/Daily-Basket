@@ -76,7 +76,9 @@ class _LoginScreenState extends State<LoginScreen> {
     } else {
       setState(() {
         _isLoading = false;
-        _errorMsg = res['error'] ?? res['message'] ?? 'Invalid email address or password.';
+        _errorMsg = res['error'] ??
+            res['message'] ??
+            'Invalid email address or password.';
       });
     }
   }
@@ -84,7 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
   void _handleEmailOtpLogin() async {
     final email = _emailController.text.trim();
     if (email.isEmpty || !email.contains('@')) {
-      setState(() => _errorMsg = 'Please enter your email above to receive a 6-digit OTP.');
+      setState(() => _errorMsg =
+          'Please enter your email above to receive a 6-digit OTP.');
       return;
     }
     setState(() {
@@ -105,108 +108,20 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     } else {
       setState(() {
-        _errorMsg = res['error'] ?? res['message'] ?? 'Failed to send Email OTP.';
+        _errorMsg =
+            res['error'] ?? res['message'] ?? 'Failed to send Email OTP.';
       });
     }
   }
 
   void _handleGoogleLogin() async {
-    final typedEmail = _emailController.text.trim();
-    if (typedEmail.isNotEmpty && typedEmail.contains('@')) {
-      await _executeGoogleLogin(
-        email: typedEmail,
-        name: typedEmail.split('@').first,
-      );
-      return;
-    }
-
-    // Show Google Account Picker Modal with real-time selection
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      isScrollControlled: true,
-      builder: (ctx) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.g_mobiledata_rounded, color: Color(0xFF4285F4), size: 36),
-                const SizedBox(width: 8),
-                Text(
-                  'Sign in with Google',
-                  style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Choose an account to continue to Daily Basket',
-              style: GoogleFonts.inter(fontSize: 14, color: AppColors.onSurfaceVariant),
-            ),
-            const SizedBox(height: 20),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const CircleAvatar(
-                backgroundColor: Color(0xFFE5EFE7),
-                child: Text('S', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-              ),
-              title: Text('Sachin Kumar', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-              subtitle: Text('sachiii8827@gmail.com', style: GoogleFonts.inter(fontSize: 13)),
-              trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-              onTap: () {
-                Navigator.of(ctx).pop();
-                _executeGoogleLogin(email: 'sachiii8827@gmail.com', name: 'Sachin Kumar');
-              },
-            ),
-            const Divider(),
-            ListTile(
-              contentPadding: EdgeInsets.zero,
-              leading: const CircleAvatar(
-                backgroundColor: Color(0xFFE5EFE7),
-                child: Icon(Icons.person_add_alt_1_rounded, color: AppColors.primary),
-              ),
-              title: Text('Use another email', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-              subtitle: Text('Enter custom email address in login field', style: GoogleFonts.inter(fontSize: 13)),
-              trailing: const Icon(Icons.edit_outlined, size: 18),
-              onTap: () {
-                Navigator.of(ctx).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Type your email above and tap "Continue with Google"'),
-                    backgroundColor: AppColors.primary,
-                  ),
-                );
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _executeGoogleLogin({
-    required String email,
-    required String name,
-  }) async {
     setState(() {
       _isLoading = true;
       _errorMsg = null;
     });
 
     final auth = context.read<AuthProvider>();
-    final res = await auth.googleLogin(
-      email: email,
-      name: name,
-      avatarUrl: 'https://lh3.googleusercontent.com/a/default-user',
-    );
+    final res = await auth.signInWithGoogle();
 
     if (!mounted) return;
 
@@ -214,8 +129,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final user = res['user'];
       if (user != null) {
         context.read<UserProvider>().updatePersonalInfo(
-              name: user['name'] ?? user['fullName'] ?? name,
-              email: user['email'] ?? email,
+              name: user['name'] ?? user['fullName'] ?? 'Customer',
+              email: user['email'] ?? '',
               phone: user['phone'] ?? '+91 98765 43210',
             );
       }
@@ -414,7 +329,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               onTap: () {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (_) => const ForgotPasswordScreen(),
+                                    builder: (_) =>
+                                        const ForgotPasswordScreen(),
                                   ),
                                 );
                               },
@@ -459,8 +375,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       : Icons.visibility_outlined,
                                   color: Colors.black54,
                                 ),
-                                onPressed: () =>
-                                    setState(() => _obscurePass = !_obscurePass),
+                                onPressed: () => setState(
+                                    () => _obscurePass = !_obscurePass),
                               ),
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.symmetric(
@@ -519,9 +435,13 @@ class _LoginScreenState extends State<LoginScreen> {
                         // ─── Divider: OR ──────────────────────────────────
                         Row(
                           children: [
-                            Expanded(child: Divider(color: AppColors.outlineVariant.withValues(alpha: 0.6))),
+                            Expanded(
+                                child: Divider(
+                                    color: AppColors.outlineVariant
+                                        .withValues(alpha: 0.6))),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
                                 'OR',
                                 style: GoogleFonts.outfit(
@@ -531,7 +451,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             ),
-                            Expanded(child: Divider(color: AppColors.outlineVariant.withValues(alpha: 0.6))),
+                            Expanded(
+                                child: Divider(
+                                    color: AppColors.outlineVariant
+                                        .withValues(alpha: 0.6))),
                           ],
                         ),
 
@@ -544,7 +467,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: OutlinedButton(
                             onPressed: _isLoading ? null : _handleGoogleLogin,
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.outlineVariant),
+                              side: const BorderSide(
+                                  color: AppColors.outlineVariant),
                               shape: const StadiumBorder(),
                             ),
                             child: Row(
@@ -578,7 +502,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: OutlinedButton(
                             onPressed: _isLoading ? null : _handleEmailOtpLogin,
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.outlineVariant),
+                              side: const BorderSide(
+                                  color: AppColors.outlineVariant),
                               shape: const StadiumBorder(),
                             ),
                             child: Row(
@@ -610,15 +535,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           width: double.infinity,
                           height: 48,
                           child: OutlinedButton(
-                            onPressed: _isLoading ? null : () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (_) => const OtpScreen(isEmailOtp: false),
-                                ),
-                              );
-                            },
+                            onPressed: _isLoading
+                                ? null
+                                : () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const OtpScreen(isEmailOtp: false),
+                                      ),
+                                    );
+                                  },
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: AppColors.outlineVariant),
+                              side: const BorderSide(
+                                  color: AppColors.outlineVariant),
                               shape: const StadiumBorder(),
                             ),
                             child: Row(
@@ -642,7 +571,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-
 
                         const SizedBox(height: 28),
 
@@ -688,4 +616,3 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
-

@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../network/api_client.dart';
 import '../storage/secure_storage_service.dart';
 
@@ -123,6 +124,42 @@ class AuthProvider extends ChangeNotifier {
       return res;
     } catch (e) {
       _errorMessage = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'error': _errorMessage};
+    }
+  }
+
+  /// Triggers native Google Sign-In sheet, retrieves real Google ID Token,
+  /// and authenticates with backend.
+  Future<Map<String, dynamic>> signInWithGoogle() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final googleSignIn = GoogleSignIn(
+        serverClientId: '495128932178-rk6883ftg533bjl6767ifu8j3o1mbfoa.apps.googleusercontent.com',
+        scopes: ['email', 'profile'],
+      );
+      final account = await googleSignIn.signIn();
+      if (account == null) {
+        _isLoading = false;
+        notifyListeners();
+        return {'success': false, 'message': 'Google sign-in was cancelled.'};
+      }
+
+      final authentication = await account.authentication;
+      final realIdToken = authentication.idToken;
+
+      return await googleLogin(
+        email: account.email,
+        name: account.displayName,
+        avatarUrl: account.photoUrl,
+        idToken: realIdToken,
+      );
+    } catch (e) {
+      _errorMessage = 'Google sign-in error: $e';
       _isLoading = false;
       notifyListeners();
       return {'success': false, 'error': _errorMessage};

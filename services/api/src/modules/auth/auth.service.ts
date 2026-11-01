@@ -209,7 +209,7 @@ export class AuthService {
       crypto.timingSafeEqual(Buffer.from(inputHash, 'utf-8'), Buffer.from(otpRecord.otpHash, 'utf-8'));
 
     if (!isHashMatch) {
-      await this.prisma.otpVerification.updateMany({
+      await this.prisma.otpVerification.update({
         where: { id: otpRecord.id },
         data: { attempts: otpRecord.attempts + 1 },
       });
@@ -217,7 +217,7 @@ export class AuthService {
     }
 
     // Mark OTP as consumed
-    await this.prisma.otpVerification.updateMany({
+    await this.prisma.otpVerification.update({
       where: { id: otpRecord.id },
       data: { consumedAt: now },
     });
@@ -1037,15 +1037,15 @@ export class AuthService {
   private async recordOtpAttempt(identifier: string, ipAddress: string) {
     try {
       await this.prisma.$transaction([
-        this.prisma.otpVerification.updateMany({
+        this.prisma.otpVerification.update({
           where: { identifier: `__ip__${ipAddress}__` },
           data: { otpCountThisHour: { increment: 1 } },
         }),
-        this.prisma.otpVerification.updateMany({
+        this.prisma.otpVerification.update({
           where: { identifier: `__ip__${ipAddress}__` },
           data: { otpCountToday: { increment: 1 } },
         }),
-        this.prisma.otpVerification.updateMany({
+        this.prisma.otpVerification.update({
           where: { identifier },
           data: { otpCountToday: { increment: 1 } },
         }),
@@ -1088,14 +1088,14 @@ export class AuthService {
       crypto.timingSafeEqual(Buffer.from(inputHash, 'utf-8'), Buffer.from(otpRecord.otpHash, 'utf-8'));
 
     if (!isHashMatch) {
-      await this.prisma.otpVerification.updateMany({
+      await this.prisma.otpVerification.update({
         where: { id: otpRecord.id },
         data: { attempts: otpRecord.attempts + 1 },
       }).catch(() => null);
       throw new UnauthorizedException('Invalid OTP code. Please try again.');
     }
 
-    await this.prisma.otpVerification.updateMany({
+    await this.prisma.otpVerification.update({
       where: { id: otpRecord.id },
       data: { consumedAt: now },
     }).catch(() => null);

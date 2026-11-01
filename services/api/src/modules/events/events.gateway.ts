@@ -10,6 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Logger, Optional } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { RedisService } from '../redis/redis.service';
 
 export interface AuthenticatedUser {
   id: string;
@@ -53,7 +54,10 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   // Recent event deduplication cache (eventHash -> timestamp)
   private readonly eventDeduplicationMap = new Map<string, number>();
 
-  constructor(@Optional() private readonly jwtService?: JwtService) {}
+  constructor(
+    @Optional() private readonly jwtService?: JwtService,
+    @Optional() private readonly redisService?: RedisService,
+  ) {}
 
   handleConnection(client: Socket) {
     const authUser = this.authenticateClient(client);
@@ -217,16 +221,23 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('rider_gps_tick')
-  handleRiderGpsTick(
+  async handleRiderGpsTick(
     @ConnectedSocket() client: Socket,
-    @MessageBody() payload: { orderId: string; riderId: string; lat: number; lng: number },
+    @MessageBody() payload: { orderId: string; riderId: string; lat: number; lng: number; bearing?: number; speed?: number },
   ) {
     const user: AuthenticatedUser | undefined = client.data?.user;
     if (user && user.role !== 'DELIVERY_PARTNER' && !['ADMIN', 'SUPER_ADMIN'].includes(user.role || '')) {
       this.logger.warn(`Non-rider socket ${client.id} attempted to emit rider_gps_tick`);
       return { status: 'rejected', error: 'Forbidden' };
     }
-    this.broadcastLiveLocation(payload.orderId, payload.riderId, payload.lat, payload.lng);
+
+    // High-velocity in-memory geospatial cache (zero PostgreSQL / Prisma overhead)
+    if (this.redisService) {
+      await this.redisService.geoAdd('dailybasket:fleet:riders', payload.lng, payload.lat, payload.riderId);
+      await this.redisService.set(`dailybasket:order:${payload.orderId}:latest_loc`, payload, 300);
+    }
+
+    this.broadcastLiveLocation(payload.orderId, payload.riderId, payload.lat, payload.lng, payload.bearing, payload.speed);
     return { status: 'acknowledged' };
   }
 
@@ -325,11 +336,19 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.server.to('admin').emit('order_assigned', { orderId, riderId });
   }
 
-  broadcastLiveLocation(orderId: string, riderId: string, lat: number, lng: number) {
+  broadcastLiveLocation(orderId: string, riderId: string, lat: number, lng: number, bearing?: number, speed?: number) {
     // Deduplicate rapid GPS jitter updates within 200ms
     if (this.isDuplicateEvent(`gps_${orderId}_${riderId}`, 200)) return;
 
-    const payload = { orderId, riderId, lat, lng, timestamp: new Date().toISOString() };
+    const payload = {
+      orderId,
+      riderId,
+      lat,
+      lng,
+      bearing: bearing ?? 0,
+      speed: speed ?? 0,
+      timestamp: new Date().toISOString(),
+    };
     this.server.emit('delivery.location', payload);
     this.server.to(`order_${orderId}`).emit('rider_location_update', payload);
     this.server.to('admin').emit('fleet_location_tick', payload);

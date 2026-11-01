@@ -78,6 +78,30 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     } catch {}
   }
 
+  // ─── High-Velocity Geospatial Operations (Rider / Fleet Tracking) ───────────
+  async geoAdd(key: string, longitude: number, latitude: number, member: string): Promise<number> {
+    try {
+      return await this.client.geoadd(key, longitude, latitude, member);
+    } catch (err: any) {
+      this.logger.error(`geoAdd failed on ${key} for member ${member}: ${err.message}`);
+      return 0;
+    }
+  }
+
+  async geoPos(key: string, member: string): Promise<[number, number] | null> {
+    try {
+      const positions = await this.client.geopos(key, member);
+      if (positions && positions.length > 0 && positions[0]) {
+        const [lng, lat] = positions[0];
+        return [parseFloat(lng), parseFloat(lat)];
+      }
+      return null;
+    } catch (err: any) {
+      this.logger.error(`geoPos failed on ${key} for member ${member}: ${err.message}`);
+      return null;
+    }
+  }
+
   // ─── Distributed Redlock Algorithm for Inventory Locking ──────────────────
   async acquireLock(resource: string, ttlSeconds = 10): Promise<string | null> {
     const lockKey = `dailybasket:lock:${resource}`;

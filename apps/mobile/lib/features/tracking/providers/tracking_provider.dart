@@ -1,5 +1,9 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:latlong2/latlong.dart';
 import '../../../../core/network/api_client.dart';
 
 enum DeliveryOrderStatus { placed, packed, outForDelivery, delivered }
@@ -12,11 +16,26 @@ class TrackingProvider extends ChangeNotifier {
   bool _isDisposed = false;
   bool get isDisposed => _isDisposed;
 
+  // ─── 100% Free OpenStreetMap Coordinates & OSRM Route ──────────────────────
+  final LatLng _storeLocation = const LatLng(12.9344, 77.6101); // Dark Store Hub #01 (80ft Rd, Koramangala)
+  final LatLng _customerLocation = const LatLng(12.9388, 77.6255); // Customer Doorstep (100ft Rd 4th Block)
+  List<LatLng> _routePoints = [];
+  int _routeStepIndex = 0;
+  bool _isRouteLoading = false;
+  double _driverBearing = 48.0;
+
+  LatLng get storeLocation => _storeLocation;
+  LatLng get customerLocation => _customerLocation;
+  List<LatLng> get routePoints => _routePoints;
+  bool get isRouteLoading => _isRouteLoading;
+  double get driverBearing => _driverBearing;
+  LatLng get driverLocation => LatLng(_driverLat, _driverLng);
+
   DeliveryOrderStatus _status = DeliveryOrderStatus.outForDelivery;
   int _remainingSeconds = 420; // 7 minutes initial ETA
   final int _initialSeconds = 420;
-  double _driverLat = 12.9372;
-  double _driverLng = 77.6210;
+  double _driverLat = 12.9344;
+  double _driverLng = 77.6101;
   String _currentStreet = '100 Feet Rd, Koramangala 4th Block';
   int _speedKmh = 24;
   final String _deliveryOtp = '4821';
@@ -77,6 +96,8 @@ class TrackingProvider extends ChangeNotifier {
   }
 
   TrackingProvider({this.orderId}) {
+    _initDefaultRoute();
+    fetchOsrmRoute();
     _startLiveSimulation();
     if (orderId != null && orderId!.isNotEmpty) {
       _fetchOrderTracking();
@@ -148,12 +169,93 @@ class TrackingProvider extends ChangeNotifier {
     }
   }
 
+  void _initDefaultRoute() {
+    _routePoints = [
+      const LatLng(12.9344, 77.6101), // Hub Store #01 (80ft Rd, Koramangala)
+      const LatLng(12.9347, 77.6120),
+      const LatLng(12.9351, 77.6142),
+      const LatLng(12.9358, 77.6165),
+      const LatLng(12.9365, 77.6188),
+      const LatLng(12.9370, 77.6205),
+      const LatLng(12.9372, 77.6220),
+      const LatLng(12.9378, 77.6238),
+      const LatLng(12.9383, 77.6248),
+      const LatLng(12.9388, 77.6255), // Customer Doorstep (100ft Rd 4th Block)
+    ];
+    _driverLat = _routePoints.first.latitude;
+    _driverLng = _routePoints.first.longitude;
+  }
+
+  /// 100% Free OSRM (Open Source Routing Machine) Turn-by-Turn Path Fetcher
+  Future<void> fetchOsrmRoute() async {
+    _isRouteLoading = true;
+    notifyListeners();
+    try {
+      final url = Uri.parse(
+        'https://router.project-osrm.org/route/v1/driving/'
+        '${_storeLocation.longitude},${_storeLocation.latitude};'
+        '${_customerLocation.longitude},${_customerLocation.latitude}'
+        '?overview=full&geometries=geojson',
+      );
+      final response = await http.get(url).timeout(const Duration(seconds: 4));
+      if (response.statusCode == 200) {
+        final decoded = json.decode(response.body);
+        final routes = decoded['routes'] as List?;
+        if (routes != null && routes.isNotEmpty) {
+          final coords = routes[0]['geometry']?['coordinates'] as List?;
+          if (coords != null && coords.isNotEmpty) {
+            _routePoints = coords
+                .map((c) => LatLng((c[1] as num).toDouble(), (c[0] as num).toDouble()))
+                .toList();
+            if (routes[0]['duration'] is num) {
+              _remainingSeconds = (routes[0]['duration'] as num).toInt().clamp(60, 600);
+            }
+            if (_routePoints.isNotEmpty && _status != DeliveryOrderStatus.delivered) {
+              _driverLat = _routePoints.first.latitude;
+              _driverLng = _routePoints.first.longitude;
+              if (_routePoints.length > 1) {
+                _driverBearing = _calculateBearing(_routePoints[0], _routePoints[1]);
+              }
+            }
+          }
+        }
+      }
+    } catch (_) {
+      // Gracefully retains default Koramangala road coordinate sequence
+    } finally {
+      _isRouteLoading = false;
+      if (!_isDisposed) {
+        notifyListeners();
+      }
+    }
+  }
+
+  double _calculateBearing(LatLng start, LatLng end) {
+    final startLat = start.latitude * (pi / 180.0);
+    final startLng = start.longitude * (pi / 180.0);
+    final endLat = end.latitude * (pi / 180.0);
+    final endLng = end.longitude * (pi / 180.0);
+
+    final dLng = endLng - startLng;
+    final y = sin(dLng) * cos(endLat);
+    final x = cos(startLat) * sin(endLat) - sin(startLat) * cos(endLat) * cos(dLng);
+    final b = atan2(y, x) * (180.0 / pi);
+    return (b + 360.0) % 360.0;
+  }
+
   void _startLiveSimulation() {
     _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
       if (_remainingSeconds > 0 && _status != DeliveryOrderStatus.delivered) {
-        _remainingSeconds -= 15; // Smooth ETA reduction for live demo feel
-        _driverLat += 0.0003;
-        _driverLng -= 0.0002;
+        _remainingSeconds = max(0, _remainingSeconds - 18);
+
+        if (_routePoints.isNotEmpty && _routeStepIndex < _routePoints.length - 1) {
+          _routeStepIndex++;
+          final prev = _routePoints[_routeStepIndex - 1];
+          final current = _routePoints[_routeStepIndex];
+          _driverLat = current.latitude;
+          _driverLng = current.longitude;
+          _driverBearing = _calculateBearing(prev, current);
+        }
 
         if (_remainingSeconds <= 120) {
           _currentStreet = 'Near Sony World Signal, 100 Feet Rd';
@@ -163,7 +265,7 @@ class TrackingProvider extends ChangeNotifier {
           _currentStreet = 'Entering Customer Gate (#42)';
           _speedKmh = 10;
         }
-        if (_remainingSeconds <= 0) {
+        if (_remainingSeconds <= 0 || _routeStepIndex >= _routePoints.length - 1) {
           _remainingSeconds = 0;
           _speedKmh = 0;
           _status = DeliveryOrderStatus.delivered;
@@ -185,9 +287,11 @@ class TrackingProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setDriverLocation(double lat, double lng) {
+  void setDriverLocation(double lat, double lng, {double? bearing, int? speed}) {
     _driverLat = lat;
     _driverLng = lng;
+    if (bearing != null) _driverBearing = bearing;
+    if (speed != null) _speedKmh = speed;
     notifyListeners();
   }
 

@@ -26,19 +26,20 @@ describe('AuthService Enterprise Security Tests', () => {
       findUnique: jest.fn(),
       findFirst: jest.fn(),
       create: jest.fn(),
-      update: jest.fn(),
+      update: jest.fn().mockResolvedValue({ id: 'otp_1' }),
     },
     otpVerification: {
       findFirst: jest.fn(),
       create: jest.fn(),
-      update: jest.fn(),
+      update: jest.fn().mockResolvedValue({ id: 'otp_1' }),
+      updateMany: jest.fn(),
       count: jest.fn().mockResolvedValue(0),
     },
     deviceSession: {
       findUnique: jest.fn(),
       findMany: jest.fn(),
       create: jest.fn(),
-      update: jest.fn(),
+      update: jest.fn().mockResolvedValue({ id: 'otp_1' }),
       updateMany: jest.fn(),
     },
     securityAuditLog: {
