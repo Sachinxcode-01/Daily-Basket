@@ -125,6 +125,18 @@ export class RequestOtpDto {
   @IsOptional()
   @IsString()
   type?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  ipAddress?: string;
+}
+
+export class RefreshTokenDto {
+  @ApiProperty({ description: 'JWT Refresh Token' })
+  @IsString()
+  @IsNotEmpty()
+  refreshToken!: string;
 }
 
 export class VerifyOtpDto {

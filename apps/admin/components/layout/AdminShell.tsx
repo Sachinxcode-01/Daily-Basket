@@ -149,11 +149,11 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   ];
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-white">
+    <div className="flex flex-col h-full bg-surface-container-lowest">
       {/* Brand Header */}
-      <div className="h-16 px-4 border-b border-zinc-200/80 flex items-center justify-between">
+      <div className="h-16 px-4 border-b border-outline-variant/30 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-white border border-zinc-200/90 p-1 flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:border-[#2d9d43]/50 transition-all shrink-0">
+          <div className="w-9 h-9 rounded-xl bg-white border border-outline-variant/40 p-1 flex items-center justify-center shadow-xs group-hover:scale-105 group-hover:border-primary/50 transition-all shrink-0">
             <Image
               src="/images/daily_basket_logo.png"
               alt="Daily Basket Logo"
@@ -164,13 +164,13 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             />
           </div>
           <div>
-            <div className="font-bold text-sm tracking-tight text-zinc-950 flex items-center gap-1.5">
+            <div className="font-bold text-sm tracking-tight text-on-surface flex items-center gap-1.5">
               <span>Daily Basket</span>
-              <span className="text-[10px] bg-emerald-100 text-[#078730] px-1.5 py-0.5 rounded font-mono font-bold">
+              <span className="text-[10px] bg-primary/15 text-primary-container px-1.5 py-0.5 rounded font-mono font-bold">
                 OS
               </span>
             </div>
-            <span className="text-[10px] uppercase font-bold text-[#2d9d43] tracking-wider block">
+            <span className="text-[10px] uppercase font-bold text-primary tracking-wider block">
               Dark Store Control
             </span>
           </div>
@@ -181,7 +181,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       <nav className="flex-1 p-3 space-y-4 overflow-y-auto scrollbar-thin">
         {navLinks.map((grp) => (
           <div key={grp.group} className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-400 px-3 block font-mono">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-on-surface-subtle px-3 block font-mono">
               {grp.group}
             </span>
             {grp.items.map((item) => {
@@ -194,16 +194,16 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all group relative ${
                     isActive
-                      ? 'bg-zinc-950 text-white shadow-sm'
-                      : 'text-zinc-600 hover:text-zinc-950 hover:bg-zinc-100/80'
+                      ? 'bg-primary text-white shadow-sm shadow-primary/25 font-bold'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'
                   }`}
                 >
                   <div className="flex items-center gap-2.5 truncate">
                     <Icon
                       className={`w-4 h-4 shrink-0 transition-colors ${
                         isActive
-                          ? 'text-[#8cfa93]'
-                          : 'text-zinc-400 group-hover:text-zinc-900'
+                          ? 'text-white'
+                          : 'text-on-surface-subtle group-hover:text-primary'
                       }`}
                     />
                     <span className="truncate">{item.label}</span>
@@ -212,12 +212,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                     <span
                       className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md font-mono ${
                         isActive
-                          ? 'bg-zinc-800 text-white'
+                          ? 'bg-primary-container text-white'
                           : item.badgeVariant === 'success'
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-status-success/15 text-status-success'
                           : item.badgeVariant === 'brand'
-                          ? 'bg-[#2d9d43]/15 text-[#078730]'
-                          : 'bg-purple-100 text-purple-700'
+                          ? 'bg-primary/15 text-primary-container'
+                          : 'bg-surface-container-high text-on-surface'
                       }`}
                     >
                       {item.badge}
@@ -231,26 +231,26 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       </nav>
 
       {/* User Footer Profile & Role Selector */}
-      <div className="p-3 border-t border-zinc-200/80 bg-zinc-50/60 relative">
-        <div className="flex items-center justify-between p-2 rounded-xl hover:bg-white border border-transparent hover:border-zinc-200/80 transition-all cursor-pointer">
+      <div className="p-3 border-t border-outline-variant/30 bg-surface-container-low/60 relative">
+        <div className="flex items-center justify-between p-2 rounded-xl hover:bg-surface-container-lowest border border-transparent hover:border-outline-variant/30 transition-all cursor-pointer">
           <button
             type="button"
             onClick={() => setShowUserMenu(!showUserMenu)}
             className="flex items-center gap-2.5 text-left flex-1 min-w-0"
           >
-            <div className="w-8 h-8 rounded-full bg-zinc-950 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+            <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
               {user?.name ? user.name.slice(0, 2).toUpperCase() : 'AD'}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-xs font-bold text-zinc-900 truncate">
+              <div className="text-xs font-bold text-on-surface truncate">
                 {user?.name || 'Administrator'}
               </div>
-              <div className="text-[10px] text-zinc-500 truncate flex items-center gap-1 font-mono">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#2d9d43] inline-block" />
+              <div className="text-[10px] text-on-surface-subtle truncate flex items-center gap-1 font-mono">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary inline-block" />
                 {role.replace('_', ' ')}
               </div>
             </div>
-            <ChevronDown className="w-4 h-4 text-zinc-400 shrink-0" />
+            <ChevronDown className="w-4 h-4 text-on-surface-subtle shrink-0" />
           </button>
         </div>
 
@@ -262,9 +262,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.98 }}
               transition={{ duration: 0.15 }}
-              className="absolute bottom-16 left-3 right-3 bg-white border border-zinc-200 rounded-2xl shadow-xl p-2 space-y-1.5 z-50"
+              className="absolute bottom-16 left-3 right-3 bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shadow-xl p-2 space-y-1.5 z-50"
             >
-              <div className="px-2 py-1 text-[10px] font-mono uppercase text-zinc-400 font-bold">
+              <div className="px-2 py-1 text-[10px] font-mono uppercase text-on-surface-subtle font-bold">
                 Quick Role Simulator
               </div>
               {(['SUPER_ADMIN', 'STORE_MANAGER', 'DISPATCH_HEAD', 'INVENTORY_LEAD'] as const).map(
@@ -278,24 +278,24 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                     }}
                     className={`w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center justify-between ${
                       role === r
-                        ? 'bg-zinc-100 text-zinc-950 font-bold'
-                        : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900'
+                        ? 'bg-primary/10 text-primary font-bold'
+                        : 'text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface'
                     }`}
                   >
                     <span>{r.replace('_', ' ')}</span>
-                    {role === r && <Shield className="w-3 h-3 text-[#2d9d43]" />}
+                    {role === r && <Shield className="w-3 h-3 text-primary" />}
                   </button>
                 )
               )}
 
-              <div className="pt-1 border-t border-zinc-100">
+              <div className="pt-1 border-t border-outline-variant/30">
                 <button
                   type="button"
                   onClick={() => {
                     setShowUserMenu(false);
                     logout();
                   }}
-                  className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 transition flex items-center gap-2"
+                  className="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold text-status-error hover:bg-status-error/10 transition flex items-center gap-2"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Terminate Session (Logout)</span>
@@ -309,9 +309,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   );
 
   return (
-    <div className="flex min-h-screen bg-[#f7f8fa] text-zinc-900 font-sans antialiased">
+    <div className="flex min-h-screen bg-surface text-on-surface font-sans antialiased">
       {/* Desktop Left Sidebar */}
-      <aside className="w-64 bg-white border-r border-zinc-200/90 hidden md:flex flex-col fixed inset-y-0 z-40 shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
+      <aside className="w-64 bg-surface-container-lowest border-r border-outline-variant/30 hidden md:flex flex-col fixed inset-y-0 z-40 shadow-[1px_0_4px_rgba(0,0,0,0.02)]">
         {sidebarContent}
       </aside>
 
@@ -342,12 +342,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       {/* Main Content Area */}
       <div className="flex-1 md:pl-64 flex flex-col min-h-screen">
         {/* Top Navbar Header */}
-        <header className="h-16 bg-white/85 backdrop-blur-md border-b border-zinc-200/80 sticky top-0 z-30 px-4 md:px-6 flex items-center justify-between gap-3">
+        <header className="h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 sticky top-0 z-30 px-4 md:px-6 flex items-center justify-between gap-3">
           {/* Mobile Menu Button */}
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
-            className="md:hidden p-2 rounded-xl text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100"
+            className="md:hidden p-2 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low"
           >
             <Menu className="w-5 h-5" />
           </button>
@@ -357,11 +357,11 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             <button
               type="button"
               onClick={() => setCommandPaletteOpen(true)}
-              className="w-full relative flex items-center justify-between pl-10 pr-3 py-2 bg-zinc-100/70 hover:bg-zinc-100 border border-transparent hover:border-zinc-200/80 rounded-xl text-xs text-zinc-500 hover:text-zinc-800 transition text-left group"
+              className="w-full relative flex items-center justify-between pl-10 pr-3 py-2 bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 hover:border-primary/40 rounded-full text-xs text-on-surface-subtle hover:text-on-surface transition text-left group"
             >
-              <Search className="w-4 h-4 text-zinc-400 group-hover:text-zinc-600 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-on-surface-subtle group-hover:text-primary absolute left-3.5 top-1/2 -translate-y-1/2" />
               <span className="truncate">Search commands, dark stores, SKUs...</span>
-              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-bold bg-white text-zinc-500 border border-zinc-200 rounded shadow-2xs">
+              <kbd className="hidden sm:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[10px] font-mono font-bold bg-surface-container-lowest text-on-surface-subtle border border-outline-variant/40 rounded-md shadow-2xs">
                 <span>⌘</span>K
               </kbd>
             </button>
@@ -385,12 +385,12 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               <button
                 type="button"
                 onClick={() => setShowStoreMenu(!showStoreMenu)}
-                className="flex items-center gap-2 px-3 py-1.5 bg-zinc-100/80 hover:bg-zinc-100 border border-zinc-200/60 text-zinc-800 rounded-xl text-xs font-semibold transition"
+                className="flex items-center gap-2 px-3 py-1.5 bg-surface-container-low hover:bg-surface-container border border-outline-variant/40 text-on-surface rounded-xl text-xs font-semibold transition"
               >
-                <Store className="w-3.5 h-3.5 text-[#2d9d43]" />
+                <Store className="w-3.5 h-3.5 text-primary" />
                 <span className="truncate max-w-[150px]">{activeStore.split(' ')[0]} Hub</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <ChevronDown className="w-3 h-3 text-zinc-400" />
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <ChevronDown className="w-3 h-3 text-on-surface-subtle" />
               </button>
 
               <AnimatePresence>
@@ -399,9 +399,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                     initial={{ opacity: 0, y: 6, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 6, scale: 0.98 }}
-                    className="absolute right-0 top-10 w-64 bg-white border border-zinc-200 rounded-2xl shadow-xl p-2 z-50 space-y-1"
+                    className="absolute right-0 top-10 w-64 bg-surface-container-lowest border border-outline-variant/40 rounded-2xl shadow-xl p-2 z-50 space-y-1"
                   >
-                    <div className="px-2 py-1 text-[10px] font-mono uppercase text-zinc-400 font-bold">
+                    <div className="px-2 py-1 text-[10px] font-mono uppercase text-on-surface-subtle font-bold">
                       Switch Micro-Warehouse Hub
                     </div>
                     {availableStores.map((st) => (
@@ -414,15 +414,15 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                         }}
                         className={`w-full text-left p-2 rounded-xl text-xs transition flex items-center justify-between ${
                           activeStore === st.name
-                            ? 'bg-emerald-50 text-[#078730] font-bold border border-emerald-200'
-                            : 'text-zinc-700 hover:bg-zinc-50'
+                            ? 'bg-primary/10 text-primary-container font-bold border border-primary/30'
+                            : 'text-on-surface-variant hover:bg-surface-container-low'
                         }`}
                       >
                         <div>
-                          <div className="truncate font-semibold">{st.name}</div>
-                          <span className="text-[10px] text-zinc-400 font-mono">{st.code}</span>
+                          <div className="truncate font-semibold text-on-surface">{st.name}</div>
+                          <span className="text-[10px] text-on-surface-subtle font-mono">{st.code}</span>
                         </div>
-                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 font-mono">
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-surface-container-low text-on-surface-subtle font-mono">
                           {st.status}
                         </span>
                       </button>
@@ -435,18 +435,18 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
             {/* Notification alert button */}
             <button
               type="button"
-              className="p-2 text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 rounded-xl transition relative border border-transparent hover:border-zinc-200"
+              className="p-2 text-on-surface-subtle hover:text-on-surface hover:bg-surface-container-low rounded-xl transition relative border border-transparent hover:border-outline-variant/30"
               title="Operational Alerts"
             >
               <Bell className="w-4 h-4" />
-              <span className="w-2 h-2 rounded-full bg-[#2d9d43] absolute top-1.5 right-1.5 ring-2 ring-white" />
+              <span className="w-2 h-2 rounded-full bg-primary absolute top-1.5 right-1.5 ring-2 ring-white" />
             </button>
 
             {/* Quick logout icon button */}
             <button
               type="button"
               onClick={logout}
-              className="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition border border-transparent hover:border-rose-200"
+              className="p-2 text-on-surface-subtle hover:text-status-error hover:bg-status-error/10 rounded-xl transition border border-transparent hover:border-status-error/20"
               title="Secure Logout"
             >
               <LogOut className="w-4 h-4" />
@@ -474,5 +474,3 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
     </div>
   );
 }
-
-

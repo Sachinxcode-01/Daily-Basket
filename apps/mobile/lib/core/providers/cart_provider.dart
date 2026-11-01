@@ -58,13 +58,14 @@ class CartProvider extends ChangeNotifier {
   // ─── Saved For Later ─────────────────────────────────────────────────────
   final List<CartItem> _savedForLater = [];
 
+  bool get _isTest => !kIsWeb && (
+    Platform.environment.containsKey('FLUTTER_TEST') ||
+    WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
+  );
+
   CartProvider({ApiClient? apiClient, bool autoFetch = true})
       : _apiClient = apiClient ?? ApiClient() {
-    final isTest = !kIsWeb && (
-      Platform.environment.containsKey('FLUTTER_TEST') ||
-      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
-    );
-    if (autoFetch && !isTest) {
+    if (autoFetch && !_isTest) {
       fetchCartFromApi();
     }
   }
@@ -224,6 +225,7 @@ class CartProvider extends ChangeNotifier {
 
   // ─── Private Async Synchronization ───────────────────────────────────────
   void _syncAddItem(CartItem item) {
+    if (_isTest) return;
     _apiClient.post('/cart/add', {
       'variantId': item.id,
       'productName': item.name,
@@ -236,6 +238,7 @@ class CartProvider extends ChangeNotifier {
   }
 
   void _syncUpdateQuantity(String id, int quantity) {
+    if (_isTest) return;
     if (quantity <= 0) {
       _apiClient.delete('/cart/item/$id').then((_) {}).catchError((e) {
         debugPrint('Sync cart delete error: $e');
@@ -248,6 +251,7 @@ class CartProvider extends ChangeNotifier {
   }
 
   void _syncClearCart() {
+    if (_isTest) return;
     _apiClient.delete('/cart/clear').then((_) {}).catchError((e) {
       debugPrint('Sync cart clear error: $e');
     });

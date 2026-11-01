@@ -7,6 +7,7 @@ import '../../../../core/data/products_catalog_data.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../referral/providers/coupon_provider.dart';
 import '../../../wallet/providers/wallet_provider.dart';
+import '../../../catalog/presentation/screens/product_details_screen.dart';
 import 'empty_basket_screen.dart';
 
 /// Your Basket / Cart Screen — Google Stitch Design System Exact Replica
@@ -66,6 +67,61 @@ class _CartScreenState extends State<CartScreen> {
         _items[index]['qty'] = updated;
       }
     });
+  }
+
+  void _openProductDetails(BuildContext context, Map<String, dynamic> item) {
+    final all = kAllCatalogProducts['all'] ?? [];
+    Map<String, dynamic>? catalogItem;
+    final itemId = item['id']?.toString() ?? '';
+    final itemName = item['name']?.toString().toLowerCase().trim() ?? '';
+
+    for (final p in all) {
+      final pId = p['id']?.toString() ?? '';
+      final pName = p['name']?.toString().toLowerCase().trim() ?? '';
+      if (itemId.isNotEmpty && pId == itemId) {
+        catalogItem = p;
+        break;
+      }
+      if (itemName.isNotEmpty &&
+          (pName == itemName || pName.contains(itemName) || itemName.contains(pName))) {
+        catalogItem = p;
+        break;
+      }
+    }
+
+    final id = itemId.isNotEmpty ? itemId : (catalogItem?['id']?.toString() ?? 'prod');
+    final name = item['name']?.toString() ?? (catalogItem?['name']?.toString() ?? 'Product');
+    final subtitle = item['subtitle']?.toString() ??
+        (catalogItem?['unit'] ?? catalogItem?['subtitle'] ?? '').toString();
+    final price = '₹${item['price']}';
+    final mrp = catalogItem != null && catalogItem['mrp'] != null
+        ? '₹${(catalogItem['mrp'] as num).round()}'
+        : price;
+    final brand = (catalogItem?['brand'] ?? 'Daily Basket Select').toString();
+    final categoryTag = (catalogItem?['category'] ?? catalogItem?['sub'] ?? 'GROCERY')
+        .toString()
+        .toUpperCase();
+    final image = (item['image']?.toString().isNotEmpty == true)
+        ? item['image'].toString()
+        : (catalogItem?['image']?.toString() ?? '');
+    final description = catalogItem?['description']?.toString();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProductDetailsScreen(
+          productId: id,
+          productName: name,
+          unitDetails: subtitle,
+          price: price,
+          mrp: mrp,
+          brand: brand,
+          categoryTag: categoryTag,
+          imageUrl: image,
+          description: description,
+        ),
+      ),
+    );
   }
 
   int get _itemTotal => _items.fold(
@@ -519,89 +575,93 @@ color: Color(0xFF6E7A6C),
                                   padding: const EdgeInsets.all(14.0),
                                   child: Row(
                                     children: [
-                                      // Thumbnail
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(12),
-                                        child: Image.network(
-                                          item['image'],
-                                          width: 54,
-                                          height: 54,
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (_, __, ___) => Container(
-                                            width: 54,
-                                            height: 54,
-                                            color: const Color(0xFFF3F3F6),
-                                            child: const Icon(
-                                              Icons.shopping_basket_rounded,
-                                              color: Color(0xFF006B23),
-                                              size: 28,
-                                            ),
+                                      // Clickable Product Image & Details -> Opens Product Details Screen
+                                      Expanded(
+                                        child: InkWell(
+                                          onTap: () => _openProductDetails(context, item),
+                                          borderRadius: BorderRadius.circular(12),
+                                          child: Row(
+                                            children: [
+                                              // Thumbnail
+                                              AppNetworkImage(
+                                                imageUrl: item['image']?.toString() ?? '',
+                                                width: 54,
+                                                height: 54,
+                                                fit: BoxFit.cover,
+                                                borderRadius: BorderRadius.circular(12),
+                                              ),
+                                              const SizedBox(width: 12),
+
+                                              // Title & Price
+                                              Expanded(
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      item['name'],
+                                                      style: GoogleFonts.outfit(
+                                                        fontSize: 15,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: const Color(0xFF1A1C1E),
+                                                      ),
+                                                      maxLines: 2,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                    const SizedBox(height: 2),
+                                                    Text(
+                                                      item['subtitle'],
+                                                      style: GoogleFonts.inter(
+                                                        fontSize: 12,
+                                                        color: const Color(0xFF6E7A6C),
+                                                      ),
+                                                      maxLines: 1,
+                                                      overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Row(
+                                                      children: [
+                                                        Text(
+                                                          '₹${item['price']}',
+                                                          style: GoogleFonts.outfit(
+                                                            fontSize: 15,
+                                                            fontWeight: FontWeight.w700,
+                                                            color: const Color(0xFF1A1C1E),
+                                                          ),
+                                                        ),
+                                                        const SizedBox(width: 12),
+                                                        GestureDetector(
+                                                          onTap: () {
+                                                            if (cartProvider != null) {
+                                                              cartProvider.saveForLater(item['id']);
+                                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                                const SnackBar(
+                                                                  content: Text('Moved to Saved for Later'),
+                                                                  duration: Duration(seconds: 2),
+                                                                  behavior: SnackBarBehavior.floating,
+                                                                ),
+                                                              );
+                                                            }
+                                                          },
+                                                          child: Text(
+                                                            'Save for later',
+                                                            style: GoogleFonts.inter(
+                                                              fontSize: 11,
+                                                              fontWeight: FontWeight.w600,
+                                                              color: const Color(0xFF006B23),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(width: 12),
-
-                                      // Title & Price
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              item['name'],
-                                              style: GoogleFonts.outfit(
-                                                fontSize: 15,
-                                                fontWeight: FontWeight.w600,
-                                                color: const Color(0xFF1A1C1E),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 2),
-                                            Text(
-                                              item['subtitle'],
-                                              style: GoogleFonts.inter(
-                                                fontSize: 12,
-                                                color: const Color(0xFF6E7A6C),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Row(
-                                              children: [
-                                                Text(
-                                                  '₹${item['price']}',
-                                                  style: GoogleFonts.outfit(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: const Color(0xFF1A1C1E),
-                                                  ),
-                                                ),
-                                                const SizedBox(width: 12),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    if (cartProvider != null) {
-                                                      cartProvider.saveForLater(item['id']);
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        const SnackBar(
-                                                          content: Text('Moved to Saved for Later'),
-                                                          duration: Duration(seconds: 2),
-                                                          behavior: SnackBarBehavior.floating,
-                                                        ),
-                                                      );
-                                                    }
-                                                  },
-                                                  child: Text(
-                                                    'Save for later',
-                                                    style: GoogleFonts.inter(
-                                                      fontSize: 11,
-                                                      fontWeight: FontWeight.w600,
-                                                      color: const Color(0xFF006B23),
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                      const SizedBox(width: 8),
 
                                       // Stepper Pill (- 1 +)
                                       Container(
@@ -750,29 +810,44 @@ color: Color(0xFF6E7A6C),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            ClipRRect(
+                            InkWell(
+                              onTap: () => _openProductDetails(context, {
+                                'id': pId,
+                                'name': pName,
+                                'subtitle': pUnit,
+                                'price': pPrice,
+                                'image': pImg,
+                              }),
                               borderRadius: BorderRadius.circular(10),
-                              child: AppNetworkImage(
-                                imageUrl: pImg,
-                                height: 75,
-                                width: double.infinity,
-                                fit: BoxFit.contain,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: AppNetworkImage(
+                                      imageUrl: pImg,
+                                      height: 75,
+                                      width: double.infinity,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    pName,
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFF1A1C1E),
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  Text(
+                                    pUnit,
+                                    style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C)),
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              pName,
-                              style: GoogleFonts.outfit(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF1A1C1E),
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              pUnit,
-                              style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C)),
                             ),
                             const Spacer(),
                             Row(
@@ -850,35 +925,48 @@ color: Color(0xFF6E7A6C),
                           padding: const EdgeInsets.all(14.0),
                           child: Row(
                             children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.network(
-                                  sItem.image,
-                                  width: 48,
-                                  height: 48,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => Container(
-                                    width: 48, height: 48, color: const Color(0xFFF3F3F6),
-                                    child: const Icon(Icons.shopping_basket, size: 24, color: Color(0xFF006B23)),
+                              Expanded(
+                                child: InkWell(
+                                  onTap: () => _openProductDetails(context, {
+                                    'id': sItem.id,
+                                    'name': sItem.name,
+                                    'subtitle': sItem.subtitle,
+                                    'price': sItem.price.round(),
+                                    'image': sItem.image,
+                                  }),
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Row(
+                                    children: [
+                                      AppNetworkImage(
+                                        imageUrl: sItem.image,
+                                        width: 48,
+                                        height: 48,
+                                        fit: BoxFit.cover,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              sItem.name,
+                                              style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            Text(
+                                              '₹${sItem.price.round()}',
+                                              style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF006B23)),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      sItem.name,
-                                      style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)),
-                                    ),
-                                    Text(
-                                      '₹${sItem.price.round()}',
-                                      style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w700, color: const Color(0xFF006B23)),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                              const SizedBox(width: 8),
                               OutlinedButton(
                                 onPressed: () {
                                   if (cartProvider != null) {

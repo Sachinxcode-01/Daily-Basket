@@ -30,6 +30,7 @@ import {
   Store,
   RefreshCw,
   Zap,
+  Trash2,
 } from 'lucide-react';
 
 // Google Stitch Source of Truth Specs
@@ -166,6 +167,28 @@ export default function OrderManagementPage() {
   const [viewMode, setViewMode] = useState<'card' | 'table' | 'mobile'>('card');
   const [orders, setOrders] = useState<AdminOrder[]>(INITIAL_ORDERS);
   const [selectedOrderForPrint, setSelectedOrderForPrint] = useState<string | null>(null);
+  const [deleteModalOrder, setDeleteModalOrder] = useState<AdminOrder | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const confirmDeleteOrder = async () => {
+    if (!deleteModalOrder) return;
+    setIsDeleting(true);
+    try {
+      const cleanId = deleteModalOrder.id.replace(/^#/, '');
+      await fetch(`/api/orders?id=${encodeURIComponent(cleanId)}`, {
+        method: 'DELETE',
+      });
+      setOrders((prev) => prev.filter((o) => o.id !== deleteModalOrder.id));
+      setLiveToast(`Order ${deleteModalOrder.id} cancelled & removed from active queue.`);
+      setTimeout(() => setLiveToast(null), 4000);
+      setDeleteModalOrder(null);
+    } catch {
+      setLiveToast('Failed to cancel order');
+      setTimeout(() => setLiveToast(null), 4000);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
   const [liveToast, setLiveToast] = useState<string | null>(null);
   const [isBalancing, setIsBalancing] = useState(false);
   const [hubCapacities, setHubCapacities] = useState<any[]>([
@@ -242,6 +265,17 @@ export default function OrderManagementPage() {
   useEffect(() => {
     let isMounted = true;
     const fetchLiveOrders = async () => {
+      try {
+        const res = await fetch('/api/orders');
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted && Array.isArray(data.orders) && data.orders.length > 0) {
+            setOrders(data.orders);
+            return;
+          }
+        }
+      } catch {}
+
       try {
         const liveOrders = await apiClient.listOrders('usr_default');
         if (isMounted && Array.isArray(liveOrders) && liveOrders.length > 0) {
@@ -530,7 +564,7 @@ export default function OrderManagementPage() {
           <button
             onClick={() => setViewMode('card')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'card' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'card' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -539,7 +573,7 @@ export default function OrderManagementPage() {
           <button
             onClick={() => setViewMode('table')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'table' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'table' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <TableIcon className="w-3.5 h-3.5" />
@@ -548,7 +582,7 @@ export default function OrderManagementPage() {
           <button
             onClick={() => setViewMode('mobile')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'mobile' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'mobile' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <Smartphone className="w-3.5 h-3.5" />
@@ -651,7 +685,7 @@ export default function OrderManagementPage() {
 
       {/* Live Ingestion Toast Banner */}
       {liveToast && (
-        <div className="bg-[#006837] text-white p-3.5 rounded-2xl flex items-center justify-between shadow-xl animate-bounce">
+        <div className="bg-[#2d9d43] text-white p-3.5 rounded-2xl flex items-center justify-between shadow-xl animate-bounce">
           <div className="flex items-center gap-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping" />
             <p className="text-sm font-extrabold">{liveToast}</p>
@@ -672,7 +706,7 @@ export default function OrderManagementPage() {
           <div className="w-[390px] h-[820px] bg-[#f4f6f4] rounded-[48px] border-[12px] border-[#1e2923] shadow-2xl overflow-hidden flex flex-col relative">
             {/* Phone Top Notch */}
             <div className="w-36 h-5 bg-[#1e2923] rounded-b-2xl mx-auto flex items-center justify-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#006837]/40" />
+              <div className="w-3 h-3 rounded-full bg-[#2d9d43]/40" />
             </div>
 
             {/* Mobile App Bar */}
@@ -686,7 +720,7 @@ export default function OrderManagementPage() {
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <Search className="w-4 h-4 text-[#006837]" />
+                <Search className="w-4 h-4 text-[#2d9d43]" />
                 <div className="relative">
                   <Bell className="w-4 h-4 text-[#1e2923]" />
                   <span className="w-2 h-2 rounded-full bg-red-600 absolute top-0 right-0" />
@@ -706,7 +740,7 @@ export default function OrderManagementPage() {
                   placeholder="Search Order ID, Customer..."
                   className="bg-transparent text-xs text-[#1e2923] placeholder-[#94a3b8] focus:outline-none flex-1"
                 />
-                <Mic className="w-4 h-4 text-[#006837]" />
+                <Mic className="w-4 h-4 text-[#2d9d43]" />
               </div>
 
               {/* Filter Pills */}
@@ -717,7 +751,7 @@ export default function OrderManagementPage() {
                     onClick={() => setSelectedFilter(f)}
                     className={`px-3 py-1.5 rounded-full font-bold whitespace-nowrap transition ${
                       selectedFilter === f
-                        ? 'bg-[#006837] text-white'
+                        ? 'bg-[#2d9d43] text-white'
                         : 'bg-white text-[#334155] border border-[#cbd5e1]'
                     }`}
                   >
@@ -730,8 +764,8 @@ export default function OrderManagementPage() {
               <div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
                 <div className="min-w-[140px] bg-[#f4faf6] border border-[#d0e5d7] p-3 rounded-2xl relative">
                   <p className="text-[10px] font-extrabold text-[#475569] uppercase tracking-wider">Today&apos;s Orders</p>
-                  <p className="text-2xl font-black text-[#006837] mt-1">142</p>
-                  <TrendingUp className="w-5 h-5 text-[#006837] absolute right-3 bottom-3" />
+                  <p className="text-2xl font-black text-[#2d9d43] mt-1">142</p>
+                  <TrendingUp className="w-5 h-5 text-[#2d9d43] absolute right-3 bottom-3" />
                 </div>
                 <div className="min-w-[140px] bg-[#fff7ed] border border-[#ffedd5] p-3 rounded-2xl relative">
                   <p className="text-[10px] font-extrabold text-[#c2410c] uppercase tracking-wider">Pending</p>
@@ -752,7 +786,7 @@ export default function OrderManagementPage() {
                         </span>
                       )}
                     </div>
-                    <span className="font-black text-base text-[#006837]">{ord.amount}</span>
+                    <span className="font-black text-base text-[#2d9d43]">{ord.amount}</span>
                   </div>
 
                   {/* Customer Inner Box */}
@@ -778,14 +812,14 @@ export default function OrderManagementPage() {
                           <div
                             className={`w-3.5 h-3.5 rounded-full flex items-center justify-center ${
                               idx <= ord.statusStep
-                                ? 'bg-[#006837] text-white ring-2 ring-[#86efac]'
+                                ? 'bg-[#2d9d43] text-white ring-2 ring-[#86efac]'
                                 : 'bg-[#e2e8f0]'
                             }`}
                           />
                           {idx < STEP_LABELS.length - 1 && (
                             <div
                               className={`flex-1 h-1 ${
-                                idx < ord.statusStep ? 'bg-[#006837]' : 'bg-[#e2e8f0]'
+                                idx < ord.statusStep ? 'bg-[#2d9d43]' : 'bg-[#e2e8f0]'
                               }`}
                             />
                           )}
@@ -794,7 +828,7 @@ export default function OrderManagementPage() {
                     </div>
                     <div className="flex justify-between text-[9px] font-bold text-[#64748b]">
                       {STEP_LABELS.map((s, idx) => (
-                        <span key={s} className={idx <= ord.statusStep ? 'text-[#006837]' : ''}>
+                        <span key={s} className={idx <= ord.statusStep ? 'text-[#2d9d43]' : ''}>
                           {s}
                         </span>
                       ))}
@@ -804,7 +838,7 @@ export default function OrderManagementPage() {
                   {/* Footer & Action */}
                   <div className="flex items-center justify-between text-[11px] text-[#64748b]">
                     <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {ord.time}</span>
-                    <span className="flex items-center gap-1 text-[#006837] font-bold"><CheckCircle2 className="w-3 h-3" /> {ord.paymentMethod}</span>
+                    <span className="flex items-center gap-1 text-[#2d9d43] font-bold"><CheckCircle2 className="w-3 h-3" /> {ord.paymentMethod}</span>
                   </div>
 
                     <div className="flex gap-2 pt-1">
@@ -816,7 +850,7 @@ export default function OrderManagementPage() {
                             ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                             : ord.hasMissingRequiredData
                             ? 'bg-amber-100 text-amber-700 border border-amber-300 cursor-not-allowed'
-                            : 'bg-[#006837] text-white hover:bg-[#00522b]'
+                            : 'bg-[#2d9d43] text-white hover:bg-[#078730]'
                         }`}
                       >
                         {ord.hasMissingRequiredData
@@ -833,7 +867,7 @@ export default function OrderManagementPage() {
                       </button>
                       <button
                         onClick={() => handleStreamRiderGps(ord.id)}
-                        className="p-2 border border-emerald-200 bg-emerald-50 rounded-xl hover:bg-emerald-100 text-[#006837]"
+                        className="p-2 border border-emerald-200 bg-emerald-50 rounded-xl hover:bg-emerald-100 text-[#2d9d43]"
                         title="Simulate live rider GPS movement"
                       >
                         <Bike className="w-4 h-4" />
@@ -861,14 +895,14 @@ export default function OrderManagementPage() {
             {/* Bottom Nav Bar */}
             <div className="bg-white border-t border-[#e2e8f0] px-4 py-2 flex justify-between items-center text-[10px] font-bold text-[#64748b]">
               <div className="flex flex-col items-center gap-0.5"><Grid className="w-4 h-4" /> Home</div>
-              <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#dcfce7] text-[#006837] rounded-2xl"><ShoppingBag className="w-4 h-4" /> Orders</div>
+              <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#dcfce7] text-[#2d9d43] rounded-2xl"><ShoppingBag className="w-4 h-4" /> Orders</div>
               <div className="flex flex-col items-center gap-0.5"><Package className="w-4 h-4" /> Inventory</div>
               <div className="flex flex-col items-center gap-0.5"><BarChart3 className="w-4 h-4" /> Analytics</div>
               <div className="flex flex-col items-center gap-0.5"><User className="w-4 h-4" /> Profile</div>
             </div>
 
             {/* Floating Action Button */}
-            <button className="absolute right-6 bottom-16 w-11 h-11 bg-[#006837] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition">
+            <button className="absolute right-6 bottom-16 w-11 h-11 bg-[#2d9d43] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition">
               <Plus className="w-6 h-6" />
             </button>
           </div>
@@ -885,9 +919,9 @@ export default function OrderManagementPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search Order ID, Customer, or Address..."
-                className="w-full pl-10 pr-10 py-2.5 bg-[#eef2ef] border border-[#e2e8f0] rounded-2xl text-xs text-[#1e2923] placeholder-[#94a3b8] focus:outline-none focus:border-[#006837]"
+                className="w-full pl-10 pr-10 py-2.5 bg-[#eef2ef] border border-[#e2e8f0] rounded-2xl text-xs text-[#1e2923] placeholder-[#94a3b8] focus:outline-none focus:border-[#2d9d43]"
               />
-              <Mic className="w-4 h-4 text-[#006837] absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer" />
+              <Mic className="w-4 h-4 text-[#2d9d43] absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer" />
             </div>
 
             {/* Filter Pills */}
@@ -898,7 +932,7 @@ export default function OrderManagementPage() {
                   onClick={() => setSelectedFilter(f)}
                   className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition ${
                     selectedFilter === f
-                      ? 'bg-[#006837] text-white shadow-sm'
+                      ? 'bg-[#2d9d43] text-white shadow-sm'
                       : 'bg-white text-[#334155] border border-[#cbd5e1] hover:bg-[#f8fafc]'
                   }`}
                 >
@@ -912,8 +946,8 @@ export default function OrderManagementPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-[#f4faf6] border border-[#d0e5d7] p-4 rounded-3xl relative shadow-sm">
               <p className="text-xs font-extrabold text-[#475569] uppercase tracking-wider">Today&apos;s Orders</p>
-              <p className="text-3xl font-black text-[#006837] mt-1">142</p>
-              <TrendingUp className="w-6 h-6 text-[#006837] absolute right-4 bottom-4" />
+              <p className="text-3xl font-black text-[#2d9d43] mt-1">142</p>
+              <TrendingUp className="w-6 h-6 text-[#2d9d43] absolute right-4 bottom-4" />
             </div>
 
             <div className="bg-[#fff7ed] border border-[#ffedd5] p-4 rounded-3xl relative shadow-sm">
@@ -957,7 +991,7 @@ export default function OrderManagementPage() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="font-black text-xl text-[#006837] block">{ord.amount}</span>
+                    <span className="font-black text-xl text-[#2d9d43] block">{ord.amount}</span>
                     <span className="text-[10px] text-amber-800 font-bold bg-amber-100 px-2 py-0.5 rounded-full inline-block">
                       ⚡ SLA: {(ord as any).slaMinutesRemaining || 7}m left
                     </span>
@@ -987,14 +1021,14 @@ export default function OrderManagementPage() {
                         <div
                           className={`w-4 h-4 rounded-full flex items-center justify-center ${
                             idx <= ord.statusStep
-                              ? 'bg-[#006837] text-white ring-4 ring-[#86efac]/40'
+                              ? 'bg-[#2d9d43] text-white ring-4 ring-[#86efac]/40'
                               : 'bg-[#e2e8f0]'
                           }`}
                         />
                         {idx < STEP_LABELS.length - 1 && (
                           <div
                             className={`flex-1 h-1 ${
-                              idx < ord.statusStep ? 'bg-[#006837]' : 'bg-[#e2e8f0]'
+                              idx < ord.statusStep ? 'bg-[#2d9d43]' : 'bg-[#e2e8f0]'
                             }`}
                           />
                         )}
@@ -1003,7 +1037,7 @@ export default function OrderManagementPage() {
                   </div>
                   <div className="flex justify-between text-xs font-bold text-[#64748b]">
                     {STEP_LABELS.map((s, idx) => (
-                      <span key={s} className={idx <= ord.statusStep ? 'text-[#006837]' : ''}>
+                      <span key={s} className={idx <= ord.statusStep ? 'text-[#2d9d43]' : ''}>
                         {s}
                       </span>
                     ))}
@@ -1027,7 +1061,7 @@ export default function OrderManagementPage() {
                         </option>
                       ))}
                     </select>
-                    <span className="flex items-center gap-1.5 text-[#006837] font-bold"><CheckCircle2 className="w-3.5 h-3.5" /> {ord.paymentMethod}</span>
+                    <span className="flex items-center gap-1.5 text-[#2d9d43] font-bold"><CheckCircle2 className="w-3.5 h-3.5" /> {ord.paymentMethod}</span>
                   </div>
                 </div>
 
@@ -1041,7 +1075,7 @@ export default function OrderManagementPage() {
                         ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                         : ord.hasMissingRequiredData
                         ? 'bg-amber-100 text-amber-700 border border-amber-300 cursor-not-allowed'
-                        : 'bg-[#006837] text-white hover:bg-[#00522b]'
+                        : 'bg-[#2d9d43] text-white hover:bg-[#078730]'
                     }`}
                   >
                     {ord.hasMissingRequiredData
@@ -1058,10 +1092,10 @@ export default function OrderManagementPage() {
                   </button>
                   <button
                     onClick={() => handleStreamRiderGps(ord.id)}
-                    className="px-3 py-2.5 border border-emerald-300 bg-emerald-50 rounded-xl hover:bg-emerald-100 text-[#006837] text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
+                    className="px-3 py-2.5 border border-emerald-300 bg-emerald-50 rounded-xl hover:bg-emerald-100 text-[#2d9d43] text-xs font-bold transition flex items-center gap-1.5 shadow-sm"
                     title="Simulate live rider GPS telemetry to map"
                   >
-                    <Bike className="w-4 h-4 text-[#006837]" />
+                    <Bike className="w-4 h-4 text-[#2d9d43]" />
                     <span>GPS Sim</span>
                   </button>
                   <a
@@ -1074,6 +1108,13 @@ export default function OrderManagementPage() {
                     <Navigation className="w-3.5 h-3.5 text-emerald-700" />
                     <span>Track</span>
                   </a>
+                  <button
+                    onClick={() => setDeleteModalOrder(ord)}
+                    className="p-2.5 border border-rose-200 bg-rose-50 rounded-xl hover:bg-rose-100 text-rose-600 transition"
+                    title="Cancel & Delete Order"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                   <button
                     onClick={() => setSelectedOrderForPrint(ord.id)}
                     className="p-2.5 border border-[#cbd5e1] rounded-xl hover:bg-[#f8fafc] text-[#1e2923] transition"
@@ -1105,7 +1146,7 @@ export default function OrderManagementPage() {
               <tbody className="divide-y divide-[#e2e8f0]">
                 {filteredOrders.map((ord) => (
                   <tr key={ord.id} className="hover:bg-[#f8fafc] transition">
-                    <td className="py-3.5 font-bold text-[#006837]">{ord.id}</td>
+                    <td className="py-3.5 font-bold text-[#2d9d43]">{ord.id}</td>
                     <td className="py-3.5">
                       <select
                         value={(ord as any).hubCode || 'BLR-KRM-01'}
@@ -1143,7 +1184,7 @@ export default function OrderManagementPage() {
                               ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
                               : ord.hasMissingRequiredData
                               ? 'bg-amber-100 text-amber-700 border border-amber-300 cursor-not-allowed'
-                              : 'bg-[#006837] text-white hover:bg-[#00522b]'
+                              : 'bg-[#2d9d43] text-white hover:bg-[#078730]'
                           }`}
                         >
                           {ord.hasMissingRequiredData
@@ -1154,7 +1195,7 @@ export default function OrderManagementPage() {
                         </button>
                         <button
                           onClick={() => handleStreamRiderGps(ord.id)}
-                          className="p-1.5 bg-emerald-50 text-[#006837] rounded-lg border border-emerald-200 hover:bg-emerald-100 transition"
+                          className="p-1.5 bg-emerald-50 text-[#2d9d43] rounded-lg border border-emerald-200 hover:bg-emerald-100 transition"
                           title="Stream live rider GPS to tracking map"
                         >
                           <Bike className="w-3.5 h-3.5" />
@@ -1168,6 +1209,13 @@ export default function OrderManagementPage() {
                         >
                           <Navigation className="w-3.5 h-3.5" />
                         </a>
+                        <button
+                          onClick={() => setDeleteModalOrder(ord)}
+                          className="p-1.5 bg-rose-50 text-rose-600 rounded-lg border border-rose-200 hover:bg-rose-100 transition"
+                          title="Cancel Order"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -1178,18 +1226,54 @@ export default function OrderManagementPage() {
         </div>
       )}
 
+      {/* Delete / Cancel Order Confirmation Modal */}
+      {deleteModalOrder && (
+        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-slate-200 space-y-4 animate-in fade-in zoom-in-95">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-rose-100 text-rose-600 rounded-2xl">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-extrabold text-base text-zinc-900">Cancel &amp; Delete Order</h3>
+                <p className="text-xs text-zinc-500">{deleteModalOrder.id} • {deleteModalOrder.customer}</p>
+              </div>
+            </div>
+            <p className="text-xs text-zinc-600 leading-relaxed">
+              Are you sure you want to cancel this order ({deleteModalOrder.amount})? This will release reserved dark store inventory and update the customer mobile/web app immediately.
+            </p>
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                onClick={() => setDeleteModalOrder(null)}
+                disabled={isDeleting}
+                className="px-4 py-2 text-xs font-semibold rounded-xl border border-zinc-200 hover:bg-zinc-100 text-zinc-700"
+              >
+                Nevermind
+              </button>
+              <button
+                onClick={confirmDeleteOrder}
+                disabled={isDeleting}
+                className="px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 text-white hover:bg-rose-700 shadow-sm disabled:opacity-50"
+              >
+                {isDeleting ? 'Cancelling...' : 'Confirm Cancellation'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Thermal Print Modal */}
       {selectedOrderForPrint && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl text-center">
-            <Printer className="w-12 h-12 text-[#006837] mx-auto" />
+            <Printer className="w-12 h-12 text-[#2d9d43] mx-auto" />
             <h3 className="text-lg font-extrabold text-[#1e2923]">Print Invoice {selectedOrderForPrint}</h3>
             <p className="text-xs text-[#64748b]">
               Sending receipt print command to thermal dark store printer over local network...
             </p>
             <button
               onClick={() => setSelectedOrderForPrint(null)}
-              className="w-full py-2.5 bg-[#006837] text-white rounded-xl font-bold text-xs"
+              className="w-full py-2.5 bg-[#2d9d43] text-white rounded-xl font-bold text-xs"
             >
               Done
             </button>

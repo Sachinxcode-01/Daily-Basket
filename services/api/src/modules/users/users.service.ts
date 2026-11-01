@@ -127,6 +127,66 @@ export class UsersService {
     }
   }
 
+  async listCustomers(limit = 50) {
+    try {
+      const users = await this.prisma.user.findMany({
+        take: limit,
+        orderBy: { createdAt: 'desc' },
+        include: {
+          orders: {
+            select: {
+              id: true,
+              totalAmount: true,
+              status: true,
+              createdAt: true,
+            },
+          },
+          addresses: true,
+          wallet: true,
+        },
+      });
+      return users.map((u) => {
+        const totalOrders = u.orders?.length || 0;
+        const totalSpentNum = u.orders?.reduce((sum, o) => sum + (o.totalAmount || 0), 0) || 0;
+        const recent = (u.orders || []).slice(0, 3).map((o) => ({
+          id: `Order #${o.id.substring(0, 8)}`,
+          time: new Date(o.createdAt).toLocaleDateString(),
+          amount: `₹${o.totalAmount}`,
+          status: o.status,
+          statusColor: o.status === 'DELIVERED' ? 'text-[#15803d]' : 'text-[#0284c7]',
+          badgeBg: o.status === 'DELIVERED' ? 'bg-emerald-50' : 'bg-sky-50',
+          isActive: o.status !== 'DELIVERED' && o.status !== 'CANCELLED',
+        }));
+
+        return {
+          id: `#DB-CUS-${u.id.substring(0, 6).toUpperCase()}`,
+          name: u.fullName || 'Customer',
+          email: u.email || 'customer@dailybasket.com',
+          phone: u.phoneNumber || '+91 98000 00000',
+          joined: `Joined ${new Date(u.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`,
+          avatar: u.avatarUrl || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=300',
+          totalOrders,
+          totalSpent: `₹${totalSpentNum.toLocaleString('en-IN')}`,
+          walletBalance: `₹${(u.wallet?.balance as number) || 0}`,
+          ltvScore: totalSpentNum > 5000 ? 'High' : totalSpentNum > 1000 ? 'Medium' : 'Low',
+          churnRisk: totalOrders > 5 ? 'Low (5%)' : 'Medium (30%)',
+          churnRiskLevel: totalOrders > 5 ? 'low' : 'med',
+          avgBasket: totalOrders > 0 ? `₹${Math.round(totalSpentNum / totalOrders)}` : '₹0',
+          loyaltyTag: totalSpentNum > 10000 ? 'VIP Platinum' : totalSpentNum > 2000 ? 'Gold Member' : 'Regular',
+          shopperTag: totalOrders > 10 ? 'Frequent Shopper' : 'New Shopper',
+          status: 'ACTIVE',
+          affinityFresh: 75,
+          affinityDairy: 60,
+          affinitySnacks: 30,
+          recentOrders: recent,
+        };
+      });
+    } catch (err) {
+      this.logger.warn(`Could not list customers from prisma: ${err}`);
+      return [];
+    }
+  }
+
   async getProfile(userId = 'usr_default') {
     const stored = this.profileStore.get(userId) || this.profileStore.get('usr_default');
     try {

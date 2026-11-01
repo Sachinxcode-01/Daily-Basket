@@ -540,6 +540,37 @@ export class OrdersService {
     };
   }
 
+  async findAllOrders() {
+    try {
+      const dbOrders = await this.prisma.order.findMany({
+        orderBy: { createdAt: 'desc' },
+        include: {
+          items: true,
+          address: true,
+          deliveryPartner: true,
+          user: {
+            select: {
+              id: true,
+              fullName: true,
+              phoneNumber: true,
+              email: true,
+              avatarUrl: true,
+            },
+          },
+          store: true,
+        },
+      });
+
+      if (dbOrders && dbOrders.length > 0) {
+        return dbOrders;
+      }
+    } catch (err) {
+      this.logger.warn(`Could not query Prisma for all orders: ${err}`);
+    }
+
+    return Array.from(OrdersService.orderStore.values());
+  }
+
   async findByUser(userId: string) {
     return this.prisma.order.findMany({
       where: { userId },

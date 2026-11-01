@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -186,6 +187,8 @@ model Product {
   variants        ProductVariant[]
   reviews         Review[]
   favorites       Favorite[]
+  wishlists       Wishlist[]
+  recentlyViewed  RecentlyViewed[]
   aiInsight       ProductAiInsight?
   referenceImages ProductReferenceImage[]
   createdAt       DateTime         @default(now())
@@ -510,6 +513,7 @@ model Wishlist {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
   @@unique([userId, productId])
@@ -521,6 +525,7 @@ model RecentlyViewed {
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   viewedAt  DateTime @default(now())
 
   @@unique([userId, productId])

@@ -23,11 +23,11 @@ export default function CreateCouponPage() {
   return (
     <div className="max-w-2xl mx-auto space-y-6 font-sans">
       <div className="flex items-center gap-3 bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
-        <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#006837]">
+        <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#2d9d43]">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-black text-[#006837]">Create New Coupon</h1>
+          <h1 className="text-2xl font-black text-[#2d9d43]">Create New Coupon</h1>
           <p className="text-xs text-[#64748b] mt-0.5">Google Stitch Screen ID: 0a470157a8f2468f81962043fc512599</p>
         </div>
       </div>
@@ -48,14 +48,14 @@ export default function CreateCouponPage() {
               type="text"
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
-              className="flex-1 px-4 py-2.5 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl font-mono font-black text-sm text-[#1e2923] uppercase outline-none focus:border-[#006837]"
+              className="flex-1 px-4 py-2.5 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl font-mono font-black text-sm text-[#1e2923] uppercase outline-none focus:border-[#2d9d43]"
             />
             <button
               type="button"
               onClick={() => setCode(`GEN${Math.floor(1000 + Math.random() * 9000)}`)}
               className="px-4 py-2.5 bg-[#f1f5f9] border border-[#e2e8f0] rounded-2xl text-xs font-bold text-[#1e2923] flex items-center gap-1 hover:bg-[#e2e8f0]"
             >
-              <Sparkles className="w-3.5 h-3.5 text-[#006837]" /> Auto Code
+              <Sparkles className="w-3.5 h-3.5 text-[#2d9d43]" /> Auto Code
             </button>
           </div>
         </div>
@@ -71,7 +71,7 @@ export default function CreateCouponPage() {
                 onClick={() => setDiscountType(type)}
                 className={`py-2.5 rounded-2xl text-xs font-bold transition border ${
                   discountType === type
-                    ? 'bg-[#006837] text-white border-[#006837] shadow-sm'
+                    ? 'bg-[#2d9d43] text-white border-[#2d9d43] shadow-sm'
                     : 'bg-[#f8fafc] text-[#64748b] border-[#cbd5e1] hover:bg-white'
                 }`}
               >
@@ -116,7 +116,7 @@ export default function CreateCouponPage() {
 
         <button
           type="submit"
-          className="w-full py-3 bg-[#006837] text-white text-xs font-bold rounded-2xl shadow-md hover:bg-[#00522b] transition"
+          className="w-full py-3 bg-[#2d9d43] text-white text-xs font-bold rounded-2xl shadow-md hover:bg-[#078730] transition"
         >
           Publish Coupon
         </button>

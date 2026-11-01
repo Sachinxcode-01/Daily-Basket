@@ -9,7 +9,7 @@ export class SearchEnhancedController {
 
   @Get('trending')
   @ApiOperation({ summary: 'Trending search keywords across all users' })
-  @ApiQuery({ name: 'limit', required: false, default: 10 })
+  @ApiQuery({ name: 'limit', required: false, example: 10 })
   async trending(@Query('limit') limit?: number) {
     const count = Number(limit) || 10;
     const result = await this.prisma.searchAnalytics.groupBy({

@@ -20,13 +20,13 @@ export default function LaunchChecklistPage() {
   return (
     <div className="max-w-3xl mx-auto space-y-6 font-sans">
       <div className="flex items-center gap-3 bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
-        <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#006837]">
+        <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#2d9d43]">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex items-center gap-2">
-          <Rocket className="w-6 h-6 text-[#006837]" />
+          <Rocket className="w-6 h-6 text-[#2d9d43]" />
           <div>
-            <h1 className="text-2xl font-black text-[#006837]">Go Live &amp; Launch Checklist</h1>
+            <h1 className="text-2xl font-black text-[#2d9d43]">Go Live &amp; Launch Checklist</h1>
             <p className="text-xs text-[#64748b] mt-0.5">Google Stitch Screen ID: eece7072c79f45dc8785946e46beab3b</p>
           </div>
         </div>
@@ -35,10 +35,10 @@ export default function LaunchChecklistPage() {
       <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-3">
         <div className="flex justify-between items-center">
           <h3 className="font-black text-base text-[#1e2923]">System Readiness Score</h3>
-          <span className="font-black text-lg text-[#006837]">85% Ready</span>
+          <span className="font-black text-lg text-[#2d9d43]">85% Ready</span>
         </div>
         <div className="w-full h-2.5 bg-[#f1f5f9] rounded-full overflow-hidden">
-          <div className="h-full bg-[#006837]" style={{ width: '85%' }} />
+          <div className="h-full bg-[#2d9d43]" style={{ width: '85%' }} />
         </div>
       </div>
 
@@ -49,7 +49,7 @@ export default function LaunchChecklistPage() {
           {tasks.map((t) => (
             <div key={t.title} className="p-4 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] flex items-center gap-3">
               {t.done ? (
-                <CheckCircle2 className="w-5 h-5 text-[#006837] shrink-0" />
+                <CheckCircle2 className="w-5 h-5 text-[#2d9d43] shrink-0" />
               ) : (
                 <Circle className="w-5 h-5 text-[#64748b] shrink-0" />
               )}

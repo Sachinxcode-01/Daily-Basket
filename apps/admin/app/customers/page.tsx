@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   ArrowLeft,
   MoreVertical,
@@ -287,6 +287,21 @@ export default function CustomerProfile360Page() {
   const [segmentFilter, setSegmentFilter] = useState('ALL');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  // Load real customer user records from backend API
+  useEffect(() => {
+    fetch('/api/customers')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.success && Array.isArray(data.customers) && data.customers.length > 0) {
+          setCustomers(data.customers);
+          if (!data.customers.some((c: any) => c.id === selectedCustomerId)) {
+            setSelectedCustomerId(data.customers[0].id);
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Selected customer for 360 profile
   const customer = useMemo(() => {
     return customers.find((c) => c.id === selectedCustomerId) || customers[0];
@@ -360,13 +375,13 @@ export default function CustomerProfile360Page() {
       {/* Top Header & View Modes */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-[#006837] flex items-center justify-center font-bold">
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-[#2d9d43] flex items-center justify-center font-bold">
             <Users className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-[#006837] tracking-tight">Customer Management & 360°</h1>
-              <span className="text-[10px] bg-emerald-100 text-[#006837] px-2 py-0.5 rounded font-mono font-bold">
+              <h1 className="text-2xl font-black text-[#2d9d43] tracking-tight">Customer Management & 360°</h1>
+              <span className="text-[10px] bg-emerald-100 text-[#2d9d43] px-2 py-0.5 rounded font-mono font-bold">
                 PROD
               </span>
             </div>
@@ -382,7 +397,7 @@ export default function CustomerProfile360Page() {
             onClick={() => setActiveTab('directory')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
               activeTab === 'directory'
-                ? 'bg-[#006837] text-white shadow-xs'
+                ? 'bg-[#2d9d43] text-white shadow-xs'
                 : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
@@ -394,7 +409,7 @@ export default function CustomerProfile360Page() {
             onClick={() => setActiveTab('360')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
               activeTab === '360'
-                ? 'bg-[#006837] text-white shadow-xs'
+                ? 'bg-[#2d9d43] text-white shadow-xs'
                 : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
@@ -423,7 +438,7 @@ export default function CustomerProfile360Page() {
 
             <div className="bg-white p-4 rounded-2xl border border-zinc-200/80 shadow-2xs">
               <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider font-mono">Average LTV</span>
-              <div className="text-2xl font-black text-[#006837] mt-1">₹42,800</div>
+              <div className="text-2xl font-black text-[#2d9d43] mt-1">₹42,800</div>
               <div className="text-[11px] text-emerald-600 font-bold mt-0.5">₹850 avg basket size</div>
             </div>
 
@@ -444,14 +459,14 @@ export default function CustomerProfile360Page() {
                   placeholder="Search customer by name, mobile phone, email, or ID..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 bg-zinc-50/80 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-hidden focus:ring-2 focus:ring-[#006837] focus:bg-white"
+                  className="w-full pl-10 pr-4 py-2 bg-zinc-50/80 border border-zinc-200 rounded-xl text-xs text-zinc-900 focus:outline-hidden focus:ring-2 focus:ring-[#2d9d43] focus:bg-white"
                 />
               </div>
 
               <select
                 value={segmentFilter}
                 onChange={(e) => setSegmentFilter(e.target.value)}
-                className="px-3 py-2 bg-zinc-50/80 border border-zinc-200 rounded-xl text-xs text-zinc-700 font-medium focus:outline-hidden focus:ring-2 focus:ring-[#006837]"
+                className="px-3 py-2 bg-zinc-50/80 border border-zinc-200 rounded-xl text-xs text-zinc-700 font-medium focus:outline-hidden focus:ring-2 focus:ring-[#2d9d43]"
               >
                 <option value="ALL">All Segments</option>
                 <option value="VIP">VIP & High LTV</option>
@@ -521,7 +536,7 @@ export default function CustomerProfile360Page() {
 
                       <td className="py-3.5 px-4 font-bold text-zinc-900">{c.totalOrders} orders</td>
 
-                      <td className="py-3.5 px-4 font-black text-[#006837]">{c.totalSpent}</td>
+                      <td className="py-3.5 px-4 font-black text-[#2d9d43]">{c.totalSpent}</td>
 
                       <td className="py-3.5 px-4 font-semibold text-zinc-800">{c.walletBalance}</td>
 
@@ -560,7 +575,7 @@ export default function CustomerProfile360Page() {
                               setSelectedCustomerId(c.id);
                               setActiveTab('360');
                             }}
-                            className="flex items-center gap-1 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-[#006837] rounded-lg text-xs font-bold transition"
+                            className="flex items-center gap-1 px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-[#2d9d43] rounded-lg text-xs font-bold transition"
                             title="Open 360 Profile"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -593,7 +608,7 @@ export default function CustomerProfile360Page() {
               <select
                 value={selectedCustomerId}
                 onChange={(e) => setSelectedCustomerId(e.target.value)}
-                className="px-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold text-[#006837] focus:ring-2 focus:ring-[#006837]"
+                className="px-3 py-1.5 bg-zinc-50 border border-zinc-200 rounded-xl text-xs font-bold text-[#2d9d43] focus:ring-2 focus:ring-[#2d9d43]"
               >
                 {customers.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -607,7 +622,7 @@ export default function CustomerProfile360Page() {
               <button
                 onClick={() => setViewMode('web')}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition ${
-                  viewMode === 'web' ? 'bg-[#006837] text-white shadow-xs' : 'text-[#64748b] hover:text-[#1e2923]'
+                  viewMode === 'web' ? 'bg-[#2d9d43] text-white shadow-xs' : 'text-[#64748b] hover:text-[#1e2923]'
                 }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
@@ -616,7 +631,7 @@ export default function CustomerProfile360Page() {
               <button
                 onClick={() => setViewMode('mobile')}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-bold transition ${
-                  viewMode === 'mobile' ? 'bg-[#006837] text-white shadow-xs' : 'text-[#64748b] hover:text-[#1e2923]'
+                  viewMode === 'mobile' ? 'bg-[#2d9d43] text-white shadow-xs' : 'text-[#64748b] hover:text-[#1e2923]'
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5" />
@@ -632,7 +647,7 @@ export default function CustomerProfile360Page() {
               <div className="w-[390px] h-[840px] bg-[#f8fafc] rounded-[48px] border-[12px] border-[#1e2923] shadow-2xl overflow-hidden flex flex-col relative">
                 {/* Phone Top Notch */}
                 <div className="w-36 h-5 bg-[#1e2923] rounded-b-2xl mx-auto flex items-center justify-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-[#006837]/40" />
+                  <div className="w-3 h-3 rounded-full bg-[#2d9d43]/40" />
                 </div>
 
                 {/* Mobile App Bar */}
@@ -641,7 +656,7 @@ export default function CustomerProfile360Page() {
                     onClick={() => setActiveTab('directory')}
                     className="w-5 h-5 text-[#1e2923] cursor-pointer"
                   />
-                  <span className="font-extrabold text-base text-[#006837]">Customer Profile</span>
+                  <span className="font-extrabold text-base text-[#2d9d43]">Customer Profile</span>
                   <MoreVertical className="w-5 h-5 text-[#1e2923] cursor-pointer" />
                 </div>
 
@@ -694,7 +709,7 @@ export default function CustomerProfile360Page() {
                         onClick={() => setActiveModal(act.label)}
                         className="min-w-[68px] bg-white border border-[#e2e8f0] py-3 rounded-2xl flex flex-col items-center gap-1 shadow-sm hover:bg-[#f8fafc]"
                       >
-                        <act.icon className="w-4 h-4 text-[#006837]" />
+                        <act.icon className="w-4 h-4 text-[#2d9d43]" />
                         <span className="text-[11px] font-bold text-[#1e2923]">{act.label}</span>
                       </button>
                     ))}
@@ -713,7 +728,7 @@ export default function CustomerProfile360Page() {
                       <div className="flex items-center gap-1.5 text-[#64748b] text-xs">
                         <Receipt className="w-4 h-4" /> Total Spent
                       </div>
-                      <p className="text-2xl font-black text-[#006837]">{customer.totalSpent}</p>
+                      <p className="text-2xl font-black text-[#2d9d43]">{customer.totalSpent}</p>
                     </div>
 
                     <div className="bg-white p-4 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-1">
@@ -727,14 +742,14 @@ export default function CustomerProfile360Page() {
                       <div className="flex items-center gap-1.5 text-[#047857] text-xs font-bold">
                         <TrendingUp className="w-4 h-4" /> LTV Score
                       </div>
-                      <p className="text-2xl font-black text-[#006837]">{customer.ltvScore}</p>
+                      <p className="text-2xl font-black text-[#2d9d43]">{customer.ltvScore}</p>
                     </div>
                   </div>
 
                   {/* AI Insights Card */}
                   <div className="bg-white p-4 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-3">
                     <div className="flex items-center gap-2">
-                      <Bot className="w-5 h-5 text-[#006837]" />
+                      <Bot className="w-5 h-5 text-[#2d9d43]" />
                       <h4 className="font-black text-base text-[#1e2923]">AI Insights</h4>
                     </div>
 
@@ -768,7 +783,7 @@ export default function CustomerProfile360Page() {
                         <div className="flex items-center gap-2">
                           <span className="w-12 text-[#64748b]">Fresh</span>
                           <div className="flex-1 h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
-                            <div className="h-full bg-[#006837]" style={{ width: `${customer.affinityFresh}%` }} />
+                            <div className="h-full bg-[#2d9d43]" style={{ width: `${customer.affinityFresh}%` }} />
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
@@ -791,7 +806,7 @@ export default function CustomerProfile360Page() {
                   <div className="bg-white p-4 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-3">
                     <div className="flex items-center justify-between">
                       <h4 className="font-black text-base text-[#1e2923]">Recent Orders</h4>
-                      <button className="text-xs font-bold text-[#006837]">View All</button>
+                      <button className="text-xs font-bold text-[#2d9d43]">View All</button>
                     </div>
 
                     <div className="space-y-3 text-xs">
@@ -799,7 +814,7 @@ export default function CustomerProfile360Page() {
                         <div key={ord.id} className="flex gap-3 items-start">
                           <span
                             className={`w-2.5 h-2.5 rounded-full mt-1 shrink-0 ${
-                              ord.isActive ? 'bg-[#006837]' : 'bg-[#cbd5e1]'
+                              ord.isActive ? 'bg-[#2d9d43]' : 'bg-[#cbd5e1]'
                             }`}
                           />
                           <div className="flex-1 space-y-0.5">
@@ -821,7 +836,7 @@ export default function CustomerProfile360Page() {
 
                 {/* Bottom Nav Bar */}
                 <div className="bg-white border-t border-[#e2e8f0] px-4 py-2 flex justify-between items-center text-[10px] font-bold text-[#64748b]">
-                  <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#dce6fe] text-[#1e2923] rounded-2xl"><Grid className="w-4 h-4 text-[#006837]" /> Dashboard</div>
+                  <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#dce6fe] text-[#1e2923] rounded-2xl"><Grid className="w-4 h-4 text-[#2d9d43]" /> Dashboard</div>
                   <div className="flex flex-col items-center gap-0.5"><ShoppingBag className="w-4 h-4" /> Orders</div>
                   <div className="flex flex-col items-center gap-0.5"><Package className="w-4 h-4" /> Inventory</div>
                   <div className="flex flex-col items-center gap-0.5"><Tag className="w-4 h-4" /> Products</div>
@@ -878,9 +893,9 @@ export default function CustomerProfile360Page() {
                       <button
                         key={act.label}
                         onClick={() => setActiveModal(act.label)}
-                        className="bg-[#f8fafc] border border-[#e2e8f0] py-3 rounded-2xl flex flex-col items-center gap-1 shadow-sm hover:bg-white hover:border-[#006837] transition"
+                        className="bg-[#f8fafc] border border-[#e2e8f0] py-3 rounded-2xl flex flex-col items-center gap-1 shadow-sm hover:bg-white hover:border-[#2d9d43] transition"
                       >
-                        <act.icon className="w-4 h-4 text-[#006837]" />
+                        <act.icon className="w-4 h-4 text-[#2d9d43]" />
                         <span className="text-[11px] font-bold text-[#1e2923]">{act.label}</span>
                       </button>
                     ))}
@@ -900,7 +915,7 @@ export default function CustomerProfile360Page() {
                     <div className="flex items-center gap-1.5 text-[#64748b] text-xs font-bold">
                       <Receipt className="w-4 h-4" /> Total Spent
                     </div>
-                    <p className="text-3xl font-black text-[#006837] mt-2">{customer.totalSpent}</p>
+                    <p className="text-3xl font-black text-[#2d9d43] mt-2">{customer.totalSpent}</p>
                   </div>
 
                   <div className="bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-1">
@@ -914,7 +929,7 @@ export default function CustomerProfile360Page() {
                     <div className="flex items-center gap-1.5 text-[#047857] text-xs font-bold">
                       <TrendingUp className="w-4 h-4" /> LTV Score
                     </div>
-                    <p className="text-3xl font-black text-[#006837] mt-2">{customer.ltvScore}</p>
+                    <p className="text-3xl font-black text-[#2d9d43] mt-2">{customer.ltvScore}</p>
                   </div>
                 </div>
               </div>
@@ -924,7 +939,7 @@ export default function CustomerProfile360Page() {
                 {/* AI Insights Card */}
                 <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-5">
                   <div className="flex items-center gap-2">
-                    <Bot className="w-6 h-6 text-[#006837]" />
+                    <Bot className="w-6 h-6 text-[#2d9d43]" />
                     <h3 className="font-black text-lg text-[#1e2923]">AI Insights & Behavior Analysis</h3>
                   </div>
 
@@ -955,7 +970,7 @@ export default function CustomerProfile360Page() {
                       <div className="flex items-center gap-3">
                         <span className="w-16 font-bold text-[#64748b]">Fresh</span>
                         <div className="flex-1 h-3 bg-[#f1f5f9] rounded-full overflow-hidden">
-                          <div className="h-full bg-[#006837]" style={{ width: `${customer.affinityFresh}%` }} />
+                          <div className="h-full bg-[#2d9d43]" style={{ width: `${customer.affinityFresh}%` }} />
                         </div>
                         <span className="w-10 text-right font-bold text-[#1e2923]">{customer.affinityFresh}%</span>
                       </div>
@@ -983,7 +998,7 @@ export default function CustomerProfile360Page() {
                 <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-4">
                   <div className="flex items-center justify-between">
                     <h3 className="font-black text-lg text-[#1e2923]">Recent Orders</h3>
-                    <button className="text-xs font-bold text-[#006837] hover:underline">View All Orders</button>
+                    <button className="text-xs font-bold text-[#2d9d43] hover:underline">View All Orders</button>
                   </div>
 
                   <div className="space-y-4 text-xs">
@@ -992,7 +1007,7 @@ export default function CustomerProfile360Page() {
                         <div className="flex items-center gap-3">
                           <span
                             className={`w-3 h-3 rounded-full ${
-                              ord.isActive ? 'bg-[#006837]' : 'bg-[#cbd5e1]'
+                              ord.isActive ? 'bg-[#2d9d43]' : 'bg-[#cbd5e1]'
                             }`}
                           />
                           <div>
@@ -1031,7 +1046,7 @@ export default function CustomerProfile360Page() {
                 showToast(`Action "${activeModal}" dispatched for ${customer.name}`);
                 setActiveModal(null);
               }}
-              className="w-full py-3 bg-[#006837] text-white font-bold text-xs rounded-2xl hover:bg-[#00522b] transition"
+              className="w-full py-3 bg-[#2d9d43] text-white font-bold text-xs rounded-2xl hover:bg-[#078730] transition"
             >
               Confirm & Dispatch
             </button>

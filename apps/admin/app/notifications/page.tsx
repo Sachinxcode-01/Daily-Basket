@@ -49,18 +49,18 @@ export default function NotificationsCenterPage() {
     <div className="max-w-4xl mx-auto space-y-6 font-sans">
       <div className="flex items-center justify-between bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
         <div className="flex items-center gap-3">
-          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#006837]">
+          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#2d9d43]">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-[#006837]">Notifications Center</h1>
+            <h1 className="text-2xl font-black text-[#2d9d43]">Notifications Center</h1>
             <p className="text-xs text-[#64748b] mt-0.5">Google Stitch Screen ID: 3f473a8ee82f41de86019498bed97103</p>
           </div>
         </div>
 
         <button
           onClick={markAllRead}
-          className="flex items-center gap-1.5 px-4 py-2 bg-[#e6f4ea] text-[#006837] text-xs font-bold rounded-2xl hover:bg-[#d2ebd9]"
+          className="flex items-center gap-1.5 px-4 py-2 bg-[#e6f4ea] text-[#2d9d43] text-xs font-bold rounded-2xl hover:bg-[#d2ebd9]"
         >
           <CheckCheck className="w-4 h-4" /> Mark All Read
         </button>
@@ -72,7 +72,7 @@ export default function NotificationsCenterPage() {
             key={f}
             onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-full text-xs font-bold transition shrink-0 ${
-              filter === f ? 'bg-[#006837] text-white shadow-sm' : 'bg-white text-[#64748b] border border-[#e2e8f0]'
+              filter === f ? 'bg-[#2d9d43] text-white shadow-sm' : 'bg-white text-[#64748b] border border-[#e2e8f0]'
             }`}
           >
             {f}

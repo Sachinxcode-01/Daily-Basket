@@ -81,11 +81,11 @@ export default function IntegrationsPage() {
       {/* Stitch Header Title & Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
         <div className="flex items-center gap-3">
-          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#006837]">
+          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#2d9d43]">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-[#006837] tracking-tight">Integrations &amp; Services</h1>
+            <h1 className="text-2xl font-black text-[#2d9d43] tracking-tight">Integrations &amp; Services</h1>
             <p className="text-xs text-[#64748b] mt-0.5 font-medium">
               Google Stitch Screen ID: 9bc94728c71e4ce3826b231fa838436f
             </p>
@@ -96,7 +96,7 @@ export default function IntegrationsPage() {
           <button
             onClick={() => setViewMode('web')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'web' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'web' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -105,7 +105,7 @@ export default function IntegrationsPage() {
           <button
             onClick={() => setViewMode('mobile')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'mobile' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'mobile' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <Smartphone className="w-3.5 h-3.5" />
@@ -119,12 +119,12 @@ export default function IntegrationsPage() {
         <div className="flex justify-center py-6">
           <div className="w-[390px] h-[840px] bg-[#f8fafc] rounded-[48px] border-[12px] border-[#1e2923] shadow-2xl overflow-hidden flex flex-col relative">
             <div className="w-36 h-5 bg-[#1e2923] rounded-b-2xl mx-auto flex items-center justify-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#006837]/40" />
+              <div className="w-3 h-3 rounded-full bg-[#2d9d43]/40" />
             </div>
 
             <div className="bg-white px-4 py-3 flex items-center justify-between border-b border-[#e2e8f0]">
               <ArrowLeft className="w-5 h-5 text-[#1e2923] cursor-pointer" />
-              <span className="font-extrabold text-base text-[#006837]">Connected Services</span>
+              <span className="font-extrabold text-base text-[#2d9d43]">Connected Services</span>
               <RefreshCw className="w-5 h-5 text-[#1e2923] cursor-pointer" />
             </div>
 
@@ -187,7 +187,7 @@ export default function IntegrationsPage() {
                     onClick={() => setSelectedCategory(c)}
                     className={`px-4 py-1.5 rounded-full font-bold transition shrink-0 ${
                       selectedCategory === c
-                        ? 'bg-[#006837] text-white shadow-sm'
+                        ? 'bg-[#2d9d43] text-white shadow-sm'
                         : 'bg-white text-[#64748b] border border-[#e2e8f0]'
                     }`}
                   >
@@ -232,7 +232,7 @@ export default function IntegrationsPage() {
 
               <button
                 onClick={() => setActiveModal('Add Integration')}
-                className="absolute bottom-4 right-4 w-12 h-12 bg-[#006837] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#00522b]"
+                className="absolute bottom-4 right-4 w-12 h-12 bg-[#2d9d43] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#078730]"
               >
                 <Plus className="w-6 h-6" />
               </button>
@@ -285,7 +285,7 @@ export default function IntegrationsPage() {
             <p className="text-xs text-[#64748b]">Executing action &quot;{activeModal}&quot; for Integrations module.</p>
             <button
               onClick={() => setActiveModal(null)}
-              className="w-full py-3 bg-[#006837] text-white font-bold text-xs rounded-2xl hover:bg-[#00522b]"
+              className="w-full py-3 bg-[#2d9d43] text-white font-bold text-xs rounded-2xl hover:bg-[#078730]"
             >
               Close Modal
             </button>

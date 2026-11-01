@@ -167,7 +167,7 @@ export default function InventoryManagementPage() {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-[#006837] tracking-tight">Inventory</h1>
+            <h1 className="text-2xl font-black text-[#2d9d43] tracking-tight">Inventory</h1>
             <p className="text-xs text-[#64748b] mt-0.5 font-medium">
               Google Stitch ID: 97fc58a67cca4a028c337f14f0d1233c • Real-time Stock Tracking
             </p>
@@ -179,7 +179,7 @@ export default function InventoryManagementPage() {
           <button
             onClick={() => setViewMode('card')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'card' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'card' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -188,7 +188,7 @@ export default function InventoryManagementPage() {
           <button
             onClick={() => setViewMode('table')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'table' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'table' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <TableIcon className="w-3.5 h-3.5" />
@@ -197,7 +197,7 @@ export default function InventoryManagementPage() {
           <button
             onClick={() => setViewMode('mobile')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'mobile' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'mobile' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <Smartphone className="w-3.5 h-3.5" />
@@ -208,7 +208,7 @@ export default function InventoryManagementPage() {
 
       {/* Live Inventory Update Toast */}
       {toastMessage && (
-        <div className="bg-[#006837] text-white p-3.5 rounded-2xl flex items-center justify-between shadow-xl animate-bounce">
+        <div className="bg-[#2d9d43] text-white p-3.5 rounded-2xl flex items-center justify-between shadow-xl animate-bounce">
           <div className="flex items-center gap-2.5">
             <span className="w-2.5 h-2.5 rounded-full bg-emerald-300 animate-ping" />
             <p className="text-sm font-extrabold">{toastMessage}</p>
@@ -229,14 +229,14 @@ export default function InventoryManagementPage() {
           <div className="w-[390px] h-[820px] bg-[#f4f6f4] rounded-[48px] border-[12px] border-[#1e2923] shadow-2xl overflow-hidden flex flex-col relative">
             {/* Phone Top Notch */}
             <div className="w-36 h-5 bg-[#1e2923] rounded-b-2xl mx-auto flex items-center justify-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#006837]/40" />
+              <div className="w-3 h-3 rounded-full bg-[#2d9d43]/40" />
             </div>
 
             {/* Mobile App Bar */}
             <div className="bg-white px-4 py-3 flex items-center justify-between border-b border-[#e2e8f0]">
               <div className="flex items-center gap-2">
                 <ArrowLeft className="w-5 h-5 text-[#1e2923]" />
-                <span className="font-extrabold text-xl text-[#006837]">Inventory</span>
+                <span className="font-extrabold text-xl text-[#2d9d43]">Inventory</span>
               </div>
               <div className="flex items-center gap-2">
                 <Search className="w-4 h-4 text-[#1e2923]" />
@@ -253,7 +253,7 @@ export default function InventoryManagementPage() {
               <div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
                 <div className="min-w-[140px] bg-white border border-[#e2e8f0] p-3 rounded-2xl shadow-sm flex flex-col justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-[#dcfce7] text-[#006837]">
+                    <div className="p-1.5 rounded-lg bg-[#dcfce7] text-[#2d9d43]">
                       <Package className="w-4 h-4" />
                     </div>
                     <span className="text-xs font-bold text-[#475569]">Products</span>
@@ -296,7 +296,7 @@ export default function InventoryManagementPage() {
                   className="bg-transparent text-xs text-[#1e2923] placeholder-[#94a3b8] focus:outline-none flex-1"
                 />
                 <QrCode className="w-4 h-4 text-[#1e2923]" />
-                <Mic className="w-4 h-4 text-[#006837]" />
+                <Mic className="w-4 h-4 text-[#2d9d43]" />
               </div>
 
               {/* Filter Pills */}
@@ -307,7 +307,7 @@ export default function InventoryManagementPage() {
                     onClick={() => setSelectedFilter(f)}
                     className={`px-4 py-1.5 rounded-full font-bold whitespace-nowrap transition ${
                       selectedFilter === f
-                        ? 'bg-[#006837] text-white'
+                        ? 'bg-[#2d9d43] text-white'
                         : 'bg-white text-[#334155] border border-[#cbd5e1]'
                     }`}
                   >
@@ -337,7 +337,7 @@ export default function InventoryManagementPage() {
                       <p className="text-[11px] text-[#64748b]">{item.sku}</p>
 
                       <div className="flex items-center justify-between mt-2">
-                        <p className="font-black text-base text-[#006837]">
+                        <p className="font-black text-base text-[#2d9d43]">
                           {item.price} <span className="text-xs font-normal text-[#64748b]">{item.unit}</span>
                         </p>
                         <span
@@ -363,7 +363,7 @@ export default function InventoryManagementPage() {
                     <button
                       onClick={() => handleRestock(item.id)}
                       className={`flex-1 py-2 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm transition active:scale-95 ${
-                        item.isLowStock ? 'bg-[#b91c1c] hover:bg-[#991b1b]' : 'bg-[#006837] hover:bg-[#00522b]'
+                        item.isLowStock ? 'bg-[#b91c1c] hover:bg-[#991b1b]' : 'bg-[#2d9d43] hover:bg-[#078730]'
                       }`}
                     >
                       {item.isLowStock ? <Zap className="w-3.5 h-3.5 text-white" /> : <ShoppingCart className="w-3.5 h-3.5 text-white" />}
@@ -373,7 +373,7 @@ export default function InventoryManagementPage() {
                       onClick={() => handleUpdateStock(item.id, 10)}
                       className="flex-1 py-2 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 hover:bg-[#f8fafc] active:scale-95 transition"
                     >
-                      <Plus className="w-3.5 h-3.5 text-[#006837]" />
+                      <Plus className="w-3.5 h-3.5 text-[#2d9d43]" />
                       <span>Quick +10</span>
                     </button>
                   </div>
@@ -385,13 +385,13 @@ export default function InventoryManagementPage() {
             <div className="bg-white border-t border-[#e2e8f0] px-4 py-2 flex justify-between items-center text-[10px] font-bold text-[#64748b]">
               <div className="flex flex-col items-center gap-0.5"><Grid className="w-4 h-4" /> Dashboard</div>
               <div className="flex flex-col items-center gap-0.5"><ShoppingBag className="w-4 h-4" /> Orders</div>
-              <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#dcfce7] text-[#006837] rounded-2xl"><Package className="w-4 h-4" /> Inventory</div>
+              <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#dcfce7] text-[#2d9d43] rounded-2xl"><Package className="w-4 h-4" /> Inventory</div>
               <div className="flex flex-col items-center gap-0.5"><BarChart3 className="w-4 h-4" /> Analytics</div>
               <div className="flex flex-col items-center gap-0.5"><User className="w-4 h-4" /> Profile</div>
             </div>
 
             {/* Floating Action Button */}
-            <button className="absolute right-6 bottom-16 w-11 h-11 bg-[#006837] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition">
+            <button className="absolute right-6 bottom-16 w-11 h-11 bg-[#2d9d43] text-white rounded-full flex items-center justify-center shadow-lg hover:scale-105 transition">
               <Plus className="w-6 h-6" />
             </button>
           </div>
@@ -407,7 +407,7 @@ export default function InventoryManagementPage() {
                 <p className="text-3xl font-black text-[#1e2923] mt-1">1,248</p>
                 <p className="text-xs font-bold text-[#16a34a] mt-1">📈 +12 this week</p>
               </div>
-              <div className="p-3 rounded-2xl bg-[#dcfce7] text-[#006837]">
+              <div className="p-3 rounded-2xl bg-[#dcfce7] text-[#2d9d43]">
                 <Package className="w-8 h-8" />
               </div>
             </div>
@@ -444,9 +444,9 @@ export default function InventoryManagementPage() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search inventory, SKU..."
-                className="w-full pl-10 pr-10 py-2.5 bg-white border border-[#cbd5e1] rounded-2xl text-xs text-[#1e2923] placeholder-[#94a3b8] focus:outline-none focus:border-[#006837]"
+                className="w-full pl-10 pr-10 py-2.5 bg-white border border-[#cbd5e1] rounded-2xl text-xs text-[#1e2923] placeholder-[#94a3b8] focus:outline-none focus:border-[#2d9d43]"
               />
-              <Mic className="w-4 h-4 text-[#006837] absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer" />
+              <Mic className="w-4 h-4 text-[#2d9d43] absolute right-3.5 top-1/2 -translate-y-1/2 cursor-pointer" />
             </div>
 
             {/* Filter Pills */}
@@ -457,7 +457,7 @@ export default function InventoryManagementPage() {
                   onClick={() => setSelectedFilter(f)}
                   className={`px-4 py-2 rounded-full font-bold whitespace-nowrap transition ${
                     selectedFilter === f
-                      ? 'bg-[#006837] text-white shadow-sm'
+                      ? 'bg-[#2d9d43] text-white shadow-sm'
                       : 'bg-white text-[#334155] border border-[#cbd5e1] hover:bg-[#f8fafc]'
                   }`}
                 >
@@ -487,7 +487,7 @@ export default function InventoryManagementPage() {
                     <p className="text-xs text-[#64748b]">{item.sku}</p>
 
                     <div className="flex items-center justify-between mt-3">
-                      <p className="font-black text-lg text-[#006837]">
+                      <p className="font-black text-lg text-[#2d9d43]">
                         {item.price} <span className="text-xs font-normal text-[#64748b]">{item.unit}</span>
                       </p>
                       <div className="flex items-center gap-2">
@@ -518,7 +518,7 @@ export default function InventoryManagementPage() {
                           <span className="font-mono font-bold text-xs px-1 text-slate-900">{item.stock}</span>
                           <button
                             onClick={() => handleUpdateStock(item.id, 5)}
-                            className="w-6 h-6 rounded-lg bg-white hover:bg-slate-200 flex items-center justify-center font-bold text-xs shadow-xs text-[#006837]"
+                            className="w-6 h-6 rounded-lg bg-white hover:bg-slate-200 flex items-center justify-center font-bold text-xs shadow-xs text-[#2d9d43]"
                             title="Increase stock by 5"
                           >
                             <Plus className="w-3 h-3" />
@@ -534,7 +534,7 @@ export default function InventoryManagementPage() {
                   <button
                     onClick={() => handleRestock(item.id)}
                     className={`flex-1 py-2.5 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-2 shadow-sm transition ${
-                      item.isLowStock ? 'bg-[#b91c1c] hover:bg-[#991b1b]' : 'bg-[#006837] hover:bg-[#00522b]'
+                      item.isLowStock ? 'bg-[#b91c1c] hover:bg-[#991b1b]' : 'bg-[#2d9d43] hover:bg-[#078730]'
                     }`}
                   >
                     {item.isLowStock ? <Zap className="w-4 h-4 text-white" /> : <ShoppingCart className="w-4 h-4 text-white" />}
@@ -544,7 +544,7 @@ export default function InventoryManagementPage() {
                     onClick={() => handleUpdateStock(item.id, 10)}
                     className="flex-1 py-2.5 bg-white border border-[#cbd5e1] text-[#1e2923] text-xs font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-[#f8fafc]"
                   >
-                    <Plus className="w-4 h-4 text-[#006837]" />
+                    <Plus className="w-4 h-4 text-[#2d9d43]" />
                     <span>Quick +10</span>
                   </button>
                 </div>
@@ -570,7 +570,7 @@ export default function InventoryManagementPage() {
               <tbody className="divide-y divide-[#e2e8f0]">
                 {filteredItems.map((item) => (
                   <tr key={item.id} className="hover:bg-[#f8fafc] transition">
-                    <td className="py-3.5 font-bold text-[#006837]">{item.sku}</td>
+                    <td className="py-3.5 font-bold text-[#2d9d43]">{item.sku}</td>
                     <td className="py-3.5 font-bold text-[#1e2923]">{item.name}</td>
                     <td className="py-3.5 font-black text-[#1e2923]">{item.price} {item.unit}</td>
                     <td className="py-3.5 font-mono font-bold text-[#1e2923]">{item.stock} units</td>
@@ -598,7 +598,7 @@ export default function InventoryManagementPage() {
                           <span className="font-mono font-bold text-xs px-1 text-slate-900">{item.stock}</span>
                           <button
                             onClick={() => handleUpdateStock(item.id, 5)}
-                            className="w-5 h-5 rounded bg-white hover:bg-slate-200 flex items-center justify-center font-bold text-xs shadow-xs text-[#006837]"
+                            className="w-5 h-5 rounded bg-white hover:bg-slate-200 flex items-center justify-center font-bold text-xs shadow-xs text-[#2d9d43]"
                             title="Increase by 5"
                           >
                             <Plus className="w-3 h-3" />
@@ -607,7 +607,7 @@ export default function InventoryManagementPage() {
                         <button
                           onClick={() => handleRestock(item.id)}
                           className={`px-3 py-1.5 text-white rounded-xl text-xs font-bold transition hover:opacity-90 active:scale-95 ${
-                            item.isLowStock ? 'bg-[#b91c1c]' : 'bg-[#006837]'
+                            item.isLowStock ? 'bg-[#b91c1c]' : 'bg-[#2d9d43]'
                           }`}
                         >
                           {item.isLowStock ? 'Urgent (+50)' : 'Restock (+50)'}

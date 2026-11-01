@@ -107,7 +107,7 @@ export default function RolesPermissionsPage() {
       {/* Stitch Header Title & Navigation Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
         <div>
-          <h1 className="text-2xl font-black text-[#006837] tracking-tight">Roles &amp; Permissions</h1>
+          <h1 className="text-2xl font-black text-[#2d9d43] tracking-tight">Roles &amp; Permissions</h1>
           <p className="text-xs text-[#64748b] mt-0.5 font-medium">
             Google Stitch Screen ID: 25b5d2e145f049b0b0656481e8e11725
           </p>
@@ -118,7 +118,7 @@ export default function RolesPermissionsPage() {
           <button
             onClick={() => setViewMode('web')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'web' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'web' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -127,7 +127,7 @@ export default function RolesPermissionsPage() {
           <button
             onClick={() => setViewMode('mobile')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'mobile' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'mobile' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <Smartphone className="w-3.5 h-3.5" />
@@ -142,7 +142,7 @@ export default function RolesPermissionsPage() {
           <div className="w-[390px] h-[840px] bg-[#f8fafc] rounded-[48px] border-[12px] border-[#1e2923] shadow-2xl overflow-hidden flex flex-col relative">
             {/* Phone Top Notch */}
             <div className="w-36 h-5 bg-[#1e2923] rounded-b-2xl mx-auto flex items-center justify-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#006837]/40" />
+              <div className="w-3 h-3 rounded-full bg-[#2d9d43]/40" />
             </div>
 
             {/* Mobile App Bar */}
@@ -155,7 +155,7 @@ export default function RolesPermissionsPage() {
                   alt="Profile"
                   className="w-6 h-6 rounded-full object-cover"
                 />
-                <span className="font-extrabold text-base text-[#006837]">Daily Basket</span>
+                <span className="font-extrabold text-base text-[#2d9d43]">Daily Basket</span>
               </div>
               <div className="relative">
                 <Bell className="w-5 h-5 text-[#1e2923] cursor-pointer" />
@@ -201,7 +201,7 @@ export default function RolesPermissionsPage() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setActiveModal('Create Role')}
-                  className="flex-1 py-3 bg-[#006837] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-1.5 shadow-sm hover:bg-[#00522b]"
+                  className="flex-1 py-3 bg-[#2d9d43] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-1.5 shadow-sm hover:bg-[#078730]"
                 >
                   <Plus className="w-4 h-4" /> Create Role
                 </button>
@@ -217,7 +217,7 @@ export default function RolesPermissionsPage() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <h4 className="font-black text-sm text-[#1e2923]">Built-in Roles</h4>
-                  <span className="text-xs font-bold text-[#006837] cursor-pointer">View All</span>
+                  <span className="text-xs font-bold text-[#2d9d43] cursor-pointer">View All</span>
                 </div>
 
                 {rolesData.roles.map((role) => {
@@ -345,7 +345,7 @@ export default function RolesPermissionsPage() {
               <div className="flex flex-col items-center gap-0.5"><ShoppingBag className="w-4 h-4" /> Orders</div>
               <div className="flex flex-col items-center gap-0.5"><Package className="w-4 h-4" /> Inventory</div>
               <div className="flex flex-col items-center gap-0.5"><Store className="w-4 h-4" /> Suppliers</div>
-              <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#006837] text-white rounded-2xl">
+              <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#2d9d43] text-white rounded-2xl">
                 <MoreHorizontal className="w-4 h-4" /> More
               </div>
             </div>
@@ -378,7 +378,7 @@ export default function RolesPermissionsPage() {
                     <h4 className="font-bold text-base text-[#1e2923]">{role.title}</h4>
                     <p className="text-xs text-[#64748b]">{role.subtitle}</p>
                   </div>
-                  <span className="font-black text-xl text-[#006837]">{role.userCount} Users</span>
+                  <span className="font-black text-xl text-[#2d9d43]">{role.userCount} Users</span>
                 </div>
               ))}
             </div>
@@ -394,7 +394,7 @@ export default function RolesPermissionsPage() {
             <p className="text-xs text-[#64748b]">Executing action &quot;{activeModal}&quot; for Security &amp; Access module.</p>
             <button
               onClick={() => setActiveModal(null)}
-              className="w-full py-3 bg-[#006837] text-white font-bold text-xs rounded-2xl hover:bg-[#00522b]"
+              className="w-full py-3 bg-[#2d9d43] text-white font-bold text-xs rounded-2xl hover:bg-[#078730]"
             >
               Close Modal
             </button>

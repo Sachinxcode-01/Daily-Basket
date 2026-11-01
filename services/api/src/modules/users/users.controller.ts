@@ -9,6 +9,12 @@ import { ResolvedUserId } from '../../common/decorators/resolved-user-id.decorat
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('admin/customers')
+  @ApiOperation({ summary: 'List customer profiles and order metrics for admin dashboard' })
+  async listCustomers(@Query('limit') limit?: number) {
+    return this.usersService.listCustomers(limit ? Number(limit) : 50);
+  }
+
   @Get('profile')
   @ApiOperation({ summary: 'Get current customer profile details' })
   async getProfile(@Query('userId') userId?: string) {

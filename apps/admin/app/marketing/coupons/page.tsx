@@ -70,11 +70,11 @@ export default function CouponDashboardPage() {
       {/* Header Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
         <div className="flex items-center gap-3">
-          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#006837]">
+          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#2d9d43]">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-[#006837] tracking-tight">Coupon Management</h1>
+            <h1 className="text-2xl font-black text-[#2d9d43] tracking-tight">Coupon Management</h1>
             <p className="text-xs text-[#64748b] mt-0.5 font-medium">Google Stitch Screen ID: ee9fc342aa164f7daa279a40d7a95b32</p>
           </div>
         </div>
@@ -83,7 +83,7 @@ export default function CouponDashboardPage() {
           <button
             onClick={() => setViewMode('web')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'web' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'web' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -92,7 +92,7 @@ export default function CouponDashboardPage() {
           <button
             onClick={() => setViewMode('mobile')}
             className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'mobile' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'mobile' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <Smartphone className="w-3.5 h-3.5" />
@@ -106,12 +106,12 @@ export default function CouponDashboardPage() {
         <div className="flex justify-center py-6">
           <div className="w-[390px] h-[840px] bg-[#f8fafc] rounded-[48px] border-[12px] border-[#1e2923] shadow-2xl overflow-hidden flex flex-col relative">
             <div className="w-36 h-5 bg-[#1e2923] rounded-b-2xl mx-auto flex items-center justify-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#006837]/40" />
+              <div className="w-3 h-3 rounded-full bg-[#2d9d43]/40" />
             </div>
 
             <div className="bg-white px-4 py-3 flex items-center justify-between border-b border-[#e2e8f0]">
               <ArrowLeft className="w-5 h-5 text-[#1e2923] cursor-pointer" />
-              <span className="font-extrabold text-base text-[#006837]">Marketing &amp; Offers</span>
+              <span className="font-extrabold text-base text-[#2d9d43]">Marketing &amp; Offers</span>
               <BarChart2 className="w-5 h-5 text-[#1e2923] cursor-pointer" />
             </div>
 
@@ -121,7 +121,7 @@ export default function CouponDashboardPage() {
               {/* Metrics Strip */}
               <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar text-xs">
                 <div className="min-w-[130px] bg-white p-3.5 rounded-2xl border border-[#e2e8f0] shadow-sm space-y-2">
-                  <div className="flex justify-between items-center text-[#006837]">
+                  <div className="flex justify-between items-center text-[#2d9d43]">
                     <span className="font-bold text-[11px] text-[#64748b]">Total Coupons</span>
                     <Ticket className="w-4 h-4" />
                   </div>
@@ -171,7 +171,7 @@ export default function CouponDashboardPage() {
                     onClick={() => setSelectedFilter(f)}
                     className={`px-4 py-1.5 rounded-full font-bold transition shrink-0 ${
                       selectedFilter === f
-                        ? 'bg-[#006837] text-white shadow-sm'
+                        ? 'bg-[#2d9d43] text-white shadow-sm'
                         : 'bg-white text-[#64748b] border border-[#e2e8f0]'
                     }`}
                   >
@@ -188,7 +188,7 @@ export default function CouponDashboardPage() {
                   <div
                     key={cpn.id}
                     onClick={() => setActiveModal(`Details for ${cpn.code}`)}
-                    className="bg-white p-4 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-3 cursor-pointer hover:border-[#006837]"
+                    className="bg-white p-4 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-3 cursor-pointer hover:border-[#2d9d43]"
                   >
                     <div className="flex justify-between items-center">
                       <span className="px-3 py-1 bg-[#f1f5f9] border border-[#cbd5e1] rounded-xl text-sm font-black font-mono text-[#1e2923]">
@@ -214,7 +214,7 @@ export default function CouponDashboardPage() {
 
               <button
                 onClick={() => setActiveModal('Create New Coupon')}
-                className="absolute bottom-4 right-4 w-12 h-12 bg-[#006837] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#00522b]"
+                className="absolute bottom-4 right-4 w-12 h-12 bg-[#2d9d43] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#078730]"
               >
                 <Plus className="w-6 h-6" />
               </button>
@@ -223,7 +223,7 @@ export default function CouponDashboardPage() {
             <div className="bg-white border-t border-[#e2e8f0] px-4 py-2 flex justify-between items-center text-[10px] font-bold text-[#64748b]">
               <div className="flex flex-col items-center gap-0.5"><Grid className="w-4 h-4" /> Dashboard</div>
               <div className="flex flex-col items-center gap-0.5"><ShoppingBag className="w-4 h-4" /> Orders</div>
-              <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#006837] text-white rounded-2xl"><Tag className="w-4 h-4" /> Offers</div>
+              <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#2d9d43] text-white rounded-2xl"><Tag className="w-4 h-4" /> Offers</div>
               <div className="flex flex-col items-center gap-0.5"><Store className="w-4 h-4" /> Suppliers</div>
             </div>
           </div>
@@ -256,7 +256,7 @@ export default function CouponDashboardPage() {
               {couponsData.coupons.map((cpn) => (
                 <div key={cpn.id} className="p-5 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] space-y-2">
                   <div className="flex justify-between items-center">
-                    <span className="font-black font-mono text-lg text-[#006837]">{cpn.code}</span>
+                    <span className="font-black font-mono text-lg text-[#2d9d43]">{cpn.code}</span>
                     <span className={`px-3 py-1 text-xs font-bold rounded-full ${cpn.statusBg}`}>{cpn.status}</span>
                   </div>
                   <p className="font-bold text-sm text-[#1e2923]">{cpn.title}</p>
@@ -275,7 +275,7 @@ export default function CouponDashboardPage() {
             <p className="text-xs text-[#64748b]">Executing action &quot;{activeModal}&quot; for Marketing module.</p>
             <button
               onClick={() => setActiveModal(null)}
-              className="w-full py-3 bg-[#006837] text-white font-bold text-xs rounded-2xl hover:bg-[#00522b]"
+              className="w-full py-3 bg-[#2d9d43] text-white font-bold text-xs rounded-2xl hover:bg-[#078730]"
             >
               Close Modal
             </button>

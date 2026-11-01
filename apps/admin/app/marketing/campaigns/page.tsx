@@ -10,11 +10,11 @@ export default function CampaignsPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6 font-sans">
       <div className="flex items-center gap-3 bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
-        <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#006837]">
+        <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#2d9d43]">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-black text-[#006837]">Campaigns &amp; Banners</h1>
+          <h1 className="text-2xl font-black text-[#2d9d43]">Campaigns &amp; Banners</h1>
           <p className="text-xs text-[#64748b] mt-0.5">Google Stitch Screen ID: 2dda772b4d834ef69b76b0da69bbc596</p>
         </div>
       </div>

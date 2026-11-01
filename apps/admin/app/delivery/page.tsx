@@ -143,11 +143,11 @@ export default function DeliveryManagementPage() {
       {/* Stitch Header Title & Navigation Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
         <div className="flex items-center gap-3">
-          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#006837]">
+          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#2d9d43]">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-[#006837] tracking-tight">
+            <h1 className="text-2xl font-black text-[#2d9d43] tracking-tight">
               {activeTab === 'dashboard' ? 'Delivery Management' : 'Rider Profile'}
             </h1>
             <p className="text-xs text-[#64748b] mt-0.5 font-medium">
@@ -162,7 +162,7 @@ export default function DeliveryManagementPage() {
             <button
               onClick={() => setActiveTab('dashboard')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                activeTab === 'dashboard' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+                activeTab === 'dashboard' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
               }`}
             >
               Delivery Dashboard
@@ -170,7 +170,7 @@ export default function DeliveryManagementPage() {
             <button
               onClick={() => setActiveTab('rider')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                activeTab === 'rider' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+                activeTab === 'rider' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
               }`}
             >
               Rider Profile
@@ -181,7 +181,7 @@ export default function DeliveryManagementPage() {
             <button
               onClick={() => setViewMode('web')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                viewMode === 'web' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+                viewMode === 'web' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
@@ -190,7 +190,7 @@ export default function DeliveryManagementPage() {
             <button
               onClick={() => setViewMode('mobile')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                viewMode === 'mobile' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+                viewMode === 'mobile' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
               }`}
             >
               <Smartphone className="w-3.5 h-3.5" />
@@ -207,13 +207,13 @@ export default function DeliveryManagementPage() {
           <div className="w-[390px] h-[840px] bg-[#f8fafc] rounded-[48px] border-[12px] border-[#1e2923] shadow-2xl overflow-hidden flex flex-col relative">
             {/* Phone Top Notch */}
             <div className="w-36 h-5 bg-[#1e2923] rounded-b-2xl mx-auto flex items-center justify-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#006837]/40" />
+              <div className="w-3 h-3 rounded-full bg-[#2d9d43]/40" />
             </div>
 
             {/* Mobile App Bar */}
             <div className="bg-white px-4 py-3 flex items-center justify-between border-b border-[#e2e8f0]">
               <ArrowLeft className="w-5 h-5 text-[#1e2923] cursor-pointer" />
-              <span className="font-extrabold text-base text-[#006837]">
+              <span className="font-extrabold text-base text-[#2d9d43]">
                 {activeTab === 'dashboard' ? 'Delivery Management' : 'Rider Profile'}
               </span>
               <Search className="w-5 h-5 text-[#1e2923] cursor-pointer" />
@@ -236,7 +236,7 @@ export default function DeliveryManagementPage() {
                     </div>
 
                     <div className="min-w-[130px] bg-white p-3 rounded-2xl border border-[#e2e8f0] shadow-sm space-y-2">
-                      <div className="flex justify-between items-center text-[#006837]">
+                      <div className="flex justify-between items-center text-[#2d9d43]">
                         <Bike className="w-4 h-4" />
                         <span className="text-[10px] font-bold text-[#15803d]">{dashboardData.availableRidersDelta}</span>
                       </div>
@@ -266,22 +266,22 @@ export default function DeliveryManagementPage() {
                     </svg>
 
                     <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                      <line x1="30%" y1="35%" x2="75%" y2="70%" stroke="#006837" strokeWidth="3" strokeDasharray="5,3" />
+                      <line x1="30%" y1="35%" x2="75%" y2="70%" stroke="#2d9d43" strokeWidth="3" strokeDasharray="5,3" />
                     </svg>
 
                     {/* Schematic Rider Marker */}
                     <div className="absolute left-[52%] top-[52%] -translate-x-1/2 -translate-y-1/2 text-center z-10">
-                      <div className="w-8 h-8 rounded-full bg-[#006837] text-white flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-emerald-400/40">
+                      <div className="w-8 h-8 rounded-full bg-[#2d9d43] text-white flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-emerald-400/40">
                         <Bike className="w-4 h-4 text-white" />
                       </div>
-                      <span className="text-[8px] font-bold text-[#006837] bg-white px-1.5 py-0.5 rounded shadow mt-0.5 inline-block">
+                      <span className="text-[8px] font-bold text-[#2d9d43] bg-white px-1.5 py-0.5 rounded shadow mt-0.5 inline-block">
                         Ramesh K. (Schematic Pin)
                       </span>
                     </div>
 
                     <div className="absolute bottom-2 left-2 right-2 bg-white/95 backdrop-blur p-2.5 rounded-2xl border border-[#e2e8f0] flex items-center justify-between shadow-md z-20">
                       <div className="flex items-center gap-2">
-                        <div className="p-1.5 bg-[#006837] text-white rounded-full">
+                        <div className="p-1.5 bg-[#2d9d43] text-white rounded-full">
                           <Compass className="w-3.5 h-3.5" />
                         </div>
                         <div>
@@ -291,7 +291,7 @@ export default function DeliveryManagementPage() {
                           </p>
                         </div>
                       </div>
-                      <span className="px-2 py-0.5 bg-emerald-100 text-[#006837] text-[9px] font-bold rounded-lg font-mono">
+                      <span className="px-2 py-0.5 bg-emerald-100 text-[#2d9d43] text-[9px] font-bold rounded-lg font-mono">
                         {socketStatus === 'connected'
                           ? telemetryPingsReceived > 0
                             ? `Pings: ${telemetryPingsReceived}`
@@ -306,7 +306,7 @@ export default function DeliveryManagementPage() {
                   {/* Auto-Dispatch AI */}
                   <div className="bg-[#f1f5f9] p-4 rounded-3xl border border-[#e2e8f0] space-y-3">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#006837]" />
+                      <Sparkles className="w-4 h-4 text-[#2d9d43]" />
                       <h4 className="font-black text-sm text-[#1e2923]">Auto-Dispatch AI</h4>
                     </div>
 
@@ -320,7 +320,7 @@ export default function DeliveryManagementPage() {
                       </div>
                       <button
                         onClick={() => setIsAutoDispatchApplied(!isAutoDispatchApplied)}
-                        className="text-xs font-black text-[#006837] ml-2 shrink-0"
+                        className="text-xs font-black text-[#2d9d43] ml-2 shrink-0"
                       >
                         {isAutoDispatchApplied ? 'Applied' : 'Apply'}
                       </button>
@@ -333,22 +333,22 @@ export default function DeliveryManagementPage() {
 
                     <div className="grid grid-cols-4 text-center text-[10px] gap-1">
                       <div className="flex flex-col items-center gap-1">
-                        <div className="w-9 h-9 rounded-full bg-[#006837] text-white flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-full bg-[#2d9d43] text-white flex items-center justify-center">
                           <Package className="w-4 h-4" />
                         </div>
                         <span className="font-bold text-[#64748b]">Packed</span>
                       </div>
                       <div className="flex flex-col items-center gap-1">
-                        <div className="w-9 h-9 rounded-full bg-[#006837] text-white flex items-center justify-center">
+                        <div className="w-9 h-9 rounded-full bg-[#2d9d43] text-white flex items-center justify-center">
                           <CheckCircle2 className="w-4 h-4" />
                         </div>
                         <span className="font-bold text-[#64748b]">Assigned</span>
                       </div>
                       <div className="flex flex-col items-center gap-1">
-                        <div className="w-9 h-9 rounded-full bg-[#006837] text-white flex items-center justify-center ring-4 ring-[#dcfce7]">
+                        <div className="w-9 h-9 rounded-full bg-[#2d9d43] text-white flex items-center justify-center ring-4 ring-[#dcfce7]">
                           <Bike className="w-4 h-4" />
                         </div>
-                        <span className="font-black text-[#006837]">On Way</span>
+                        <span className="font-black text-[#2d9d43]">On Way</span>
                       </div>
                       <div className="flex flex-col items-center gap-1">
                         <div className="w-9 h-9 rounded-full bg-[#f1f5f9] text-[#94a3b8] flex items-center justify-center">
@@ -367,7 +367,7 @@ export default function DeliveryManagementPage() {
                       </button>
                       <button
                         onClick={() => setActiveModal('View Route')}
-                        className="flex-1 py-2.5 bg-[#006837] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-1.5"
+                        className="flex-1 py-2.5 bg-[#2d9d43] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-1.5"
                       >
                         <MapPin className="w-4 h-4" /> View Route
                       </button>
@@ -378,14 +378,14 @@ export default function DeliveryManagementPage() {
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <h4 className="font-black text-sm text-[#1e2923]">Active Fleet</h4>
-                      <button className="text-xs font-bold text-[#006837]">View All</button>
+                      <button className="text-xs font-bold text-[#2d9d43]">View All</button>
                     </div>
 
                     {dashboardData.activeFleet.map((r) => (
                       <div
                         key={r.id}
                         onClick={() => setActiveTab('rider')}
-                        className="bg-white p-3.5 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-2 cursor-pointer hover:border-[#006837] transition"
+                        className="bg-white p-3.5 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-2 cursor-pointer hover:border-[#2d9d43] transition"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
@@ -428,7 +428,7 @@ export default function DeliveryManagementPage() {
                     <div className="relative inline-block mx-auto">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={riderData.avatar} alt={riderData.name} className="w-24 h-24 rounded-3xl object-cover" />
-                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-[#006837] text-white text-[10px] font-bold rounded-full flex items-center gap-1 shadow-sm">
+                      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-[#2d9d43] text-white text-[10px] font-bold rounded-full flex items-center gap-1 shadow-sm">
                         <CheckCircle2 className="w-3 h-3" /> Verified
                       </div>
                     </div>
@@ -451,7 +451,7 @@ export default function DeliveryManagementPage() {
                           <p className="text-[10px] text-[#64748b] font-mono">{riderData.vehicleReg}</p>
                         </div>
                       </div>
-                      <button className="font-bold text-[#006837]">Edit</button>
+                      <button className="font-bold text-[#2d9d43]">Edit</button>
                     </div>
                   </div>
 
@@ -472,7 +472,7 @@ export default function DeliveryManagementPage() {
                         <span className="text-[10px] text-[#64748b]">Rating</span>
                       </div>
                       <div className="bg-white p-3 rounded-2xl border border-[#e2e8f0] shadow-sm flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-[#006837]" /><span className="font-black text-[#1e2923]">{riderData.onTimeRate}</span></div>
+                        <div className="flex items-center gap-1.5"><Clock className="w-4 h-4 text-[#2d9d43]" /><span className="font-black text-[#1e2923]">{riderData.onTimeRate}</span></div>
                         <span className="text-[10px] text-[#64748b]">On-Time</span>
                       </div>
                     </div>
@@ -498,7 +498,7 @@ export default function DeliveryManagementPage() {
 
             {/* Bottom Nav Bar */}
             <div className="bg-white border-t border-[#e2e8f0] px-4 py-2 flex justify-between items-center text-[10px] font-bold text-[#64748b]">
-              <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#dce6fe] text-[#1e2923] rounded-2xl"><Grid className="w-4 h-4 text-[#006837]" /> Dashboard</div>
+              <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#dce6fe] text-[#1e2923] rounded-2xl"><Grid className="w-4 h-4 text-[#2d9d43]" /> Dashboard</div>
               <div className="flex flex-col items-center gap-0.5"><ShoppingBag className="w-4 h-4" /> Orders</div>
               <div className="flex flex-col items-center gap-0.5"><Package className="w-4 h-4" /> Inventory</div>
               <div className="flex flex-col items-center gap-0.5"><Tag className="w-4 h-4" /> Products</div>
@@ -525,7 +525,7 @@ export default function DeliveryManagementPage() {
                   </div>
 
                   <div className="bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-2">
-                    <div className="flex justify-between items-center text-[#006837]">
+                    <div className="flex justify-between items-center text-[#2d9d43]">
                       <Bike className="w-5 h-5" />
                       <span className="text-xs font-bold text-[#15803d]">{dashboardData.availableRidersDelta}</span>
                     </div>
@@ -559,7 +559,7 @@ export default function DeliveryManagementPage() {
 
                   {/* Active Delivery Route Lines */}
                   <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                    <line x1="25%" y1="28%" x2="60%" y2="65%" stroke="#006837" strokeWidth="4" strokeDasharray="6,4" />
+                    <line x1="25%" y1="28%" x2="60%" y2="65%" stroke="#2d9d43" strokeWidth="4" strokeDasharray="6,4" />
                     <line x1="25%" y1="28%" x2="85%" y2="28%" stroke="#0284c7" strokeWidth="3" strokeDasharray="4,4" />
                   </svg>
 
@@ -581,10 +581,10 @@ export default function DeliveryManagementPage() {
                     }}
                     className="absolute -translate-x-1/2 -translate-y-1/2 text-center z-20 transition-all duration-700 ease-out"
                   >
-                    <div className="w-10 h-10 rounded-full bg-[#006837] text-white flex items-center justify-center shadow-xl border-2 border-white ring-4 ring-emerald-400/40">
+                    <div className="w-10 h-10 rounded-full bg-[#2d9d43] text-white flex items-center justify-center shadow-xl border-2 border-white ring-4 ring-emerald-400/40">
                       <Bike className="w-5 h-5 text-white" />
                     </div>
-                    <span className="text-[10px] font-extrabold text-[#006837] bg-white px-2 py-0.5 rounded-full shadow-md mt-1 inline-block whitespace-nowrap">
+                    <span className="text-[10px] font-extrabold text-[#2d9d43] bg-white px-2 py-0.5 rounded-full shadow-md mt-1 inline-block whitespace-nowrap">
                       Ramesh K. (Live GPS ⚡)
                     </span>
                   </div>
@@ -602,14 +602,14 @@ export default function DeliveryManagementPage() {
                   {/* Bottom Telemetry Overlay */}
                   <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur p-4 rounded-2xl border border-[#e2e8f0] flex items-center justify-between shadow-md z-20">
                     <div className="flex items-center gap-3">
-                      <div className="p-2.5 bg-[#006837] text-white rounded-full">
+                      <div className="p-2.5 bg-[#2d9d43] text-white rounded-full">
                         <Compass className="w-5 h-5" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="font-bold text-sm text-[#1e2923]">Schematic Fleet Dispatch Grid</p>
-                          <span className="bg-emerald-100 text-[#006837] text-[10px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-[#006837]" />
+                          <span className="bg-emerald-100 text-[#2d9d43] text-[10px] font-mono font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#2d9d43]" />
                             {socketStatus === 'connected'
                               ? telemetryPingsReceived > 0
                                 ? `${telemetryPingsReceived} pings received`
@@ -625,7 +625,7 @@ export default function DeliveryManagementPage() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="text-xs font-bold text-[#006837] bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 inline-block font-mono">
+                      <span className="text-xs font-bold text-[#2d9d43] bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200 inline-block font-mono">
                         Status: {socketStatus.toUpperCase()}
                       </span>
                     </div>
@@ -638,7 +638,7 @@ export default function DeliveryManagementPage() {
                 {/* Auto Dispatch AI */}
                 <div className="bg-[#f1f5f9] p-6 rounded-3xl border border-[#e2e8f0] space-y-4">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-[#006837]" />
+                    <Sparkles className="w-5 h-5 text-[#2d9d43]" />
                     <h3 className="font-black text-base text-[#1e2923]">Auto-Dispatch AI</h3>
                   </div>
 
@@ -652,7 +652,7 @@ export default function DeliveryManagementPage() {
                     </div>
                     <button
                       onClick={() => setIsAutoDispatchApplied(!isAutoDispatchApplied)}
-                      className="px-3 py-1.5 bg-[#006837] text-white text-xs font-bold rounded-xl"
+                      className="px-3 py-1.5 bg-[#2d9d43] text-white text-xs font-bold rounded-xl"
                     >
                       {isAutoDispatchApplied ? 'Applied' : 'Apply'}
                     </button>
@@ -663,7 +663,7 @@ export default function DeliveryManagementPage() {
                 <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-4">
                   <div className="flex justify-between items-center">
                     <h3 className="font-black text-base text-[#1e2923]">Active Fleet</h3>
-                    <button className="text-xs font-bold text-[#006837]">View All</button>
+                    <button className="text-xs font-bold text-[#2d9d43]">View All</button>
                   </div>
 
                   <div className="space-y-3">
@@ -671,7 +671,7 @@ export default function DeliveryManagementPage() {
                       <div
                         key={r.id}
                         onClick={() => setActiveTab('rider')}
-                        className="p-4 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] flex items-center justify-between cursor-pointer hover:border-[#006837] transition"
+                        className="p-4 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] flex items-center justify-between cursor-pointer hover:border-[#2d9d43] transition"
                       >
                         <div className="flex items-center gap-3">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -731,7 +731,7 @@ export default function DeliveryManagementPage() {
             <p className="text-xs text-[#64748b]">Executing action &quot;{activeModal}&quot; for active delivery fleet.</p>
             <button
               onClick={() => setActiveModal(null)}
-              className="w-full py-3 bg-[#006837] text-white font-bold text-xs rounded-2xl hover:bg-[#00522b]"
+              className="w-full py-3 bg-[#2d9d43] text-white font-bold text-xs rounded-2xl hover:bg-[#078730]"
             >
               Close Modal
             </button>

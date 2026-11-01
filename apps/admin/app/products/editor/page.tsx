@@ -161,7 +161,7 @@ function AdminProductEditorInner() {
     <div className="p-6 max-w-5xl mx-auto flex flex-col gap-6 font-sans">
       {/* Toast Notification */}
       {isSavedToast && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-3 bg-[#006837] text-white px-5 py-3.5 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4">
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-3 bg-[#2d9d43] text-white px-5 py-3.5 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4">
           <CheckCircle2 className="w-5 h-5 text-[#22c55e]" />
           <span className="text-sm font-bold">Product saved successfully! Redirecting...</span>
         </div>
@@ -178,11 +178,11 @@ function AdminProductEditorInner() {
           </Link>
           <div>
             <div className="flex items-center gap-2 text-xs text-[#64748b] mb-0.5">
-              <Link href="/products" className="hover:text-[#006837] font-semibold">Products</Link>
+              <Link href="/products" className="hover:text-[#2d9d43] font-semibold">Products</Link>
               <span>/</span>
               <span className="text-[#1e2923] font-bold">{productId ? 'Edit Product' : 'Create Product'}</span>
             </div>
-            <h1 className="text-2xl font-black text-[#006837]">
+            <h1 className="text-2xl font-black text-[#2d9d43]">
               {productId ? `Edit: ${name || productId}` : 'Create New Product'}
             </h1>
           </div>
@@ -210,7 +210,7 @@ function AdminProductEditorInner() {
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="px-6 py-2.5 bg-[#006837] text-white rounded-xl text-xs font-bold hover:bg-[#00522b] transition shadow-md flex items-center gap-2"
+            className="px-6 py-2.5 bg-[#2d9d43] text-white rounded-xl text-xs font-bold hover:bg-[#078730] transition shadow-md flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
             <span>{isSaving ? 'Saving...' : 'Save Product'}</span>
@@ -224,7 +224,7 @@ function AdminProductEditorInner() {
           {/* Basic Information */}
           <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm flex flex-col gap-4">
             <h2 className="text-base font-black text-[#1e2923] flex items-center gap-2">
-              <Package className="w-4 h-4 text-[#006837]" /> Basic Information
+              <Package className="w-4 h-4 text-[#2d9d43]" /> Basic Information
             </h2>
 
             <div className="flex flex-col gap-1.5">
@@ -234,7 +234,7 @@ function AdminProductEditorInner() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Organic Robusta Bananas"
-                className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#006837]"
+                className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#2d9d43]"
                 required
               />
             </div>
@@ -247,7 +247,7 @@ function AdminProductEditorInner() {
                   value={brand}
                   onChange={(e) => setBrand(e.target.value)}
                   placeholder="e.g., Fresh Farms"
-                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#2d9d43]"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -257,7 +257,7 @@ function AdminProductEditorInner() {
                   value={sku}
                   onChange={(e) => setSku(e.target.value)}
                   placeholder="e.g., SKU-FRU-001"
-                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm font-mono focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm font-mono focus:outline-none focus:border-[#2d9d43]"
                 />
               </div>
             </div>
@@ -268,7 +268,7 @@ function AdminProductEditorInner() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#2d9d43]"
                 >
                   <option value="Fresh Produce">Fresh Produce</option>
                   <option value="Dairy & Eggs">Dairy & Eggs</option>
@@ -286,7 +286,7 @@ function AdminProductEditorInner() {
                   value={unit}
                   onChange={(e) => setUnit(e.target.value)}
                   placeholder="e.g., 500g Pack"
-                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#2d9d43]"
                 />
               </div>
             </div>
@@ -298,7 +298,7 @@ function AdminProductEditorInner() {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Detailed description of freshness, source farm, nutrients, and shelf life..."
-                className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#006837]"
+                className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#2d9d43]"
               />
             </div>
           </div>
@@ -306,7 +306,7 @@ function AdminProductEditorInner() {
           {/* Pricing & Stock */}
           <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm flex flex-col gap-4">
             <h2 className="text-base font-black text-[#1e2923] flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-[#006837]" /> Pricing & Inventory Units
+              <DollarSign className="w-4 h-4 text-[#2d9d43]" /> Pricing & Inventory Units
             </h2>
 
             <div className="grid grid-cols-3 gap-4">
@@ -318,7 +318,7 @@ function AdminProductEditorInner() {
                   step="0.01"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm font-bold focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm font-bold focus:outline-none focus:border-[#2d9d43]"
                   required
                 />
               </div>
@@ -331,7 +331,7 @@ function AdminProductEditorInner() {
                   step="0.01"
                   value={mrp}
                   onChange={(e) => setMrp(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-sm focus:outline-none focus:border-[#2d9d43]"
                 />
               </div>
 
@@ -342,7 +342,7 @@ function AdminProductEditorInner() {
                   min="0"
                   value={stock}
                   onChange={(e) => setStock(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#006837] text-sm font-black focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#2d9d43] text-sm font-black focus:outline-none focus:border-[#2d9d43]"
                   required
                 />
               </div>
@@ -377,7 +377,7 @@ function AdminProductEditorInner() {
                 }}
               />
               {isOrganic && (
-                <div className="absolute top-3 left-3 bg-[#006837] text-white px-2 py-0.5 rounded-full text-[10px] font-black flex items-center gap-1 shadow-sm">
+                <div className="absolute top-3 left-3 bg-[#2d9d43] text-white px-2 py-0.5 rounded-full text-[10px] font-black flex items-center gap-1 shadow-sm">
                   <Leaf className="w-3 h-3" /> ORGANIC
                 </div>
               )}
@@ -390,7 +390,7 @@ function AdminProductEditorInner() {
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="/images/daily_basket_logo.png"
-                className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-xs focus:outline-none focus:border-[#006837]"
+                className="w-full px-4 py-2.5 bg-[#f8fafc] rounded-xl border border-[#cbd5e1] text-[#1e2923] text-xs focus:outline-none focus:border-[#2d9d43]"
               />
             </div>
 
@@ -400,7 +400,7 @@ function AdminProductEditorInner() {
                 type="checkbox"
                 checked={isOrganic}
                 onChange={(e) => setIsOrganic(e.target.checked)}
-                className="w-4 h-4 accent-[#006837] rounded"
+                className="w-4 h-4 accent-[#2d9d43] rounded"
               />
               <div>
                 <span className="text-xs font-bold text-[#1e2923] block">Certified 100% Organic</span>
@@ -450,7 +450,7 @@ function AdminProductEditorInner() {
 
 export default function AdminProductEditorPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-sm font-bold text-[#006837]">Loading Editor...</div>}>
+    <Suspense fallback={<div className="p-8 text-center text-sm font-bold text-[#2d9d43]">Loading Editor...</div>}>
       <AdminProductEditorInner />
     </Suspense>
   );

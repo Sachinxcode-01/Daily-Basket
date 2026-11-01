@@ -166,7 +166,7 @@ function ProductDetailsInner() {
     <div className="space-y-6 max-w-6xl mx-auto font-sans pb-16">
       {/* Toast Alert */}
       {isSavedToast && (
-        <div className="fixed top-6 right-6 z-50 bg-[#006837] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-sm font-bold animate-bounce">
+        <div className="fixed top-6 right-6 z-50 bg-[#2d9d43] text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-sm font-bold animate-bounce">
           <Check className="w-4 h-4" />
           <span>Stock updated &amp; broadcasted to client apps!</span>
         </div>
@@ -177,13 +177,13 @@ function ProductDetailsInner() {
         <div className="flex items-center gap-3">
           <Link
             href="/products"
-            className="p-2.5 rounded-2xl hover:bg-[#f1f5f9] transition text-[#006837] border border-[#e2e8f0]"
+            className="p-2.5 rounded-2xl hover:bg-[#f1f5f9] transition text-[#2d9d43] border border-[#e2e8f0]"
           >
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-black text-[#006837] tracking-tight">{product.name}</h1>
+              <h1 className="text-2xl font-black text-[#2d9d43] tracking-tight">{product.name}</h1>
               <span className="px-2.5 py-0.5 bg-[#dcfce7] text-[#15803d] text-[11px] font-extrabold rounded-md">
                 {product.sku}
               </span>
@@ -200,7 +200,7 @@ function ProductDetailsInner() {
             href={`/products/editor?id=${product.id}`}
             className="px-4 py-2 bg-white border border-[#cbd5e1] text-[#1e2923] rounded-2xl text-xs font-bold hover:bg-[#f8fafc] transition flex items-center gap-1.5 shadow-sm"
           >
-            <Edit className="w-3.5 h-3.5 text-[#006837]" />
+            <Edit className="w-3.5 h-3.5 text-[#2d9d43]" />
             <span>Edit Product</span>
           </Link>
 
@@ -216,7 +216,7 @@ function ProductDetailsInner() {
             <button
               onClick={() => setViewMode('web')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                viewMode === 'web' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+                viewMode === 'web' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
@@ -225,7 +225,7 @@ function ProductDetailsInner() {
             <button
               onClick={() => setViewMode('mobile')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                viewMode === 'mobile' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+                viewMode === 'mobile' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
               }`}
             >
               <Smartphone className="w-3.5 h-3.5" />
@@ -254,15 +254,15 @@ function ProductDetailsInner() {
           <div className="w-[390px] h-[840px] bg-[#f8fafc] rounded-[48px] border-[12px] border-[#1e2923] shadow-2xl overflow-hidden flex flex-col relative">
             {/* Phone Top Notch */}
             <div className="w-36 h-5 bg-[#1e2923] rounded-b-2xl mx-auto flex items-center justify-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#006837]/40" />
+              <div className="w-3 h-3 rounded-full bg-[#2d9d43]/40" />
             </div>
 
             {/* Mobile App Bar */}
             <div className="bg-white px-4 py-3 flex items-center justify-between border-b border-[#e2e8f0]">
               <Link href="/products">
-                <ArrowLeft className="w-5 h-5 text-[#006837] cursor-pointer" />
+                <ArrowLeft className="w-5 h-5 text-[#2d9d43] cursor-pointer" />
               </Link>
-              <span className="font-extrabold text-base text-[#006837]">Product Details</span>
+              <span className="font-extrabold text-base text-[#2d9d43]">Product Details</span>
               <div className="flex items-center gap-2">
                 <Share2 className="w-4 h-4 text-[#1e2923]" />
                 <MoreVertical className="w-4 h-4 text-[#1e2923]" />
@@ -280,7 +280,7 @@ function ProductDetailsInner() {
                   className="max-h-full max-w-full object-contain"
                 />
                 {/* Published Badge */}
-                <div className="absolute top-3 left-3 bg-[#006837] text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-[11px] font-bold shadow-sm">
+                <div className="absolute top-3 left-3 bg-[#2d9d43] text-white px-2.5 py-1 rounded-full flex items-center gap-1 text-[11px] font-bold shadow-sm">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>{isPublished ? 'Published' : 'Draft'}</span>
                 </div>
@@ -297,14 +297,14 @@ function ProductDetailsInner() {
                   {product.category}
                 </span>
                 <h2 className="text-xl font-black text-[#1e2923] leading-snug">{product.name}</h2>
-                <p className="text-xs font-bold text-[#006837]">{product.brand}</p>
+                <p className="text-xs font-bold text-[#2d9d43]">{product.brand}</p>
                 <p className="text-xs text-[#334155] leading-relaxed pt-1">
                   {isDescriptionExpanded
                     ? product.description
                     : `${product.description.slice(0, 110)}...`}
                   <button
                     onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                    className="text-[#006837] font-bold ml-1 inline-block"
+                    className="text-[#2d9d43] font-bold ml-1 inline-block"
                   >
                     {isDescriptionExpanded ? 'Read Less' : 'Read More'}
                   </button>
@@ -314,17 +314,17 @@ function ProductDetailsInner() {
               {/* Spec Cards Strip */}
               <div className="px-4 grid grid-cols-3 gap-2">
                 <div className="bg-white p-2.5 rounded-2xl border border-[#e2e8f0] text-center space-y-1">
-                  <Scale className="w-4 h-4 text-[#006837] mx-auto" />
+                  <Scale className="w-4 h-4 text-[#2d9d43] mx-auto" />
                   <span className="text-[10px] text-[#64748b] block">Unit</span>
                   <span className="font-bold text-xs text-[#1e2923] block truncate">{product.unit}</span>
                 </div>
                 <div className="bg-white p-2.5 rounded-2xl border border-[#e2e8f0] text-center space-y-1">
-                  <QrCode className="w-4 h-4 text-[#006837] mx-auto" />
+                  <QrCode className="w-4 h-4 text-[#2d9d43] mx-auto" />
                   <span className="text-[10px] text-[#64748b] block">SKU</span>
                   <span className="font-bold text-[10px] text-[#1e2923] font-mono block truncate">{product.sku}</span>
                 </div>
                 <div className="bg-white p-2.5 rounded-2xl border border-[#e2e8f0] text-center space-y-1">
-                  <Scan className="w-4 h-4 text-[#006837] mx-auto" />
+                  <Scan className="w-4 h-4 text-[#2d9d43] mx-auto" />
                   <span className="text-[10px] text-[#64748b] block">Barcode</span>
                   <span className="font-bold text-[10px] text-[#1e2923] font-mono block truncate">{product.barcode}</span>
                 </div>
@@ -334,13 +334,13 @@ function ProductDetailsInner() {
               <div className="mx-4 bg-white p-4 rounded-2xl border border-[#e2e8f0] space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-[#dcfce7] text-[#006837]">
+                    <div className="p-1.5 rounded-lg bg-[#dcfce7] text-[#2d9d43]">
                       <DollarSign className="w-4 h-4" />
                     </div>
                     <span className="font-bold text-sm text-[#1e2923]">Pricing &amp; Margins</span>
                   </div>
                   {product.discount && (
-                    <span className="px-2 py-0.5 bg-emerald-100 text-[#006837] text-[10px] font-bold rounded-md">
+                    <span className="px-2 py-0.5 bg-emerald-100 text-[#2d9d43] text-[10px] font-bold rounded-md">
                       {product.discount}
                     </span>
                   )}
@@ -369,7 +369,7 @@ function ProductDetailsInner() {
               <div className="mx-4 bg-white p-4 rounded-2xl border border-[#e2e8f0] space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <div className="p-1.5 rounded-lg bg-[#dcfce7] text-[#006837]">
+                    <div className="p-1.5 rounded-lg bg-[#dcfce7] text-[#2d9d43]">
                       <Store className="w-4 h-4" />
                     </div>
                     <span className="font-bold text-sm text-[#1e2923]">Inventory Status</span>
@@ -380,7 +380,7 @@ function ProductDetailsInner() {
                 </div>
 
                 <div>
-                  <span className="text-2xl font-black text-[#006837]">{stockCount}</span>{' '}
+                  <span className="text-2xl font-black text-[#2d9d43]">{stockCount}</span>{' '}
                   <span className="text-xs text-[#64748b]">Available Units</span>
                 </div>
 
@@ -411,7 +411,7 @@ function ProductDetailsInner() {
               </button>
               <button
                 onClick={() => setIsUpdateStockOpen(true)}
-                className="flex-1 py-2.5 bg-[#006837] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm hover:bg-[#00522b]"
+                className="flex-1 py-2.5 bg-[#2d9d43] text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-sm hover:bg-[#078730]"
               >
                 <Edit className="w-4 h-4" /> Restock
               </button>
@@ -431,7 +431,7 @@ function ProductDetailsInner() {
                 alt={product.name}
                 className="max-h-full max-w-full object-contain"
               />
-              <div className="absolute top-4 left-4 bg-[#006837] text-white px-3 py-1 rounded-full flex items-center gap-1.5 text-xs font-bold shadow-md">
+              <div className="absolute top-4 left-4 bg-[#2d9d43] text-white px-3 py-1 rounded-full flex items-center gap-1.5 text-xs font-bold shadow-md">
                 <CheckCircle2 className="w-4 h-4" /> {isPublished ? 'Published' : 'Draft'}
               </div>
               <div className="absolute bottom-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full flex items-center gap-1.5 text-xs font-bold text-[#1e2923] shadow-md">
@@ -442,17 +442,17 @@ function ProductDetailsInner() {
             {/* Metadata Cards Strip */}
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-white p-4 rounded-2xl border border-[#e2e8f0] text-center space-y-1">
-                <Scale className="w-5 h-5 text-[#006837] mx-auto" />
+                <Scale className="w-5 h-5 text-[#2d9d43] mx-auto" />
                 <span className="text-xs text-[#64748b] block">Unit Weight</span>
                 <span className="font-bold text-sm text-[#1e2923] block">{product.unit}</span>
               </div>
               <div className="bg-white p-4 rounded-2xl border border-[#e2e8f0] text-center space-y-1">
-                <QrCode className="w-5 h-5 text-[#006837] mx-auto" />
+                <QrCode className="w-5 h-5 text-[#2d9d43] mx-auto" />
                 <span className="text-xs text-[#64748b] block">SKU Code</span>
                 <span className="font-bold text-xs text-[#1e2923] font-mono block truncate">{product.sku}</span>
               </div>
               <div className="bg-white p-4 rounded-2xl border border-[#e2e8f0] text-center space-y-1">
-                <Scan className="w-5 h-5 text-[#006837] mx-auto" />
+                <Scan className="w-5 h-5 text-[#2d9d43] mx-auto" />
                 <span className="text-xs text-[#64748b] block">Barcode</span>
                 <span className="font-bold text-xs text-[#1e2923] font-mono block truncate">{product.barcode}</span>
               </div>
@@ -497,7 +497,7 @@ function ProductDetailsInner() {
                 {product.category}
               </span>
               <h2 className="text-2xl font-black text-[#1e2923]">{product.name}</h2>
-              <p className="text-sm font-bold text-[#006837]">{product.brand}</p>
+              <p className="text-sm font-bold text-[#2d9d43]">{product.brand}</p>
               <p className="text-xs text-[#334155] leading-relaxed pt-2">
                 {product.description}
               </p>
@@ -507,7 +507,7 @@ function ProductDetailsInner() {
             <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-[#dcfce7] text-[#006837]">
+                  <div className="p-2 rounded-xl bg-[#dcfce7] text-[#2d9d43]">
                     <DollarSign className="w-5 h-5" />
                   </div>
                   <span className="font-bold text-base text-[#1e2923]">Pricing &amp; Margins</span>
@@ -523,7 +523,7 @@ function ProductDetailsInner() {
                   <span className="text-base text-[#94a3b8] line-through">₹{product.mrp}</span>
                 )}
                 {product.discount && (
-                  <span className="text-xs font-extrabold text-[#006837] bg-emerald-100 px-2 py-0.5 rounded-md">
+                  <span className="text-xs font-extrabold text-[#2d9d43] bg-emerald-100 px-2 py-0.5 rounded-md">
                     {product.discount}
                   </span>
                 )}
@@ -545,7 +545,7 @@ function ProductDetailsInner() {
             <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-xl bg-[#dcfce7] text-[#006837]">
+                  <div className="p-2 rounded-xl bg-[#dcfce7] text-[#2d9d43]">
                     <Store className="w-5 h-5" />
                   </div>
                   <span className="font-bold text-base text-[#1e2923]">Inventory Status</span>
@@ -556,7 +556,7 @@ function ProductDetailsInner() {
               </div>
 
               <div>
-                <span className="text-3xl font-black text-[#006837]">{stockCount}</span>{' '}
+                <span className="text-3xl font-black text-[#2d9d43]">{stockCount}</span>{' '}
                 <span className="text-sm text-[#64748b]">Available Units</span>
               </div>
 
@@ -577,7 +577,7 @@ function ProductDetailsInner() {
 
               <button
                 onClick={() => setIsUpdateStockOpen(true)}
-                className="w-full py-3 bg-[#006837] hover:bg-[#00522b] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition"
+                className="w-full py-3 bg-[#2d9d43] hover:bg-[#078730] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-2 shadow-sm transition"
               >
                 <Package className="w-4 h-4" /> Update Stock Count
               </button>
@@ -599,7 +599,7 @@ function ProductDetailsInner() {
               type="number"
               value={newStockInput}
               onChange={(e) => setNewStockInput(e.target.value)}
-              className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-base font-bold text-[#1e2923] focus:outline-none focus:border-[#006837]"
+              className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-base font-bold text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
             />
 
             <div className="flex gap-3 pt-2">
@@ -611,7 +611,7 @@ function ProductDetailsInner() {
               </button>
               <button
                 onClick={handleUpdateStock}
-                className="flex-1 py-3 bg-[#006837] text-white text-xs font-bold rounded-2xl hover:bg-[#00522b]"
+                className="flex-1 py-3 bg-[#2d9d43] text-white text-xs font-bold rounded-2xl hover:bg-[#078730]"
               >
                 Save &amp; Broadcast WebSocket
               </button>

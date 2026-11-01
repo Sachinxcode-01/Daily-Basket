@@ -5,7 +5,7 @@ import AdminShell from '../components/layout/AdminShell';
 
 export const metadata = {
   title: 'Daily Basket | Store Admin & Quick-Commerce Suite',
-  description: 'Inventory management, daily mandi pricing, order dispatch, and rider tracking.',
+  description: 'Ultrafast local Kirana & dark store control center for Daily Basket quick-commerce.',
   icons: {
     icon: '/images/daily_basket_logo.png',
     shortcut: '/images/daily_basket_logo.png',
@@ -20,7 +20,7 @@ export default function AdminLayout({
 }) {
   return (
     <html lang="en" className="light">
-      <body className="bg-[#f7f8fa] text-zinc-900 min-h-screen font-sans antialiased selection:bg-emerald-500 selection:text-white">
+      <body className="bg-surface text-on-surface min-h-screen font-sans antialiased selection:bg-primary selection:text-white">
         <AuthProvider>
           <AdminShell>{children}</AdminShell>
         </AuthProvider>

@@ -112,7 +112,7 @@ export default function AddNewProductPage() {
     <div className="space-y-6 max-w-5xl mx-auto font-sans relative">
       {/* Toast Notification */}
       {successToast && (
-        <div className="fixed top-6 right-6 z-50 flex items-center gap-3 bg-[#006837] text-white px-5 py-3.5 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4">
+        <div className="fixed top-6 right-6 z-50 flex items-center gap-3 bg-[#2d9d43] text-white px-5 py-3.5 rounded-2xl shadow-2xl animate-in fade-in slide-in-from-top-4">
           <CheckCircle2 className="w-5 h-5 text-[#22c55e]" />
           <span className="text-sm font-bold">Product published to catalog! Redirecting...</span>
         </div>
@@ -125,7 +125,7 @@ export default function AddNewProductPage() {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-black text-[#006837] tracking-tight">Add New Product</h1>
+            <h1 className="text-2xl font-black text-[#2d9d43] tracking-tight">Add New Product</h1>
             <p className="text-xs text-[#64748b] mt-0.5 font-medium">
               Google Stitch ID: 161ecffe647347dcb3399a8bf75f8be0 • Step {currentStep} of 5
             </p>
@@ -137,7 +137,7 @@ export default function AddNewProductPage() {
           <button
             onClick={() => setViewMode('web')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'web' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'web' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <LayoutGrid className="w-3.5 h-3.5" />
@@ -146,7 +146,7 @@ export default function AddNewProductPage() {
           <button
             onClick={() => setViewMode('mobile')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-              viewMode === 'mobile' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+              viewMode === 'mobile' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
             }`}
           >
             <Smartphone className="w-3.5 h-3.5" />
@@ -174,7 +174,7 @@ export default function AddNewProductPage() {
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black transition ${
                   s.step === currentStep
-                    ? 'bg-[#006837] text-white shadow-md'
+                    ? 'bg-[#2d9d43] text-white shadow-md'
                     : s.step < currentStep
                     ? 'bg-[#dcfce7] text-[#15803d]'
                     : 'bg-[#e2e8f0] text-[#64748b]'
@@ -184,7 +184,7 @@ export default function AddNewProductPage() {
               </div>
               <span
                 className={`text-xs whitespace-nowrap ${
-                  s.step === currentStep ? 'font-bold text-[#006837]' : 'font-medium text-[#64748b]'
+                  s.step === currentStep ? 'font-bold text-[#2d9d43]' : 'font-medium text-[#64748b]'
                 }`}
               >
                 {s.title}
@@ -204,7 +204,7 @@ export default function AddNewProductPage() {
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
                   placeholder="e.g., Organic Robusta Bananas"
-                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm text-[#1e2923] focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
                   required
                 />
               </div>
@@ -217,7 +217,7 @@ export default function AddNewProductPage() {
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
                     placeholder="Brand Name"
-                    className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm text-[#1e2923] focus:outline-none focus:border-[#006837]"
+                    className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
                   />
                 </div>
 
@@ -226,7 +226,7 @@ export default function AddNewProductPage() {
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm text-[#1e2923] focus:outline-none focus:border-[#006837]"
+                    className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
                   >
                     <option value="Fresh Produce">Fresh Produce</option>
                     <option value="Dairy & Eggs">Dairy & Eggs</option>
@@ -241,7 +241,7 @@ export default function AddNewProductPage() {
               {/* AI Assistant Banner */}
               {aiNotice && (
                 <div className="p-4 bg-[#eff6ff] border border-[#dbeafe] rounded-2xl flex items-start gap-3">
-                  <div className="p-2 bg-[#006837] text-white rounded-full mt-0.5">
+                  <div className="p-2 bg-[#2d9d43] text-white rounded-full mt-0.5">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <div className="flex-1 text-xs">
@@ -252,7 +252,7 @@ export default function AddNewProductPage() {
                     <button
                       type="button"
                       onClick={handleGenerateAiDescription}
-                      className="text-[#006837] font-bold underline mt-2 text-xs block hover:text-[#00522b]"
+                      className="text-[#2d9d43] font-bold underline mt-2 text-xs block hover:text-[#078730]"
                     >
                       Generate Description with AI
                     </button>
@@ -267,7 +267,7 @@ export default function AddNewProductPage() {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Enter product description..."
-                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm text-[#1e2923] focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
                 />
               </div>
 
@@ -278,7 +278,7 @@ export default function AddNewProductPage() {
                   value={barcode}
                   onChange={(e) => setBarcode(e.target.value)}
                   placeholder="e.g. 890123456789"
-                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm font-mono text-[#1e2923] focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm font-mono text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
                 />
               </div>
             </div>
@@ -309,7 +309,7 @@ export default function AddNewProductPage() {
         {currentStep === 2 && (
           <div className="max-w-xl mx-auto space-y-6">
             <h3 className="text-lg font-black text-[#1e2923] flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-[#006837]" /> Product Pricing & Margin
+              <DollarSign className="w-5 h-5 text-[#2d9d43]" /> Product Pricing & Margin
             </h3>
 
             <div className="grid grid-cols-2 gap-4">
@@ -321,7 +321,7 @@ export default function AddNewProductPage() {
                   step="0.01"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#f8fafc] border-2 border-[#cbd5e1] rounded-2xl text-lg font-black text-[#1e2923] focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-3 bg-[#f8fafc] border-2 border-[#cbd5e1] rounded-2xl text-lg font-black text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
                   required
                 />
               </div>
@@ -334,7 +334,7 @@ export default function AddNewProductPage() {
                   step="0.01"
                   value={mrp}
                   onChange={(e) => setMrp(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#f8fafc] border-2 border-[#cbd5e1] rounded-2xl text-lg font-black text-[#64748b] focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-3 bg-[#f8fafc] border-2 border-[#cbd5e1] rounded-2xl text-lg font-black text-[#64748b] focus:outline-none focus:border-[#2d9d43]"
                 />
               </div>
             </div>
@@ -354,7 +354,7 @@ export default function AddNewProductPage() {
         {currentStep === 3 && (
           <div className="max-w-xl mx-auto space-y-6">
             <h3 className="text-lg font-black text-[#1e2923] flex items-center gap-2">
-              <Package className="w-5 h-5 text-[#006837]" /> Inventory & Stock Controls
+              <Package className="w-5 h-5 text-[#2d9d43]" /> Inventory & Stock Controls
             </h3>
 
             <div className="grid grid-cols-2 gap-4">
@@ -365,7 +365,7 @@ export default function AddNewProductPage() {
                   min="0"
                   value={stockQuantity}
                   onChange={(e) => setStockQuantity(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#f8fafc] border-2 border-[#cbd5e1] rounded-2xl text-lg font-black text-[#006837] focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-3 bg-[#f8fafc] border-2 border-[#cbd5e1] rounded-2xl text-lg font-black text-[#2d9d43] focus:outline-none focus:border-[#2d9d43]"
                   required
                 />
               </div>
@@ -377,7 +377,7 @@ export default function AddNewProductPage() {
                   min="0"
                   value={minStockAlert}
                   onChange={(e) => setMinStockAlert(e.target.value)}
-                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm font-bold text-[#1e2923] focus:outline-none focus:border-[#006837]"
+                  className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm font-bold text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
                 />
               </div>
             </div>
@@ -389,7 +389,7 @@ export default function AddNewProductPage() {
                 value={unitName}
                 onChange={(e) => setUnitName(e.target.value)}
                 placeholder="e.g. 500g Pack"
-                className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm font-bold text-[#1e2923] focus:outline-none focus:border-[#006837]"
+                className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-sm font-bold text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
               />
             </div>
 
@@ -398,11 +398,11 @@ export default function AddNewProductPage() {
                 type="checkbox"
                 checked={isOrganic}
                 onChange={(e) => setIsOrganic(e.target.checked)}
-                className="w-5 h-5 accent-[#006837] rounded"
+                className="w-5 h-5 accent-[#2d9d43] rounded"
               />
               <div>
                 <span className="text-sm font-black text-[#1e2923] flex items-center gap-1.5">
-                  <Leaf className="w-4 h-4 text-[#006837]" /> Certified Organic Product
+                  <Leaf className="w-4 h-4 text-[#2d9d43]" /> Certified Organic Product
                 </span>
                 <span className="text-xs text-[#64748b]">Displays green organic badge to customers</span>
               </div>
@@ -414,7 +414,7 @@ export default function AddNewProductPage() {
         {currentStep === 4 && (
           <div className="max-w-xl mx-auto space-y-6">
             <h3 className="text-lg font-black text-[#1e2923] flex items-center gap-2">
-              <Camera className="w-5 h-5 text-[#006837]" /> Product Media & Images
+              <Camera className="w-5 h-5 text-[#2d9d43]" /> Product Media & Images
             </h3>
 
             <div className="w-full h-56 bg-[#f8fafc] rounded-3xl border-2 border-dashed border-[#cbd5e1] flex flex-col items-center justify-center p-4">
@@ -437,7 +437,7 @@ export default function AddNewProductPage() {
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 placeholder="/images/daily_basket_logo.png"
-                className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-xs text-[#1e2923] focus:outline-none focus:border-[#006837]"
+                className="w-full px-4 py-3 bg-[#f8fafc] border border-[#cbd5e1] rounded-2xl text-xs text-[#1e2923] focus:outline-none focus:border-[#2d9d43]"
               />
             </div>
           </div>
@@ -447,7 +447,7 @@ export default function AddNewProductPage() {
         {currentStep === 5 && (
           <div className="max-w-xl mx-auto space-y-6">
             <h3 className="text-lg font-black text-[#1e2923] flex items-center gap-2">
-              <CheckCircle2 className="w-5 h-5 text-[#006837]" /> Review Product Before Publishing
+              <CheckCircle2 className="w-5 h-5 text-[#2d9d43]" /> Review Product Before Publishing
             </h3>
 
             <div className="bg-[#f8fafc] p-6 rounded-3xl border border-[#cbd5e1] space-y-4">
@@ -474,7 +474,7 @@ export default function AddNewProductPage() {
                 </div>
                 <div className="bg-white p-3 rounded-2xl border border-[#e2e8f0]">
                   <span className="text-[10px] text-[#64748b] uppercase font-bold">Stock</span>
-                  <p className="text-lg font-black text-[#006837] mt-0.5">{stockQuantity} units</p>
+                  <p className="text-lg font-black text-[#2d9d43] mt-0.5">{stockQuantity} units</p>
                 </div>
               </div>
             </div>
@@ -510,7 +510,7 @@ export default function AddNewProductPage() {
                 }
                 setCurrentStep((prev) => Math.min(prev + 1, 5));
               }}
-              className="px-8 py-3 bg-[#006837] text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-md hover:bg-[#00522b] transition"
+              className="px-8 py-3 bg-[#2d9d43] text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-md hover:bg-[#078730] transition"
             >
               <span>Next Step</span>
               <ArrowRight className="w-4 h-4" />
@@ -520,7 +520,7 @@ export default function AddNewProductPage() {
               type="button"
               disabled={isPublishing}
               onClick={handlePublish}
-              className="px-10 py-3.5 bg-[#006837] text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-lg hover:bg-[#00522b] transition transform hover:scale-[1.02]"
+              className="px-10 py-3.5 bg-[#2d9d43] text-white font-bold text-xs rounded-xl flex items-center gap-2 shadow-lg hover:bg-[#078730] transition transform hover:scale-[1.02]"
             >
               <Check className="w-4 h-4" />
               <span>{isPublishing ? 'Publishing...' : 'Publish Product to Catalog'}</span>

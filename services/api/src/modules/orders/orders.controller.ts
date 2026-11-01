@@ -47,6 +47,12 @@ export class OrdersController {
     return this.ordersService.findByUser(userId);
   }
 
+  @Get('admin/all')
+  @ApiOperation({ summary: 'List all store orders across all users for admin dashboard' })
+  async getAllOrders() {
+    return this.ordersService.findAllOrders();
+  }
+
   @Get(':id/tracking')
   @ApiOperation({ summary: 'Get live GPS tracking and delivery step status' })
   async getOrderTracking(@Param('id') id: string) {

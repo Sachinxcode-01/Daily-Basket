@@ -16,18 +16,18 @@ export default function HelpSupportPage() {
   return (
     <div className="max-w-4xl mx-auto space-y-6 font-sans">
       <div className="flex items-center gap-3 bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
-        <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#006837]">
+        <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#2d9d43]">
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div>
-          <h1 className="text-2xl font-black text-[#006837]">Help &amp; Support Center</h1>
+          <h1 className="text-2xl font-black text-[#2d9d43]">Help &amp; Support Center</h1>
           <p className="text-xs text-[#64748b] mt-0.5">Google Stitch Screen ID: 91bf727083b347b4b71f60a23bb4a2b8</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white p-6 rounded-3xl border border-[#e2e8f0] shadow-sm flex items-center gap-4">
-          <div className="p-3 bg-emerald-100 text-[#006837] rounded-2xl">
+          <div className="p-3 bg-emerald-100 text-[#2d9d43] rounded-2xl">
             <Headphones className="w-6 h-6" />
           </div>
           <div>

@@ -13,6 +13,8 @@ class HeroBannerData {
   final String route;
   final List<Color> gradientColors;
   final IconData badgeIcon;
+  final BoxFit fit;
+  final Alignment alignment;
 
   const HeroBannerData({
     required this.id,
@@ -24,6 +26,8 @@ class HeroBannerData {
     required this.route,
     required this.gradientColors,
     required this.badgeIcon,
+    this.fit = BoxFit.cover,
+    this.alignment = Alignment.centerRight,
   });
 }
 
@@ -183,170 +187,178 @@ class _HeroBannerCarouselState extends State<HeroBannerCarousel> {
   }
 
   Widget _buildBannerCard(HeroBannerData banner) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: GestureDetector(
-        onTap: () => _handleBannerTap(banner),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: banner.gradientColors,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: banner.gradientColors.first.withValues(alpha: 0.3),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final cardWidth = constraints.maxWidth;
+        final maxContentWidth = cardWidth * 0.62;
+
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: GestureDetector(
+            onTap: () => _handleBannerTap(banner),
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: banner.gradientColors,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: banner.gradientColors.first.withValues(alpha: 0.3),
+                    blurRadius: 14,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              // Background Illustration / Artwork
-              if (banner.assetPath != null)
-                Positioned(
-                  right: -10,
-                  bottom: -15,
-                  top: -10,
-                  width: 170,
-                  child: Opacity(
-                    opacity: 0.88,
-                    child: Image.asset(
-                      banner.assetPath!,
-                      fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const SizedBox(),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Full-bleed responsive background image
+                  if (banner.assetPath != null)
+                    Positioned.fill(
+                      child: Image.asset(
+                        banner.assetPath!,
+                        fit: banner.fit,
+                        alignment: banner.alignment,
+                        errorBuilder: (_, __, ___) => const SizedBox(),
+                      ),
                     ),
-                  ),
-                ),
 
-              // Gradient Scrim for text readability
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                    colors: [
-                      banner.gradientColors.first.withValues(alpha: 0.95),
-                      banner.gradientColors.first.withValues(alpha: 0.70),
-                      Colors.transparent,
-                    ],
-                    stops: const [0.0, 0.58, 1.0],
-                  ),
-                ),
-              ),
-
-              // Text Content & Actions
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 16, 16, 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Eyebrow Chip
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                  // Responsive gradient scrim ensuring text contrast & seamless blend
+                  Positioned.fill(
+                    child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.20),
-                        borderRadius: BorderRadius.circular(9999),
-                        border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.35),
-                          width: 0.5,
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            banner.gradientColors.first.withValues(alpha: 0.96),
+                            banner.gradientColors.first.withValues(alpha: 0.85),
+                            banner.gradientColors.last.withValues(alpha: 0.40),
+                            banner.gradientColors.last.withValues(alpha: 0.15),
+                          ],
+                          stops: const [0.0, 0.46, 0.74, 1.0],
                         ),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(banner.badgeIcon, size: 12, color: Colors.white),
-                          const SizedBox(width: 4),
-                          Text(
-                            banner.eyebrow,
-                            style: GoogleFonts.inter(
-                              fontSize: 10,
+                    ),
+                  ),
+
+                  // Text Content & Actions
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(18, 14, 16, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Eyebrow Chip
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.20),
+                            borderRadius: BorderRadius.circular(9999),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.35),
+                              width: 0.5,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(banner.badgeIcon, size: 12, color: Colors.white),
+                              const SizedBox(width: 4),
+                              Text(
+                                banner.eyebrow,
+                                style: GoogleFonts.inter(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  letterSpacing: 0.6,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+
+                        // Main Headline
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: maxContentWidth),
+                          child: Text(
+                            banner.title,
+                            style: GoogleFonts.outfit(
+                              fontSize: 22,
                               fontWeight: FontWeight.w700,
                               color: Colors.white,
-                              letterSpacing: 0.6,
+                              letterSpacing: -0.3,
+                              height: 1.15,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-
-                    // Main Headline
-                    Text(
-                      banner.title,
-                      style: GoogleFonts.outfit(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white,
-                        letterSpacing: -0.3,
-                        height: 1.15,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-
-                    // Subtitle
-                    ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 210),
-                      child: Text(
-                        banner.subtitle,
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: Colors.white.withValues(alpha: 0.92),
-                          height: 1.3,
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
+                        const SizedBox(height: 4),
 
-                    // CTA Pill Button
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 7),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(9999),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            banner.ctaText,
-                            style: GoogleFonts.outfit(
+                        // Subtitle
+                        ConstrainedBox(
+                          constraints: BoxConstraints(maxWidth: maxContentWidth),
+                          child: Text(
+                            banner.subtitle,
+                            style: GoogleFonts.inter(
                               fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: banner.gradientColors.first,
+                              color: Colors.white.withValues(alpha: 0.92),
+                              height: 1.3,
                             ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          const SizedBox(width: 4),
-                          Icon(
-                            Icons.arrow_forward_rounded,
-                            size: 14,
-                            color: banner.gradientColors.first,
+                        ),
+                        const SizedBox(height: 10),
+
+                        // CTA Pill Button
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 14, vertical: 7),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(9999),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.15),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                banner.ctaText,
+                                style: GoogleFonts.outfit(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: banner.gradientColors.first,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.arrow_forward_rounded,
+                                size: 14,
+                                color: banner.gradientColors.first,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

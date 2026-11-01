@@ -50,7 +50,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
         rating: '4.9',
         status: 'Preferred',
         statusBg: 'bg-emerald-100 text-[#15803d]',
-        accent: 'border-l-[#006837]',
+        accent: 'border-l-[#2d9d43]',
         lastDelivery: '2h ago',
         pendingPOs: 3,
         hasDelay: false,
@@ -62,7 +62,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
         rating: '4.7',
         status: 'Active',
         statusBg: 'bg-slate-100 text-[#475569]',
-        accent: 'border-l-[#006837]',
+        accent: 'border-l-[#2d9d43]',
         lastDelivery: 'Yesterday',
         pendingPOs: 0,
         hasDelay: false,
@@ -120,11 +120,11 @@ export default function SuppliersAndPurchaseOrdersPage() {
       {/* Stitch Header Title & Navigation Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
         <div className="flex items-center gap-3">
-          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#006837]">
+          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#2d9d43]">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-[#006837] tracking-tight">
+            <h1 className="text-2xl font-black text-[#2d9d43] tracking-tight">
               {activeTab === 'suppliers' ? 'Supplier Management' : 'Purchase Orders'}
             </h1>
             <p className="text-xs text-[#64748b] mt-0.5 font-medium">
@@ -139,7 +139,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
             <button
               onClick={() => setActiveTab('suppliers')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                activeTab === 'suppliers' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+                activeTab === 'suppliers' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
               }`}
             >
               Suppliers
@@ -147,7 +147,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
             <button
               onClick={() => setActiveTab('orders')}
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                activeTab === 'orders' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+                activeTab === 'orders' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
               }`}
             >
               Purchase Orders
@@ -158,7 +158,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
             <button
               onClick={() => setViewMode('web')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                viewMode === 'web' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+                viewMode === 'web' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
               }`}
             >
               <LayoutGrid className="w-3.5 h-3.5" />
@@ -167,7 +167,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
             <button
               onClick={() => setViewMode('mobile')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
-                viewMode === 'mobile' ? 'bg-[#006837] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
+                viewMode === 'mobile' ? 'bg-[#2d9d43] text-white shadow-sm' : 'text-[#64748b] hover:text-[#1e2923]'
               }`}
             >
               <Smartphone className="w-3.5 h-3.5" />
@@ -184,7 +184,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
           <div className="w-[390px] h-[840px] bg-[#f8fafc] rounded-[48px] border-[12px] border-[#1e2923] shadow-2xl overflow-hidden flex flex-col relative">
             {/* Phone Top Notch */}
             <div className="w-36 h-5 bg-[#1e2923] rounded-b-2xl mx-auto flex items-center justify-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#006837]/40" />
+              <div className="w-3 h-3 rounded-full bg-[#2d9d43]/40" />
             </div>
 
             {/* Mobile App Bar */}
@@ -194,7 +194,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
               ) : (
                 <ArrowLeft className="w-5 h-5 text-[#1e2923] cursor-pointer" />
               )}
-              <span className="font-extrabold text-base text-[#006837]">
+              <span className="font-extrabold text-base text-[#2d9d43]">
                 {activeTab === 'suppliers' ? 'Suppliers' : 'Daily Basket'}
               </span>
               <div className="flex items-center gap-2">
@@ -242,7 +242,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
                         onClick={() => setSupplierFilter(f)}
                         className={`px-3.5 py-1.5 rounded-full font-bold transition ${
                           supplierFilter === f
-                            ? 'bg-[#dce6fe] text-[#1e2923] border border-[#006837]'
+                            ? 'bg-[#dce6fe] text-[#1e2923] border border-[#2d9d43]'
                             : 'bg-white text-[#64748b] border border-[#e2e8f0]'
                         }`}
                       >
@@ -291,8 +291,8 @@ export default function SuppliersAndPurchaseOrdersPage() {
                   {/* Smart Insights Card */}
                   <div className="bg-[#e6f4ea] p-4 rounded-3xl border border-[#a7f3d0] space-y-3">
                     <div className="flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-[#006837]" />
-                      <h4 className="font-black text-sm text-[#006837]">Smart Insights</h4>
+                      <Sparkles className="w-4 h-4 text-[#2d9d43]" />
+                      <h4 className="font-black text-sm text-[#2d9d43]">Smart Insights</h4>
                     </div>
 
                     <div className="bg-white p-3.5 rounded-2xl border border-[#e2e8f0] space-y-2">
@@ -314,7 +314,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
                   {/* Floating Action Button */}
                   <button
                     onClick={() => setActiveModal('New Supplier')}
-                    className="absolute bottom-4 right-4 w-12 h-12 bg-[#006837] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#00522b]"
+                    className="absolute bottom-4 right-4 w-12 h-12 bg-[#2d9d43] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#078730]"
                   >
                     <Plus className="w-6 h-6" />
                   </button>
@@ -324,7 +324,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
                 <>
                   {/* AI Purchase Insight Banner */}
                   <div className="bg-[#f0f7ff] p-4 rounded-3xl border border-[#dce6fe] flex items-start gap-3">
-                    <Sparkles className="w-5 h-5 text-[#006837] shrink-0 mt-0.5" />
+                    <Sparkles className="w-5 h-5 text-[#2d9d43] shrink-0 mt-0.5" />
                     <div>
                       <h4 className="font-bold text-xs text-[#1e2923]">AI Purchase Insight</h4>
                       <p className="text-[11px] text-[#334155] leading-snug mt-1">{poData.aiPurchaseInsight}</p>
@@ -376,7 +376,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
                         onClick={() => setPoFilter(f)}
                         className={`px-4 py-1.5 rounded-full font-bold transition shrink-0 ${
                           poFilter === f
-                            ? 'bg-[#006837] text-white shadow-sm'
+                            ? 'bg-[#2d9d43] text-white shadow-sm'
                             : 'bg-white text-[#64748b] border border-[#e2e8f0]'
                         }`}
                       >
@@ -398,7 +398,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
                               {po.status}
                             </span>
                           </div>
-                          <span className="font-black text-lg text-[#006837]">{po.amount}</span>
+                          <span className="font-black text-lg text-[#2d9d43]">{po.amount}</span>
                         </div>
 
                         <p className="text-xs text-[#64748b]">{po.supplier}</p>
@@ -407,7 +407,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
                         </p>
 
                         <div className="w-full h-1.5 bg-[#f1f5f9] rounded-full overflow-hidden">
-                          <div className="h-full bg-[#006837]" style={{ width: `${po.progress}%` }} />
+                          <div className="h-full bg-[#2d9d43]" style={{ width: `${po.progress}%` }} />
                         </div>
 
                         <div className="flex gap-2 pt-1">
@@ -419,7 +419,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
                           </button>
                           <button
                             onClick={() => setActiveModal(po.action2Label)}
-                            className="flex-1 py-2.5 bg-[#006837] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-1 hover:bg-[#00522b]"
+                            className="flex-1 py-2.5 bg-[#2d9d43] text-white text-xs font-bold rounded-2xl flex items-center justify-center gap-1 hover:bg-[#078730]"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" /> {po.action2Label}
                           </button>
@@ -431,7 +431,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
                   {/* Floating Action Button */}
                   <button
                     onClick={() => setActiveModal('New PO')}
-                    className="absolute bottom-4 right-4 w-12 h-12 bg-[#006837] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#00522b]"
+                    className="absolute bottom-4 right-4 w-12 h-12 bg-[#2d9d43] text-white rounded-full flex items-center justify-center shadow-lg hover:bg-[#078730]"
                   >
                     <Plus className="w-6 h-6" />
                   </button>
@@ -445,9 +445,9 @@ export default function SuppliersAndPurchaseOrdersPage() {
               <div className="flex flex-col items-center gap-0.5"><ShoppingBag className="w-4 h-4" /> Orders</div>
               <div className="flex flex-col items-center gap-0.5"><Package className="w-4 h-4" /> Inventory</div>
               {activeTab === 'suppliers' ? (
-                <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#006837] text-white rounded-2xl"><Store className="w-4 h-4" /> Suppliers</div>
+                <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#2d9d43] text-white rounded-2xl"><Store className="w-4 h-4" /> Suppliers</div>
               ) : (
-                <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#006837] text-white rounded-2xl"><ShoppingCart className="w-4 h-4" /> Purchase</div>
+                <div className="flex flex-col items-center gap-0.5 px-3 py-1 bg-[#2d9d43] text-white rounded-2xl"><ShoppingCart className="w-4 h-4" /> Purchase</div>
               )}
               <div className="flex flex-col items-center gap-0.5"><BarChart3 className="w-4 h-4" /> Analytics</div>
             </div>
@@ -511,8 +511,8 @@ export default function SuppliersAndPurchaseOrdersPage() {
                 {/* Smart Insights */}
                 <div className="bg-[#e6f4ea] p-6 rounded-3xl border border-[#a7f3d0] space-y-4">
                   <div className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-[#006837]" />
-                    <h3 className="font-black text-base text-[#006837]">Smart Insights</h3>
+                    <Sparkles className="w-5 h-5 text-[#2d9d43]" />
+                    <h3 className="font-black text-base text-[#2d9d43]">Smart Insights</h3>
                   </div>
 
                   <div className="bg-white p-5 rounded-2xl border border-[#e2e8f0] space-y-3">
@@ -534,7 +534,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
               <div className="lg:col-span-12 space-y-6">
                 <div className="bg-[#f0f7ff] p-6 rounded-3xl border border-[#dce6fe] flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Sparkles className="w-6 h-6 text-[#006837]" />
+                    <Sparkles className="w-6 h-6 text-[#2d9d43]" />
                     <div>
                       <h3 className="font-bold text-sm text-[#1e2923]">AI Purchase Insight</h3>
                       <p className="text-xs text-[#334155] mt-0.5">{poData.aiPurchaseInsight}</p>
@@ -550,7 +550,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
                       <div key={po.id} className="p-5 bg-[#f8fafc] rounded-2xl border border-[#e2e8f0] space-y-3">
                         <div className="flex justify-between items-center">
                           <span className="font-black text-lg text-[#1e2923]">{po.id}</span>
-                          <span className="font-black text-xl text-[#006837]">{po.amount}</span>
+                          <span className="font-black text-xl text-[#2d9d43]">{po.amount}</span>
                         </div>
                         <p className="text-xs text-[#64748b]">{po.supplier}</p>
                       </div>
@@ -571,7 +571,7 @@ export default function SuppliersAndPurchaseOrdersPage() {
             <p className="text-xs text-[#64748b]">Executing action &quot;{activeModal}&quot; for supplier ecosystem.</p>
             <button
               onClick={() => setActiveModal(null)}
-              className="w-full py-3 bg-[#006837] text-white font-bold text-xs rounded-2xl hover:bg-[#00522b]"
+              className="w-full py-3 bg-[#2d9d43] text-white font-bold text-xs rounded-2xl hover:bg-[#078730]"
             >
               Close Modal
             </button>

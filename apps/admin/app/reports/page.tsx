@@ -18,11 +18,11 @@ export default function ReportsCenterPage() {
     <div className="max-w-4xl mx-auto space-y-6 font-sans">
       <div className="flex items-center justify-between bg-white p-5 rounded-3xl border border-[#e2e8f0] shadow-sm">
         <div className="flex items-center gap-3">
-          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#006837]">
+          <button className="p-2 rounded-xl hover:bg-[#f1f5f9] transition text-[#2d9d43]">
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
-            <h1 className="text-2xl font-black text-[#006837]">Reports &amp; Analytics Center</h1>
+            <h1 className="text-2xl font-black text-[#2d9d43]">Reports &amp; Analytics Center</h1>
             <p className="text-xs text-[#64748b] mt-0.5">Google Stitch Screen ID: 744f3887c5604ad183aca8a23d31dcb8</p>
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function ReportsCenterPage() {
                   </div>
                 </div>
 
-                <button className="p-2.5 bg-[#006837] text-white rounded-xl hover:bg-[#00522b] transition">
+                <button className="p-2.5 bg-[#2d9d43] text-white rounded-xl hover:bg-[#078730] transition">
                   <Download className="w-4 h-4" />
                 </button>
               </div>
