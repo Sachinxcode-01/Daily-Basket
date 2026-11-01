@@ -1037,15 +1037,15 @@ export class AuthService {
   private async recordOtpAttempt(identifier: string, ipAddress: string) {
     try {
       await this.prisma.$transaction([
-        this.prisma.otpVerification.update({
+        this.prisma.otpVerification.updateMany({
           where: { identifier: `__ip__${ipAddress}__` },
           data: { otpCountThisHour: { increment: 1 } },
         }),
-        this.prisma.otpVerification.update({
+        this.prisma.otpVerification.updateMany({
           where: { identifier: `__ip__${ipAddress}__` },
           data: { otpCountToday: { increment: 1 } },
         }),
-        this.prisma.otpVerification.update({
+        this.prisma.otpVerification.updateMany({
           where: { identifier },
           data: { otpCountToday: { increment: 1 } },
         }),

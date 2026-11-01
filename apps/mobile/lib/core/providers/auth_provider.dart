@@ -82,7 +82,8 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return res;
       } else {
-        _errorMessage = res['error'] ?? res['message'] ?? 'Invalid credentials.';
+        _errorMessage =
+            res['error'] ?? res['message'] ?? 'Invalid credentials.';
         _isLoading = false;
         notifyListeners();
         return res;
@@ -118,7 +119,8 @@ class AuthProvider extends ChangeNotifier {
 
       _isLoading = false;
       if (res['success'] != true) {
-        _errorMessage = res['error'] ?? res['message'] ?? 'Registration failed.';
+        _errorMessage =
+            res['error'] ?? res['message'] ?? 'Registration failed.';
       }
       notifyListeners();
       return res;
@@ -139,7 +141,8 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final googleSignIn = GoogleSignIn(
-        serverClientId: '495128932178-rk6883ftg533bjl6767ifu8j3o1mbfoa.apps.googleusercontent.com',
+        serverClientId:
+            '495128932178-rk6883ftg533bjl6767ifu8j3o1mbfoa.apps.googleusercontent.com',
         scopes: ['email', 'profile'],
       );
       final account = await googleSignIn.signIn();
@@ -179,10 +182,12 @@ class AuthProvider extends ChangeNotifier {
 
     try {
       final res = await _apiClient.post('/auth/google-login', {
-        'idToken': idToken ?? 'google_id_token_${DateTime.now().millisecondsSinceEpoch}',
+        'idToken': idToken ??
+            'google_id_token_${DateTime.now().millisecondsSinceEpoch}',
         'email': email.trim().toLowerCase(),
         'name': name ?? (email.split('@').first.replaceAll('.', ' ')),
-        'avatarUrl': avatarUrl ?? 'https://lh3.googleusercontent.com/a/default-user',
+        'avatarUrl':
+            avatarUrl ?? 'https://lh3.googleusercontent.com/a/default-user',
         'platform': 'MOBILE_APP',
       });
 
@@ -209,7 +214,8 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return res;
       } else {
-        _errorMessage = res['error'] ?? res['message'] ?? 'Google sign-in failed.';
+        _errorMessage =
+            res['error'] ?? res['message'] ?? 'Google sign-in failed.';
         _isLoading = false;
         notifyListeners();
         return res;
@@ -235,7 +241,9 @@ class AuthProvider extends ChangeNotifier {
 
       _isLoading = false;
       if (res['success'] != true) {
-        _errorMessage = res['error'] ?? res['message'] ?? 'Failed to send verification code.';
+        _errorMessage = res['error'] ??
+            res['message'] ??
+            'Failed to send verification code.';
       }
       notifyListeners();
       return res;
@@ -262,15 +270,22 @@ class AuthProvider extends ChangeNotifier {
       final payload = <String, dynamic>{
         'newPass': newPass,
       };
-      if (token != null && token.isNotEmpty) payload['token'] = token.trim();
-      if (otp != null && otp.isNotEmpty) payload['otp'] = otp.trim();
-      if (email != null && email.isNotEmpty) payload['email'] = email.trim().toLowerCase();
+      if (token != null && token.isNotEmpty) {
+        payload['token'] = token.trim();
+      }
+      if (otp != null && otp.isNotEmpty) {
+        payload['otp'] = otp.trim();
+      }
+      if (email != null && email.isNotEmpty) {
+        payload['email'] = email.trim().toLowerCase();
+      }
 
       final res = await _apiClient.post('/auth/reset-password', payload);
 
       _isLoading = false;
       if (res['success'] != true) {
-        _errorMessage = res['error'] ?? res['message'] ?? 'Password reset failed.';
+        _errorMessage =
+            res['error'] ?? res['message'] ?? 'Password reset failed.';
       }
       notifyListeners();
       return res;
@@ -295,7 +310,8 @@ class AuthProvider extends ChangeNotifier {
 
       _isLoading = false;
       if (res['success'] != true) {
-        _errorMessage = res['error'] ?? res['message'] ?? 'Email verification failed.';
+        _errorMessage =
+            res['error'] ?? res['message'] ?? 'Email verification failed.';
       }
       notifyListeners();
       return res;
@@ -308,7 +324,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// 7. Request Phone OTP
-  Future<Map<String, dynamic>> requestPhoneOtp(String phone, [String type = 'LOGIN']) async {
+  Future<Map<String, dynamic>> requestPhoneOtp(String phone,
+      [String type = 'LOGIN']) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -382,7 +399,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   /// 9. Request 6-digit Email OTP
-  Future<Map<String, dynamic>> sendEmailOtp(String email, [String type = 'LOGIN']) async {
+  Future<Map<String, dynamic>> sendEmailOtp(String email,
+      [String type = 'LOGIN']) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
@@ -395,7 +413,8 @@ class AuthProvider extends ChangeNotifier {
 
       _isLoading = false;
       if (res['success'] != true) {
-        _errorMessage = res['error'] ?? res['message'] ?? 'Failed to dispatch email OTP.';
+        _errorMessage =
+            res['error'] ?? res['message'] ?? 'Failed to dispatch email OTP.';
       }
       notifyListeners();
       return res;
@@ -423,7 +442,8 @@ class AuthProvider extends ChangeNotifier {
         'platform': 'MOBILE_APP',
       });
 
-      final tokens = res['tokens'] is Map<String, dynamic> ? res['tokens'] : null;
+      final tokens =
+          res['tokens'] is Map<String, dynamic> ? res['tokens'] : null;
       final token = res['accessToken'] ?? tokens?['accessToken'];
       final refresh = res['refreshToken'] ?? tokens?['refreshToken'];
 
@@ -446,7 +466,8 @@ class AuthProvider extends ChangeNotifier {
         notifyListeners();
         return {'success': true, ...res};
       } else {
-        _errorMessage = res['error'] ?? res['message'] ?? 'Invalid or expired OTP code.';
+        _errorMessage =
+            res['error'] ?? res['message'] ?? 'Invalid or expired OTP code.';
         _isLoading = false;
         notifyListeners();
         return res;
