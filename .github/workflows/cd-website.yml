@@ -40,7 +40,10 @@ jobs:
           cache: 'pnpm'
 
       - name: Install Dependencies
-        run: pnpm install --frozen-lockfile --prod=false
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Shared Packages
+        run: pnpm --filter "@daily-basket/*" run build
 
       - name: Lint Customer Website
         run: pnpm --filter website run lint
