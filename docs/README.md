@@ -23,9 +23,11 @@ Welcome to the **Daily Basket Enterprise Documentation Hub**. This matrix provid
 - 📊 [`docs/ERD.md`](ERD.md) — Entity Relationship Diagrams & Database Constraints
 - 🔐 [`docs/AUTHENTICATION.md`](AUTHENTICATION.md) — Phone OTP, JWT Rotation, Google OAuth, TOTP MFA, & Biometrics
 - 🛡️ [`docs/SECURITY_ARCHITECTURE.md`](SECURITY_ARCHITECTURE.md) — RBAC, Throttling, Helmet, Security Audit Logs, & AES-256
+- 🔍 [`docs/AUTHENTICATION_HARDENING_AUDIT.md`](AUTHENTICATION_HARDENING_AUDIT.md) — Auth Security Hardening Audit & Vulnerability Remediation
 
 ### 4. Intelligence & Real-time Subsystems
 - 🤖 [`docs/AI.md`](AI.md) — Multi-Provider AI Engine (Gemini, Grok, OpenRouter, Local AI, Fallbacks, & Tools)
+- 🎙️ [`docs/VOICE_SHOPPING.md`](VOICE_SHOPPING.md) — Voice-Assisted Grocery Shopping & Audio Transcription Architecture
 - ⚡ [`docs/REALTIME.md`](REALTIME.md) — Real-time Socket.IO WebSockets & Telemetry Gateways
 - 💬 [`docs/SOCKETS.md`](SOCKETS.md) — WebSocket Event Payload Dictionary & Connection Protocols
 - 📦 [`docs/REDIS.md`](REDIS.md) — Redis 7 Caching Strategy, Key Namespaces, Pub/Sub, & Session Store
@@ -40,10 +42,10 @@ Welcome to the **Daily Basket Enterprise Documentation Hub**. This matrix provid
 - 🛵 [`docs/DELIVERY_APP.md`](DELIVERY_APP.md) — Delivery Partner PWA, GPS Telemetry, & Doorstep OTP
 
 ### 6. Business Domain Feature Guides
-- 🍎 [`docs/features/PRODUCTS.md`](features/PRODUCTS.md) — Catalog Taxonomy, Categories, Keywords, & Brand Aliases
-- 📦 [`docs/features/INVENTORY.md`](features/INVENTORY.md) — Dark Store Inventory Stock Allocation & Low-Stock Alerts
-- 💳 [`docs/features/PAYMENTS.md`](features/PAYMENTS.md) — Razorpay Payment Gateway, HMAC Webhooks, & Wallet Ledger
-- 🔔 [`docs/features/NOTIFICATIONS.md`](features/NOTIFICATIONS.md) — Push Notifications, SMS OTP, Email, & Alert Feeds
+- 🍎 [`docs/feature-domains/PRODUCTS.md`](feature-domains/PRODUCTS.md) — Catalog Taxonomy, Categories, Keywords, & Brand Aliases
+- 📦 [`docs/feature-domains/INVENTORY.md`](feature-domains/INVENTORY.md) — Dark Store Inventory Stock Allocation & Low-Stock Alerts
+- 💳 [`docs/feature-domains/PAYMENTS.md`](feature-domains/PAYMENTS.md) — Razorpay Payment Gateway, HMAC Webhooks, & Wallet Ledger
+- 🔔 [`docs/feature-domains/NOTIFICATIONS.md`](feature-domains/NOTIFICATIONS.md) — Push Notifications, SMS OTP, Email, & Alert Feeds
 
 ### 7. DevOps, Setup & Testing
 - 🐳 [`docs/DEPLOYMENT.md`](DEPLOYMENT.md) — Production Deployment Specs (Docker, Compose, NGINX, K8s)

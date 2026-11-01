@@ -828,6 +828,8 @@ export class AuthService {
     return sessions.map((s, index) => ({
       id: s.id,
       device: `${s.deviceName || 'Device'} (${s.platform || 'Client'})`,
+      // NOTE: Fallback IP and location default to Karnataka/Bengaluru primary deployment zone.
+      // For multi-region/international expansion, integrate MaxMind GeoLite2 or Cloudflare CF-IPCountry headers.
       ip: s.ipAddress || '157.34.12.8',
       location: s.location || 'Bengaluru, India',
       isCurrent: index === 0,
@@ -946,6 +948,11 @@ export class AuthService {
     throw new BadRequestException('Passkey authentication is disabled. Not yet implemented.');
   }
 
+  /**
+   * Evaluates device & connection risk.
+   * NOTE: Default IP classification assumes Bengaluru / Indian ISP ranges and private subnets.
+   * For multi-region or cross-border deployments, connect to GeoIP service / AWS CloudFront viewer headers.
+   */
   async evaluateDeviceRisk(userId: string, deviceId: string, ipAddress: string, platform: string) {
     const isKnownIp = ipAddress.startsWith('127.') || ipAddress.startsWith('192.168.') || ipAddress.startsWith('10.');
     const riskScore = isKnownIp ? 0.05 : 0.45;

@@ -54,12 +54,26 @@ timeline
 - [x] Doorstep OTP verification (`4821`) before marking orders delivered.
 - [x] Earnings ledger breakdown (base pay + incentives + order count).
 
-### ⚙️ Backend Microservices (`services/api`)
+### ⚙️ Backend API Microservices (`services/api`)
 - [x] NestJS API Gateway with JWT rotation, RBAC guards, Helmet, Throttler rate limiting.
 - [x] PostgreSQL 16 database managed via Prisma ORM 5.
 - [x] Multi-provider LLM engine (Gemini primary, Grok/OpenRouter/Local failover).
 - [x] Razorpay payment integration with HMAC SHA-256 signature verification.
 - [x] Redis 7 caching, BullMQ job queues, dual Socket.IO gateways.
+
+---
+
+## 🏷️ Standardized Monorepo Scope Prefixes
+
+All commits, pull requests, and changelog entries follow standard conventional scopes:
+- `api`: Backend NestJS microservices (`services/api`) — *standardized from legacy `(backend)`*
+- `mobile`: Flutter customer mobile application (`apps/mobile`)
+- `admin`: Store admin Next.js dashboard (`apps/admin`)
+- `admin-mobile`: Flutter store admin companion (`apps/daily_basket_admin`)
+- `delivery`: Delivery partner Next.js PWA (`apps/delivery`)
+- `website`: Customer Next.js storefront (`apps/website`)
+- `packages`: Shared libraries (`packages/*`)
+- `docs`: Documentation and architecture specifications (`docs/*`)
 
 ---
 

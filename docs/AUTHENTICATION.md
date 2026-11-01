@@ -169,3 +169,18 @@ Health diagnostic endpoint providing real-time telemetry on Firebase credentials
 - **OTP Throttling**: 60-second re-request cooldown enforced via Redis keys (`otp:cooldown:<phone>`).
 - **Audit Logging**: Every authentication event (`LOGIN_GOOGLE_OAUTH`, `LOGIN_PASSWORD`, `VERIFY_OTP`, `PASSWORD_RESET`, `MFA_ENABLED`) is immutably logged into `SecurityAuditLog`.
 - **Zero Egress PII**: Sensitive credentials and private keys are excluded from git and versioned through secure environment pipelines.
+
+---
+
+## 🌐 4. Multi-Region Deployment & Rate Limiting Architecture
+
+### Shared OTP Rate Limit Bucket
+OTP requests across `forgotPassword` and login `checkOtpRateLimit` resolve against a shared identifier bucket (`normalizedEmail` or E.164 phone number) in Redis and PostgreSQL (`otpVerification` table).
+- **Design Rationale**: A single shared bucket prevents split-channel amplification attacks where an adversary attempts simultaneous credential brute-forcing via login OTP and password recovery flows.
+- **Operational Impact**: A user triggering multiple password reset OTPs will consume their allocation within the shared window; client applications display unified cooldown counters (`60s` retry cooldown).
+
+### Regional IP & Device Risk Assumptions
+Device risk scoring in `AuthService.evaluateDeviceRisk` currently benchmarks against Karnataka/Bengaluru primary hyper-local dark store operations:
+- **Private & Local Ranges**: `127.0.0.0/8`, `192.168.0.0/16`, `10.0.0.0/8` are categorized as low-risk (score: `0.05`).
+- **Default ISP / Location**: Unresolved or edge client IPs fall back to Bengaluru (`157.34.12.8`, `Bengaluru, India`) representing dark store hub centroids.
+- **Multi-Country Expansion Path**: When provisioning hubs outside India, configure MaxMind GeoLite2 database or upstream edge headers (`CF-IPCountry`, `X-Forwarded-Country`) to dynamically set regional risk thresholds rather than static Indian ISP fallbacks.

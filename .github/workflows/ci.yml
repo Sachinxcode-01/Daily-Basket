@@ -60,6 +60,33 @@ jobs:
       - name: Lint API
         run: pnpm --filter api run lint
 
+      - name: Validate Module Import Casing
+        run: |
+          node -e '
+            const fs = require("fs");
+            const path = require("path");
+            const content = fs.readFileSync("services/api/src/app.module.ts", "utf8");
+            const re = /import\s+[^;]+from\s+[\x27"]([^"]+)[\x27"]/g;
+            let m, errors = 0;
+            while ((m = re.exec(content))) {
+              const spec = m[1];
+              if (spec.startsWith(".")) {
+                const full = path.resolve("services/api/src", spec + ".ts");
+                const dir = path.dirname(full);
+                const file = path.basename(full);
+                if (fs.existsSync(dir)) {
+                  const actual = fs.readdirSync(dir);
+                  if (!actual.includes(file)) {
+                    console.error("Case mismatch or missing file in app.module.ts import:", spec);
+                    errors++;
+                  }
+                }
+              }
+            }
+            if (errors > 0) process.exit(1);
+            console.log("app.module.ts import casing check passed.");
+          '
+
       - name: Typecheck Website
         run: pnpm --filter website run typecheck
 
