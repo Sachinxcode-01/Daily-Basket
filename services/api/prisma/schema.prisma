@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -1354,14 +1353,33 @@ model InAppNotification {
   @@map("in_app_notifications")
 }
 
+model DailyMessageCampaign {
+  id               String               @id @default(uuid())
+  title            String
+  body             String
+  contentHash      String?              @map("content_hash")
+  audienceRole     String               @default("CUSTOMER") @map("audience_role")
+  enabled          Boolean              @default(true)
+  segmentOverrides Json?                @map("segment_overrides")
+  createdAt        DateTime             @default(now()) @map("created_at")
+  updatedAt        DateTime             @updatedAt @map("updated_at")
 
+  outboxRows       DailyMessageOutbox[]
 
+  @@map("daily_message_campaigns")
+}
 
+model DailyMessageOutbox {
+  id          String               @id @default(uuid())
+  campaignId  String               @map("campaign_id")
+  campaign    DailyMessageCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  userId      String               @map("user_id")
+  status      String               @default("PENDING")
+  deliveredAt DateTime?            @map("delivered_at")
+  createdAt   DateTime             @default(now()) @map("created_at")
 
-
-
-
-
-
-
+  @@index([userId, status])
+  @@index([createdAt])
+  @@map("daily_message_outbox")
+}
 

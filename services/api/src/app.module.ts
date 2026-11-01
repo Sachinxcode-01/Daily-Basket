@@ -64,6 +64,7 @@ import { WishlistModule } from './modules/wishlist/wishlist.module';
 import { AdminDashboardModule } from './modules/admin/dashboard/admin-dashboard.module';
 import { BotDetectionMiddleware } from './common/middleware/bot-detection.middleware';
 
+import { DailyMessagesModule } from './modules/daily-messages/daily-messages.module';
 @Module({
   imports: [
     CartModule,
@@ -122,6 +123,7 @@ import { BotDetectionMiddleware } from './common/middleware/bot-detection.middle
     RecentlyViewedModule,
     RecommendationModule,
     WishlistModule,
+    DailyMessagesModule,
   ],
 
   providers: [

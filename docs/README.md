@@ -19,6 +19,10 @@ Welcome to the **Daily Basket Enterprise Documentation Hub**. This matrix provid
 ### 3. API, Database & Security
 - 🔌 [`docs/API.md`](API.md) — Complete NestJS REST Endpoint Directory with DTOs & Validation Schemas
 - 📄 [`docs/OPENAPI.md`](OPENAPI.md) — Swagger UI Setup & OpenAPI 3.0 Contract Specification
+- 📊 [`DATA-MODEL.md`](../DATA-MODEL.md) — Enterprise Data Entities, Relationships & Relational Topologies
+- 🧱 [`SCHEMA.md`](../SCHEMA.md) — PostgreSQL 16 Tables, Columns, Data Types, Constraints & Indexes Reference
+- 🔄 [`MIGRATIONS.md`](../MIGRATIONS.md) — Prisma Migration Logs, Rollback Protocols & Zero-Downtime Workflows
+- 🔐 [`RLS-POLICIES.md`](../RLS-POLICIES.md) — PostgreSQL Row-Level Security Rules, Multi-Tenant Boundaries & Auditing
 - 🗄️ [`docs/DATABASE.md`](DATABASE.md) — PostgreSQL Database Schema & Prisma Models Reference
 - 📊 [`docs/ERD.md`](ERD.md) — Entity Relationship Diagrams & Database Constraints
 - 🔐 [`docs/AUTHENTICATION.md`](AUTHENTICATION.md) — Phone OTP, JWT Rotation, Google OAuth, TOTP MFA, & Biometrics
@@ -46,6 +50,7 @@ Welcome to the **Daily Basket Enterprise Documentation Hub**. This matrix provid
 - 📦 [`docs/feature-domains/INVENTORY.md`](feature-domains/INVENTORY.md) — Dark Store Inventory Stock Allocation & Low-Stock Alerts
 - 💳 [`docs/feature-domains/PAYMENTS.md`](feature-domains/PAYMENTS.md) — Razorpay Payment Gateway, HMAC Webhooks, & Wallet Ledger
 - 🔔 [`docs/feature-domains/NOTIFICATIONS.md`](feature-domains/NOTIFICATIONS.md) — Push Notifications, SMS OTP, Email, & Alert Feeds
+- 📢 [`docs/feature-domains/DAILY_MESSAGES.md`](feature-domains/DAILY_MESSAGES.md) — Automated 08:00 Daily Marketing Loop, Campaigns & Cohort Push Dispatch
 
 ### 7. DevOps, Setup & Testing
 - 🐳 [`docs/DEPLOYMENT.md`](DEPLOYMENT.md) — Production Deployment Specs (Docker, Compose, NGINX, K8s)
