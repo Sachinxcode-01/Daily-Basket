@@ -48,10 +48,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   void _recalculate() {
-    final cartProvider = Provider.of<CartProvider>(context, listen: false);
-    final checkoutProvider = Provider.of<CheckoutProvider>(context, listen: false);
+    CartProvider? cartProvider;
+    CheckoutProvider? checkoutProvider;
+    try {
+      cartProvider = Provider.of<CartProvider>(context, listen: false);
+    } catch (_) {}
+    try {
+      checkoutProvider = Provider.of<CheckoutProvider>(context, listen: false);
+    } catch (_) {}
 
-    List<CartItem> items = cartProvider.items;
+    if (checkoutProvider == null) return;
+
+    List<CartItem> items = cartProvider?.items ?? [];
     if (items.isEmpty) {
       items = [
         CartItem(id: 'b1', name: 'Organic Whole Milk', subtitle: '1 Litre Bottle', price: 3.50, qty: 1, image: ''),
@@ -70,8 +78,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       cartProvider = context.watch<CartProvider>();
     } catch (_) {}
 
-    final checkoutProvider = context.watch<CheckoutProvider>();
-    final couponProvider = context.watch<CouponProvider>();
+    CheckoutProvider? checkoutProvider;
+    try {
+      checkoutProvider = context.watch<CheckoutProvider>();
+    } catch (_) {}
+
+    CouponProvider? couponProvider;
+    try {
+      couponProvider = context.watch<CouponProvider>();
+    } catch (_) {}
 
     List<CartItem> items = (cartProvider != null && !cartProvider.isEmpty)
         ? cartProvider.items
@@ -81,15 +96,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             CartItem(id: 'b3', name: 'Premium Bananas', subtitle: 'Bunch of 4-5', price: 2.80, qty: 1, image: 'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=200&q=80'),
           ];
 
-    final pricing = checkoutProvider.pricing;
+    final pricing = checkoutProvider?.pricing;
 
     final double subtotal = pricing?.subtotal ?? items.fold(0.0, (sum, i) => sum + (i.price * i.qty));
-    final double couponDiscount = pricing?.couponDiscount ?? couponProvider.calculateDiscount(subtotal);
+    final double couponDiscount = pricing?.couponDiscount ?? (couponProvider?.calculateDiscount(subtotal) ?? 0.0);
     final double deliveryFee = pricing?.deliveryFee ?? (subtotal >= 199 ? 0.0 : 25.0);
     final double platformFee = pricing?.platformFee ?? (subtotal > 0 ? 3.0 : 0.0);
     final double packagingFee = pricing?.packagingFee ?? (subtotal > 0 ? 5.0 : 0.0);
     final double totalGst = pricing?.totalGst ?? (subtotal * 0.05);
-    final double walletDeducted = pricing?.walletDeducted ?? (checkoutProvider.useWallet ? 150.0 : 0.0);
+    final double walletDeducted = pricing?.walletDeducted ?? ((checkoutProvider?.useWallet ?? false) ? 150.0 : 0.0);
     final double grandTotal = pricing?.grandTotal ?? (subtotal + deliveryFee + platformFee + packagingFee + totalGst - couponDiscount);
     final double finalPayable = pricing?.finalPayable ?? (grandTotal - walletDeducted).clamp(0.0, double.infinity);
 
@@ -166,7 +181,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 ),
                                 DropdownButtonHideUnderline(
                                   child: DropdownButton<String>(
-                                    value: _selectedSlot,
+                                    value: _deliverySlots.contains(_selectedSlot) ? _selectedSlot : _deliverySlots.first,
                                     isExpanded: true,
                                     icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
                                     style: GoogleFonts.outfit(
@@ -177,7 +192,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     onChanged: (val) {
                                       if (val != null) {
                                         setState(() => _selectedSlot = val);
-                                        checkoutProvider.setDeliverySlot(val);
+                                        checkoutProvider?.setDeliverySlot(val);
                                         _recalculate();
                                       }
                                     },
@@ -379,32 +394,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             onPressed: () {
                               final code = _couponCtrl.text.trim();
                               if (code.isNotEmpty) {
-                                checkoutProvider.setCoupon(code);
+                                checkoutProvider?.setCoupon(code);
                                 _recalculate();
                               }
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
+                              minimumSize: const Size(84, 44),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                             ),
                             child: Text('APPLY', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white)),
                           ),
                         ],
                       ),
-                      if (checkoutProvider.appliedCouponCode != null) ...[
+                      if (checkoutProvider?.appliedCouponCode != null) ...[
                         const SizedBox(height: 8),
                         Row(
                           children: [
                             const Icon(Icons.check_circle_rounded, color: AppColors.primary, size: 16),
                             const SizedBox(width: 6),
                             Text(
-                              'Coupon "${checkoutProvider.appliedCouponCode}" Applied!',
+                              'Coupon "${checkoutProvider!.appliedCouponCode}" Applied!',
                               style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.primary),
                             ),
                             const Spacer(),
                             GestureDetector(
                               onTap: () {
-                                checkoutProvider.setCoupon(null);
+                                checkoutProvider?.setCoupon(null);
                                 _couponCtrl.clear();
                                 _recalculate();
                               },
@@ -417,9 +434,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       Material(
                         color: Colors.transparent,
                         child: SwitchListTile(
-                          value: checkoutProvider.useWallet,
+                          value: checkoutProvider?.useWallet ?? false,
                           onChanged: (val) {
-                            checkoutProvider.toggleWallet(val);
+                            checkoutProvider?.toggleWallet(val);
                             _recalculate();
                           },
                           title: Text(
@@ -542,7 +559,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                checkoutProvider.selectedPaymentMethod,
+                                checkoutProvider?.selectedPaymentMethod ?? 'UPI',
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -563,43 +580,45 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => PaymentScreen(
-                              totalAmount: finalPayable,
-                              itemQuantity: items.length,
+                    SizedBox(
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => PaymentScreen(
+                                totalAmount: finalPayable,
+                                itemQuantity: items.length,
+                              ),
                             ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(140, 48),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'PROCEED TO PAY',
+                              style: GoogleFonts.outfit(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            const Icon(Icons.arrow_forward_rounded, size: 18),
+                          ],
                         ),
                       ),
-                      child: Row(
-                        children: [
-                          Text(
-                            'PROCEED TO PAY',
-                            style: GoogleFonts.outfit(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(width: 6),
-                          const Icon(Icons.arrow_forward_rounded, size: 18),
-                        ],
-                      ),
                     ),
-                  ),
                 ],
               ),
             ),

@@ -129,7 +129,8 @@ class CheckoutProvider extends ChangeNotifier {
     if (WidgetsBinding.instance.lifecycleState != null) {
       try {
         final client = HttpClient();
-        final request = await client.postUrl(Uri.parse('$baseUrl/orders/calculate'));
+        client.connectionTimeout = const Duration(seconds: 2);
+        final request = await client.postUrl(Uri.parse('$baseUrl/orders/calculate')).timeout(const Duration(seconds: 2));
         request.headers.set('content-type', 'application/json');
         request.write(jsonEncode({
           'items': itemsPayload,
@@ -139,7 +140,7 @@ class CheckoutProvider extends ChangeNotifier {
           'deliverySlot': _selectedSlot,
           'userWalletBalance': _userWalletBalance,
         }));
-        final response = await request.close();
+        final response = await request.close().timeout(const Duration(seconds: 2));
 
         if (response.statusCode == 200) {
           final bodyStr = await response.transform(utf8.decoder).join();
