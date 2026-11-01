@@ -21,7 +21,7 @@ jobs:
     permissions:
       contents: read
     env:
-      NEXT_TELEMETRY_DISABLED: '1'
+      NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -90,7 +90,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -112,7 +112,7 @@ jobs:
     permissions:
       contents: read
     env:
-      NEXT_TELEMETRY_DISABLED: '1'
+      NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -126,7 +126,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
@@ -164,13 +164,13 @@ jobs:
       - name: Setup Java SDK
         uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: '17'
+          distribution: "zulu"
+          java-version: "17"
 
       - name: Setup Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
+          channel: "stable"
           cache: true
 
       - name: Install Flutter Dependencies
@@ -183,7 +183,7 @@ jobs:
 
       - name: Run Flutter Tests
         env:
-          FLUTTER_TEST: 'true'
+          FLUTTER_TEST: "true"
         run: |
           set -o pipefail
           flutter test --reporter=expanded 2>&1 | tee test_log.txt
@@ -205,7 +205,7 @@ jobs:
         if: always()
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          LOG_TITLE: 'Flutter CI Test Log'
+          LOG_TITLE: "Flutter CI Test Log"
         run: node .github/scripts/post-log.js
 
       - name: Upload Test Log Artifact
