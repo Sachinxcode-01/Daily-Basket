@@ -140,7 +140,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final notificationsEnabled = notificationProvider?.notificationsEnabled ?? true;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: const AppNavigationDrawer(isDrawer: true),
       bottomNavigationBar: widget.isEmbedded ? null : const AppBottomNav(currentIndex: 5),
       body: SafeArea(

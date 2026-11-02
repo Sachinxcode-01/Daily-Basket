@@ -9,6 +9,7 @@ import '../providers/language_provider.dart';
 /// Reusable Global Bottom Navigation Bar for Daily Basket
 /// Matches Google Stitch design tokens: 6-item navigation shell
 /// (Home, Categories, Search, Cart, Orders, Profile)
+/// Supports dynamic adaptation for Light and Dark theme modes.
 class AppBottomNav extends StatelessWidget {
   final int currentIndex;
 
@@ -48,6 +49,16 @@ class AppBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final navBg = isDark
+        ? const Color(0xFF191C1E).withValues(alpha: 0.94)
+        : Colors.white.withValues(alpha: 0.92);
+    final borderColor = isDark
+        ? const Color(0xFF2A2D31)
+        : const Color(0xFFBECAB9).withValues(alpha: 0.25);
+    final activeColor = isDark ? const Color(0xFF70DD7A) : const Color(0xFF006B23);
+    final inactiveColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF6E7A6C);
+
     int cartCount = 0;
     LanguageProvider? languageProvider;
     try {
@@ -64,16 +75,16 @@ class AppBottomNav extends StatelessWidget {
         child: Container(
           height: 72,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.92),
+            color: navBg,
             border: Border(
               top: BorderSide(
-                color: const Color(0xFFBECAB9).withValues(alpha: 0.25),
+                color: borderColor,
                 width: 0.5,
               ),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
+                color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
                 blurRadius: 12,
                 offset: const Offset(0, -2),
               ),
@@ -88,18 +99,24 @@ class AppBottomNav extends StatelessWidget {
                 index: 0,
                 icon: Icons.home_rounded,
                 label: languageProvider?.translate('shop', 'Home') ?? 'Home',
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
               ),
               _buildNavItem(
                 context,
                 index: 1,
                 icon: Icons.grid_view_rounded,
                 label: languageProvider?.translate('categories', 'Categories') ?? 'Categories',
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
               ),
               _buildNavItem(
                 context,
                 index: 2,
                 icon: Icons.search_rounded,
                 label: languageProvider?.translate('search', 'Search') ?? 'Search',
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
               ),
               _buildNavItem(
                 context,
@@ -107,18 +124,24 @@ class AppBottomNav extends StatelessWidget {
                 icon: Icons.shopping_basket_outlined,
                 label: languageProvider?.translate('cart', 'Cart') ?? 'Cart',
                 badgeCount: cartCount,
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
               ),
               _buildNavItem(
                 context,
                 index: 4,
                 icon: Icons.receipt_long_rounded,
                 label: languageProvider?.translate('orders', 'Orders') ?? 'Orders',
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
               ),
               _buildNavItem(
                 context,
                 index: 5,
                 icon: Icons.person_outline_rounded,
                 label: languageProvider?.translate('account', 'Profile') ?? 'Profile',
+                activeColor: activeColor,
+                inactiveColor: inactiveColor,
               ),
             ],
           ),
@@ -132,11 +155,11 @@ class AppBottomNav extends StatelessWidget {
     required int index,
     required IconData icon,
     required String label,
+    required Color activeColor,
+    required Color inactiveColor,
     int badgeCount = 0,
   }) {
     final isSelected = index == currentIndex;
-    const activeColor = Color(0xFF006B23);
-    const inactiveColor = Color(0xFF6E7A6C);
 
     return InkWell(
       onTap: () => _onItemTapped(context, index),
@@ -161,7 +184,7 @@ class AppBottomNav extends StatelessWidget {
                     right: -6,
                     child: Container(
                       padding: const EdgeInsets.all(3),
-                      decoration: const BoxDecoration(
+                      decoration: BoxDecoration(
                         color: activeColor,
                         shape: BoxShape.circle,
                       ),
@@ -194,4 +217,3 @@ class AppBottomNav extends StatelessWidget {
     );
   }
 }
-

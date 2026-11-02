@@ -118,9 +118,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     final double finalPayable = pricing?.finalPayable ?? (grandTotal - walletDeducted).clamp(0.0, double.infinity);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F9FC),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_rounded, color: AppColors.onSurface),

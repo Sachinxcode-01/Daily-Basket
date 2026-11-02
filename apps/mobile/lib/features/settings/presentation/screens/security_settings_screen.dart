@@ -11,11 +11,11 @@ class SecuritySettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: const AppNavigationDrawer(isDrawer: true),
       bottomNavigationBar: const AppBottomNav(currentIndex: 5),
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F9FC),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         leading: Navigator.canPop(context)
             ? IconButton(

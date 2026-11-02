@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/providers/theme_provider.dart';
 import '../../../../core/widgets/staggered_animated_card.dart';
 
 /// Stitch Screen: Admin Settings & Security
@@ -194,7 +197,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
           _sectionHeader('📱 App & Display'),
           StaggeredAnimatedCard(
             index: 14,
-            child: _buildThemeModeTile(),
+            child: _buildThemeModeTile(context),
           ),
           StaggeredAnimatedCard(
             index: 15,
@@ -406,7 +409,29 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
     );
   }
 
-  Widget _buildThemeModeTile() {
+  Widget _buildThemeModeTile(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+    final isDark = themeProvider.isDark;
+    final isLight = themeProvider.isLight;
+
+    final String modeLabel;
+    final IconData modeIcon;
+    final Color modeColor;
+
+    if (isDark) {
+      modeLabel = 'Dark Mode (Active)';
+      modeIcon = Icons.dark_mode_rounded;
+      modeColor = const Color(0xFF818CF8);
+    } else if (isLight) {
+      modeLabel = 'Light Mode (Active)';
+      modeIcon = Icons.light_mode_rounded;
+      modeColor = const Color(0xFFF59E0B);
+    } else {
+      modeLabel = 'System Default (Active)';
+      modeIcon = Icons.brightness_auto_rounded;
+      modeColor = const Color(0xFF2DD4BF);
+    }
+
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B),
@@ -419,15 +444,194 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
           width: 40,
           height: 40,
           decoration: BoxDecoration(
-            color: const Color(0xFF6366F1).withOpacity(0.15),
+            color: modeColor.withOpacity(0.15),
             borderRadius: BorderRadius.circular(10),
           ),
-          child: const Icon(Icons.dark_mode_rounded, color: Color(0xFF818CF8), size: 20),
+          child: Icon(modeIcon, color: modeColor, size: 20),
         ),
         title: const Text('Theme & Appearance', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
-        subtitle: const Text('Dark Mode (Enterprise Default)', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+        subtitle: Text(modeLabel, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
         trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF64748B)),
-        onTap: () {},
+        onTap: () => _showThemeSelectorSheet(context),
+      ),
+    );
+  }
+
+  void _showThemeSelectorSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF1E293B),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (bottomSheetContext) {
+        final provider = bottomSheetContext.watch<ThemeProvider>();
+
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      'Theme & Appearance',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, color: Color(0xFF94A3B8)),
+                      onPressed: () => Navigator.pop(bottomSheetContext),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Choose your preferred visual theme for the Admin Console.',
+                  style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                ),
+                const SizedBox(height: 20),
+                _buildThemeOptionTile(
+                  bottomSheetContext,
+                  title: 'System Default',
+                  subtitle: 'Automatically adapts to device display settings',
+                  icon: Icons.brightness_auto_rounded,
+                  iconColor: const Color(0xFF2DD4BF),
+                  isSelected: provider.isSystem,
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    provider.setSystem();
+                    Navigator.pop(bottomSheetContext);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Theme set to System Default'),
+                        duration: Duration(seconds: 1),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Color(0xFF0F766E),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                _buildThemeOptionTile(
+                  bottomSheetContext,
+                  title: 'Light Mode',
+                  subtitle: 'Crisp, high-contrast light surfaces for bright environments',
+                  icon: Icons.light_mode_rounded,
+                  iconColor: const Color(0xFFF59E0B),
+                  isSelected: provider.isLight,
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    provider.setLight();
+                    Navigator.pop(bottomSheetContext);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Theme set to Light Mode'),
+                        duration: Duration(seconds: 1),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Color(0xFF0F766E),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+                _buildThemeOptionTile(
+                  bottomSheetContext,
+                  title: 'Dark Mode',
+                  subtitle: 'Enterprise OLED dark interface with emerald accents',
+                  icon: Icons.dark_mode_rounded,
+                  iconColor: const Color(0xFF818CF8),
+                  isSelected: provider.isDark,
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    provider.setDark();
+                    Navigator.pop(bottomSheetContext);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Theme set to Dark Mode'),
+                        duration: Duration(seconds: 1),
+                        behavior: SnackBarBehavior.floating,
+                        backgroundColor: Color(0xFF0F766E),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildThemeOptionTile(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color iconColor,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFF0F2034) : const Color(0xFF0F172A),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF2DD4BF) : const Color(0xFF334155),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: iconColor.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: iconColor, size: 20),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: Color(0xFF94A3B8),
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (isSelected)
+              const Icon(Icons.check_circle_rounded, color: Color(0xFF2DD4BF), size: 22),
+          ],
+        ),
       ),
     );
   }

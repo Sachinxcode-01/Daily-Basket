@@ -69,24 +69,30 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
   Widget build(BuildContext context) {
     final dashboard = context.watch<AdminDashboardProvider>();
     final currentIndex = dashboard.currentTabIndex;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: _surfaceLight,
-      drawer: _buildDrawer(context, dashboard, currentIndex),
+      backgroundColor: isDark ? const Color(0xFF121416) : _surfaceLight,
+      drawer: _buildDrawer(context, dashboard, currentIndex, isDark),
       body: IndexedStack(
         index: currentIndex.clamp(0, _screens.length - 1),
         children: _screens,
       ),
-      bottomNavigationBar: _buildUnifiedBottomNav(context, dashboard, currentIndex),
+      bottomNavigationBar: _buildUnifiedBottomNav(context, dashboard, currentIndex, isDark),
     );
   }
 
   Widget _buildDrawer(
-      BuildContext context, AdminDashboardProvider dashboard, int currentIndex) {
+      BuildContext context, AdminDashboardProvider dashboard, int currentIndex, bool isDark) {
     final productsProvider = context.watch<AdminProductsProvider>();
+    final cardBg = isDark ? const Color(0xFF1E2124) : _cardBg;
+    final textDark = isDark ? const Color(0xFFF9F9FC) : _textDark;
+    final pillActive = isDark ? const Color(0xFF00531A) : _pillActiveBg;
+    final primaryActive = isDark ? const Color(0xFF70DD7A) : _primaryDark;
+    final dividerColor = isDark ? const Color(0xFF2D3748) : const Color(0xFFE2E8F0);
 
     return Drawer(
-      backgroundColor: _cardBg,
+      backgroundColor: cardBg,
       child: SafeArea(
         child: Column(
           children: [
@@ -209,7 +215,7 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
                   return Container(
                     margin: const EdgeInsets.symmetric(vertical: 2),
                     decoration: BoxDecoration(
-                      color: isSelected ? _pillActiveBg : Colors.transparent,
+                      color: isSelected ? pillActive : Colors.transparent,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: ListTile(
@@ -218,13 +224,13 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
                           borderRadius: BorderRadius.circular(12)),
                       leading: Icon(
                         item.icon,
-                        color: isSelected ? _primaryDark : _textDark,
+                        color: isSelected ? primaryActive : textDark,
                         size: 22,
                       ),
                       title: Text(
                         item.label,
                         style: TextStyle(
-                          color: isSelected ? _primaryDark : _textDark,
+                          color: isSelected ? primaryActive : textDark,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.w500,
                           fontSize: 13.5,
@@ -241,7 +247,7 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
               ),
             ),
 
-            const Divider(color: Color(0xFFE2E8F0), height: 1),
+            Divider(color: dividerColor, height: 1),
             ListTile(
               leading: const Icon(Icons.logout_rounded,
                   color: Color(0xFFDC2626), size: 22),
@@ -263,8 +269,13 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
   }
 
   Widget _buildUnifiedBottomNav(
-      BuildContext context, AdminDashboardProvider dashboard, int currentIndex) {
+      BuildContext context, AdminDashboardProvider dashboard, int currentIndex, bool isDark) {
     final productsProvider = context.watch<AdminProductsProvider>();
+    final cardBg = isDark ? const Color(0xFF1E2124) : _cardBg;
+    final pillActive = isDark ? const Color(0xFF00531A) : _pillActiveBg;
+    final primaryActive = isDark ? const Color(0xFF70DD7A) : _primaryDark;
+    final textMuted = isDark ? const Color(0xFF94A3B8) : _textMuted;
+    final borderColor = isDark ? const Color(0xFF2D3748) : const Color(0xFFE2E8F0);
 
     // 5 primary bottom destinations:
     // 0: Home, 1: Orders, 2: Products, 3: Inventory, 4: Fleet
@@ -300,10 +311,10 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
 
     return Container(
       decoration: BoxDecoration(
-        color: _cardBg,
+        color: cardBg,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-        border: const Border(
-          top: BorderSide(color: Color(0xFFE2E8F0), width: 1),
+        border: Border(
+          top: BorderSide(color: borderColor, width: 1),
         ),
         boxShadow: [
           BoxShadow(
@@ -330,7 +341,7 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
-                    color: isSelected ? _pillActiveBg : Colors.transparent,
+                    color: isSelected ? pillActive : Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Column(
@@ -341,7 +352,7 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
                         children: [
                           Icon(
                             item.icon,
-                            color: isSelected ? _primaryDark : _textMuted,
+                            color: isSelected ? primaryActive : textMuted,
                             size: 22,
                           ),
                           if (item.badgeCount != null && item.badgeCount! > 0)
@@ -376,7 +387,7 @@ class _AdminDashboardShellState extends State<AdminDashboardShell> {
                       Text(
                         item.label,
                         style: TextStyle(
-                          color: isSelected ? _primaryDark : _textMuted,
+                          color: isSelected ? primaryActive : textMuted,
                           fontWeight:
                               isSelected ? FontWeight.bold : FontWeight.w500,
                           fontSize: 11,

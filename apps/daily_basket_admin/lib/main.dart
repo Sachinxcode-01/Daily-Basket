@@ -86,12 +86,14 @@ class DailyBasketAdminApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = context.watch<ThemeProvider>();
+
     return MaterialApp(
       title: 'Daily Basket Admin',
       debugShowCheckedModeBanner: false,
       theme: AdminTheme.lightTheme,
       darkTheme: AdminTheme.darkTheme,
-      themeMode: ThemeMode.light,
+      themeMode: themeProvider.themeMode,
       initialRoute: '/',
       routes: {
         '/': (context) => const AdminSplashScreen(),
@@ -99,18 +101,26 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/google-signin': (context) => const AdminGoogleSigninScreen(),
         '/admin/secure-login': (context) => const AdminSecureLoginScreen(),
         '/admin/mfa-selection': (context) => const AdminMfaSelectionScreen(),
-        '/admin/otp-verification': (context) => const AdminOtpVerificationScreen(),
-        '/admin/biometric-login': (context) => const AdminBiometricLoginScreen(),
-        '/admin/device-verification': (context) => const AdminDeviceVerificationScreen(),
-        '/admin/complete-profile': (context) => const AdminProfileCompletionScreen(),
+        '/admin/otp-verification': (context) =>
+            const AdminOtpVerificationScreen(),
+        '/admin/biometric-login': (context) =>
+            const AdminBiometricLoginScreen(),
+        '/admin/device-verification': (context) =>
+            const AdminDeviceVerificationScreen(),
+        '/admin/complete-profile': (context) =>
+            const AdminProfileCompletionScreen(),
         '/admin/ai-health': (context) => const AiHealthDashboardScreen(),
-        '/admin/forgot-password': (context) => const AdminForgotPasswordScreen(),
+        '/admin/forgot-password': (context) =>
+            const AdminForgotPasswordScreen(),
         '/admin/reset-password': (context) => const AdminResetPasswordScreen(),
 
         '/admin/auth-error': (context) => const AdminAuthErrorScreen(),
-        '/admin/session-expired': (context) => const AdminSessionExpiredScreen(),
-        '/admin/force-password-change': (context) => const AdminForcePasswordChangeScreen(),
-        '/admin/terms-acceptance': (context) => const AdminTermsAcceptanceScreen(),
+        '/admin/session-expired': (context) =>
+            const AdminSessionExpiredScreen(),
+        '/admin/force-password-change': (context) =>
+            const AdminForcePasswordChangeScreen(),
+        '/admin/terms-acceptance': (context) =>
+            const AdminTermsAcceptanceScreen(),
         '/admin/access-denied': (context) => const AdminAccessDeniedScreen(),
         '/admin/loading': (context) => const AdminLoadingScreen(),
         '/admin/account-locked': (context) => const AdminAccountLockedScreen(),
@@ -122,10 +132,13 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/orders': (context) => const AdminOrdersScreen(),
         '/admin/inventory': (context) => const AdminInventoryScreen(),
         '/admin/products': (context) => const AdminProductsScreen(),
-        '/admin/products/new': (context) => const AdminAddProductBasicInfoScreen(),
-        '/admin/products/details': (context) => const AdminProductDetailsScreen(),
+        '/admin/products/new': (context) =>
+            const AdminAddProductBasicInfoScreen(),
+        '/admin/products/details': (context) =>
+            const AdminProductDetailsScreen(),
         '/admin/customers': (context) => const AdminCustomersScreen(),
-        '/admin/customers/profile': (context) => const AdminCustomerProfile360Screen(),
+        '/admin/customers/profile': (context) =>
+            const AdminCustomerProfile360Screen(),
         '/admin/delivery': (context) => const AdminDeliveryScreen(),
         '/admin/delivery/rider': (context) => const AdminRiderProfileScreen(),
         '/admin/finance': (context) => const AdminFinanceScreen(),
@@ -133,25 +146,37 @@ class DailyBasketAdminApp extends StatelessWidget {
         '/admin/support': (context) => const AdminSupportScreen(),
         '/admin/settings': (context) => const AdminSettingsScreen(),
         '/admin/suppliers': (context) => const AdminSuppliersScreen(),
-        '/admin/purchase-orders': (context) => const AdminPurchaseOrdersScreen(),
+        '/admin/purchase-orders': (context) =>
+            const AdminPurchaseOrdersScreen(),
         '/admin/grn': (context) => const AdminGrnScreen(),
-        '/admin/inventory/warehouse': (context) => const AdminWarehouseStockScreen(),
-        '/admin/finance/dashboard': (context) => const AdminFinanceDashboardScreen(),
-        '/admin/settings/roles-permissions': (context) => const AdminRolesPermissionsScreen(),
+        '/admin/inventory/warehouse': (context) =>
+            const AdminWarehouseStockScreen(),
+        '/admin/finance/dashboard': (context) =>
+            const AdminFinanceDashboardScreen(),
+        '/admin/settings/roles-permissions': (context) =>
+            const AdminRolesPermissionsScreen(),
         '/admin/roles': (context) => const AdminRolesPermissionsScreen(),
-        '/admin/marketing/coupons': (context) => const AdminCouponDashboardScreen(),
-        '/admin/marketing/coupons/create': (context) => const AdminCreateCouponScreen(),
-        '/admin/marketing/analytics': (context) => const AdminCouponAnalyticsScreen(),
+        '/admin/marketing/coupons': (context) =>
+            const AdminCouponDashboardScreen(),
+        '/admin/marketing/coupons/create': (context) =>
+            const AdminCreateCouponScreen(),
+        '/admin/marketing/analytics': (context) =>
+            const AdminCouponAnalyticsScreen(),
         '/admin/marketing/campaigns': (context) => const AdminCampaignsScreen(),
-        '/admin/marketing/coupons/details': (context) => const AdminCouponDetailsScreen(),
-        '/admin/settings/integrations': (context) => const AdminIntegrationsScreen(),
+        '/admin/marketing/coupons/details': (context) =>
+            const AdminCouponDetailsScreen(),
+        '/admin/settings/integrations': (context) =>
+            const AdminIntegrationsScreen(),
         '/admin/integrations': (context) => const AdminIntegrationsScreen(),
-        '/admin/notifications': (context) => const AdminNotificationsCenterScreen(),
+        '/admin/notifications': (context) =>
+            const AdminNotificationsCenterScreen(),
         '/admin/reports': (context) => const AdminReportsScreen(),
         '/admin/copilot': (context) => const AdminAiCopilotScreen(),
         '/admin/support/help': (context) => const AdminHelpSupportScreen(),
-        '/admin/settings/privacy': (context) => const AdminPrivacyPolicyScreen(),
-        '/admin/settings/checklist': (context) => const AdminLaunchChecklistScreen(),
+        '/admin/settings/privacy': (context) =>
+            const AdminPrivacyPolicyScreen(),
+        '/admin/settings/checklist': (context) =>
+            const AdminLaunchChecklistScreen(),
         '/admin/checklist': (context) => const AdminLaunchChecklistScreen(),
       },
     );

@@ -41,7 +41,7 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
     final addresses = addressProvider.addresses;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: const AppNavigationDrawer(isDrawer: true),
       bottomNavigationBar: const AppBottomNav(currentIndex: 5),
       appBar: const AppTopBar(

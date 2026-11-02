@@ -12,7 +12,7 @@ class TermsOfServiceScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       drawer: const AppNavigationDrawer(isDrawer: true),
       bottomNavigationBar: const AppBottomNav(currentIndex: -1),
       appBar: const AppTopBar(

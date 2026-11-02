@@ -13,6 +13,7 @@ import '../providers/user_provider.dart';
 /// - Branded title typography
 /// - User profile avatar button (clickable, navigates to `/profile`)
 /// - Cart quick-access button with live item count badge
+/// - Dynamic adaptation for Dark & Light theme modes
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final bool showDrawer;
@@ -40,6 +41,14 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final topBarBg = isDark
+        ? const Color(0xFF191C1E).withValues(alpha: 0.95)
+        : Colors.white.withValues(alpha: 0.95);
+    final iconColor = isDark ? const Color(0xFFF0F0F3) : const Color(0xFF1A1C1E);
+    final brandColor = isDark ? const Color(0xFF70DD7A) : const Color(0xFF006B23);
+    final avatarBorderColor = isDark ? const Color(0xFF70DD7A) : const Color(0xFFC0E8C7);
+
     UserProvider? userProvider;
     CartProvider? cartProvider;
 
@@ -57,7 +66,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     Widget? leadingWidget;
     if (showBack || (!showDrawer && Navigator.of(context).canPop())) {
       leadingWidget = IconButton(
-        icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
+        icon: Icon(Icons.arrow_back_rounded, color: iconColor),
         tooltip: 'Back',
         onPressed: onBack ??
             () {
@@ -74,7 +83,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
       );
     } else if (showDrawer) {
       leadingWidget = IconButton(
-        icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
+        icon: Icon(Icons.menu_rounded, color: iconColor, size: 26),
         tooltip: 'Navigation Hub',
         onPressed: () {
           HapticFeedback.lightImpact();
@@ -93,7 +102,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     if (shouldShowDrawerAction) {
       actionsList.add(
         IconButton(
-          icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E)),
+          icon: Icon(Icons.menu_rounded, color: iconColor),
           tooltip: 'Navigation Hub',
           onPressed: () {
             HapticFeedback.lightImpact();
@@ -109,9 +118,9 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
           clipBehavior: Clip.none,
           children: [
             IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.shopping_basket_outlined,
-                color: Color(0xFF006B23),
+                color: brandColor,
                 size: 24,
               ),
               tooltip: 'Cart',
@@ -126,8 +135,8 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                 right: 6,
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF006B23),
+                  decoration: BoxDecoration(
+                    color: brandColor,
                     shape: BoxShape.circle,
                   ),
                   constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
@@ -161,10 +170,10 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
               height: 38,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFFC0E8C7), width: 2),
+                border: Border.all(color: avatarBorderColor, width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF006B23).withValues(alpha: 0.12),
+                    color: brandColor.withValues(alpha: 0.12),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -175,9 +184,9 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Image.network(
                   profileImageUrl,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => const Icon(
+                  errorBuilder: (_, __, ___) => Icon(
                     Icons.person,
-                    color: Color(0xFF006B23),
+                    color: brandColor,
                   ),
                 ),
               ),
@@ -188,7 +197,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return AppBar(
-      backgroundColor: Colors.white.withValues(alpha: 0.95),
+      backgroundColor: topBarBg,
       elevation: 0.5,
       centerTitle: true,
       leading: leadingWidget,
@@ -197,11 +206,10 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
         style: GoogleFonts.outfit(
           fontSize: 20,
           fontWeight: FontWeight.w700,
-          color: const Color(0xFF006B23),
+          color: brandColor,
         ),
       ),
       actions: actionsList,
     );
   }
 }
-

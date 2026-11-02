@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/navigation/app_navigation_drawer.dart';
@@ -7,15 +8,23 @@ import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/providers/app_theme_provider.dart';
 
 /// App Theme Screen — Exact Google Stitch Specification
+/// Fully supports interactive switching between System, Light, and Dark modes.
 class AppThemeScreen extends StatelessWidget {
   const AppThemeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final appThemeProvider = context.watch<AppThemeProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final scaffoldBg = isDark ? const Color(0xFF121416) : const Color(0xFFF9F9FC);
+    final cardBg = isDark ? const Color(0xFF1E2124) : Colors.white;
+    final textTitleColor = isDark ? const Color(0xFFF0F0F3) : const Color(0xFF1A1C1E);
+    final textSubColor = isDark ? const Color(0xFFBECAB9) : const Color(0xFF3F4A3D);
+    final activeGreen = isDark ? const Color(0xFF70DD7A) : const Color(0xFF006B23);
+    final cardBorderUnselected = isDark ? const Color(0xFF303438) : const Color(0xFFE2E2E5);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FC),
+      backgroundColor: scaffoldBg,
       drawer: const AppNavigationDrawer(isDrawer: true),
       bottomNavigationBar: const AppBottomNav(currentIndex: 5),
       appBar: const AppTopBar(
@@ -36,7 +45,7 @@ class AppThemeScreen extends StatelessWidget {
                   'Customize your Daily Basket experience. Choose how you want the app to look.',
                   style: GoogleFonts.inter(
                     fontSize: 15,
-                    color: const Color(0xFF3F4A3D),
+                    color: textSubColor,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -46,18 +55,24 @@ class AppThemeScreen extends StatelessWidget {
                   context,
                   value: 'system',
                   title: 'System Default',
-                  description: 'Automatically matches your device\'s display settings.',
+                  description: "Automatically matches your device's display settings.",
                   selectedThemeKey: appThemeProvider.selectedThemeKey,
+                  cardBg: cardBg,
+                  textTitleColor: textTitleColor,
+                  textSubColor: textSubColor,
+                  activeGreen: activeGreen,
+                  cardBorderUnselected: cardBorderUnselected,
+                  isDark: isDark,
                   previewWidget: Container(
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF006B23).withValues(alpha: 0.1),
+                      color: activeGreen.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.settings_brightness_rounded,
-                      color: Color(0xFF006B23),
+                      color: activeGreen,
                       size: 32,
                     ),
                   ),
@@ -71,6 +86,12 @@ class AppThemeScreen extends StatelessWidget {
                   title: 'Light Mode',
                   description: 'Clean, crisp, and bright. Perfect for daytime shopping.',
                   selectedThemeKey: appThemeProvider.selectedThemeKey,
+                  cardBg: cardBg,
+                  textTitleColor: textTitleColor,
+                  textSubColor: textSubColor,
+                  activeGreen: activeGreen,
+                  cardBorderUnselected: cardBorderUnselected,
+                  isDark: isDark,
                   previewWidget: Container(
                     width: 64,
                     height: 64,
@@ -80,17 +101,23 @@ class AppThemeScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: const Color(0xFFE2E2E5)),
                     ),
-                    child: Stack(
+                    child: const Stack(
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(height: 6, width: double.infinity, color: const Color(0xFFF3F3F6)),
-                            const SizedBox(height: 4),
-                            Container(height: 6, width: 32, color: const Color(0xFFF3F3F6)),
+                            ColoredBox(
+                              color: Color(0xFFF3F3F6),
+                              child: SizedBox(height: 6, width: double.infinity),
+                            ),
+                            SizedBox(height: 4),
+                            ColoredBox(
+                              color: Color(0xFFF3F3F6),
+                              child: SizedBox(height: 6, width: 32),
+                            ),
                           ],
                         ),
-                        const Align(
+                        Align(
                           alignment: Alignment.center,
                           child: Icon(Icons.light_mode_outlined, color: Color(0xFF1A1C1E), size: 24),
                         ),
@@ -105,8 +132,14 @@ class AppThemeScreen extends StatelessWidget {
                   context,
                   value: 'dark',
                   title: 'Dark Mode',
-                  description: 'Easy on the eyes in low light, with high-contrast elements.',
+                  description: 'Easy on the eyes in low light, with high-contrast emerald elements.',
                   selectedThemeKey: appThemeProvider.selectedThemeKey,
+                  cardBg: cardBg,
+                  textTitleColor: textTitleColor,
+                  textSubColor: textSubColor,
+                  activeGreen: activeGreen,
+                  cardBorderUnselected: cardBorderUnselected,
+                  isDark: isDark,
                   previewWidget: Container(
                     width: 64,
                     height: 64,
@@ -114,20 +147,27 @@ class AppThemeScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: const Color(0xFF1A1C1E),
                       borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: const Color(0xFF34373B)),
                     ),
-                    child: Stack(
+                    child: const Stack(
                       children: [
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Container(height: 6, width: double.infinity, color: const Color(0xFF2F3133)),
-                            const SizedBox(height: 4),
-                            Container(height: 6, width: 32, color: const Color(0xFF2F3133)),
+                            ColoredBox(
+                              color: Color(0xFF2F3133),
+                              child: SizedBox(height: 6, width: double.infinity),
+                            ),
+                            SizedBox(height: 4),
+                            ColoredBox(
+                              color: Color(0xFF2F3133),
+                              child: SizedBox(height: 6, width: 32),
+                            ),
                           ],
                         ),
-                        const Align(
+                        Align(
                           alignment: Alignment.center,
-                          child: Icon(Icons.dark_mode_outlined, color: Color(0xFFF9F9FC), size: 24),
+                          child: Icon(Icons.dark_mode_outlined, color: Color(0xFF70DD7A), size: 24),
                         ),
                       ],
                     ),
@@ -148,18 +188,25 @@ class AppThemeScreen extends StatelessWidget {
     required String description,
     required String selectedThemeKey,
     required Widget previewWidget,
+    required Color cardBg,
+    required Color textTitleColor,
+    required Color textSubColor,
+    required Color activeGreen,
+    required Color cardBorderUnselected,
+    required bool isDark,
   }) {
     final isSelected = selectedThemeKey == value;
 
     return InkWell(
       onTap: () {
+        HapticFeedback.lightImpact();
         context.read<AppThemeProvider>().setTheme(value);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Theme set to $title'),
             duration: const Duration(seconds: 1),
             behavior: SnackBarBehavior.floating,
-            backgroundColor: const Color(0xFF006B23),
+            backgroundColor: activeGreen,
           ),
         );
       },
@@ -168,15 +215,15 @@ class AppThemeScreen extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cardBg,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? const Color(0xFF006B23) : const Color(0xFFE2E2E5),
+            color: isSelected ? activeGreen : cardBorderUnselected,
             width: isSelected ? 2 : 1,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -198,7 +245,7 @@ class AppThemeScreen extends StatelessWidget {
                         style: GoogleFonts.outfit(
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
-                          color: const Color(0xFF1A1C1E),
+                          color: textTitleColor,
                         ),
                       ),
                       Container(
@@ -206,9 +253,9 @@ class AppThemeScreen extends StatelessWidget {
                         height: 22,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isSelected ? const Color(0xFF006B23) : Colors.transparent,
+                          color: isSelected ? activeGreen : Colors.transparent,
                           border: Border.all(
-                            color: isSelected ? const Color(0xFF006B23) : const Color(0xFFBECAB9),
+                            color: isSelected ? activeGreen : const Color(0xFFBECAB9),
                             width: 2,
                           ),
                         ),
@@ -223,7 +270,7 @@ class AppThemeScreen extends StatelessWidget {
                     description,
                     style: GoogleFonts.inter(
                       fontSize: 13,
-                      color: const Color(0xFF3F4A3D),
+                      color: textSubColor,
                     ),
                   ),
                 ],

@@ -453,7 +453,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
         if (messages.isNotEmpty) _scrollToBottom();
 
         return Scaffold(
-          backgroundColor: const Color(0xFFF9F9FC),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           drawer: const AppNavigationDrawer(isDrawer: true),
           appBar: _buildAppBar(aiProvider, agentName, agentRole, isEscalated),
           body: SafeArea(

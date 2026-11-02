@@ -115,7 +115,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
             : (widget.totalAmount > 0 ? widget.totalAmount : 32.50));
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF9F9FC),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
