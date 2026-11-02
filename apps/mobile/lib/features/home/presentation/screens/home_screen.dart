@@ -4,6 +4,7 @@
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/widgets/staggered_animation_wrappers.dart';
@@ -12,6 +13,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/providers/language_provider.dart';
 import '../../../../core/providers/recently_viewed_provider.dart';
+import '../../../../core/providers/user_provider.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../categories/presentation/screens/browse_categories_screen.dart';
 import '../../../search/presentation/screens/search_results_screen.dart';
@@ -76,7 +78,8 @@ const _dailySelling = <_Product>[
     mrp: r'₹45',
     rating: 4.8,
     reviews: 1420,
-    imageUrl: 'assets/products/fresh-vegetables/2483b1e4-6b95-4777-82ba-9ea62a37f40d.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/2483b1e4-6b95-4777-82ba-9ea62a37f40d.png',
     category: 'Vegetables',
     discountPercentage: '16% OFF',
   ),
@@ -102,7 +105,8 @@ const _dailySelling = <_Product>[
     mrp: r'₹28',
     rating: 4.8,
     reviews: 9850,
-    imageUrl: 'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
     category: 'Vegetables',
     discountPercentage: '14% OFF',
   ),
@@ -115,7 +119,8 @@ const _dailySelling = <_Product>[
     mrp: r'₹50',
     rating: 4.7,
     reviews: 6300,
-    imageUrl: 'assets/products/bread-pav/007ea008-b857-4dd5-9005-fb6c4d98601b.png',
+    imageUrl:
+        'assets/products/bread-pav/007ea008-b857-4dd5-9005-fb6c4d98601b.png',
     category: 'Bread & Bakery',
     discountPercentage: '10% OFF',
   ),
@@ -128,7 +133,8 @@ const _dailySelling = <_Product>[
     mrp: r'₹40',
     rating: 4.8,
     reviews: 5400,
-    imageUrl: 'assets/products/curd-yogurt/01278ea4-9aef-4263-8ea8-6a3eab2bd076.png',
+    imageUrl:
+        'assets/products/curd-yogurt/01278ea4-9aef-4263-8ea8-6a3eab2bd076.png',
     category: 'Curd & Yogurt',
     discountPercentage: '12% OFF',
   ),
@@ -154,7 +160,8 @@ const _dailySelling = <_Product>[
     mrp: r'₹50',
     rating: 4.6,
     reviews: 3200,
-    imageUrl: 'assets/products/vermicelli/3da21b8f-16e5-4727-9899-c5ef3e1db668.png',
+    imageUrl:
+        'assets/products/vermicelli/3da21b8f-16e5-4727-9899-c5ef3e1db668.png',
     category: 'Vermicelli',
     discountPercentage: '16% OFF',
   ),
@@ -167,7 +174,8 @@ const _dailySelling = <_Product>[
     mrp: r'₹195',
     rating: 4.8,
     reviews: 5100,
-    imageUrl: 'assets/products/flakes-kids-cereals/01e92a08-b40b-4d6f-aca7-8537cd382447.png',
+    imageUrl:
+        'assets/products/flakes-kids-cereals/01e92a08-b40b-4d6f-aca7-8537cd382447.png',
     category: 'Cereals',
     discountPercentage: '15% OFF',
   ),
@@ -184,7 +192,8 @@ const _highSelling = <_Product>[
     mrp: r'₹48',
     rating: 4.8,
     reviews: 18900,
-    imageUrl: 'assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',
     category: 'Vegetables',
     discountPercentage: '21% OFF',
   ),
@@ -210,7 +219,8 @@ const _highSelling = <_Product>[
     mrp: r'₹40',
     rating: 4.7,
     reviews: 14200,
-    imageUrl: 'assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',
     category: 'Vegetables',
     discountPercentage: '20% OFF',
   ),
@@ -223,7 +233,8 @@ const _highSelling = <_Product>[
     mrp: r'₹25',
     rating: 4.8,
     reviews: 8900,
-    imageUrl: 'assets/products/bread-pav/036bad6d-4fbc-4c42-a18a-4bf33a3dfb6b.png',
+    imageUrl:
+        'assets/products/bread-pav/036bad6d-4fbc-4c42-a18a-4bf33a3dfb6b.png',
     category: 'Bread & Bakery',
     discountPercentage: '12% OFF',
   ),
@@ -236,7 +247,8 @@ const _highSelling = <_Product>[
     mrp: r'₹60',
     rating: 4.7,
     reviews: 4300,
-    imageUrl: 'assets/products/curd-yogurt/04dbb266-d965-4447-ba2c-655f725b47f5.png',
+    imageUrl:
+        'assets/products/curd-yogurt/04dbb266-d965-4447-ba2c-655f725b47f5.png',
     category: 'Curd & Yogurt',
     discountPercentage: '17% OFF',
   ),
@@ -262,7 +274,8 @@ const _highSelling = <_Product>[
     mrp: r'₹48',
     rating: 4.6,
     reviews: 4900,
-    imageUrl: 'assets/products/vermicelli/4bf7f974-20b4-48b8-9367-f60997e8b940.png',
+    imageUrl:
+        'assets/products/vermicelli/4bf7f974-20b4-48b8-9367-f60997e8b940.png',
     category: 'Vermicelli',
     discountPercentage: '19% OFF',
   ),
@@ -275,7 +288,8 @@ const _highSelling = <_Product>[
     mrp: r'₹145',
     rating: 4.8,
     reviews: 7200,
-    imageUrl: 'assets/products/flakes-kids-cereals/09a1e487-9781-4ade-ab0e-73327c96691e.png',
+    imageUrl:
+        'assets/products/flakes-kids-cereals/09a1e487-9781-4ade-ab0e-73327c96691e.png',
     category: 'Cereals',
     discountPercentage: '14% OFF',
   ),
@@ -292,7 +306,8 @@ const _recommended = <_Product>[
     mrp: r'₹55',
     rating: 4.9,
     reviews: 3100,
-    imageUrl: 'assets/products/fresh-vegetables/2483b1e4-6b95-4777-82ba-9ea62a37f40d.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/2483b1e4-6b95-4777-82ba-9ea62a37f40d.png',
     category: 'Vegetables',
     discountPercentage: '20% OFF',
   ),
@@ -318,7 +333,8 @@ const _recommended = <_Product>[
     mrp: r'₹30',
     rating: 4.8,
     reviews: 5120,
-    imageUrl: 'assets/products/fresh-vegetables/083c2cf1-36a0-4328-98a1-fbe6e0ec1d0a.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/083c2cf1-36a0-4328-98a1-fbe6e0ec1d0a.png',
     category: 'Vegetables',
     discountPercentage: '26% OFF',
   ),
@@ -331,7 +347,8 @@ const _recommended = <_Product>[
     mrp: r'₹55',
     rating: 4.7,
     reviews: 5200,
-    imageUrl: 'assets/products/bread-pav/076a5684-8206-48cc-b730-e1c7fe05e5df.png',
+    imageUrl:
+        'assets/products/bread-pav/076a5684-8206-48cc-b730-e1c7fe05e5df.png',
     category: 'Bread & Bakery',
     discountPercentage: '13% OFF',
   ),
@@ -344,7 +361,8 @@ const _recommended = <_Product>[
     mrp: r'₹42',
     rating: 4.6,
     reviews: 4100,
-    imageUrl: 'assets/products/curd-yogurt/057e0c66-77e1-4d90-ab5f-f2afe3aa69d9.png',
+    imageUrl:
+        'assets/products/curd-yogurt/057e0c66-77e1-4d90-ab5f-f2afe3aa69d9.png',
     category: 'Curd & Yogurt',
     discountPercentage: '10% OFF',
   ),
@@ -383,7 +401,8 @@ const _recommended = <_Product>[
     mrp: r'₹199',
     rating: 4.7,
     reviews: 4300,
-    imageUrl: 'assets/products/flakes-kids-cereals/0c447ba4-a230-4b31-92e7-03007bebf0bc.png',
+    imageUrl:
+        'assets/products/flakes-kids-cereals/0c447ba4-a230-4b31-92e7-03007bebf0bc.png',
     category: 'Cereals',
     discountPercentage: '15% OFF',
   ),
@@ -400,7 +419,8 @@ const _topBuying = <_Product>[
     mrp: r'₹55',
     rating: 4.8,
     reviews: 11400,
-    imageUrl: 'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
     category: 'Vegetables',
     discountPercentage: '18% OFF',
   ),
@@ -426,7 +446,8 @@ const _topBuying = <_Product>[
     mrp: r'₹42',
     rating: 4.7,
     reviews: 6400,
-    imageUrl: 'assets/products/fresh-vegetables/079cdbf5-0e6e-4de4-ad0a-447e56ae8016.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/079cdbf5-0e6e-4de4-ad0a-447e56ae8016.png',
     category: 'Vegetables',
     discountPercentage: '19% OFF',
   ),
@@ -439,7 +460,8 @@ const _topBuying = <_Product>[
     mrp: r'₹60',
     rating: 4.6,
     reviews: 4700,
-    imageUrl: 'assets/products/bread-pav/0780817d-4d79-4e2f-abe4-5a5725df31b0.png',
+    imageUrl:
+        'assets/products/bread-pav/0780817d-4d79-4e2f-abe4-5a5725df31b0.png',
     category: 'Bread & Bakery',
     discountPercentage: '13% OFF',
   ),
@@ -452,7 +474,8 @@ const _topBuying = <_Product>[
     mrp: r'₹40',
     rating: 4.7,
     reviews: 3900,
-    imageUrl: 'assets/products/curd-yogurt/0bcb96d2-7515-41eb-b1d1-7dd218a5a26d.png',
+    imageUrl:
+        'assets/products/curd-yogurt/0bcb96d2-7515-41eb-b1d1-7dd218a5a26d.png',
     category: 'Curd & Yogurt',
     discountPercentage: '10% OFF',
   ),
@@ -478,7 +501,8 @@ const _topBuying = <_Product>[
     mrp: r'₹55',
     rating: 4.6,
     reviews: 2600,
-    imageUrl: 'assets/products/vermicelli/64ca266c-db61-4087-b9f5-2019f2704a3e.png',
+    imageUrl:
+        'assets/products/vermicelli/64ca266c-db61-4087-b9f5-2019f2704a3e.png',
     category: 'Vermicelli',
     discountPercentage: '18% OFF',
   ),
@@ -491,7 +515,8 @@ const _topBuying = <_Product>[
     mrp: r'₹115',
     rating: 4.7,
     reviews: 6200,
-    imageUrl: 'assets/products/flakes-kids-cereals/141e68a9-f36a-422f-8746-a9a49359401b.png',
+    imageUrl:
+        'assets/products/flakes-kids-cereals/141e68a9-f36a-422f-8746-a9a49359401b.png',
     category: 'Cereals',
     discountPercentage: '15% OFF',
   ),
@@ -509,7 +534,8 @@ const _catalog = <_Product>[
     mrp: r'₹45',
     rating: 4.8,
     reviews: 1420,
-    imageUrl: 'assets/products/fresh-vegetables/2483b1e4-6b95-4777-82ba-9ea62a37f40d.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/2483b1e4-6b95-4777-82ba-9ea62a37f40d.png',
     category: 'Vegetables',
     discountPercentage: '16% OFF',
   ),
@@ -522,7 +548,8 @@ const _catalog = <_Product>[
     mrp: r'₹28',
     rating: 4.8,
     reviews: 9850,
-    imageUrl: 'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
     category: 'Vegetables',
     discountPercentage: '14% OFF',
   ),
@@ -535,7 +562,8 @@ const _catalog = <_Product>[
     mrp: r'₹35',
     rating: 4.7,
     reviews: 14200,
-    imageUrl: 'assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/00f0d26a-7b61-4e84-8903-abed0e2c4f69.png',
     category: 'Vegetables',
     discountPercentage: '9% OFF',
   ),
@@ -548,7 +576,8 @@ const _catalog = <_Product>[
     mrp: r'₹48',
     rating: 4.8,
     reviews: 18900,
-    imageUrl: 'assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/02df8262-1ccc-4078-a215-991a85ded7b0.png',
     category: 'Vegetables',
     discountPercentage: '21% OFF',
   ),
@@ -561,7 +590,8 @@ const _catalog = <_Product>[
     mrp: r'₹40',
     rating: 4.6,
     reviews: 6400,
-    imageUrl: 'assets/products/fresh-vegetables/079cdbf5-0e6e-4de4-ad0a-447e56ae8016.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/079cdbf5-0e6e-4de4-ad0a-447e56ae8016.png',
     category: 'Vegetables',
     discountPercentage: '10% OFF',
   ),
@@ -574,7 +604,8 @@ const _catalog = <_Product>[
     mrp: r'₹30',
     rating: 4.9,
     reviews: 5120,
-    imageUrl: 'assets/products/fresh-vegetables/083c2cf1-36a0-4328-98a1-fbe6e0ec1d0a.png',
+    imageUrl:
+        'assets/products/fresh-vegetables/083c2cf1-36a0-4328-98a1-fbe6e0ec1d0a.png',
     category: 'Vegetables',
     discountPercentage: '26% OFF',
   ),
@@ -643,7 +674,8 @@ const _catalog = <_Product>[
     mrp: r'₹50',
     rating: 4.7,
     reviews: 6300,
-    imageUrl: 'assets/products/bread-pav/007ea008-b857-4dd5-9005-fb6c4d98601b.png',
+    imageUrl:
+        'assets/products/bread-pav/007ea008-b857-4dd5-9005-fb6c4d98601b.png',
     category: 'Bread & Bakery',
     discountPercentage: '10% OFF',
   ),
@@ -656,7 +688,8 @@ const _catalog = <_Product>[
     mrp: r'₹25',
     rating: 4.8,
     reviews: 8900,
-    imageUrl: 'assets/products/bread-pav/036bad6d-4fbc-4c42-a18a-4bf33a3dfb6b.png',
+    imageUrl:
+        'assets/products/bread-pav/036bad6d-4fbc-4c42-a18a-4bf33a3dfb6b.png',
     category: 'Bread & Bakery',
     discountPercentage: '12% OFF',
   ),
@@ -669,7 +702,8 @@ const _catalog = <_Product>[
     mrp: r'₹55',
     rating: 4.7,
     reviews: 5200,
-    imageUrl: 'assets/products/bread-pav/076a5684-8206-48cc-b730-e1c7fe05e5df.png',
+    imageUrl:
+        'assets/products/bread-pav/076a5684-8206-48cc-b730-e1c7fe05e5df.png',
     category: 'Bread & Bakery',
     discountPercentage: '13% OFF',
   ),
@@ -682,7 +716,8 @@ const _catalog = <_Product>[
     mrp: r'₹60',
     rating: 4.6,
     reviews: 4700,
-    imageUrl: 'assets/products/bread-pav/0780817d-4d79-4e2f-abe4-5a5725df31b0.png',
+    imageUrl:
+        'assets/products/bread-pav/0780817d-4d79-4e2f-abe4-5a5725df31b0.png',
     category: 'Bread & Bakery',
     discountPercentage: '13% OFF',
   ),
@@ -697,7 +732,8 @@ const _catalog = <_Product>[
     mrp: r'₹40',
     rating: 4.8,
     reviews: 5400,
-    imageUrl: 'assets/products/curd-yogurt/01278ea4-9aef-4263-8ea8-6a3eab2bd076.png',
+    imageUrl:
+        'assets/products/curd-yogurt/01278ea4-9aef-4263-8ea8-6a3eab2bd076.png',
     category: 'Curd & Yogurt',
     discountPercentage: '12% OFF',
   ),
@@ -710,7 +746,8 @@ const _catalog = <_Product>[
     mrp: r'₹60',
     rating: 4.7,
     reviews: 4300,
-    imageUrl: 'assets/products/curd-yogurt/04dbb266-d965-4447-ba2c-655f725b47f5.png',
+    imageUrl:
+        'assets/products/curd-yogurt/04dbb266-d965-4447-ba2c-655f725b47f5.png',
     category: 'Curd & Yogurt',
     discountPercentage: '17% OFF',
   ),
@@ -723,7 +760,8 @@ const _catalog = <_Product>[
     mrp: r'₹42',
     rating: 4.6,
     reviews: 4100,
-    imageUrl: 'assets/products/curd-yogurt/057e0c66-77e1-4d90-ab5f-f2afe3aa69d9.png',
+    imageUrl:
+        'assets/products/curd-yogurt/057e0c66-77e1-4d90-ab5f-f2afe3aa69d9.png',
     category: 'Curd & Yogurt',
     discountPercentage: '10% OFF',
   ),
@@ -736,7 +774,8 @@ const _catalog = <_Product>[
     mrp: r'₹40',
     rating: 4.7,
     reviews: 3900,
-    imageUrl: 'assets/products/curd-yogurt/0bcb96d2-7515-41eb-b1d1-7dd218a5a26d.png',
+    imageUrl:
+        'assets/products/curd-yogurt/0bcb96d2-7515-41eb-b1d1-7dd218a5a26d.png',
     category: 'Curd & Yogurt',
     discountPercentage: '10% OFF',
   ),
@@ -751,7 +790,8 @@ const _catalog = <_Product>[
     mrp: r'₹195',
     rating: 4.8,
     reviews: 5100,
-    imageUrl: 'assets/products/flakes-kids-cereals/01e92a08-b40b-4d6f-aca7-8537cd382447.png',
+    imageUrl:
+        'assets/products/flakes-kids-cereals/01e92a08-b40b-4d6f-aca7-8537cd382447.png',
     category: 'Cereals',
     discountPercentage: '15% OFF',
   ),
@@ -764,7 +804,8 @@ const _catalog = <_Product>[
     mrp: r'₹145',
     rating: 4.8,
     reviews: 7200,
-    imageUrl: 'assets/products/flakes-kids-cereals/09a1e487-9781-4ade-ab0e-73327c96691e.png',
+    imageUrl:
+        'assets/products/flakes-kids-cereals/09a1e487-9781-4ade-ab0e-73327c96691e.png',
     category: 'Cereals',
     discountPercentage: '14% OFF',
   ),
@@ -777,7 +818,8 @@ const _catalog = <_Product>[
     mrp: r'₹199',
     rating: 4.7,
     reviews: 4300,
-    imageUrl: 'assets/products/flakes-kids-cereals/0c447ba4-a230-4b31-92e7-03007bebf0bc.png',
+    imageUrl:
+        'assets/products/flakes-kids-cereals/0c447ba4-a230-4b31-92e7-03007bebf0bc.png',
     category: 'Cereals',
     discountPercentage: '15% OFF',
   ),
@@ -790,7 +832,8 @@ const _catalog = <_Product>[
     mrp: r'₹115',
     rating: 4.7,
     reviews: 6200,
-    imageUrl: 'assets/products/flakes-kids-cereals/141e68a9-f36a-422f-8746-a9a49359401b.png',
+    imageUrl:
+        'assets/products/flakes-kids-cereals/141e68a9-f36a-422f-8746-a9a49359401b.png',
     category: 'Cereals',
     discountPercentage: '15% OFF',
   ),
@@ -859,7 +902,8 @@ const _catalog = <_Product>[
     mrp: r'₹50',
     rating: 4.6,
     reviews: 3200,
-    imageUrl: 'assets/products/vermicelli/3da21b8f-16e5-4727-9899-c5ef3e1db668.png',
+    imageUrl:
+        'assets/products/vermicelli/3da21b8f-16e5-4727-9899-c5ef3e1db668.png',
     category: 'Vermicelli',
     discountPercentage: '16% OFF',
   ),
@@ -872,7 +916,8 @@ const _catalog = <_Product>[
     mrp: r'₹48',
     rating: 4.6,
     reviews: 4900,
-    imageUrl: 'assets/products/vermicelli/4bf7f974-20b4-48b8-9367-f60997e8b940.png',
+    imageUrl:
+        'assets/products/vermicelli/4bf7f974-20b4-48b8-9367-f60997e8b940.png',
     category: 'Vermicelli',
     discountPercentage: '19% OFF',
   ),
@@ -898,13 +943,23 @@ const _catalog = <_Product>[
     mrp: r'₹55',
     rating: 4.6,
     reviews: 2600,
-    imageUrl: 'assets/products/vermicelli/64ca266c-db61-4087-b9f5-2019f2704a3e.png',
+    imageUrl:
+        'assets/products/vermicelli/64ca266c-db61-4087-b9f5-2019f2704a3e.png',
     category: 'Vermicelli',
     discountPercentage: '18% OFF',
   ),
 ];
 
-const _kCats = ['All', 'Vegetables', 'Milk', 'Bread & Bakery', 'Curd & Yogurt', 'Cereals', 'Poha & Grains', 'Vermicelli'];
+const _kCats = [
+  'All',
+  'Vegetables',
+  'Milk',
+  'Bread & Bakery',
+  'Curd & Yogurt',
+  'Cereals',
+  'Poha & Grains',
+  'Vermicelli'
+];
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -924,7 +979,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   void _updateProductQty(_Product p, int delta, CartProvider? cartProvider) {
     if (cartProvider != null) {
-      final priceVal = double.tryParse(p.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 50.0;
+      final priceVal =
+          double.tryParse(p.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 50.0;
       cartProvider.updateQuantityById(
         id: p.id,
         name: p.name,
@@ -946,16 +1002,25 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   }
 
   int get _cartCount => _cart.values.fold(0, (s, v) => s + v);
-  List<_Product> get _filtered =>
-      _selectedCat == 'All' ? _catalog : _catalog.where((p) => p.category == _selectedCat).toList();
+  List<_Product> get _filtered => _selectedCat == 'All'
+      ? _catalog
+      : _catalog.where((p) => p.category == _selectedCat).toList();
 
   @override
   Widget build(BuildContext context) {
     CartProvider? cartProvider;
     LanguageProvider? languageProvider;
+    UserProvider? userProvider;
 
-    try { cartProvider = context.watch<CartProvider>(); } catch (_) {}
-    try { languageProvider = context.watch<LanguageProvider>(); } catch (_) {}
+    try {
+      cartProvider = context.watch<CartProvider>();
+    } catch (_) {}
+    try {
+      languageProvider = context.watch<LanguageProvider>();
+    } catch (_) {}
+    try {
+      userProvider = context.watch<UserProvider>();
+    } catch (_) {}
 
     final cartCount = cartProvider?.totalCount ?? _cartCount;
 
@@ -968,11 +1033,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       },
       child: Scaffold(
         backgroundColor: const Color(0xFFF9F9FC),
+        drawer: const AppNavigationDrawer(isDrawer: true),
         body: SafeArea(
           child: IndexedStack(
             index: _navIndex,
             children: [
-              _buildFeed(cartProvider),
+              _buildFeed(cartProvider, userProvider),
               const BrowseCategoriesScreen(isEmbedded: true),
               const SearchResultsScreen(),
               const CartScreen(isEmbedded: true),
@@ -989,7 +1055,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     );
   }
 
-  Widget _buildBottomNav(int cartCount, LanguageProvider? languageProvider) => ClipRect(
+  Widget _buildBottomNav(int cartCount, LanguageProvider? languageProvider) =>
+      ClipRect(
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
           child: Container(
@@ -1014,12 +1081,31 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _navItem(0, Icons.home_rounded, languageProvider?.translate('shop', 'Home') ?? 'Home'),
-                _navItem(1, Icons.grid_view_rounded, languageProvider?.translate('categories', 'Categories') ?? 'Categories'),
-                _navItem(2, Icons.search_rounded, languageProvider?.translate('search', 'Search') ?? 'Search'),
-                _navItem(3, Icons.shopping_basket_outlined, languageProvider?.translate('cart', 'Cart') ?? 'Cart', badge: cartCount),
-                _navItem(4, Icons.receipt_long_rounded, languageProvider?.translate('orders', 'Orders') ?? 'Orders'),
-                _navItem(5, Icons.person_outline_rounded, languageProvider?.translate('account', 'Profile') ?? 'Profile'),
+                _navItem(0, Icons.home_rounded,
+                    languageProvider?.translate('shop', 'Home') ?? 'Home'),
+                _navItem(
+                    1,
+                    Icons.grid_view_rounded,
+                    languageProvider?.translate('categories', 'Categories') ??
+                        'Categories'),
+                _navItem(
+                    2,
+                    Icons.search_rounded,
+                    languageProvider?.translate('search', 'Search') ??
+                        'Search'),
+                _navItem(3, Icons.shopping_basket_outlined,
+                    languageProvider?.translate('cart', 'Cart') ?? 'Cart',
+                    badge: cartCount),
+                _navItem(
+                    4,
+                    Icons.receipt_long_rounded,
+                    languageProvider?.translate('orders', 'Orders') ??
+                        'Orders'),
+                _navItem(
+                    5,
+                    Icons.person_outline_rounded,
+                    languageProvider?.translate('account', 'Profile') ??
+                        'Profile'),
               ],
             ),
           ),
@@ -1068,23 +1154,30 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         ],
       );
 
-  Widget _buildFeed(CartProvider? cartProvider) => SingleChildScrollView(
+  Widget _buildFeed(CartProvider? cartProvider, [UserProvider? userProvider]) =>
+      SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                _buildHeader(), const SizedBox(height: 12),
-                _buildGreetingHeader(),
-                _buildDeliveryEtaWidget(),
-                const SizedBox(height: 8),
-                const StoreStatusBannerWidget(isOpen: true, closingTime: '11:00 PM'),
-                const SizedBox(height: 8),
-                _buildAddressBar(), const SizedBox(height: 12),
-                _buildSearchBar(), const SizedBox(height: 16),
-              ]),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildHeader(userProvider),
+                    const SizedBox(height: 12),
+                    _buildGreetingHeader(userProvider),
+                    _buildDeliveryEtaWidget(),
+                    const SizedBox(height: 8),
+                    const StoreStatusBannerWidget(
+                        isOpen: true, closingTime: '11:00 PM'),
+                    const SizedBox(height: 8),
+                    _buildAddressBar(),
+                    const SizedBox(height: 12),
+                    _buildSearchBar(),
+                    const SizedBox(height: 16),
+                  ]),
             ),
 
             // ─── 1. Multi-Banner Hero Carousel ──────────────────────────────────
@@ -1112,7 +1205,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
             // ─── 5. Deal of the Day / Product Spotlight Bento ───────────────────
             ProductSpotlightSection(
-              onDetailsTap: () => Navigator.pushNamed(context, '/catalog/favorites'),
+              onDetailsTap: () =>
+                  Navigator.pushNamed(context, '/catalog/favorites'),
             ),
             const SizedBox(height: 20),
 
@@ -1123,11 +1217,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             // ─── 6. Categories ──────────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                _sectionHeader('Categories', onAll: () => setState(() => _navIndex = 1)),
-                const SizedBox(height: 12),
-                _buildCategoryChips(),
-              ]),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionHeader('Categories',
+                        onAll: () => setState(() => _navIndex = 1)),
+                    const SizedBox(height: 12),
+                    _buildCategoryChips(),
+                  ]),
             ),
             const SizedBox(height: 24),
 
@@ -1176,12 +1273,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             // ─── 5. Kirana Essentials (Grid) ───────────────────────────────────
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                _sectionHeader('Kirana Essentials'),
-                const SizedBox(height: 12),
-                _buildCategoryFilter(),
-                const SizedBox(height: 16),
-              ]),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _sectionHeader('Kirana Essentials'),
+                    const SizedBox(height: 12),
+                    _buildCategoryFilter(),
+                    const SizedBox(height: 16),
+                  ]),
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -1190,8 +1289,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, childAspectRatio: 0.49,
-                    crossAxisSpacing: 14, mainAxisSpacing: 14,
+                    crossAxisCount: 2,
+                    childAspectRatio: 0.49,
+                    crossAxisSpacing: 14,
+                    mainAxisSpacing: 14,
                   ),
                   itemCount: _filtered.length,
                   itemBuilder: (_, i) => AnimationConfiguration.staggeredGrid(
@@ -1219,39 +1320,120 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         ),
       );
 
-  Widget _buildHeader() => Row(
+  Widget _buildHeader([UserProvider? userProvider]) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(onPressed: () => AppNavigationDrawer.show(context), icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26)),
+          IconButton(
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              AppNavigationDrawer.show(context);
+            },
+            icon: const Icon(Icons.menu_rounded,
+                color: Color(0xFF1A1C1E), size: 26),
+            tooltip: 'Navigation Hub',
+          ),
           Flexible(
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Container(
-                width: 28, height: 28, padding: const EdgeInsets.all(2),
-                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6), border: Border.all(color: Colors.black12)),
-                child: Image.asset('assets/images/daily_basket_logo.png', fit: BoxFit.contain, errorBuilder: (_, __, ___) => const Icon(Icons.shopping_bag_rounded, size: 18, color: Color(0xFF2D9D43))),
+                width: 28,
+                height: 28,
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: Colors.black12)),
+                child: Image.asset('assets/images/daily_basket_logo.png',
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Icon(
+                        Icons.shopping_bag_rounded,
+                        size: 18,
+                        color: Color(0xFF2D9D43))),
               ),
               const SizedBox(width: 8),
               Flexible(
-                child: Text('Daily Basket', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w700, color: const Color(0xFF2D9D43)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                child: Text('Daily Basket',
+                    style: GoogleFonts.outfit(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: const Color(0xFF2D9D43)),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis),
               ),
             ]),
           ),
-          Stack(clipBehavior: Clip.none, children: [
-            IconButton(
-              onPressed: () => setState(() => _navIndex = 3),
-              icon: const Icon(Icons.shopping_basket_outlined, color: Color(0xFF2D9D43), size: 26),
-            ),
-            if (_cartCount > 0) Positioned(top: 6, right: 6, child: Container(
-              padding: const EdgeInsets.all(4),
-              decoration: const BoxDecoration(color: Color(0xFF2D9D43), shape: BoxShape.circle),
-              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-              child: Text('$_cartCount', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-            )),
-          ]),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(clipBehavior: Clip.none, children: [
+                IconButton(
+                  onPressed: () {
+                    HapticFeedback.lightImpact();
+                    setState(() => _navIndex = 3);
+                  },
+                  icon: const Icon(Icons.shopping_basket_outlined,
+                      color: Color(0xFF2D9D43), size: 26),
+                  tooltip: 'Shopping Cart',
+                ),
+                if (_cartCount > 0)
+                  Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: const BoxDecoration(
+                            color: Color(0xFF2D9D43), shape: BoxShape.circle),
+                        constraints:
+                            const BoxConstraints(minWidth: 16, minHeight: 16),
+                        child: Text('$_cartCount',
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center),
+                      )),
+              ]),
+              const SizedBox(width: 4),
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  setState(() => _navIndex = 5);
+                },
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border:
+                        Border.all(color: const Color(0xFFC0E8C7), width: 1.8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF006B23).withValues(alpha: 0.12),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(9999),
+                    child: Image.network(
+                      userProvider?.profileImageUrl ??
+                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => const Icon(
+                        Icons.person,
+                        color: Color(0xFF2D9D43),
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       );
 
-  Widget _buildGreetingHeader() {
+  Widget _buildGreetingHeader([UserProvider? userProvider]) {
     final hour = DateTime.now().hour;
     String greeting = 'Good Morning';
     IconData timeIcon = Icons.wb_sunny_rounded;
@@ -1263,29 +1445,37 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       timeIcon = Icons.nights_stay_rounded;
     }
 
+    final displayName = userProvider?.name.split(' ').first ?? 'Aarav';
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: Row(
-              children: [
-                Icon(timeIcon, color: const Color(0xFFEAB308), size: 20),
-                const SizedBox(width: 8),
-                Flexible(
-                  child: Text(
-                    '$greeting, Sachinxcode! 👋',
-                    style: GoogleFonts.outfit(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A1C1E),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                setState(() => _navIndex = 5);
+              },
+              child: Row(
+                children: [
+                  Icon(timeIcon, color: const Color(0xFFEAB308), size: 20),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      '$greeting, $displayName! 👋',
+                      style: GoogleFonts.outfit(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1A1C1E),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           const SizedBox(width: 8),
@@ -1294,7 +1484,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             decoration: BoxDecoration(
               color: const Color(0xFFE8F5E9),
               borderRadius: BorderRadius.circular(9999),
-              border: Border.all(color: const Color(0xFF2D9D43).withValues(alpha: 0.2)),
+              border: Border.all(
+                  color: const Color(0xFF2D9D43).withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
@@ -1351,7 +1542,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.bolt_rounded, color: Color(0xFF2D9D43), size: 20),
+                    child: const Icon(Icons.bolt_rounded,
+                        color: Color(0xFF2D9D43), size: 20),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -1385,7 +1577,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               ),
             ),
             const SizedBox(width: 6),
-            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 14),
+            const Icon(Icons.arrow_forward_ios_rounded,
+                color: Colors.white, size: 14),
           ],
         ),
       );
@@ -1394,39 +1587,50 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         onTap: () => Navigator.pushNamed(context, '/saved-addresses'),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(color: const Color(0xFFF3F3F6), borderRadius: BorderRadius.circular(9999)),
+          decoration: BoxDecoration(
+              color: const Color(0xFFF3F3F6),
+              borderRadius: BorderRadius.circular(9999)),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            const Icon(Icons.location_on_outlined, color: Color(0xFF2D9D43), size: 20),
+            const Icon(Icons.location_on_outlined,
+                color: Color(0xFF2D9D43), size: 20),
             const SizedBox(width: 8),
             Flexible(
               child: Text(
                 '123 Main St, New York',
-                style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500, color: const Color(0xFF1A1C1E)),
+                style: GoogleFonts.inter(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF1A1C1E)),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
             const SizedBox(width: 4),
-            const Icon(Icons.keyboard_arrow_down_rounded, color: Color(0xFF6E7A6C), size: 20),
+            const Icon(Icons.keyboard_arrow_down_rounded,
+                color: Color(0xFF6E7A6C), size: 20),
           ]),
         ),
       );
 
   Widget _buildSearchBar() => Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(color: const Color(0xFFF3F3F6), borderRadius: BorderRadius.circular(9999)),
+        decoration: BoxDecoration(
+            color: const Color(0xFFF3F3F6),
+            borderRadius: BorderRadius.circular(9999)),
         child: Row(
           children: [
             Expanded(
               child: GestureDetector(
                 onTap: () => Navigator.pushNamed(context, '/search'),
                 child: Row(children: [
-                  const Icon(Icons.search_rounded, color: Color(0xFF6E7A6C), size: 22),
+                  const Icon(Icons.search_rounded,
+                      color: Color(0xFF6E7A6C), size: 22),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'Search products...',
-                      style: GoogleFonts.inter(fontSize: 14, color: const Color(0xFF6E7A6C)),
+                      style: GoogleFonts.inter(
+                          fontSize: 14, color: const Color(0xFF6E7A6C)),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1492,12 +1696,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          if (onAll != null) TextButton(onPressed: onAll, child: Text('See All', style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF2D9D43)))),
+          if (onAll != null)
+            TextButton(
+                onPressed: onAll,
+                child: Text('See All',
+                    style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF2D9D43)))),
         ],
       );
-
-
-
 
   Widget _buildCategoryChips() {
     const chips = [
@@ -1513,25 +1721,38 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       child: Row(
-        children: chips.map((c) => GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProductListingScreen(
-                  categoryId: c.$2,
-                  categoryName: c.$1,
-                ),
-              ),
-            );
-          },
-          child: Container(
-            margin: const EdgeInsets.only(right: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(color: const Color(0xFFF3F3F6), borderRadius: BorderRadius.circular(16)),
-            child: Row(children: [Text(c.$3, style: const TextStyle(fontSize: 20)), const SizedBox(width: 8), Text(c.$1, style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E)))]),
-          ),
-        )).toList(),
+        children: chips
+            .map((c) => GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ProductListingScreen(
+                          categoryId: c.$2,
+                          categoryName: c.$1,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    margin: const EdgeInsets.only(right: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                        color: const Color(0xFFF3F3F6),
+                        borderRadius: BorderRadius.circular(16)),
+                    child: Row(children: [
+                      Text(c.$3, style: const TextStyle(fontSize: 20)),
+                      const SizedBox(width: 8),
+                      Text(c.$1,
+                          style: GoogleFonts.outfit(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF1A1C1E)))
+                    ]),
+                  ),
+                ))
+            .toList(),
       ),
     );
   }
@@ -1539,7 +1760,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   Widget _buildCategoryFilter() => SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         physics: const BouncingScrollPhysics(),
-        child: Row(children: _kCats.map((cat) {
+        child: Row(
+            children: _kCats.map((cat) {
           final sel = _selectedCat == cat;
           return GestureDetector(
             onTap: () => setState(() => _selectedCat = cat),
@@ -1550,9 +1772,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               decoration: BoxDecoration(
                 color: sel ? const Color(0xFF2D9D43) : Colors.white,
                 borderRadius: BorderRadius.circular(9999),
-                border: Border.all(color: sel ? const Color(0xFF2D9D43) : const Color(0xFFBECAB9)),
+                border: Border.all(
+                    color: sel
+                        ? const Color(0xFF2D9D43)
+                        : const Color(0xFFBECAB9)),
               ),
-              child: Text(cat, style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w500, color: sel ? Colors.white : const Color(0xFF3F4A3D))),
+              child: Text(cat,
+                  style: GoogleFonts.inter(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: sel ? Colors.white : const Color(0xFF3F4A3D))),
             ),
           );
         }).toList()),
@@ -1611,7 +1840,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             'unitDetails': p.unit,
             'deliveryTime': '10 mins',
             'imageUrl': p.imageUrl,
-            'description': 'Farm fresh and premium quality ${p.name}. Delivered in 10 minutes directly to your doorstep with guaranteed freshness.',
+            'description':
+                'Farm fresh and premium quality ${p.name}. Delivered in 10 minutes directly to your doorstep with guaranteed freshness.',
           },
         );
       },
@@ -1619,14 +1849,21 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2))],
+          border:
+              Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withValues(alpha: 0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2))
+          ],
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
                 child: AspectRatio(
                   aspectRatio: 1.30,
                   child: Container(
@@ -1635,7 +1872,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     child: AppNetworkImage(
                       imageUrl: p.imageUrl,
                       fit: BoxFit.contain,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(12)),
                       fallbackIcon: _getCategoryIcon(p.category),
                       fallbackBgColor: const Color(0xFFF3F3F6),
                       fallbackIconColor: const Color(0xFF2D9D43),
@@ -1648,7 +1886,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   top: 8,
                   left: 8,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                     decoration: BoxDecoration(
                       color: const Color(0xFFBA1A1A),
                       borderRadius: BorderRadius.circular(4),
@@ -1681,8 +1920,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     'name': p.name,
                     'brand': p.brand,
                     'weight': p.unit,
-                    'price': double.tryParse(p.price.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 50.0,
-                    'mrp': double.tryParse(p.mrp.replaceAll(RegExp(r'[^0-9.]'), '')) ?? 60.0,
+                    'price': double.tryParse(
+                            p.price.replaceAll(RegExp(r'[^0-9.]'), '')) ??
+                        50.0,
+                    'mrp': double.tryParse(
+                            p.mrp.replaceAll(RegExp(r'[^0-9.]'), '')) ??
+                        60.0,
                     'category': p.category,
                     'imageUrl': p.imageUrl,
                   },
@@ -1694,80 +1937,145 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(10, 6, 10, 8),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(p.brand, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF2D9D43)), maxLines: 1, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 2),
-                Text(p.name, style: GoogleFonts.outfit(fontSize: 12.5, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E), height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 1),
-                Text(p.unit, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C))),
-                const SizedBox(height: 3),
-                Row(children: [
-                  const Icon(Icons.star_rounded, size: 12, color: Color(0xFFF59E0B)),
-                  const SizedBox(width: 2),
-                  Text(p.rating.toStringAsFixed(1), style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.w600, color: const Color(0xFF1A1C1E))),
-                  const SizedBox(width: 3),
-                  Flexible(child: Text('(${_fmt(p.reviews)})', style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C)), overflow: TextOverflow.ellipsis)),
-                ]),
-                const Spacer(),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(p.price, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w700, color: const Color(0xFF2D9D43))),
-                    const SizedBox(width: 5),
-                    Text(p.mrp, style: GoogleFonts.inter(fontSize: 10, color: const Color(0xFF6E7A6C), decoration: TextDecoration.lineThrough)),
-                    if (disc.isNotEmpty) ...[
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(
-                          disc,
+                    Text(p.brand,
+                        style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF2D9D43)),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 2),
+                    Text(p.name,
+                        style: GoogleFonts.outfit(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1A1C1E),
+                            height: 1.2),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 1),
+                    Text(p.unit,
+                        style: GoogleFonts.inter(
+                            fontSize: 10, color: const Color(0xFF6E7A6C))),
+                    const SizedBox(height: 3),
+                    Row(children: [
+                      const Icon(Icons.star_rounded,
+                          size: 12, color: Color(0xFFF59E0B)),
+                      const SizedBox(width: 2),
+                      Text(p.rating.toStringAsFixed(1),
                           style: GoogleFonts.inter(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFFBA1A1A),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 6),
-                qty == 0
-                    ? AppPressable(
-                        child: SizedBox(
-                          width: double.infinity, height: 32,
-                          child: ElevatedButton(
-                            onPressed: () => _updateProductQty(p, 1, cartProvider),
-                            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2D9D43), foregroundColor: Colors.white, elevation: 0, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)), padding: EdgeInsets.zero),
-                            child: Text('Add', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600)),
-                          ),
-                        ),
-                      )
-                    : Container(
-                        height: 32,
-                        decoration: BoxDecoration(color: const Color(0xFF2D9D43), borderRadius: BorderRadius.circular(8)),
-                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                          AppPressable(
-                            onTap: () => _updateProductQty(p, -1, cartProvider),
-                            child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.remove, color: Colors.white, size: 16)),
-                          ),
-                          AnimatedSwitcher(
-                            duration: const Duration(milliseconds: 180),
-                            transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF1A1C1E))),
+                      const SizedBox(width: 3),
+                      Flexible(
+                          child: Text('(${_fmt(p.reviews)})',
+                              style: GoogleFonts.inter(
+                                  fontSize: 10, color: const Color(0xFF6E7A6C)),
+                              overflow: TextOverflow.ellipsis)),
+                    ]),
+                    const Spacer(),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(p.price,
+                            style: GoogleFonts.outfit(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF2D9D43))),
+                        const SizedBox(width: 5),
+                        Text(p.mrp,
+                            style: GoogleFonts.inter(
+                                fontSize: 10,
+                                color: const Color(0xFF6E7A6C),
+                                decoration: TextDecoration.lineThrough)),
+                        if (disc.isNotEmpty) ...[
+                          const SizedBox(width: 4),
+                          Flexible(
                             child: Text(
-                              '$qty',
-                              key: ValueKey<int>(qty),
-                              style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.white),
+                              disc,
+                              style: GoogleFonts.inter(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFFBA1A1A),
+                              ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          AppPressable(
-                            onTap: () => _updateProductQty(p, 1, cartProvider),
-                            child: const Padding(padding: EdgeInsets.symmetric(horizontal: 8), child: Icon(Icons.add, color: Colors.white, size: 16)),
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    qty == 0
+                        ? AppPressable(
+                            child: SizedBox(
+                              width: double.infinity,
+                              height: 32,
+                              child: ElevatedButton(
+                                onPressed: () =>
+                                    _updateProductQty(p, 1, cartProvider),
+                                style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF2D9D43),
+                                    foregroundColor: Colors.white,
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8)),
+                                    padding: EdgeInsets.zero),
+                                child: Text('Add',
+                                    style: GoogleFonts.outfit(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600)),
+                              ),
+                            ),
+                          )
+                        : Container(
+                            height: 32,
+                            decoration: BoxDecoration(
+                                color: const Color(0xFF2D9D43),
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  AppPressable(
+                                    onTap: () =>
+                                        _updateProductQty(p, -1, cartProvider),
+                                    child: const Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 8),
+                                        child: Icon(Icons.remove,
+                                            color: Colors.white, size: 16)),
+                                  ),
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 180),
+                                    transitionBuilder: (child, anim) =>
+                                        ScaleTransition(
+                                            scale: anim, child: child),
+                                    child: Text(
+                                      '$qty',
+                                      key: ValueKey<int>(qty),
+                                      style: GoogleFonts.outfit(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white),
+                                    ),
+                                  ),
+                                  AppPressable(
+                                    onTap: () =>
+                                        _updateProductQty(p, 1, cartProvider),
+                                    child: const Padding(
+                                        padding:
+                                            EdgeInsets.symmetric(horizontal: 8),
+                                        child: Icon(Icons.add,
+                                            color: Colors.white, size: 16)),
+                                  ),
+                                ]),
                           ),
-                        ]),
-                      ),
-              ]),
+                  ]),
             ),
           ),
         ]),
@@ -1785,23 +2093,46 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(color: active ? const Color(0xFF2D9D43) : Colors.transparent, borderRadius: BorderRadius.circular(9999)),
+        decoration: BoxDecoration(
+            color: active ? const Color(0xFF2D9D43) : Colors.transparent,
+            borderRadius: BorderRadius.circular(9999)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           Stack(clipBehavior: Clip.none, children: [
-            Icon(icon, color: active ? Colors.white : const Color(0xFF6E7A6C), size: 22),
-            if (badge > 0 && !active) Positioned(top: -4, right: -6, child: AnimatedScale(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.elasticOut,
-              scale: 1.0,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                decoration: const BoxDecoration(color: Color(0xFFBA1A1A), shape: BoxShape.circle),
-                constraints: const BoxConstraints(minWidth: 15, minHeight: 15),
-                child: Text('$badge', style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-              ),
-            )),
+            Icon(icon,
+                color: active ? Colors.white : const Color(0xFF6E7A6C),
+                size: 22),
+            if (badge > 0 && !active)
+              Positioned(
+                  top: -4,
+                  right: -6,
+                  child: AnimatedScale(
+                    duration: const Duration(milliseconds: 250),
+                    curve: Curves.elasticOut,
+                    scale: 1.0,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 4, vertical: 1),
+                      decoration: const BoxDecoration(
+                          color: Color(0xFFBA1A1A), shape: BoxShape.circle),
+                      constraints:
+                          const BoxConstraints(minWidth: 15, minHeight: 15),
+                      child: Text('$badge',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                              fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center),
+                    ),
+                  )),
           ]),
-          if (active) ...[const SizedBox(width: 6), Text(label, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12))],
+          if (active) ...[
+            const SizedBox(width: 6),
+            Text(label,
+                style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12))
+          ],
         ]),
       ),
     );

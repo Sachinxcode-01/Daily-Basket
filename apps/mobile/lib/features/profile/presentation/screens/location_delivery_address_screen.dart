@@ -112,7 +112,18 @@ class _LocationDeliveryAddressScreenState
 
   @override
   Widget build(BuildContext context) {
-    final filteredAddresses = _savedAddresses.where((addr) {
+    final addressProvider = context.watch<AddressProvider>();
+    final addressesSource = addressProvider.addresses.isNotEmpty
+        ? addressProvider.addresses.map((a) => {
+            'id': a['id'],
+            'label': a['label'] ?? 'Home',
+            'icon': a['label'] == 'Work' ? Icons.work_rounded : Icons.home_rounded,
+            'address': a['addressText'] ?? a['fullAddress'] ?? a['city'] ?? '',
+            'inRange': a['isServiceable'] ?? a['inRange'] ?? true,
+          }).toList()
+        : _savedAddresses;
+
+    final filteredAddresses = addressesSource.where((addr) {
       if (_searchQuery.isEmpty) return true;
       final q = _searchQuery.toLowerCase();
       final label = (addr['label'] as String).toLowerCase();
@@ -428,16 +439,30 @@ class _LocationDeliveryAddressScreenState
                       const SizedBox(height: 28),
 
                       // ─── Saved Addresses Section ───────────────────────────
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          'Saved Addresses',
-                          style: GoogleFonts.outfit(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.onSurface,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Saved Addresses',
+                            style: GoogleFonts.outfit(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.onSurface,
+                            ),
                           ),
-                        ),
+                          TextButton.icon(
+                            onPressed: () => Navigator.of(context).pushNamed('/add-address'),
+                            icon: const Icon(Icons.add, size: 16, color: AppColors.primary),
+                            label: Text(
+                              'Add New',
+                              style: GoogleFonts.outfit(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 12),
                       ListView.separated(

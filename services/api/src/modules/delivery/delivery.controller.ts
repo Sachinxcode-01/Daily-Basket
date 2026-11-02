@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { DeliveryService } from './delivery.service';
 import { GeofenceService } from './geofence.service';
 import { TimedDispatchService } from './timed-dispatch.service';
+import { PincodeLookupService } from './pincode-lookup.service';
 
 @ApiTags('Delivery & GPS Tracking')
 @Controller('delivery')
@@ -11,7 +12,20 @@ export class DeliveryController {
     private readonly deliveryService: DeliveryService,
     private readonly geofenceService: GeofenceService,
     private readonly timedDispatchService: TimedDispatchService,
+    private readonly pincodeLookupService: PincodeLookupService,
   ) {}
+
+  @Get('pincode/:pincode')
+  @ApiOperation({ summary: 'Automatic Indian PIN code lookup and delivery serviceability verification' })
+  async lookupPincode(@Param('pincode') pincode: string) {
+    return this.pincodeLookupService.lookupPincode(pincode);
+  }
+
+  @Get('postal-lookup/:pincode')
+  @ApiOperation({ summary: 'Lookup postal info by Indian PIN code (alias)' })
+  async lookupPostal(@Param('pincode') pincode: string) {
+    return this.pincodeLookupService.lookupPincode(pincode);
+  }
 
   @Post('dispatch/:orderId')
   @ApiOperation({ summary: 'Evaluate timed dispatch (60% packing progress) and dynamic corridor batching' })

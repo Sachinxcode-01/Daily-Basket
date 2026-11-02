@@ -24,7 +24,6 @@ class _AdminDeliveryDashboardScreenState extends State<AdminDeliveryDashboardScr
   static const Color _textDark = Color(0xFF1E2923);
   static const Color _textMuted = Color(0xFF64748B);
   static const Color _mintText = Color(0xFF15803D);
-  static const Color _periwinkleBg = Color(0xFFDCE6FE);
 
   // Delivery Management State Data
   final Map<String, dynamic> _dashboardData = {
@@ -146,7 +145,6 @@ class _AdminDeliveryDashboardScreenState extends State<AdminDeliveryDashboardScr
                 ),
               ),
             ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -154,9 +152,22 @@ class _AdminDeliveryDashboardScreenState extends State<AdminDeliveryDashboardScr
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0.5,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_rounded, color: _textDark),
-        onPressed: () => Navigator.pop(context),
+      leading: Builder(
+        builder: (ctx) {
+          if (Scaffold.maybeOf(ctx)?.hasDrawer ?? false) {
+            return IconButton(
+              icon: const Icon(Icons.menu_rounded, color: _textDark),
+              onPressed: () => Scaffold.of(ctx).openDrawer(),
+            );
+          }
+          if (Navigator.canPop(ctx)) {
+            return IconButton(
+              icon: const Icon(Icons.arrow_back_rounded, color: _textDark),
+              onPressed: () => Navigator.pop(ctx),
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
       centerTitle: true,
       title: const Text(
@@ -742,64 +753,6 @@ class _AdminDeliveryDashboardScreenState extends State<AdminDeliveryDashboardScr
           );
         }),
       ],
-    );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(0, Icons.grid_view_rounded, 'Dashboard', isSelected: true),
-              _buildNavItem(1, Icons.shopping_bag_outlined, 'Orders'),
-              _buildNavItem(2, Icons.inventory_2_outlined, 'Inventory'),
-              _buildNavItem(3, Icons.local_offer_rounded, 'Products'),
-              _buildNavItem(4, Icons.bar_chart_rounded, 'Analytics'),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label, {bool isSelected = false}) {
-    return InkWell(
-      onTap: () {},
-      borderRadius: BorderRadius.circular(20),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? _periwinkleBg : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? _primaryGreen : const Color(0xFF64748B),
-              size: 22,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? _textDark : const Color(0xFF64748B),
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

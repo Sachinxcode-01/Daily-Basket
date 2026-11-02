@@ -3,9 +3,13 @@
 // Project: Daily Basket Quick-Commerce Suite (ID: 6885817708675501691)
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/widgets/staggered_animation_wrappers.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/providers/user_provider.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import '../../../../core/providers/search_history_provider.dart';
@@ -518,8 +522,17 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
   Widget build(BuildContext context) {
     final filteredProducts = _getFilteredProducts();
 
+    UserProvider? userProvider;
+    try {
+      userProvider = context.watch<UserProvider>();
+    } catch (_) {}
+    final profileImageUrl = userProvider?.profileImageUrl ??
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+
     return Scaffold(
       backgroundColor: AppColors.background,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 2),
       appBar: AppBar(
         backgroundColor: Colors.white.withValues(alpha: 0.90),
         elevation: 0.5,
@@ -580,6 +593,7 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                   Icons.tune_rounded,
                   color: AppColors.primary,
                 ),
+                tooltip: 'Filter & Sort',
                 onPressed: _openFilterBottomSheet,
               ),
               if (_selectedFilter != 'All' || _selectedSort != 'Relevance')
@@ -596,6 +610,44 @@ class _SearchResultsScreenState extends State<SearchResultsScreen> {
                   ),
                 ),
             ],
+          ),
+          IconButton(
+            icon: const Icon(Icons.menu_rounded, color: AppColors.primary),
+            tooltip: 'Navigation Hub',
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              AppNavigationDrawer.show(context);
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0, left: 2.0),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.of(context).pushNamed('/profile');
+              },
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFF2D9D43).withValues(alpha: 0.6),
+                    width: 1.5,
+                  ),
+                ),
+                child: ClipOval(
+                  child: Image.network(
+                    profileImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const CircleAvatar(
+                      backgroundColor: Color(0xFF2D9D43),
+                      child: Icon(Icons.person_rounded, color: Colors.white, size: 18),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),

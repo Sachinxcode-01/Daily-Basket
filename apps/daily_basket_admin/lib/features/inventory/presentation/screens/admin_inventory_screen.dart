@@ -14,7 +14,6 @@ class AdminInventoryScreen extends StatefulWidget {
 class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
   String _selectedFilter = 'All';
   final TextEditingController _searchController = TextEditingController();
-  int _activeNavIndex = 2; // 2 = Inventory tab
 
   // Brand Colors matching Google Stitch Specs
   static const Color _primaryGreen = Color(0xFF006837);
@@ -40,7 +39,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
       'stock': 124,
       'status': 'IN_STOCK',
       'isLowStock': false,
-      'image': 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=300',
+      'image':
+          'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=300',
     },
     {
       'id': 'MK-FR-002',
@@ -51,7 +51,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
       'stock': 8,
       'status': 'LOW_STOCK',
       'isLowStock': true,
-      'image': 'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300',
+      'image':
+          'https://images.unsplash.com/photo-1563636619-e9143da7973b?w=300',
     },
     {
       'id': 'BD-SD-003',
@@ -62,7 +63,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
       'stock': 42,
       'status': 'IN_STOCK',
       'isLowStock': false,
-      'image': 'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=300',
+      'image':
+          'https://images.unsplash.com/photo-1586444248902-2f64eddc13df?w=300',
     },
     {
       'id': 'HNY-ORG-004',
@@ -73,7 +75,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
       'stock': 15,
       'status': 'IN_STOCK',
       'isLowStock': false,
-      'image': 'https://images.unsplash.com/photo-1587049352847-4a222e784d38?w=300',
+      'image':
+          'https://images.unsplash.com/photo-1587049352847-4a222e784d38?w=300',
     },
   ];
 
@@ -88,8 +91,9 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
       final query = _searchController.text.toLowerCase();
       if (query.isEmpty) return matchesFilter;
 
-      final matchesQuery = item['name'].toString().toLowerCase().contains(query) ||
-          item['sku'].toString().toLowerCase().contains(query);
+      final matchesQuery =
+          item['name'].toString().toLowerCase().contains(query) ||
+              item['sku'].toString().toLowerCase().contains(query);
 
       return matchesFilter && matchesQuery;
     }).toList();
@@ -155,7 +159,6 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
         elevation: 4,
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -163,12 +166,21 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0.5,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_rounded, color: _textDark),
-        onPressed: () {
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context);
+      leading: Builder(
+        builder: (ctx) {
+          if (Scaffold.maybeOf(ctx)?.hasDrawer ?? false) {
+            return IconButton(
+              icon: const Icon(Icons.menu_rounded, color: _textDark),
+              onPressed: () => Scaffold.of(ctx).openDrawer(),
+            );
           }
+          if (Navigator.canPop(ctx)) {
+            return IconButton(
+              icon: const Icon(Icons.arrow_back_rounded, color: _textDark),
+              onPressed: () => Navigator.pop(ctx),
+            );
+          }
+          return const SizedBox.shrink();
         },
       ),
       titleSpacing: 0,
@@ -189,7 +201,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
           alignment: Alignment.center,
           children: [
             IconButton(
-              icon: const Icon(Icons.notifications_none_rounded, color: _textDark),
+              icon: const Icon(Icons.notifications_none_rounded,
+                  color: _textDark),
               onPressed: () {},
             ),
             Positioned(
@@ -276,7 +289,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: borderColor ?? const Color(0xFFE2E8F0), width: 1.2),
+        border: Border.all(
+            color: borderColor ?? const Color(0xFFE2E8F0), width: 1.2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.02),
@@ -344,7 +358,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
         child: Row(
           children: [
             const SizedBox(width: 14),
-            const Icon(Icons.search_rounded, color: Color(0xFF64748B), size: 20),
+            const Icon(Icons.search_rounded,
+                color: Color(0xFF64748B), size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: TextField(
@@ -353,7 +368,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
                 style: const TextStyle(fontSize: 14, color: _textDark),
                 decoration: const InputDecoration(
                   hintText: 'Search inventory, SKU...',
-                  hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 13.5),
+                  hintStyle:
+                      TextStyle(color: Color(0xFF94A3B8), fontSize: 13.5),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.zero,
@@ -361,11 +377,13 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.qr_code_scanner_rounded, color: _textDark, size: 20),
+              icon: const Icon(Icons.qr_code_scanner_rounded,
+                  color: _textDark, size: 20),
               onPressed: () {},
             ),
             IconButton(
-              icon: const Icon(Icons.mic_none_rounded, color: _primaryGreen, size: 22),
+              icon: const Icon(Icons.mic_none_rounded,
+                  color: _primaryGreen, size: 22),
               onPressed: () {},
             ),
           ],
@@ -453,7 +471,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
                     width: 72,
                     height: 72,
                     color: _primaryGreen.withOpacity(0.1),
-                    child: const Icon(Icons.shopping_basket_rounded, color: _primaryGreen, size: 32),
+                    child: const Icon(Icons.shopping_basket_rounded,
+                        color: _primaryGreen, size: 32),
                   ),
                 ),
               ),
@@ -478,12 +497,19 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
                           ),
                         ),
                         PopupMenuButton<String>(
-                          icon: const Icon(Icons.more_vert_rounded, color: _textMuted, size: 20),
+                          icon: const Icon(Icons.more_vert_rounded,
+                              color: _textMuted, size: 20),
                           onSelected: (val) {},
                           itemBuilder: (_) => [
-                            const PopupMenuItem(value: 'edit', child: Text('Edit SKU Details')),
-                            const PopupMenuItem(value: 'barcode', child: Text('Print Barcode Label')),
-                            const PopupMenuItem(value: 'delete', child: Text('Archive SKU', style: TextStyle(color: Colors.red))),
+                            const PopupMenuItem(
+                                value: 'edit', child: Text('Edit SKU Details')),
+                            const PopupMenuItem(
+                                value: 'barcode',
+                                child: Text('Print Barcode Label')),
+                            const PopupMenuItem(
+                                value: 'delete',
+                                child: Text('Archive SKU',
+                                    style: TextStyle(color: Colors.red))),
                           ],
                         ),
                       ],
@@ -522,7 +548,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
                         const Spacer(),
                         // Status Pill Badge
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: isLowStock ? _lowStockBg : _inStockBg,
                             borderRadius: BorderRadius.circular(16),
@@ -534,15 +561,19 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
                                 width: 6,
                                 height: 6,
                                 decoration: BoxDecoration(
-                                  color: isLowStock ? _lowStockDot : _inStockDot,
+                                  color:
+                                      isLowStock ? _lowStockDot : _inStockDot,
                                   shape: BoxShape.circle,
                                 ),
                               ),
                               const SizedBox(width: 5),
                               Text(
-                                isLowStock ? 'Low Stock ($stock)' : 'In Stock ($stock)',
+                                isLowStock
+                                    ? 'Low Stock ($stock)'
+                                    : 'In Stock ($stock)',
                                 style: TextStyle(
-                                  color: isLowStock ? _lowStockText : _inStockText,
+                                  color:
+                                      isLowStock ? _lowStockText : _inStockText,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 11.5,
                                 ),
@@ -579,7 +610,9 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          isLowStock ? Icons.bolt_rounded : Icons.add_shopping_cart_rounded,
+                          isLowStock
+                              ? Icons.bolt_rounded
+                              : Icons.add_shopping_cart_rounded,
                           color: Colors.white,
                           size: 18,
                         ),
@@ -614,7 +647,9 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(
-                          isLowStock ? Icons.local_offer_outlined : Icons.edit_outlined,
+                          isLowStock
+                              ? Icons.local_offer_outlined
+                              : Icons.edit_outlined,
                           color: _textDark,
                           size: 18,
                         ),
@@ -643,7 +678,8 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.inventory_2_outlined, size: 56, color: Color(0xFFCBD5E1)),
+          const Icon(Icons.inventory_2_outlined,
+              size: 56, color: Color(0xFFCBD5E1)),
           const SizedBox(height: 12),
           const Text(
             'No inventory items found',
@@ -663,71 +699,13 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
     );
   }
 
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(0, Icons.grid_view_rounded, 'Dashboard'),
-              _buildNavItem(1, Icons.shopping_basket_outlined, 'Orders'),
-              _buildNavItem(2, Icons.inventory_2_rounded, 'Inventory'),
-              _buildNavItem(3, Icons.bar_chart_rounded, 'Analytics'),
-              _buildNavItem(4, Icons.person_outline_rounded, 'Profile'),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label) {
-    final isSelected = _activeNavIndex == index;
-    return InkWell(
-      onTap: () => setState(() => _activeNavIndex = index),
-      borderRadius: BorderRadius.circular(20),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFDCFCE7) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? _primaryGreen : const Color(0xFF64748B),
-              size: 22,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? _primaryGreen : const Color(0xFF64748B),
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _showAddStockDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('Add SKU to Inventory', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Add SKU to Inventory',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         content: const Text('Scan or enter SKU details to update stock level.'),
         actions: [
           TextButton(
@@ -737,11 +715,11 @@ class _AdminInventoryScreenState extends State<AdminInventoryScreen> {
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
             style: ElevatedButton.styleFrom(backgroundColor: _primaryGreen),
-            child: const Text('Add Stock', style: TextStyle(color: Colors.white)),
+            child:
+                const Text('Add Stock', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
   }
 }
-

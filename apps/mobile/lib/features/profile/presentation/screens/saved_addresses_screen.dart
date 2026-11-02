@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_top_bar.dart';
 import '../../providers/address_provider.dart';
+import 'add_address_screen.dart';
 
 /// Saved Addresses Screen — Google Stitch Design System Exact Replica
 class SavedAddressesScreen extends StatefulWidget {
@@ -38,22 +42,13 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F9FC),
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        title: Text(
-          'Saved Addresses',
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF1A1C1E),
-          ),
-        ),
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 5),
+      appBar: const AppTopBar(
+        title: 'Saved Addresses',
+        showBack: true,
+        showDrawer: true,
+        showProfile: true,
       ),
       body: Stack(
         children: [
@@ -223,11 +218,21 @@ class _SavedAddressesScreenState extends State<SavedAddressesScreen> {
                               onSelected: (val) {
                                 if (val == 'default') {
                                   addressProvider.setDefaultAddress(item['id']);
+                                } else if (val == 'edit') {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (_) => AddAddressScreen(editAddressData: item),
+                                    ),
+                                  );
                                 } else if (val == 'delete') {
                                   _deleteAddress(item['id'].toString(), label);
                                 }
                               },
                               itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  value: 'edit',
+                                  child: Text('Edit Address'),
+                                ),
                                 const PopupMenuItem(
                                   value: 'default',
                                   child: Text('Set as Default'),

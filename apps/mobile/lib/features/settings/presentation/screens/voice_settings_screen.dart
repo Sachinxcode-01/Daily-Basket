@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_top_bar.dart';
 
 class VoiceSettingsScreen extends StatefulWidget {
   const VoiceSettingsScreen({super.key});
@@ -29,11 +32,13 @@ class _VoiceSettingsScreenState extends State<VoiceSettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        title: const Text('Voice AI Settings', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF0F172A),
-        elevation: 0.5,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 5),
+      appBar: const AppTopBar(
+        title: 'Voice AI Settings',
+        showBack: true,
+        showDrawer: true,
+        showProfile: true,
       ),
       body: ListView(
         padding: const EdgeInsets.all(16.0),

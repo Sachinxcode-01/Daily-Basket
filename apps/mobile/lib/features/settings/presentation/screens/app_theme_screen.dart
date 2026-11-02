@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/providers/app_theme_provider.dart';
 
 /// App Theme Screen — Exact Google Stitch Specification
@@ -13,25 +16,13 @@ class AppThemeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
-      appBar: AppBar(
-        backgroundColor: Colors.white.withValues(alpha: 0.90),
-        elevation: 0.5,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: Color(0xFF006B23),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text(
-          'App Theme',
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: const Color(0xFF1A1C1E),
-          ),
-        ),
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 5),
+      appBar: const AppTopBar(
+        title: 'App Theme',
+        showBack: true,
+        showDrawer: true,
+        showProfile: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),

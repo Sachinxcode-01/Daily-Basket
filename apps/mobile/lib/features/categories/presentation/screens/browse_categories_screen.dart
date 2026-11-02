@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/providers/user_provider.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_network_image.dart';
 import 'category_products_screen.dart';
@@ -150,7 +155,17 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider? userProvider;
+    try {
+      userProvider = context.watch<UserProvider>();
+    } catch (_) {}
+    final profileImageUrl = userProvider?.profileImageUrl ??
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+
     return Scaffold(
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar:
+          widget.isEmbedded ? null : const AppBottomNav(currentIndex: 1),
       backgroundColor: AppColors.surface,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(64),
@@ -172,8 +187,19 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.location_on, color: AppColors.primary),
-                    onPressed: () => Navigator.pushNamed(context, '/select-location'),
+                    icon: widget.isEmbedded
+                        ? const Icon(Icons.location_on,
+                            color: AppColors.primary)
+                        : const Icon(Icons.menu_rounded,
+                            color: AppColors.primary, size: 26),
+                    onPressed: () {
+                      if (widget.isEmbedded) {
+                        Navigator.pushNamed(context, '/select-location');
+                      } else {
+                        HapticFeedback.lightImpact();
+                        AppNavigationDrawer.show(context);
+                      }
+                    },
                   ),
                   Text(
                     widget.isEmbedded ? 'Categories' : 'Daily Basket',
@@ -187,6 +213,35 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                     icon: const Icon(Icons.search, color: AppColors.primary),
                     onPressed: () => Navigator.pushNamed(context, '/search'),
                   ),
+                  if (!widget.isEmbedded)
+                    GestureDetector(
+                      onTap: () {
+                        HapticFeedback.lightImpact();
+                        Navigator.of(context).pushNamed('/profile');
+                      },
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        margin: const EdgeInsets.only(left: 6),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                              color: const Color(0xFFC0E8C7), width: 1.5),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(9999),
+                          child: Image.network(
+                            profileImageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const Icon(
+                              Icons.person,
+                              color: Color(0xFF006B23),
+                              size: 18,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -206,14 +261,16 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                   onTap: () => Navigator.pushNamed(context, '/search'),
                   borderRadius: BorderRadius.circular(12),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
                     decoration: BoxDecoration(
                       color: AppColors.surfaceContainerLow,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.search, color: AppColors.outline, size: 20),
+                        const Icon(Icons.search,
+                            color: AppColors.outline, size: 20),
                         const SizedBox(width: 10),
                         Text(
                           'Search groceries...',
@@ -248,7 +305,8 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                     itemBuilder: (context, index) {
                       final item = _featuredCategories[index];
                       return InkWell(
-                        onTap: () => _navigateToCategory(item['slug']!, item['title']!),
+                        onTap: () =>
+                            _navigateToCategory(item['slug']!, item['title']!),
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
                           width: 260,
@@ -271,7 +329,8 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                                   imageUrl: item['imageUrl']!,
                                   fit: BoxFit.cover,
                                   borderRadius: BorderRadius.circular(16),
-                                  fallbackBgColor: AppColors.surfaceContainerHigh,
+                                  fallbackBgColor:
+                                      AppColors.surfaceContainerHigh,
                                   fallbackIcon: Icons.storefront_rounded,
                                 ),
                               ),
@@ -309,7 +368,8 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                                       item['subtitle']!,
                                       style: GoogleFonts.inter(
                                         fontSize: 12,
-                                        color: Colors.white.withValues(alpha: 0.85),
+                                        color: Colors.white
+                                            .withValues(alpha: 0.85),
                                       ),
                                     ),
                                   ],
@@ -348,7 +408,8 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                   itemBuilder: (context, index) {
                     final cat = _allCategories[index];
                     return InkWell(
-                      onTap: () => _navigateToCategory(cat['slug']!, cat['title']!),
+                      onTap: () =>
+                          _navigateToCategory(cat['slug']!, cat['title']!),
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
                         padding: const EdgeInsets.all(12),
@@ -379,7 +440,8 @@ class _BrowseCategoriesScreenState extends State<BrowseCategoriesScreen> {
                                   height: double.infinity,
                                   fit: BoxFit.cover,
                                   borderRadius: BorderRadius.circular(8),
-                                  fallbackBgColor: AppColors.surfaceContainerHigh,
+                                  fallbackBgColor:
+                                      AppColors.surfaceContainerHigh,
                                   fallbackIcon: Icons.shopping_basket_rounded,
                                 ),
                               ),

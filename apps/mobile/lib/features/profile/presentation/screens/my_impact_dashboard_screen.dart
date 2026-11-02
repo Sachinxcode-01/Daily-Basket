@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/providers/user_provider.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 /// My Impact Dashboard Screen — Exact Google Stitch Specification
 /// Screen ID: b0b7938902674fbba61f412fcdc66bff
@@ -64,19 +69,40 @@ class _MyImpactDashboardScreenState extends State<MyImpactDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    UserProvider? userProvider;
+    try {
+      userProvider = context.watch<UserProvider>();
+    } catch (_) {}
+    final profileImageUrl = userProvider?.profileImageUrl ??
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 5),
       appBar: AppBar(
         backgroundColor: Colors.white.withValues(alpha: 0.90),
         elevation: 0.5,
         centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: Color(0xFF006B23),
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading: Navigator.of(context).canPop()
+            ? IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_rounded,
+                  color: Color(0xFF006B23),
+                ),
+                onPressed: () => Navigator.of(context).maybePop(),
+              )
+            : IconButton(
+                icon: const Icon(
+                  Icons.menu_rounded,
+                  color: Color(0xFF006B23),
+                  size: 26,
+                ),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  AppNavigationDrawer.show(context);
+                },
+              ),
         title: Text(
           'Daily Basket',
           style: GoogleFonts.outfit(
@@ -91,6 +117,52 @@ class _MyImpactDashboardScreenState extends State<MyImpactDashboardScreen> {
             tooltip: 'Recalculate Impact',
             onPressed: _recalculateImpact,
           ),
+          IconButton(
+            icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E)),
+            tooltip: 'Navigation Hub',
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              AppNavigationDrawer.show(context);
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 14.0, left: 4.0),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.of(context).pushNamed('/profile');
+              },
+              child: Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFF2D9D43).withValues(alpha: 0.6),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.network(
+                    profileImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const CircleAvatar(
+                      backgroundColor: Color(0xFF2D9D43),
+                      child: Icon(Icons.person_rounded,
+                          color: Colors.white, size: 20),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ],
       ),
       body: RefreshIndicator(
@@ -102,7 +174,8 @@ class _MyImpactDashboardScreenState extends State<MyImpactDashboardScreen> {
               )
             : SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
                 child: Center(
                   child: ConstrainedBox(
                     constraints: const BoxConstraints(maxWidth: 800),
@@ -183,7 +256,8 @@ class _MyImpactDashboardScreenState extends State<MyImpactDashboardScreen> {
                                       'You are in the $_percentile of eco-conscious shoppers in your area this month.',
                                       style: GoogleFonts.inter(
                                         fontSize: 13,
-                                        color: Colors.white.withValues(alpha: 0.9),
+                                        color:
+                                            Colors.white.withValues(alpha: 0.9),
                                       ),
                                     ),
                                   ],
@@ -235,7 +309,8 @@ class _MyImpactDashboardScreenState extends State<MyImpactDashboardScreen> {
                           title: 'Plastic Saved',
                           value: '${_plasticSavedKg.toStringAsFixed(1)} kg',
                           progress: _monthlyProgress,
-                          progressLabel: 'Goal: 5.0 kg (${(_monthlyProgress * 100).toInt()}%)',
+                          progressLabel:
+                              'Goal: 5.0 kg (${(_monthlyProgress * 100).toInt()}%)',
                           description:
                               'Equivalent to saving ${(_plasticSavedKg * 50).toInt()} plastic bottles from landfills.',
                         ),
@@ -277,9 +352,12 @@ class _MyImpactDashboardScreenState extends State<MyImpactDashboardScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            _buildBadgeItem(Icons.nature_people_rounded, 'Zero Waste', 'Tier 2'),
-                            _buildBadgeItem(Icons.bolt_rounded, 'EV Champion', 'Tier 3'),
-                            _buildBadgeItem(Icons.park_rounded, 'Tree Saver', 'Tier 1'),
+                            _buildBadgeItem(Icons.nature_people_rounded,
+                                'Zero Waste', 'Tier 2'),
+                            _buildBadgeItem(
+                                Icons.bolt_rounded, 'EV Champion', 'Tier 3'),
+                            _buildBadgeItem(
+                                Icons.park_rounded, 'Tree Saver', 'Tier 1'),
                           ],
                         ),
                         const SizedBox(height: 32),

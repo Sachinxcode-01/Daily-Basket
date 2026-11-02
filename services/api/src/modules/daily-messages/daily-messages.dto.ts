@@ -36,3 +36,4 @@ export class DispatchDailyMessageDto {
   @IsOptional()
   campaignId?: string;
 }
+

@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/providers/user_provider.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/theme/app_theme.dart';
 
 /// Notification Center Screen — Exact Google Stitch Specification
@@ -55,18 +60,36 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
             .where((n) => n['category'] == _selectedFilter)
             .toList();
 
+    UserProvider? userProvider;
+    try {
+      userProvider = context.watch<UserProvider>();
+    } catch (_) {}
+    final profileImageUrl = userProvider?.profileImageUrl ??
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+
     return Scaffold(
       backgroundColor: AppColors.background,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: -1),
       appBar: AppBar(
         backgroundColor: Colors.white.withValues(alpha: 0.90),
         elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_rounded,
-            color: AppColors.primary,
-          ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        leading: Navigator.of(context).canPop()
+            ? IconButton(
+                icon: const Icon(
+                  Icons.arrow_back_rounded,
+                  color: AppColors.primary,
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+              )
+            : IconButton(
+                icon: const Icon(Icons.menu_rounded,
+                    color: AppColors.primary, size: 26),
+                onPressed: () {
+                  HapticFeedback.lightImpact();
+                  AppNavigationDrawer.show(context);
+                },
+              ),
         title: Text(
           'Notification Center',
           style: GoogleFonts.outfit(
@@ -78,9 +101,48 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
         centerTitle: true,
         actions: [
           IconButton(
+            icon: const Icon(Icons.menu_rounded, color: AppColors.primary),
+            tooltip: 'Navigation Hub',
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              AppNavigationDrawer.show(context);
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 6.0, left: 2.0),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.of(context).pushNamed('/profile');
+              },
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border:
+                      Border.all(color: const Color(0xFFC0E8C7), width: 1.8),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(9999),
+                  child: Image.network(
+                    profileImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const Icon(
+                      Icons.person,
+                      color: Color(0xFF006B23),
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          IconButton(
             icon: const Icon(Icons.settings_outlined, color: AppColors.primary),
             tooltip: 'Notification Preferences',
-            onPressed: () => Navigator.of(context).pushNamed('/notification-preferences'),
+            onPressed: () =>
+                Navigator.of(context).pushNamed('/notification-preferences'),
           ),
           TextButton.icon(
             onPressed: () {
@@ -175,7 +237,8 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
                     final title = (item['title'] as String).toLowerCase();
                     if (title.contains('order') || category == 'Orders') {
                       Navigator.pushNamed(context, '/orders');
-                    } else if (title.contains('wallet') || title.contains('cashback')) {
+                    } else if (title.contains('wallet') ||
+                        title.contains('cashback')) {
                       Navigator.pushNamed(context, '/wallet');
                     } else if (title.contains('sale') || category == 'Offers') {
                       Navigator.pushNamed(context, '/offers');
@@ -224,7 +287,8 @@ class _NotificationCenterScreenState extends State<NotificationCenterScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     item['title'],

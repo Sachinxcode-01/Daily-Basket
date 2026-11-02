@@ -78,6 +78,7 @@ class CartProvider extends ChangeNotifier {
   double get itemTotalDouble =>
       _items.fold(0.0, (sum, item) => sum + (item.price * item.qty));
   int get totalCount => _items.fold(0, (sum, item) => sum + item.qty);
+  int get itemCount => totalCount;
   bool get isEmpty => _items.isEmpty;
 
   /// Fetch remote persistent cart and merge on app start

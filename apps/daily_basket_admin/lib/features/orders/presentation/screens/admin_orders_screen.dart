@@ -14,7 +14,6 @@ class AdminOrdersScreen extends StatefulWidget {
 class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
   String _selectedFilter = 'All Orders';
   final TextEditingController _searchController = TextEditingController();
-  int _activeNavIndex = 1; // 1 = Orders tab
 
   // Brand Colors matching Google Stitch Design Spec
   static const Color _primaryGreen = Color(0xFF006837);
@@ -36,20 +35,26 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
       'customer': 'Rahul Sharma',
       'address': '12, Green Park Avenue, Block C, HSR',
       'phone': '+91 98765 43210',
-      'avatar': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+      'avatar':
+          'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
       'amount': 1240,
       'isPriority': true,
       'statusStep': 1, // 0: New, 1: Accept, 2: Pack, 3: Assign, 4: Done
       'time': '10:24 AM (5m ago)',
       'paymentMethod': 'Paid via UPI',
-      'items': ['Organic Avocados x4', 'Aashirvaad Atta 5kg', 'Amul Butter 500g'],
+      'items': [
+        'Organic Avocados x4',
+        'Aashirvaad Atta 5kg',
+        'Amul Butter 500g'
+      ],
     },
     {
       'id': '#DB-9840',
       'customer': 'Priya Desai',
       'address': 'Sector 4, HSR Layout, Bengaluru',
       'phone': '+91 98765 12345',
-      'avatar': 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
+      'avatar':
+          'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
       'amount': 450,
       'isPriority': false,
       'statusStep': 2,
@@ -62,20 +67,26 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
       'customer': 'Ananya R.',
       'address': '102, Sun City Apts, Sarjapur Road',
       'phone': '+91 91234 56789',
-      'avatar': 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150',
+      'avatar':
+          'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150',
       'amount': 890,
       'isPriority': true,
       'statusStep': 0,
       'time': '10:28 AM (1m ago)',
       'paymentMethod': 'Paid via Wallet',
-      'items': ['Greek Yogurt 400g', 'Cold Pressed Juice 1L', 'Blueberries 125g'],
+      'items': [
+        'Greek Yogurt 400g',
+        'Cold Pressed Juice 1L',
+        'Blueberries 125g'
+      ],
     },
     {
       'id': '#DB-9835',
       'customer': 'Vikram Malhotra',
       'address': '45, Koramangala 5th Block, Bengaluru',
       'phone': '+91 99887 76655',
-      'avatar': 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
+      'avatar':
+          'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
       'amount': 1560,
       'isPriority': false,
       'statusStep': 3,
@@ -98,9 +109,10 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
       final query = _searchController.text.toLowerCase();
       if (query.isEmpty) return matchesFilter;
 
-      final matchesQuery = order['id'].toString().toLowerCase().contains(query) ||
-          order['customer'].toString().toLowerCase().contains(query) ||
-          order['address'].toString().toLowerCase().contains(query);
+      final matchesQuery =
+          order['id'].toString().toLowerCase().contains(query) ||
+              order['customer'].toString().toLowerCase().contains(query) ||
+              order['address'].toString().toLowerCase().contains(query);
 
       return matchesFilter && matchesQuery;
     }).toList();
@@ -165,7 +177,6 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         elevation: 4,
         child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
 
@@ -173,12 +184,21 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0.5,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_rounded, color: _textDark),
-        onPressed: () {
-          if (Navigator.canPop(context)) {
-            Navigator.pop(context);
+      leading: Builder(
+        builder: (ctx) {
+          if (Scaffold.maybeOf(ctx)?.hasDrawer ?? false) {
+            return IconButton(
+              icon: const Icon(Icons.menu_rounded, color: _textDark),
+              onPressed: () => Scaffold.of(ctx).openDrawer(),
+            );
           }
+          if (Navigator.canPop(ctx)) {
+            return IconButton(
+              icon: const Icon(Icons.arrow_back_rounded, color: _textDark),
+              onPressed: () => Navigator.pop(ctx),
+            );
+          }
+          return const SizedBox.shrink();
         },
       ),
       titleSpacing: 0,
@@ -235,7 +255,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
           alignment: Alignment.center,
           children: [
             IconButton(
-              icon: const Icon(Icons.notifications_none_rounded, color: _textDark),
+              icon: const Icon(Icons.notifications_none_rounded,
+                  color: _textDark),
               onPressed: () {},
             ),
             Positioned(
@@ -270,7 +291,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
         child: Row(
           children: [
             const SizedBox(width: 14),
-            const Icon(Icons.search_rounded, color: Color(0xFF64748B), size: 20),
+            const Icon(Icons.search_rounded,
+                color: Color(0xFF64748B), size: 20),
             const SizedBox(width: 10),
             Expanded(
               child: TextField(
@@ -279,7 +301,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                 style: const TextStyle(fontSize: 14, color: _textDark),
                 decoration: const InputDecoration(
                   hintText: 'Search Order ID, Customer...',
-                  hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 13.5),
+                  hintStyle:
+                      TextStyle(color: Color(0xFF94A3B8), fontSize: 13.5),
                   border: InputBorder.none,
                   isDense: true,
                   contentPadding: EdgeInsets.zero,
@@ -287,7 +310,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.mic_none_rounded, color: _primaryGreen, size: 22),
+              icon: const Icon(Icons.mic_none_rounded,
+                  color: _primaryGreen, size: 22),
               onPressed: () {},
             ),
           ],
@@ -297,7 +321,13 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
   }
 
   Widget _buildFilterChips() {
-    final filters = ['All Orders', 'New (12)', 'Pending', 'Packed', 'Dispatched'];
+    final filters = [
+      'All Orders',
+      'New (12)',
+      'Pending',
+      'Packed',
+      'Dispatched'
+    ];
     return SizedBox(
       height: 38,
       child: ListView.separated(
@@ -473,7 +503,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               const SizedBox(width: 8),
               if (isPriority)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: _priorityRedBg,
                     borderRadius: BorderRadius.circular(8),
@@ -482,7 +513,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.local_fire_department_rounded, color: _priorityRedText, size: 14),
+                      Icon(Icons.local_fire_department_rounded,
+                          color: _priorityRedText, size: 14),
                       SizedBox(width: 3),
                       Text(
                         'Priority',
@@ -528,7 +560,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                       width: 44,
                       height: 44,
                       color: _primaryGreen.withOpacity(0.1),
-                      child: const Icon(Icons.person_rounded, color: _primaryGreen),
+                      child: const Icon(Icons.person_rounded,
+                          color: _primaryGreen),
                     ),
                   ),
                 ),
@@ -567,7 +600,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     color: _blueCallBg,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.phone_rounded, color: _blueCallIcon, size: 18),
+                  child: const Icon(Icons.phone_rounded,
+                      color: _blueCallIcon, size: 18),
                 ),
               ],
             ),
@@ -581,14 +615,16 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
           // Footer meta info: Time & Payment Method
           Row(
             children: [
-              const Icon(Icons.access_time_rounded, color: _textMuted, size: 14),
+              const Icon(Icons.access_time_rounded,
+                  color: _textMuted, size: 14),
               const SizedBox(width: 4),
               Text(
                 order['time'] as String,
                 style: const TextStyle(color: _textMuted, fontSize: 12),
               ),
               const Spacer(),
-              const Icon(Icons.check_circle_rounded, color: _primaryGreen, size: 14),
+              const Icon(Icons.check_circle_rounded,
+                  color: _primaryGreen, size: 14),
               const SizedBox(width: 4),
               Text(
                 order['paymentMethod'] as String,
@@ -612,7 +648,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     onPressed: () {
                       setState(() {
                         if (order['statusStep'] < 4) {
-                          order['statusStep'] = (order['statusStep'] as int) + 1;
+                          order['statusStep'] =
+                              (order['statusStep'] as int) + 1;
                         }
                       });
                     },
@@ -644,7 +681,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   border: Border.all(color: const Color(0xFFCBD5E1)),
                 ),
                 child: IconButton(
-                  icon: const Icon(Icons.print_outlined, color: _textDark, size: 20),
+                  icon: const Icon(Icons.print_outlined,
+                      color: _textDark, size: 20),
                   onPressed: () => _showPrintReceiptSheet(context, order),
                 ),
               ),
@@ -676,9 +714,12 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                         height: 14,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isPassed ? _primaryGreen : const Color(0xFFE2E8F0),
+                          color: isPassed
+                              ? _primaryGreen
+                              : const Color(0xFFE2E8F0),
                           border: isCurrent
-                              ? Border.all(color: const Color(0xFF86EFAC), width: 3)
+                              ? Border.all(
+                                  color: const Color(0xFF86EFAC), width: 3)
                               : null,
                         ),
                       ),
@@ -710,7 +751,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       color: isPassed ? _primaryGreen : const Color(0xFF94A3B8),
-                      fontWeight: isPassed ? FontWeight.bold : FontWeight.normal,
+                      fontWeight:
+                          isPassed ? FontWeight.bold : FontWeight.normal,
                       fontSize: 10.5,
                     ),
                   ),
@@ -765,66 +807,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
     );
   }
 
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(0, Icons.grid_view_rounded, 'Home'),
-              _buildNavItem(1, Icons.shopping_basket_rounded, 'Orders'),
-              _buildNavItem(2, Icons.inventory_2_outlined, 'Inventory'),
-              _buildNavItem(3, Icons.bar_chart_rounded, 'Analytics'),
-              _buildNavItem(4, Icons.person_outline_rounded, 'Profile'),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label) {
-    final isSelected = _activeNavIndex == index;
-    return InkWell(
-      onTap: () => setState(() => _activeNavIndex = index),
-      borderRadius: BorderRadius.circular(20),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFDCFCE7) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? _primaryGreen : const Color(0xFF64748B),
-              size: 22,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? _primaryGreen : const Color(0xFF64748B),
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showPrintReceiptSheet(BuildContext context, Map<String, dynamic> order) {
+  void _showPrintReceiptSheet(
+      BuildContext context, Map<String, dynamic> order) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -853,9 +837,12 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: _primaryGreen,
                 minimumSize: const Size(double.infinity, 44),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('Close', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: const Text('Close',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -868,8 +855,10 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('Manual Order Entry', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Create a quick manual dark store phone order entry.'),
+        title: const Text('Manual Order Entry',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        content:
+            const Text('Create a quick manual dark store phone order entry.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -883,7 +872,8 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
                   'customer': 'New Customer',
                   'address': 'Koramangala 4th Block, Bengaluru',
                   'phone': '+91 99999 88888',
-                  'avatar': 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
+                  'avatar':
+                      'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
                   'amount': 350,
                   'isPriority': true,
                   'statusStep': 0,
@@ -895,11 +885,11 @@ class _AdminOrdersScreenState extends State<AdminOrdersScreen> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(backgroundColor: _primaryGreen),
-            child: const Text('Create Order', style: TextStyle(color: Colors.white)),
+            child: const Text('Create Order',
+                style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
     );
   }
 }
-

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/providers/notification_provider.dart';
 
 /// Notification Settings Screen — Google Stitch Design System Exact Replica
@@ -13,28 +16,13 @@ class NotificationSettingsScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F9FC),
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        title: Text(
-          'Notifications',
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF006B23),
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: Color(0xFF1A1C1E)),
-            onPressed: () => Navigator.of(context).pushNamed('/app-theme'),
-          ),
-        ],
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 5),
+      appBar: const AppTopBar(
+        title: 'Notifications',
+        showBack: true,
+        showDrawer: true,
+        showProfile: true,
       ),
       body: Column(
         children: [

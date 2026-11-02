@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/providers/user_provider.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/cart_provider.dart';
@@ -104,8 +107,17 @@ class _FreshProduceListingScreenState extends State<FreshProduceListingScreen> {
       sort: _selectedSort,
     );
 
+    UserProvider? userProvider;
+    try {
+      userProvider = context.watch<UserProvider>();
+    } catch (_) {}
+    final profileImageUrl = userProvider?.profileImageUrl ??
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+
     return Scaffold(
       backgroundColor: AppColors.background,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 1),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56),
         child: Container(
@@ -170,6 +182,42 @@ class _FreshProduceListingScreenState extends State<FreshProduceListingScreen> {
                             ),
                           ),
                       ],
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.menu_rounded, color: AppColors.primary),
+                    tooltip: 'Navigation Hub',
+                    onPressed: () {
+                      AppNavigationDrawer.show(context);
+                    },
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 8.0, left: 2.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).pushNamed('/profile');
+                      },
+                      child: Container(
+                        width: 34,
+                        height: 34,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: const Color(0xFF2D9D43).withValues(alpha: 0.6),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: ClipOval(
+                          child: Image.network(
+                            profileImageUrl,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => const CircleAvatar(
+                              backgroundColor: Color(0xFF2D9D43),
+                              child: Icon(Icons.person_rounded, color: Colors.white, size: 18),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ],

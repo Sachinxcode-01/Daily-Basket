@@ -15,14 +15,21 @@ export interface UserProfileDto {
 export interface UserAddressDto {
   id?: string;
   label: string;
+  fullName?: string;
+  phone?: string;
+  country?: string;
+  state?: string;
+  district?: string;
+  city: string;
+  area?: string;
+  pincode: string;
   houseNo: string;
   street: string;
   landmark?: string;
-  city: string;
-  pincode: string;
-  latitude: number;
-  longitude: number;
+  latitude?: number;
+  longitude?: number;
   isDefault?: boolean;
+  isServiceable?: boolean;
 }
 
 export interface NotificationSettingsDto {
@@ -289,12 +296,50 @@ export class UsersService {
   }
 
   async createAddress(userId = 'usr_default', dto: UserAddressDto) {
+    if (!dto.pincode || !/^[1-9][0-9]{5}$/.test(dto.pincode.trim())) {
+      throw new BadRequestException('Invalid PIN code. Must be a valid 6-digit Indian PIN code (e.g. 582103 or 560038).');
+    }
+    if (!dto.houseNo || !dto.houseNo.trim()) {
+      throw new BadRequestException('House / Flat / Building number is required.');
+    }
+    if (!dto.street || !dto.street.trim()) {
+      throw new BadRequestException('Street / Road name is required.');
+    }
+
     const lat = dto.latitude != null && !isNaN(Number(dto.latitude)) ? Number(dto.latitude) : 12.9716;
     const lng = dto.longitude != null && !isNaN(Number(dto.longitude)) ? Number(dto.longitude) : 77.5946;
+    const isDefault = dto.isDefault ?? true;
+
+    // Check duplicate in memory store
+    const addrs = this.addressStore.get(userId) || [];
+    const duplicateIdx = addrs.findIndex(
+      (a) =>
+        a.pincode.trim() === dto.pincode.trim() &&
+        a.houseNo.trim().toLowerCase() === dto.houseNo.trim().toLowerCase() &&
+        a.street.trim().toLowerCase() === dto.street.trim().toLowerCase(),
+    );
+
+    if (duplicateIdx !== -1) {
+      // Update existing record rather than creating a duplicate
+      const existing = addrs[duplicateIdx];
+      const updated: UserAddressDto = {
+        ...existing,
+        ...dto,
+        id: existing.id,
+        latitude: lat,
+        longitude: lng,
+        isDefault,
+      };
+      if (isDefault) {
+        addrs.forEach((a) => (a.isDefault = false));
+      }
+      addrs[duplicateIdx] = updated;
+      this.addressStore.set(userId, addrs);
+      return { success: true, data: updated, message: 'Address updated successfully' };
+    }
 
     try {
       await this.ensureUser(userId);
-      const isDefault = dto.isDefault ?? true;
       const created = await this.prisma.$transaction(async (tx) => {
         if (isDefault) {
           await tx.address.updateMany({
@@ -306,11 +351,11 @@ export class UsersService {
           data: {
             userId,
             label: dto.label || 'HOME',
-            houseNo: dto.houseNo || '',
-            street: dto.street || '',
-            landmark: dto.landmark || null,
-            city: dto.city || 'Bengaluru',
-            pincode: dto.pincode || '560038',
+            houseNo: dto.houseNo.trim(),
+            street: dto.street.trim(),
+            landmark: dto.landmark?.trim() || null,
+            city: dto.city?.trim() || 'Bengaluru',
+            pincode: dto.pincode.trim(),
             latitude: lat,
             longitude: lng,
             isDefault,
@@ -321,17 +366,23 @@ export class UsersService {
       const formatted: UserAddressDto = {
         id: created.id,
         label: created.label,
+        fullName: dto.fullName,
+        phone: dto.phone,
+        country: dto.country || 'India',
+        state: dto.state,
+        district: dto.district,
+        city: created.city,
+        area: dto.area,
+        pincode: created.pincode,
         houseNo: created.houseNo,
         street: created.street,
         landmark: created.landmark || undefined,
-        city: created.city,
-        pincode: created.pincode,
         latitude: created.latitude,
         longitude: created.longitude,
         isDefault: created.isDefault,
+        isServiceable: dto.isServiceable,
       };
 
-      const addrs = this.addressStore.get(userId) || [];
       if (formatted.isDefault) {
         addrs.forEach((a) => (a.isDefault = false));
       }
@@ -343,18 +394,18 @@ export class UsersService {
       this.logger.warn(`Database createAddress fallback for ${userId}: ${err?.message}`);
     }
 
-    const addrs = this.addressStore.get(userId) || [];
-    const newAddr = {
+    const newAddr: UserAddressDto = {
       ...dto,
       id: `addr_${Date.now()}`,
+      country: dto.country || 'India',
       latitude: lat,
       longitude: lng,
-      isDefault: addrs.length === 0 || dto.isDefault === true,
+      isDefault: addrs.length === 0 || isDefault,
     };
     if (newAddr.isDefault) {
       addrs.forEach((a) => (a.isDefault = false));
     }
-    addrs.push(newAddr);
+    addrs.unshift(newAddr);
     this.addressStore.set(userId, addrs);
     return { success: true, data: newAddr, message: 'Address created successfully' };
   }

@@ -268,21 +268,104 @@ export class ApiClient {
     return this.fetcher(`${API_ROUTES.ORDERS.LIST}?userId=${encodeURIComponent(userId)}`);
   }
 
-  // Address Methods
+  // Address & PIN Code Methods
+  public async lookupPincode(pincode: string): Promise<any> {
+    const cleanPin = (pincode || '').trim();
+    if (!/^[1-9][0-9]{5}$/.test(cleanPin)) {
+      return {
+        success: false,
+        isValid: false,
+        pincode: cleanPin,
+        country: 'India',
+        state: '',
+        district: '',
+        city: '',
+        localities: [],
+        postOffices: [],
+        isServiceable: false,
+        serviceabilityBadge: 'OUT_OF_RANGE',
+        serviceabilityMessage: 'Invalid PIN code. Must be a valid 6-digit Indian PIN code.',
+        error: 'Invalid PIN code format.',
+      };
+    }
+
+    try {
+      const res: any = await this.fetcher(`/api/v1/delivery/pincode/${encodeURIComponent(cleanPin)}`);
+      if (res && (res.success || res.isValid)) {
+        return res;
+      }
+    } catch {
+      // Graceful fallback to postal public API
+    }
+
+    try {
+      const resp = await fetch(`https://api.postalpincode.in/pincode/${cleanPin}`);
+      const data: any = await resp.json();
+      if (Array.isArray(data) && data.length > 0 && data[0].Status === 'Success') {
+        const poList = data[0].PostOffice || [];
+        const firstPo = poList[0] || {};
+        const localities = Array.from(new Set(poList.map((p: any) => p.Name))).filter(Boolean);
+        const serviceablePins = new Set(['560001', '560008', '560025', '560034', '560038', '560075', '560095', '560102', '560103']);
+        const isServiceable = serviceablePins.has(cleanPin);
+
+        return {
+          success: true,
+          isValid: true,
+          pincode: cleanPin,
+          country: firstPo.Country || 'India',
+          state: firstPo.State || '',
+          district: firstPo.District || '',
+          city: firstPo.District || firstPo.Division || firstPo.Block || firstPo.Name || '',
+          localities,
+          postOffices: poList,
+          isServiceable,
+          serviceabilityBadge: isServiceable ? 'IN_RANGE' : 'OUT_OF_RANGE',
+          serviceabilityMessage: isServiceable
+            ? '10-Minute Kirana Delivery Available in this area!'
+            : `Currently delivery is not available in ${firstPo.District || cleanPin}. Daily Basket operates in Bengaluru.`,
+        };
+      }
+    } catch {
+      // Ignored
+    }
+
+    return {
+      success: false,
+      isValid: false,
+      pincode: cleanPin,
+      country: 'India',
+      state: '',
+      district: '',
+      city: '',
+      localities: [],
+      postOffices: [],
+      isServiceable: false,
+      serviceabilityBadge: 'OUT_OF_RANGE',
+      serviceabilityMessage: 'No postal information found for this PIN code.',
+      error: 'No postal records found.',
+    };
+  }
   public async getAddresses(userId = 'usr_default'): Promise<any> {
     return this.fetcher(`/api/v1/addresses?userId=${encodeURIComponent(userId)}`);
   }
 
   public async createAddress(addressData: {
     label: string;
+    fullName?: string;
+    phone?: string;
+    country?: string;
+    state?: string;
+    district?: string;
+    city: string;
+    area?: string;
+    pincode: string;
     houseNo: string;
     street: string;
     landmark?: string;
-    city: string;
-    pincode: string;
     latitude?: number;
     longitude?: number;
     isDefault?: boolean;
+    isServiceable?: boolean;
   }, userId = 'usr_default'): Promise<any> {
     return this.fetcher('/api/v1/addresses', {
       method: 'POST',
@@ -292,14 +375,21 @@ export class ApiClient {
 
   public async updateAddress(id: string, addressData: Partial<{
     label: string;
+    fullName?: string;
+    phone?: string;
+    country?: string;
+    state?: string;
+    district?: string;
+    city: string;
+    area?: string;
+    pincode: string;
     houseNo: string;
     street: string;
     landmark?: string;
-    city: string;
-    pincode: string;
     latitude?: number;
     longitude?: number;
     isDefault?: boolean;
+    isServiceable?: boolean;
   }>, userId = 'usr_default'): Promise<any> {
     return this.fetcher(`/api/v1/addresses/${id}`, {
       method: 'PUT',

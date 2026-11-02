@@ -65,3 +65,4 @@ export class DailyMessagesController {
     return this.dailyMessagesService.listCampaigns();
   }
 }
+

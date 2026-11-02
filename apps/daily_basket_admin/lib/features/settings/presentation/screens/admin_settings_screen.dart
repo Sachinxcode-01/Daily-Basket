@@ -18,7 +18,6 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
   bool _orderAlerts = true;
   bool _stockAlerts = true;
   bool _maintenanceMode = false;
-  bool _darkMode = true;
   bool _autoAssignRiders = true;
 
   @override
@@ -195,14 +194,7 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
           _sectionHeader('📱 App & Display'),
           StaggeredAnimatedCard(
             index: 14,
-            child: _buildToggleTile(
-              icon: Icons.dark_mode_rounded,
-              iconColor: const Color(0xFF64748B),
-              title: 'Dark Mode',
-              subtitle: 'Admin app display theme',
-              value: _darkMode,
-              onChanged: (v) => setState(() => _darkMode = v),
-            ),
+            child: _buildThemeModeTile(),
           ),
           StaggeredAnimatedCard(
             index: 15,
@@ -410,6 +402,32 @@ class _AdminSettingsScreenState extends State<AdminSettingsScreen> {
         subtitle: Text(subtitle, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
         trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF64748B)),
         onTap: onTap,
+      ),
+    );
+  }
+
+  Widget _buildThemeModeTile() {
+    return Container(
+      decoration: BoxDecoration(
+        color: const Color(0xFF1E293B),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFF334155).withOpacity(0.6)),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        leading: Container(
+          width: 40,
+          height: 40,
+          decoration: BoxDecoration(
+            color: const Color(0xFF6366F1).withOpacity(0.15),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(Icons.dark_mode_rounded, color: Color(0xFF818CF8), size: 20),
+        ),
+        title: const Text('Theme & Appearance', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+        subtitle: const Text('Dark Mode (Enterprise Default)', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+        trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF64748B)),
+        onTap: () {},
       ),
     );
   }

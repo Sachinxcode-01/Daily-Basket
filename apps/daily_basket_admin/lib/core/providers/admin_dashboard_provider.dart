@@ -6,13 +6,21 @@ class AdminDashboardProvider extends ChangeNotifier {
   final int _pendingOrders = 12;
   final int _activeRiders = 42;
   final double _systemHealth = 99.98;
-
+  int _currentTabIndex = 0;
 
   double get todayRevenue => _todayRevenue;
   int get todayOrders => _todayOrders;
   int get pendingOrders => _pendingOrders;
   int get activeRiders => _activeRiders;
   double get systemHealth => _systemHealth;
+  int get currentTabIndex => _currentTabIndex;
+
+  void switchTab(int index) {
+    if (_currentTabIndex != index) {
+      _currentTabIndex = index;
+      notifyListeners();
+    }
+  }
 
   void refreshMetrics() {
     _todayRevenue += 240.0;

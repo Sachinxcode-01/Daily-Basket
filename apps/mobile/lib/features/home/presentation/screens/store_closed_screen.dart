@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -7,6 +8,8 @@ import '../../../../core/network/api_client.dart';
 
 import '../../../../core/navigation/app_navigation_drawer.dart';
 import '../../../../core/providers/cart_provider.dart';
+import '../../../../core/providers/user_provider.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../cart/presentation/screens/cart_screen.dart';
 import '../../../profile/presentation/screens/saved_addresses_screen.dart';
@@ -54,12 +57,10 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
     });
 
     try {
-      final response = await http
-          .get(
-            Uri.parse('${ApiClient.defaultBaseUrl}/store-operations/status'),
-            headers: {'Content-Type': 'application/json'},
-          )
-          .timeout(const Duration(seconds: 4));
+      final response = await http.get(
+        Uri.parse('${ApiClient.defaultBaseUrl}/store-operations/status'),
+        headers: {'Content-Type': 'application/json'},
+      ).timeout(const Duration(seconds: 4));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -72,7 +73,8 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text('Store is now open! Welcome back to Daily Basket.'),
+                content:
+                    Text('Store is now open! Welcome back to Daily Basket.'),
                 backgroundColor: AppColors.primary,
                 behavior: SnackBarBehavior.floating,
               ),
@@ -93,7 +95,9 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
 
         if (mounted) {
           setState(() {
-            _opensAtText = isMaintenance ? 'Maintenance in progress' : 'Opens at $openTimeStr';
+            _opensAtText = isMaintenance
+                ? 'Maintenance in progress'
+                : 'Opens at $openTimeStr';
             _opensAtSubtitle = maintenanceMsg ?? 'Tomorrow morning';
           });
 
@@ -114,7 +118,8 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
       if (mounted && isUserTriggered) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Store verified: Opening at 7:00 AM tomorrow morning'),
+            content:
+                Text('Store verified: Opening at 7:00 AM tomorrow morning'),
             backgroundColor: AppColors.secondary,
             behavior: SnackBarBehavior.floating,
             duration: Duration(seconds: 2),
@@ -148,8 +153,17 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
     final cartProvider = context.watch<CartProvider>();
     final int cartItemCount = cartProvider.totalCount;
 
+    UserProvider? userProvider;
+    try {
+      userProvider = context.watch<UserProvider>();
+    } catch (_) {}
+    final profileImageUrl = userProvider?.profileImageUrl ??
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+
     return Scaffold(
       backgroundColor: AppColors.background,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: -1),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(64),
         child: Container(
@@ -170,9 +184,11 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.menu, color: AppColors.primary, size: 24),
-                    tooltip: 'Main Navigation Menu',
+                    icon: const Icon(Icons.menu_rounded,
+                        color: AppColors.primary, size: 26),
+                    tooltip: 'Navigation Hub',
                     onPressed: () {
+                      HapticFeedback.lightImpact();
                       AppNavigationDrawer.show(context);
                     },
                     style: IconButton.styleFrom(
@@ -196,42 +212,76 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
                       ),
                     ),
                   ),
-                  Stack(
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.shopping_cart_outlined,
-                          color: AppColors.primary,
-                          size: 24,
-                        ),
-                        tooltip: 'View Cart',
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const CartScreen(),
+                      Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(
+                              Icons.shopping_cart_outlined,
+                              color: AppColors.primary,
+                              size: 24,
                             ),
-                          );
-                        },
-                        style: IconButton.styleFrom(
-                          padding: const EdgeInsets.all(8),
-                          backgroundColor: Colors.transparent,
-                        ),
+                            tooltip: 'View Cart',
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => const CartScreen(),
+                                ),
+                              );
+                            },
+                            style: IconButton.styleFrom(
+                              padding: const EdgeInsets.all(8),
+                              backgroundColor: Colors.transparent,
+                            ),
+                          ),
+                          if (cartItemCount > 0)
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                decoration: BoxDecoration(
+                                  color: AppColors.error,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                      color: AppColors.surface, width: 2),
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      if (cartItemCount > 0)
-                        Positioned(
-                          top: 6,
-                          right: 6,
-                          child: Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: AppColors.error,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: AppColors.surface, width: 2),
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.of(context).pushNamed('/profile');
+                        },
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: const Color(0xFFC0E8C7), width: 1.8),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(9999),
+                            child: Image.network(
+                              profileImageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                Icons.person,
+                                color: Color(0xFF006B23),
+                                size: 20,
+                              ),
                             ),
                           ),
                         ),
+                      ),
                     ],
                   ),
                 ],
@@ -276,7 +326,8 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
-                              color: AppColors.secondaryContainer.withValues(alpha: 0.3),
+                              color: AppColors.secondaryContainer
+                                  .withValues(alpha: 0.3),
                               child: const Center(
                                 child: Icon(
                                   Icons.storefront_outlined,
@@ -354,7 +405,8 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
                   // ─── Status Card ───────────────────────────────────────────
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 20, horizontal: 20),
                     decoration: BoxDecoration(
                       color: AppColors.surfaceContainerLowest,
                       borderRadius: BorderRadius.circular(16),
@@ -422,9 +474,12 @@ class _StoreClosedScreenState extends State<StoreClosedScreen> {
                                 color: AppColors.onPrimary,
                               ),
                             )
-                          : const Icon(Icons.refresh, size: 20, color: AppColors.onPrimary),
+                          : const Icon(Icons.refresh,
+                              size: 20, color: AppColors.onPrimary),
                       label: Text(
-                        _isLoading ? 'Checking Availability...' : 'Refresh Status',
+                        _isLoading
+                            ? 'Checking Availability...'
+                            : 'Refresh Status',
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.w600,

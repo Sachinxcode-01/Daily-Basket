@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'core/theme/admin_theme.dart';
 import 'core/providers/admin_auth_provider.dart';
 import 'core/providers/admin_dashboard_provider.dart';
+import 'core/providers/admin_products_provider.dart';
+import 'core/providers/theme_provider.dart';
 
 // Stitch Authentication & Session Screens
 import 'features/authentication/presentation/screens/admin_splash_screen.dart';
@@ -70,7 +72,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => AdminAuthProvider()),
         ChangeNotifierProvider(create: (_) => AdminDashboardProvider()),
+        ChangeNotifierProvider(create: (_) => AdminProductsProvider()),
         ChangeNotifierProvider(create: (_) => AiHealthProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: const DailyBasketAdminApp(),
     ),
@@ -87,7 +91,7 @@ class DailyBasketAdminApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AdminTheme.lightTheme,
       darkTheme: AdminTheme.darkTheme,
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
       initialRoute: '/',
       routes: {
         '/': (context) => const AdminSplashScreen(),

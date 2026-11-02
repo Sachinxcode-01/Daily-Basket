@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/services/pincode_lookup_service.dart';
 
 enum LocationPermissionState { granted, denied, prompt }
 
@@ -34,7 +35,16 @@ class AddressProvider extends ChangeNotifier {
   String _fetchingProgressText = 'Detecting GPS Location...';
   bool _isLoading = false;
   final ApiClient _apiClient = ApiClient();
+  final PincodeLookupService _pincodeService = PincodeLookupService();
   Map<String, dynamic>? currentProfile;
+
+  bool _isPincodeLoading = false;
+  PincodeLookupResult? _lastPincodeResult;
+  String? _pincodeError;
+
+  bool get isPincodeLoading => _isPincodeLoading;
+  PincodeLookupResult? get lastPincodeResult => _lastPincodeResult;
+  String? get pincodeError => _pincodeError;
 
   AddressProvider({this.currentProfile});
 
@@ -44,30 +54,40 @@ class AddressProvider extends ChangeNotifier {
       'label': 'Home',
       'fullName': 'Rahul Sharma',
       'phone': '+91 98765 43210',
+      'country': 'India',
+      'state': 'Karnataka',
+      'district': 'Bengaluru',
       'houseFlat': 'Flat 402, Green Valley Apartments',
-      'streetArea': '100ft Road, Indiranagar',
+      'streetArea': '100ft Road',
+      'area': 'Indiranagar',
       'pincode': '560038',
       'city': 'Bengaluru',
       'landmark': 'Near Indiranagar Metro Station',
-      'addressText': 'Flat 402, Green Valley Apartments, 100ft Road, Indiranagar, Bengaluru - 560038',
+      'addressText': 'Flat 402, Green Valley Apartments, 100ft Road, Indiranagar, Bengaluru, Karnataka - 560038',
       'isDefault': true,
       'type': 'HOME',
       'inRange': true,
+      'isServiceable': true,
     },
     {
       'id': 'addr_2',
       'label': 'Work',
       'fullName': 'Rahul Sharma',
       'phone': '+91 98765 43210',
+      'country': 'India',
+      'state': 'Karnataka',
+      'district': 'Bengaluru',
       'houseFlat': 'Tech Park, Tower B, 5th Floor',
-      'streetArea': 'Outer Ring Road, Bellandur',
+      'streetArea': 'Outer Ring Road',
+      'area': 'Bellandur',
       'pincode': '560103',
       'city': 'Bengaluru',
       'landmark': 'Opposite Shell Fuel Station',
-      'addressText': 'Tech Park, Tower B, 5th Floor, Outer Ring Road, Bellandur, Bengaluru - 560103',
+      'addressText': 'Tech Park, Tower B, 5th Floor, Outer Ring Road, Bellandur, Bengaluru, Karnataka - 560103',
       'isDefault': false,
       'type': 'WORK',
       'inRange': true,
+      'isServiceable': true,
     },
   ];
 
@@ -96,6 +116,28 @@ class AddressProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Automatically fetches postal details and delivery serviceability for a PIN code
+  Future<PincodeLookupResult> lookupPincode(String pin) async {
+    _isPincodeLoading = true;
+    _pincodeError = null;
+    notifyListeners();
+
+    try {
+      final res = await _pincodeService.lookup(pin);
+      _lastPincodeResult = res;
+      _pincodeError = res.errorMessage;
+      return res;
+    } catch (e) {
+      _pincodeError = 'Error fetching postal info: $e';
+      final fallback = PincodeLookupResult.invalid(pin, _pincodeError);
+      _lastPincodeResult = fallback;
+      return fallback;
+    } finally {
+      _isPincodeLoading = false;
+      notifyListeners();
+    }
+  }
+
   /// Fetches saved delivery addresses from the NestJS Backend API
   Future<void> fetchBackendAddresses([Map<String, dynamic>? profile]) async {
     if (profile != null) {
@@ -113,21 +155,45 @@ class AddressProvider extends ChangeNotifier {
         for (var item in list) {
           final resolvedName = item['fullName'] ?? item['name'] ?? currentProfile?['fullName'] ?? currentProfile?['name'];
           final resolvedPhone = item['phone'] ?? item['phoneNumber'] ?? currentProfile?['phone'] ?? currentProfile?['phoneNumber'];
+          final house = item['houseNo'] ?? item['houseFlat'] ?? '';
+          final street = item['street'] ?? item['streetArea'] ?? '';
+          final area = item['area'] ?? '';
+          final city = item['city'] ?? 'Bengaluru';
+          final district = item['district'] ?? '';
+          final state = item['state'] ?? 'Karnataka';
+          final country = item['country'] ?? 'India';
+          final pin = item['pincode'] ?? '560038';
+          final isServiceable = item['isServiceable'] ?? PincodeLookupService.defaultServiceablePins.contains(pin);
+
+          final parts = [
+            house,
+            street,
+            if (area.toString().isNotEmpty) area,
+            city,
+            if (district.toString().isNotEmpty && district != city) district,
+            if (state.toString().isNotEmpty) state,
+            '$pin, $country'
+          ].where((s) => s.toString().trim().isNotEmpty).toList();
 
           final addressItem = <String, dynamic>{
             'id': item['id']?.toString() ?? 'addr_${DateTime.now().millisecondsSinceEpoch}',
             'label': item['label'] ?? 'Home',
             if (resolvedName != null && resolvedName.toString().isNotEmpty) 'fullName': resolvedName.toString(),
             if (resolvedPhone != null && resolvedPhone.toString().isNotEmpty) 'phone': resolvedPhone.toString(),
-            'houseFlat': item['houseNo'] ?? item['houseFlat'] ?? '',
-            'streetArea': item['street'] ?? item['streetArea'] ?? '',
-            'pincode': item['pincode'] ?? '560038',
-            'city': item['city'] ?? 'Bengaluru',
+            'country': country,
+            'state': state,
+            'district': district,
+            'houseFlat': house,
+            'streetArea': street,
+            'area': area,
+            'pincode': pin,
+            'city': city,
             'landmark': item['landmark'] ?? '',
-            'addressText': '${item['houseNo'] ?? ''}, ${item['street'] ?? ''}, ${item['city'] ?? 'Bengaluru'} - ${item['pincode'] ?? ''}',
+            'addressText': parts.isNotEmpty ? parts.join(', ') : '$house, $street, $city - $pin',
             'isDefault': item['isDefault'] ?? false,
             'type': (item['label'] ?? 'HOME').toString().toUpperCase(),
-            'inRange': true,
+            'inRange': isServiceable,
+            'isServiceable': isServiceable,
           };
           _addresses.add(addressItem);
         }
@@ -213,14 +279,21 @@ class AddressProvider extends ChangeNotifier {
         '/addresses',
         {
           'label': newAddress['label'] ?? 'Home',
-          'houseNo': newAddress['houseFlat'] ?? '',
-          'street': newAddress['streetArea'] ?? '',
-          'landmark': newAddress['landmark'] ?? '',
+          'fullName': newAddress['fullName'],
+          'phone': newAddress['phone'],
+          'country': newAddress['country'] ?? 'India',
+          'state': newAddress['state'],
+          'district': newAddress['district'],
           'city': newAddress['city'] ?? 'Bengaluru',
+          'area': newAddress['area'],
           'pincode': newAddress['pincode'] ?? '560038',
+          'houseNo': newAddress['houseFlat'] ?? newAddress['houseNo'] ?? '',
+          'street': newAddress['streetArea'] ?? newAddress['street'] ?? '',
+          'landmark': newAddress['landmark'] ?? '',
           'latitude': 12.9716,
           'longitude': 77.5946,
           'isDefault': isDefault,
+          'isServiceable': newAddress['isServiceable'] ?? newAddress['inRange'],
         },
       );
       if (res['success'] == true && res['data'] != null && res['data']['id'] != null) {

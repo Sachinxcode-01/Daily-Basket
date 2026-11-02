@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/providers/user_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_network_image.dart';
 
@@ -186,8 +190,16 @@ class _ReviewsRecommendationsScreenState extends State<ReviewsRecommendationsScr
 
   @override
   Widget build(BuildContext context) {
+    UserProvider? userProvider;
+    try {
+      userProvider = context.watch<UserProvider>();
+    } catch (_) {}
+    final profileImageUrl = userProvider?.profileImageUrl ??
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
+      drawer: const AppNavigationDrawer(isDrawer: true),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
@@ -203,7 +215,56 @@ class _ReviewsRecommendationsScreenState extends State<ReviewsRecommendationsScr
         actions: [
           IconButton(
             icon: const Icon(Icons.search_rounded, color: AppColors.onSurface),
-            onPressed: () {},
+            tooltip: 'Search',
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              Navigator.of(context).pushNamed('/search');
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.menu_rounded, color: AppColors.onSurface),
+            tooltip: 'Navigation Hub',
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              AppNavigationDrawer.show(context);
+            },
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0, left: 4.0),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.of(context).pushNamed('/profile');
+              },
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: const Color(0xFF2D9D43).withValues(alpha: 0.6),
+                    width: 2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.08),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.network(
+                    profileImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const CircleAvatar(
+                      backgroundColor: Color(0xFF2D9D43),
+                      child: Icon(Icons.person_rounded, color: Colors.white, size: 18),
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
         ],
       ),

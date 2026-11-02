@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/widgets/staggered_animation_wrappers.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/navigation/app_navigation_drawer.dart';
 import '../../../../core/providers/user_provider.dart';
 import '../../../../core/providers/app_theme_provider.dart';
@@ -139,6 +141,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: widget.isEmbedded ? null : const AppBottomNav(currentIndex: 5),
       body: SafeArea(
         child: Column(
           children: [
@@ -155,7 +159,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         IconButton(
-                          onPressed: () => AppNavigationDrawer.show(context),
+                          onPressed: () {
+                            HapticFeedback.lightImpact();
+                            AppNavigationDrawer.show(context);
+                          },
+                          tooltip: 'Navigation Hub',
                           icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
                         ),
                         Text(

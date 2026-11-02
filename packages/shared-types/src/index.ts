@@ -124,7 +124,13 @@ export interface Cart {
 export interface Address {
   id: string;
   userId: string;
-  label: 'HOME' | 'WORK' | 'OTHER';
+  label: 'HOME' | 'WORK' | 'OTHER' | string;
+  fullName?: string;
+  phone?: string;
+  country?: string;
+  state?: string;
+  district?: string;
+  area?: string;
   houseNo: string;
   street: string;
   landmark?: string;
@@ -133,6 +139,44 @@ export interface Address {
   latitude: number;
   longitude: number;
   isDefault: boolean;
+  isServiceable?: boolean;
+}
+
+export interface PincodePostOffice {
+  name: string;
+  branchType: string;
+  deliveryStatus: string;
+  circle: string;
+  district: string;
+  division: string;
+  region: string;
+  block: string;
+  state: string;
+  country: string;
+  pincode: string;
+}
+
+export interface PincodeLookupResult {
+  success: boolean;
+  isValid: boolean;
+  pincode: string;
+  country: string;
+  state: string;
+  district: string;
+  city: string;
+  localities: string[];
+  postOffices: PincodePostOffice[];
+  isServiceable: boolean;
+  serviceabilityMessage: string;
+  serviceabilityBadge: 'IN_RANGE' | 'OUT_OF_RANGE';
+  darkStore?: {
+    id: string;
+    name: string;
+    distanceKm?: number;
+    estimatedDeliveryMins: number;
+    isOpen: boolean;
+  };
+  error?: string;
 }
 
 export interface OrderItem {

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 /// Security Settings Screen — Google Stitch Design System Exact Replica
 class SecuritySettingsScreen extends StatelessWidget {
@@ -10,22 +12,27 @@ class SecuritySettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 5),
       appBar: AppBar(
         backgroundColor: const Color(0xFFF9F9FC),
         elevation: 0,
         leading: Navigator.canPop(context)
             ? IconButton(
-                icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
+                icon: const Icon(Icons.arrow_back_rounded,
+                    color: Color(0xFF1A1C1E)),
                 onPressed: () => Navigator.of(context).maybePop(),
               )
             : IconButton(
-                icon: const Icon(Icons.menu_rounded, color: Color(0xFF1A1C1E), size: 26),
+                icon: const Icon(Icons.menu_rounded,
+                    color: Color(0xFF1A1C1E), size: 26),
                 onPressed: () => AppNavigationDrawer.show(context),
               ),
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.shield_outlined, color: Color(0xFF006B23), size: 22),
+            const Icon(Icons.shield_outlined,
+                color: Color(0xFF006B23), size: 22),
             const SizedBox(width: 8),
             Text(
               'Security & Privacy',
@@ -39,25 +46,32 @@ class SecuritySettingsScreen extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none_rounded, color: Color(0xFF1A1C1E), size: 24),
+            icon: const Icon(Icons.notifications_none_rounded,
+                color: Color(0xFF1A1C1E), size: 24),
             onPressed: () => Navigator.of(context).pushNamed('/notifications'),
           ),
           Padding(
             padding: const EdgeInsets.only(right: 14.0),
-            child: Container(
-              width: 34,
-              height: 34,
-              decoration: const BoxDecoration(
-                color: Color(0xFFE8F5E9),
-                shape: BoxShape.circle,
-              ),
-              child: Center(
-                child: Text(
-                  'AS',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF00531A),
+            child: GestureDetector(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.of(context).pushNamed('/profile');
+              },
+              child: Container(
+                width: 34,
+                height: 34,
+                decoration: const BoxDecoration(
+                  color: Color(0xFFE8F5E9),
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    'AS',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: const Color(0xFF00531A),
+                    ),
                   ),
                 ),
               ),
@@ -102,7 +116,8 @@ class SecuritySettingsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+                border: Border.all(
+                    color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.03),
@@ -117,21 +132,28 @@ class SecuritySettingsScreen extends StatelessWidget {
                     icon: Icons.password_rounded,
                     title: 'Change Password',
                     subtitle: 'Update your account password regularly',
-                    trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
+                    trailing: const Icon(Icons.chevron_right_rounded,
+                        color: Color(0xFF6E7A6C)),
                     onTap: () {
                       Navigator.of(context).pushNamed('/reset-password');
                     },
                   ),
-                  const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
+                  const Divider(
+                      color: Color(0xFFEEEEF0),
+                      height: 1,
+                      indent: 60,
+                      endIndent: 16),
                   _buildSettingTile(
                     icon: Icons.shield_outlined,
                     title: 'Two-Factor Authentication',
-                    subtitle: 'Add an extra layer of security via SMS/Authenticator',
+                    subtitle:
+                        'Add an extra layer of security via SMS/Authenticator',
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: const Color(0xFFC0E8C7),
                             borderRadius: BorderRadius.circular(6),
@@ -146,26 +168,40 @@ class SecuritySettingsScreen extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
+                        const Icon(Icons.chevron_right_rounded,
+                            color: Color(0xFF6E7A6C)),
                       ],
                     ),
-                    onTap: () => Navigator.of(context).pushNamed('/mfa-selection'),
+                    onTap: () =>
+                        Navigator.of(context).pushNamed('/mfa-selection'),
                   ),
-                  const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
+                  const Divider(
+                      color: Color(0xFFEEEEF0),
+                      height: 1,
+                      indent: 60,
+                      endIndent: 16),
                   _buildSettingTile(
                     icon: Icons.fingerprint_rounded,
                     title: 'Biometric Authentication',
                     subtitle: 'Unlock app with Fingerprint / Face ID',
-                    trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
-                    onTap: () => Navigator.of(context).pushNamed('/enable-biometrics'),
+                    trailing: const Icon(Icons.chevron_right_rounded,
+                        color: Color(0xFF6E7A6C)),
+                    onTap: () =>
+                        Navigator.of(context).pushNamed('/enable-biometrics'),
                   ),
-                  const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
+                  const Divider(
+                      color: Color(0xFFEEEEF0),
+                      height: 1,
+                      indent: 60,
+                      endIndent: 16),
                   _buildSettingTile(
                     icon: Icons.security_rounded,
                     title: 'App Permissions Center',
                     subtitle: 'Manage location, camera, mic, & notifications',
-                    trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
-                    onTap: () => Navigator.of(context).pushNamed('/permissions-settings'),
+                    trailing: const Icon(Icons.chevron_right_rounded,
+                        color: Color(0xFF6E7A6C)),
+                    onTap: () => Navigator.of(context)
+                        .pushNamed('/permissions-settings'),
                   ),
                 ],
               ),
@@ -181,7 +217,8 @@ class SecuritySettingsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+                border: Border.all(
+                    color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.03),
@@ -196,13 +233,17 @@ class SecuritySettingsScreen extends StatelessWidget {
                     icon: Icons.devices_rounded,
                     title: 'Active Devices',
                     subtitle: 'Manage devices logged into your account',
-                    trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
+                    trailing: const Icon(Icons.chevron_right_rounded,
+                        color: Color(0xFF6E7A6C)),
                     onTap: () {
                       showDialog(
                         context: context,
                         builder: (ctx) => AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                          title: Text('Active Session', style: GoogleFonts.outfit(fontWeight: FontWeight.w700)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                          title: Text('Active Session',
+                              style: GoogleFonts.outfit(
+                                  fontWeight: FontWeight.w700)),
                           content: Text(
                             'Current Device: Daily Basket Mobile (Android / iOS)\nLocation: Bengaluru, India\nIP Address: 106.51.78.12\nStatus: Active Now',
                             style: GoogleFonts.inter(fontSize: 13, height: 1.5),
@@ -210,7 +251,10 @@ class SecuritySettingsScreen extends StatelessWidget {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx),
-                              child: Text('OK', style: GoogleFonts.outfit(fontWeight: FontWeight.w700, color: const Color(0xFF006B23))),
+                              child: Text('OK',
+                                  style: GoogleFonts.outfit(
+                                      fontWeight: FontWeight.w700,
+                                      color: const Color(0xFF006B23))),
                             ),
                           ],
                         ),
@@ -231,7 +275,8 @@ class SecuritySettingsScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
+                border: Border.all(
+                    color: const Color(0xFFBECAB9).withValues(alpha: 0.3)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.03),
@@ -246,18 +291,24 @@ class SecuritySettingsScreen extends StatelessWidget {
                     icon: Icons.download_rounded,
                     title: 'Download My Data',
                     subtitle: 'Request a copy of your order & profile data',
-                    trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF6E7A6C)),
+                    trailing: const Icon(Icons.chevron_right_rounded,
+                        color: Color(0xFF6E7A6C)),
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Data export request initiated. Check email shortly.'),
+                          content: Text(
+                              'Data export request initiated. Check email shortly.'),
                           backgroundColor: Color(0xFF006B23),
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
                     },
                   ),
-                  const Divider(color: Color(0xFFEEEEF0), height: 1, indent: 60, endIndent: 16),
+                  const Divider(
+                      color: Color(0xFFEEEEF0),
+                      height: 1,
+                      indent: 60,
+                      endIndent: 16),
                   _buildSettingTile(
                     icon: Icons.delete_forever_outlined,
                     iconBg: const Color(0xFFFFDAD6),
@@ -265,8 +316,10 @@ class SecuritySettingsScreen extends StatelessWidget {
                     title: 'Delete Account',
                     titleColor: const Color(0xFFBA1A1A),
                     subtitle: 'Permanently remove your account and data',
-                    trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFFBA1A1A)),
-                    onTap: () => Navigator.of(context).pushNamed('/delete-account'),
+                    trailing: const Icon(Icons.chevron_right_rounded,
+                        color: Color(0xFFBA1A1A)),
+                    onTap: () =>
+                        Navigator.of(context).pushNamed('/delete-account'),
                   ),
                 ],
               ),

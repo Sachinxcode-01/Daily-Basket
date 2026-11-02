@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter/services.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/providers/user_provider.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/search_history_provider.dart';
 import '../../../../core/providers/cart_provider.dart';
@@ -29,42 +33,50 @@ class _SearchScreenState extends State<SearchScreen> {
     {
       'title': 'Fresh Vegetables (154)',
       'query': 'Vegetables',
-      'imageUrl': 'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
+      'imageUrl':
+          'assets/products/fresh-vegetables/00124fbd-0fa5-441d-adeb-301d694bf0f4.png',
     },
     {
       'title': 'Bread & Pav (248)',
       'query': 'Bread',
-      'imageUrl': 'assets/products/bread-pav/00021c97-6a3f-4e0d-b873-455b88015ff7.png',
+      'imageUrl':
+          'assets/products/bread-pav/00021c97-6a3f-4e0d-b873-455b88015ff7.png',
     },
     {
       'title': 'Dairy & Milk (41)',
       'query': 'Milk',
-      'imageUrl': 'assets/products/milk/0a9446f2-8419-48fb-bce5-8ff5e9c0cae6.png',
+      'imageUrl':
+          'assets/products/milk/0a9446f2-8419-48fb-bce5-8ff5e9c0cae6.png',
     },
     {
       'title': 'Curd & Yogurt (78)',
       'query': 'Curd',
-      'imageUrl': 'assets/products/curd-yogurt/0024f2b9-e1f2-4eb4-9ae8-936601b3f9ff.png',
+      'imageUrl':
+          'assets/products/curd-yogurt/0024f2b9-e1f2-4eb4-9ae8-936601b3f9ff.png',
     },
     {
       'title': 'Flakes & Cereals (53)',
       'query': 'Flakes',
-      'imageUrl': 'assets/products/flakes-kids-cereals/004c316d-318e-4f15-8fa9-43c35b369db0.png',
+      'imageUrl':
+          'assets/products/flakes-kids-cereals/004c316d-318e-4f15-8fa9-43c35b369db0.png',
     },
     {
       'title': 'Grains & Poha (17)',
       'query': 'Poha',
-      'imageUrl': 'assets/products/poha-daliya-grains/08a3d56b-f53e-4361-bd80-d6360c7f763f.png',
+      'imageUrl':
+          'assets/products/poha-daliya-grains/08a3d56b-f53e-4361-bd80-d6360c7f763f.png',
     },
     {
       'title': 'Vermicelli (16)',
       'query': 'Vermicelli',
-      'imageUrl': 'assets/products/vermicelli/0b0932bb-8e3b-4171-80a5-f946eef24f5a.png',
+      'imageUrl':
+          'assets/products/vermicelli/0b0932bb-8e3b-4171-80a5-f946eef24f5a.png',
     },
     {
       'title': 'All Products (607)',
       'query': '',
-      'imageUrl': 'assets/products/bread-pav/0091807d-304b-4eb9-a292-ba252b489a20.png',
+      'imageUrl':
+          'assets/products/bread-pav/0091807d-304b-4eb9-a292-ba252b489a20.png',
     },
   ];
 
@@ -133,39 +145,58 @@ class _SearchScreenState extends State<SearchScreen> {
         .replaceAll(RegExp(r'(\d+)(kg|g|l|ml|pc|pcs)'), r'$1 $2');
 
     final qClean = norm(query);
-    final tokens = qClean.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
+    final tokens =
+        qClean.split(RegExp(r'\s+')).where((t) => t.isNotEmpty).toList();
     if (tokens.isEmpty) return [];
 
     final all = kAllCatalogProducts['all'] ?? [];
     return all.where((p) {
       final name = norm(p['name'] as String? ?? '');
       final brand = norm(p['brand'] as String? ?? '');
-      final weight = norm(p['unit'] as String? ?? p['subtitle'] as String? ?? '');
+      final weight =
+          norm(p['unit'] as String? ?? p['subtitle'] as String? ?? '');
       final cat = norm(p['category'] as String? ?? '');
       final sub = norm(p['sub'] as String? ?? '');
-      final slug = norm(p['categorySlug'] as String? ?? p['folder'] as String? ?? '');
+      final slug =
+          norm(p['categorySlug'] as String? ?? p['folder'] as String? ?? '');
       final tag = norm(p['badge'] as String? ?? '');
 
       String synonyms = '';
       if (slug.contains('vegetables') || cat.contains('veg')) {
         synonyms += ' vegetable vegetables veggie veggies sabzi greens ';
       }
-      if (slug.contains('bread') || cat.contains('bakery') || name.contains('bread') || name.contains('pav')) {
+      if (slug.contains('bread') ||
+          cat.contains('bakery') ||
+          name.contains('bread') ||
+          name.contains('pav')) {
         synonyms += ' bread bakery pav bun toast rusk ';
       }
       if (slug.contains('milk') || cat.contains('milk')) {
         synonyms += ' milk dairy doodh ';
       }
-      if (slug.contains('curd') || cat.contains('curd') || name.contains('dahi') || name.contains('yogurt')) {
+      if (slug.contains('curd') ||
+          cat.contains('curd') ||
+          name.contains('dahi') ||
+          name.contains('yogurt')) {
         synonyms += ' curd yogurt dahi yoghurt probiotics ';
       }
-      if (slug.contains('flakes') || cat.contains('cereal') || name.contains('corn') || name.contains('chocos')) {
-        synonyms += ' flakes cereal cereals breakfast cornflakes chocos muesli granola ';
+      if (slug.contains('flakes') ||
+          cat.contains('cereal') ||
+          name.contains('corn') ||
+          name.contains('chocos')) {
+        synonyms +=
+            ' flakes cereal cereals breakfast cornflakes chocos muesli granola ';
       }
-      if (slug.contains('poha') || cat.contains('grain') || name.contains('dalia') || name.contains('poha')) {
+      if (slug.contains('poha') ||
+          cat.contains('grain') ||
+          name.contains('dalia') ||
+          name.contains('poha')) {
         synonyms += ' poha daliya dalia grains staples atta dal pulses rice ';
       }
-      if (slug.contains('vermicelli') || name.contains('seviyan') || name.contains('upma') || cat.contains('vermicelli')) {
+      if (slug.contains('vermicelli') ||
+          name.contains('seviyan') ||
+          name.contains('upma') ||
+          cat.contains('vermicelli')) {
         synonyms += ' vermicelli seviyan sevai semiya upma noodles pasta ';
       }
 
@@ -182,9 +213,19 @@ class _SearchScreenState extends State<SearchScreen> {
         : ['Amul Milk', 'Brown Bread', 'Tomatoes', 'Curd', 'Poha'];
     final queryText = _searchController.text.trim();
     final isSearching = queryText.isNotEmpty;
-    final liveMatches = isSearching ? _getLiveMatches(queryText) : <Map<String, dynamic>>[];
+    final liveMatches =
+        isSearching ? _getLiveMatches(queryText) : <Map<String, dynamic>>[];
+
+    UserProvider? userProvider;
+    try {
+      userProvider = context.watch<UserProvider>();
+    } catch (_) {}
+    final profileImageUrl = userProvider?.profileImageUrl ??
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
 
     return Scaffold(
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 2),
       backgroundColor: AppColors.surface,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(64),
@@ -206,8 +247,16 @@ class _SearchScreenState extends State<SearchScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back, color: AppColors.onSurfaceVariant),
-                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back,
+                        color: AppColors.onSurfaceVariant),
+                    onPressed: () {
+                      if (Navigator.canPop(context)) {
+                        Navigator.pop(context);
+                      } else {
+                        HapticFeedback.lightImpact();
+                        AppNavigationDrawer.show(context);
+                      }
+                    },
                   ),
                   Text(
                     'Daily Basket',
@@ -217,38 +266,74 @@ class _SearchScreenState extends State<SearchScreen> {
                       color: AppColors.primary,
                     ),
                   ),
-                  Consumer<CartProvider>(
-                    builder: (context, cart, _) => Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.shopping_basket_outlined, color: AppColors.onSurfaceVariant),
-                          onPressed: () => Navigator.pushNamed(context, '/cart'),
-                        ),
-                        if (cart.totalCount > 0)
-                          Positioned(
-                            right: 6,
-                            top: 6,
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                color: AppColors.error,
-                                shape: BoxShape.circle,
-                              ),
-                              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-                              child: Text(
-                                '${cart.totalCount}',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Consumer<CartProvider>(
+                        builder: (context, cart, _) => Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.shopping_basket_outlined,
+                                  color: AppColors.onSurfaceVariant),
+                              onPressed: () =>
+                                  Navigator.pushNamed(context, '/cart'),
+                            ),
+                            if (cart.totalCount > 0)
+                              Positioned(
+                                right: 6,
+                                top: 6,
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: const BoxDecoration(
+                                    color: AppColors.error,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  constraints: const BoxConstraints(
+                                      minWidth: 16, minHeight: 16),
+                                  child: Text(
+                                    '${cart.totalCount}',
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: () {
+                          HapticFeedback.lightImpact();
+                          Navigator.of(context).pushNamed('/profile');
+                        },
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                                color: const Color(0xFFC0E8C7), width: 1.5),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(9999),
+                            child: Image.network(
+                              profileImageUrl,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const Icon(
+                                Icons.person,
+                                color: Color(0xFF006B23),
+                                size: 18,
                               ),
                             ),
                           ),
-                      ],
-                    ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -281,7 +366,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     children: [
                       const Padding(
                         padding: EdgeInsets.only(left: 14, right: 10),
-                        child: Icon(Icons.search, color: AppColors.primary, size: 22),
+                        child: Icon(Icons.search,
+                            color: AppColors.primary, size: 22),
                       ),
                       Expanded(
                         child: TextField(
@@ -290,21 +376,25 @@ class _SearchScreenState extends State<SearchScreen> {
                           autofocus: true,
                           textInputAction: TextInputAction.search,
                           onSubmitted: _submitSearch,
-                          style: GoogleFonts.inter(fontSize: 15, color: AppColors.onSurface),
+                          style: GoogleFonts.inter(
+                              fontSize: 15, color: AppColors.onSurface),
                           decoration: InputDecoration(
                             hintText: 'Search 607 groceries & essentials...',
                             hintStyle: GoogleFonts.inter(
                               fontSize: 15,
-                              color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
+                              color: AppColors.onSurfaceVariant
+                                  .withValues(alpha: 0.7),
                             ),
                             border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                            contentPadding:
+                                const EdgeInsets.symmetric(vertical: 14),
                           ),
                         ),
                       ),
                       if (_searchController.text.isNotEmpty)
                         IconButton(
-                          icon: const Icon(Icons.close, size: 20, color: AppColors.onSurfaceVariant),
+                          icon: const Icon(Icons.close,
+                              size: 20, color: AppColors.onSurfaceVariant),
                           onPressed: () {
                             setState(() {
                               _searchController.clear();
@@ -312,7 +402,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           },
                         ),
                       IconButton(
-                        icon: const Icon(Icons.mic_outlined, size: 20, color: AppColors.onSurfaceVariant),
+                        icon: const Icon(Icons.mic_outlined,
+                            size: 20, color: AppColors.onSurfaceVariant),
                         onPressed: () {
                           VoiceSearchDialog.show(
                             context,
@@ -358,7 +449,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primary),
+                            const Icon(Icons.arrow_forward_rounded,
+                                size: 14, color: AppColors.primary),
                           ],
                         ),
                       ),
@@ -369,7 +461,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   if (liveMatches.isEmpty) ...[
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 40, horizontal: 16),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceContainerLow,
                         borderRadius: BorderRadius.circular(16),
@@ -378,29 +471,48 @@ class _SearchScreenState extends State<SearchScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.search_off_rounded, size: 48, color: AppColors.onSurfaceVariant),
+                          const Icon(Icons.search_off_rounded,
+                              size: 48, color: AppColors.onSurfaceVariant),
                           const SizedBox(height: 12),
                           Text(
                             'No products found for "$queryText"',
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.w600, color: AppColors.onSurface),
+                            style: GoogleFonts.outfit(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.onSurface),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             'Try searching for milk, bread, tomatoes, curd, or vermicelli',
                             textAlign: TextAlign.center,
-                            style: GoogleFonts.inter(fontSize: 13, color: AppColors.onSurfaceVariant),
+                            style: GoogleFonts.inter(
+                                fontSize: 13,
+                                color: AppColors.onSurfaceVariant),
                           ),
                           const SizedBox(height: 16),
                           Wrap(
                             spacing: 8,
                             runSpacing: 8,
                             alignment: WrapAlignment.center,
-                            children: ['Amul Milk', 'Brown Bread', 'Tomatoes', 'Curd', 'Poha', 'Vermicelli'].map((tag) {
+                            children: [
+                              'Amul Milk',
+                              'Brown Bread',
+                              'Tomatoes',
+                              'Curd',
+                              'Poha',
+                              'Vermicelli'
+                            ].map((tag) {
                               return ActionChip(
-                                label: Text(tag, style: GoogleFonts.inter(fontSize: 12, color: AppColors.primary)),
-                                backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), side: BorderSide.none),
+                                label: Text(tag,
+                                    style: GoogleFonts.inter(
+                                        fontSize: 12,
+                                        color: AppColors.primary)),
+                                backgroundColor:
+                                    AppColors.primary.withValues(alpha: 0.1),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    side: BorderSide.none),
                                 onPressed: () {
                                   _searchController.text = tag;
                                 },
@@ -414,22 +526,29 @@ class _SearchScreenState extends State<SearchScreen> {
                     ListView.separated(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: liveMatches.length > 25 ? 25 : liveMatches.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1, color: AppColors.surfaceVariant),
+                      itemCount:
+                          liveMatches.length > 25 ? 25 : liveMatches.length,
+                      separatorBuilder: (_, __) => const Divider(
+                          height: 1, color: AppColors.surfaceVariant),
                       itemBuilder: (context, index) {
                         final p = liveMatches[index];
                         final name = p['name'] as String;
                         final brand = (p['brand'] ?? 'Daily Basket') as String;
-                        final unit = (p['unit'] ?? p['subtitle'] ?? '1 Pack') as String;
+                        final unit =
+                            (p['unit'] ?? p['subtitle'] ?? '1 Pack') as String;
                         final price = (p['price'] as num).toDouble().round();
-                        final mrp = ((p['mrp'] as num?)?.toDouble() ?? (price * 1.25)).round();
+                        final mrp =
+                            ((p['mrp'] as num?)?.toDouble() ?? (price * 1.25))
+                                .round();
                         final image = (p['image'] ?? '') as String;
                         final badge = (p['badge'] ?? '') as String;
 
                         return InkWell(
                           onTap: () {
                             try {
-                              context.read<SearchHistoryProvider>().addQuery(name);
+                              context
+                                  .read<SearchHistoryProvider>()
+                                  .addQuery(name);
                             } catch (_) {}
                             Navigator.push(
                               context,
@@ -442,14 +561,17 @@ class _SearchScreenState extends State<SearchScreen> {
                                   mrp: '₹$mrp',
                                   unitDetails: unit,
                                   imageUrl: image,
-                                  categoryTag: (p['category'] ?? 'GROCERIES').toString().toUpperCase(),
+                                  categoryTag: (p['category'] ?? 'GROCERIES')
+                                      .toString()
+                                      .toUpperCase(),
                                 ),
                               ),
                             );
                           },
                           borderRadius: BorderRadius.circular(12),
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 8),
                             child: Row(
                               children: [
                                 // Thumbnail
@@ -469,7 +591,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                 // Name & Unit
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         name,
@@ -508,18 +631,25 @@ class _SearchScreenState extends State<SearchScreen> {
                                               '₹$mrp',
                                               style: GoogleFonts.outfit(
                                                 fontSize: 12,
-                                                color: AppColors.onSurfaceVariant,
-                                                decoration: TextDecoration.lineThrough,
+                                                color:
+                                                    AppColors.onSurfaceVariant,
+                                                decoration:
+                                                    TextDecoration.lineThrough,
                                               ),
                                             ),
                                           ],
                                           if (badge.isNotEmpty) ...[
                                             const SizedBox(width: 8),
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 5,
+                                                      vertical: 1),
                                               decoration: BoxDecoration(
-                                                color: AppColors.primary.withValues(alpha: 0.1),
-                                                borderRadius: BorderRadius.circular(4),
+                                                color: AppColors.primary
+                                                    .withValues(alpha: 0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(4),
                                               ),
                                               child: Text(
                                                 badge,
@@ -546,23 +676,29 @@ class _SearchScreenState extends State<SearchScreen> {
                                         height: 32,
                                         decoration: BoxDecoration(
                                           color: AppColors.primary,
-                                          borderRadius: BorderRadius.circular(8),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                         ),
                                         child: Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             InkWell(
-                                              onTap: () => cart.updateQuantityById(
+                                              onTap: () =>
+                                                  cart.updateQuantityById(
                                                 id: pid,
                                                 name: name,
                                                 subtitle: unit,
-                                                price: (p['price'] as num).toDouble(),
+                                                price: (p['price'] as num)
+                                                    .toDouble(),
                                                 image: image,
                                                 delta: -1,
                                               ),
                                               child: const Padding(
-                                                padding: EdgeInsets.symmetric(horizontal: 6),
-                                                child: Icon(Icons.remove, size: 14, color: Colors.white),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 6),
+                                                child: Icon(Icons.remove,
+                                                    size: 14,
+                                                    color: Colors.white),
                                               ),
                                             ),
                                             Text(
@@ -574,17 +710,22 @@ class _SearchScreenState extends State<SearchScreen> {
                                               ),
                                             ),
                                             InkWell(
-                                              onTap: () => cart.updateQuantityById(
+                                              onTap: () =>
+                                                  cart.updateQuantityById(
                                                 id: pid,
                                                 name: name,
                                                 subtitle: unit,
-                                                price: (p['price'] as num).toDouble(),
+                                                price: (p['price'] as num)
+                                                    .toDouble(),
                                                 image: image,
                                                 delta: 1,
                                               ),
                                               child: const Padding(
-                                                padding: EdgeInsets.symmetric(horizontal: 6),
-                                                child: Icon(Icons.add, size: 14, color: Colors.white),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 6),
+                                                child: Icon(Icons.add,
+                                                    size: 14,
+                                                    color: Colors.white),
                                               ),
                                             ),
                                           ],
@@ -603,10 +744,15 @@ class _SearchScreenState extends State<SearchScreen> {
                                         );
                                       },
                                       style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12, vertical: 4),
                                         minimumSize: const Size(0, 32),
-                                        side: const BorderSide(color: AppColors.primary, width: 1.2),
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                        side: const BorderSide(
+                                            color: AppColors.primary,
+                                            width: 1.2),
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(8)),
                                       ),
                                       child: Text(
                                         'ADD',
@@ -633,7 +779,8 @@ class _SearchScreenState extends State<SearchScreen> {
                           icon: const Icon(Icons.grid_view_rounded, size: 16),
                           label: Text(
                             'See all ${liveMatches.length} matching products',
-                            style: GoogleFonts.inter(fontWeight: FontWeight.w600),
+                            style:
+                                GoogleFonts.inter(fontWeight: FontWeight.w600),
                           ),
                         ),
                       ),
@@ -674,14 +821,16 @@ class _SearchScreenState extends State<SearchScreen> {
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: recentSearches.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1, color: AppColors.surfaceVariant),
+                    separatorBuilder: (_, __) => const Divider(
+                        height: 1, color: AppColors.surfaceVariant),
                     itemBuilder: (context, index) {
                       final item = recentSearches[index];
                       return InkWell(
                         onTap: () => _submitSearch(item),
                         borderRadius: BorderRadius.circular(10),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 8),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -690,7 +839,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                   Icon(
                                     Icons.history,
                                     size: 18,
-                                    color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
+                                    color: AppColors.onSurfaceVariant
+                                        .withValues(alpha: 0.7),
                                   ),
                                   const SizedBox(width: 12),
                                   Text(
@@ -705,7 +855,8 @@ class _SearchScreenState extends State<SearchScreen> {
                               Icon(
                                 Icons.north_west,
                                 size: 16,
-                                color: AppColors.onSurfaceVariant.withValues(alpha: 0.6),
+                                color: AppColors.onSurfaceVariant
+                                    .withValues(alpha: 0.6),
                               ),
                             ],
                           ),
@@ -729,7 +880,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   GridView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       childAspectRatio: 4 / 3,
                       crossAxisSpacing: 12,

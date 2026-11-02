@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/providers/user_provider.dart';
 import '../../../../core/providers/ai_chat_provider.dart';
 import '../../../../core/services/voice_chat_service.dart';
 import '../../../../core/services/image_analysis_service.dart';
@@ -452,6 +454,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
 
         return Scaffold(
           backgroundColor: const Color(0xFFF9F9FC),
+          drawer: const AppNavigationDrawer(isDrawer: true),
           appBar: _buildAppBar(aiProvider, agentName, agentRole, isEscalated),
           body: SafeArea(
             child: Column(
@@ -526,6 +529,13 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
 
   PreferredSizeWidget _buildAppBar(AiChatProvider provider, String agentName,
       String agentRole, bool isEscalated) {
+    UserProvider? userProvider;
+    try {
+      userProvider = context.watch<UserProvider>();
+    } catch (_) {}
+    final profileImageUrl = userProvider?.profileImageUrl ??
+        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
+
     return AppBar(
       backgroundColor: Colors.white.withValues(alpha: 0.95),
       elevation: 0.5,
@@ -674,6 +684,44 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
                   Text('Clear Chat Session'),
                 ])),
           ],
+        ),
+        IconButton(
+          icon: const Icon(Icons.menu_rounded, color: AppColors.onSurface),
+          tooltip: 'Navigation Hub',
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            AppNavigationDrawer.show(context);
+          },
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 12.0, left: 2.0),
+          child: GestureDetector(
+            onTap: () {
+              HapticFeedback.lightImpact();
+              Navigator.of(context).pushNamed('/profile');
+            },
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: const Color(0xFF2D9D43).withValues(alpha: 0.6),
+                  width: 1.5,
+                ),
+              ),
+              child: ClipOval(
+                child: Image.network(
+                  profileImageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const CircleAvatar(
+                    backgroundColor: Color(0xFF2D9D43),
+                    child: Icon(Icons.person_rounded, color: Colors.white, size: 16),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );

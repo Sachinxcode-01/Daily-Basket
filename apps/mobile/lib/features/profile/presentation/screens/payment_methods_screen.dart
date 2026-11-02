@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_top_bar.dart';
 
 /// Saved Payment Methods Management Screen — Google Stitch Design System Exact Replica
 class PaymentMethodsScreen extends StatefulWidget {
@@ -143,22 +146,13 @@ class _PaymentMethodsScreenState extends State<PaymentMethodsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF9F9FC),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFF9F9FC),
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1A1C1E)),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        title: Text(
-          'Payment Methods',
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF1A1C1E),
-          ),
-        ),
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 5),
+      appBar: const AppTopBar(
+        title: 'Payment Methods',
+        showBack: true,
+        showDrawer: true,
+        showProfile: true,
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),

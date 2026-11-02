@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/checkout_provider.dart';
 import '../../../referral/providers/coupon_provider.dart';
+import '../../../profile/providers/address_provider.dart';
 import 'payment_screen.dart';
 
 /// Checkout Summary / Confirm Order Screen — Google Stitch Design System Source of Truth
@@ -87,6 +88,14 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       couponProvider = context.watch<CouponProvider>();
     } catch (_) {}
+
+    AddressProvider? addressProvider;
+    try {
+      addressProvider = context.watch<AddressProvider>();
+    } catch (_) {}
+    final currentAddress = addressProvider?.defaultAddress;
+    final bool isAddressServiceable = currentAddress == null ||
+        (currentAddress['isServiceable'] == true || currentAddress['inRange'] == true);
 
     List<CartItem> items = (cartProvider != null && !cartProvider.isEmpty)
         ? cartProvider.items
@@ -209,22 +218,51 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       const Divider(height: 24, color: Color(0xFFE2E8F0)),
                       Row(
                         children: [
-                          const Icon(Icons.location_on_outlined, color: AppColors.primary, size: 20),
+                          Icon(
+                            isAddressServiceable ? Icons.location_on_outlined : Icons.location_off_outlined,
+                            color: isAddressServiceable ? AppColors.primary : AppColors.error,
+                            size: 20,
+                          ),
                           const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  'Delivering to Home',
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: AppColors.onSurface,
-                                  ),
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Delivering to ${currentAddress?['label'] ?? 'Home'}',
+                                      style: GoogleFonts.outfit(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                        color: AppColors.onSurface,
+                                      ),
+                                    ),
+                                    if (!isAddressServiceable) ...[
+                                      const SizedBox(width: 8),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFFFDAD6),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          'UNSERVICEABLE',
+                                          style: GoogleFonts.inter(
+                                            fontSize: 9,
+                                            fontWeight: FontWeight.w700,
+                                            color: const Color(0xFFBA1A1A),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
                                 ),
                                 Text(
-                                  'Flat 402, Sunshine Heights, Indiranagar, Bengaluru',
+                                  (currentAddress?['addressText'] ??
+                                          currentAddress?['address'] ??
+                                          'Flat 402, Sunshine Heights, Indiranagar, Bengaluru')
+                                      .toString(),
                                   style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -233,7 +271,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             ),
                           ),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () => Navigator.of(context).pushNamed('/saved-addresses'),
                             child: Text(
                               'Change',
                               style: GoogleFonts.outfit(
@@ -583,18 +621,30 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     SizedBox(
                       height: 48,
                       child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (_) => PaymentScreen(
-                                totalAmount: finalPayable,
-                                itemQuantity: items.length,
-                              ),
-                            ),
-                          );
-                        },
+                        onPressed: !isAddressServiceable
+                            ? () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Delivery is currently unavailable at this address. Please change to a serviceable delivery address to continue checkout.',
+                                    ),
+                                    backgroundColor: AppColors.error,
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            : () {
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (_) => PaymentScreen(
+                                      totalAmount: finalPayable,
+                                      itemQuantity: items.length,
+                                    ),
+                                  ),
+                                );
+                              },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
+                          backgroundColor: isAddressServiceable ? AppColors.primary : const Color(0xFF6E7A6C),
                           foregroundColor: Colors.white,
                           minimumSize: const Size(140, 48),
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -606,7 +656,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'PROCEED TO PAY',
+                              isAddressServiceable ? 'PROCEED TO PAY' : 'LOCATION OUT OF ZONE',
                               style: GoogleFonts.outfit(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -614,7 +664,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                               ),
                             ),
                             const SizedBox(width: 6),
-                            const Icon(Icons.arrow_forward_rounded, size: 18),
+                            Icon(isAddressServiceable ? Icons.arrow_forward_rounded : Icons.location_off_rounded, size: 18),
                           ],
                         ),
                       ),

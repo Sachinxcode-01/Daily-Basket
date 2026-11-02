@@ -11,6 +11,7 @@ class AdminProductDetailsScreen extends StatefulWidget {
   const AdminProductDetailsScreen({
     super.key,
     this.productId = 'AV-ORG-001',
+    String? initialProductId,
   });
 
   @override
@@ -31,7 +32,6 @@ class _AdminProductDetailsScreenState extends State<AdminProductDetailsScreen> {
   static const Color _textMuted = Color(0xFF64748B);
   static const Color _mintBg = Color(0xFFDCFCE7);
   static const Color _mintText = Color(0xFF15803D);
-  static const Color _periwinkleBg = Color(0xFFDCE6FE);
   static const Color _orangeText = Color(0xFFC2410C);
 
   // Real Product Data State (integrated with NestJS backend)
@@ -359,13 +359,7 @@ class _AdminProductDetailsScreenState extends State<AdminProductDetailsScreen> {
                 ),
               ),
             ),
-      bottomNavigationBar: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildFloatingActionBar(),
-          _buildBottomNavigationBar(),
-        ],
-      ),
+      bottomNavigationBar: _buildFloatingActionBar(),
     );
   }
 
@@ -1026,64 +1020,6 @@ class _AdminProductDetailsScreenState extends State<AdminProductDetailsScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(0, Icons.grid_view_rounded, 'Dashboard'),
-              _buildNavItem(1, Icons.shopping_bag_outlined, 'Orders'),
-              _buildNavItem(2, Icons.inventory_2_outlined, 'Inventory'),
-              _buildNavItem(3, Icons.local_offer_rounded, 'Products', isSelected: true),
-              _buildNavItem(4, Icons.bar_chart_rounded, 'Analytics'),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(int index, IconData icon, String label, {bool isSelected = false}) {
-    return InkWell(
-      onTap: () {},
-      borderRadius: BorderRadius.circular(20),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: isSelected ? _periwinkleBg : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected ? _primaryGreen : const Color(0xFF64748B),
-              size: 22,
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? _textDark : const Color(0xFF64748B),
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                fontSize: 11,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

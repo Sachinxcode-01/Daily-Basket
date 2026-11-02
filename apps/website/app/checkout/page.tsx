@@ -4,7 +4,7 @@
 
 'use client';
 
-import React, { useMemo, useState, Suspense } from 'react';
+import { useMemo, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, MapPin, CheckCircle2, Zap, Clock, Loader2 } from 'lucide-react';
@@ -81,11 +81,20 @@ function CheckoutInner() {
       ? (addresses.find((a: any) => a.isDefault) ?? addresses[0])
       : DEFAULT_CHECKOUT_ADDRESS;
 
+  const SERVICEABLE_PINS = ['560001', '560008', '560025', '560034', '560038', '560075', '560095', '560102', '560103'];
+  const isAddressServiceable =
+    address?.isServiceable === true ||
+    (address?.pincode ? SERVICEABLE_PINS.includes(String(address.pincode).trim()) : false);
+
   const payable = pricing?.finalPayable ?? pricing?.grandTotal ?? 0;
 
   const handlePlaceOrder = async () => {
     if (orderItems.length === 0) {
       router.push('/cart');
+      return;
+    }
+    if (!isAddressServiceable) {
+      setError("This address is outside Daily Basket's 10-Min Kirana delivery zone. Please select or add an address in a serviceable area.");
       return;
     }
     setIsPlacing(true);
@@ -153,6 +162,12 @@ function CheckoutInner() {
                 <p className="text-slate-400 text-xs mt-1">
                   {address.houseNo ? `${address.houseNo}, ${address.street}, ${address.city} - ${address.pincode}` : (address.addressLine || address.city)}
                 </p>
+                {!isAddressServiceable && (
+                  <div className="mt-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs flex items-start gap-2">
+                    <span className="font-bold">⚠️ Out of Delivery Area:</span>
+                    <span>Daily Basket 10-Min Kirana currently delivers only in Bangalore cluster PINs. Please select or add an address in a serviceable area to proceed.</span>
+                  </div>
+                )}
               </>
             ) : (
               <p className="text-slate-400 text-xs">No saved address. Please add one to continue.</p>
@@ -230,10 +245,16 @@ function CheckoutInner() {
             </div>
             <button
               onClick={handlePlaceOrder}
-              disabled={isPlacing || pricingLoading || !address}
+              disabled={isPlacing || pricingLoading || !address || !isAddressServiceable}
               className="flex-1 max-w-xs py-3.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-bold rounded-xl shadow-lg shadow-emerald-900/40 flex items-center justify-center gap-2 transition"
             >
-              {isPlacing ? <Loader2 className="w-5 h-5 animate-spin" /> : <span>Place Cash on Delivery Order</span>}
+              {isPlacing ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : !isAddressServiceable ? (
+                <span>Delivery Area Unavailable</span>
+              ) : (
+                <span>Place Cash on Delivery Order</span>
+              )}
             </button>
           </div>
         </div>
