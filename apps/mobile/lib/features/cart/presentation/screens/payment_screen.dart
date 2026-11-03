@@ -71,14 +71,22 @@ class _PaymentScreenState extends State<PaymentScreen> {
         token: auth.accessToken,
       );
 
-      
-    } catch (_) {}
+      if (res['success'] == false || ((res['statusCode'] as int?) ?? 400) >= 400) {
+        // Payment declined or backend rejected the order — don't clear cart or navigate to success.
+        _showFailureToast(res);
+        return;
+      }
+    } catch (e) {
+      // Network/client failure — surface user feedback but keep cart intact so they can retry.
+      _showFailureToast({ 'success': false, 'message': '$e' });
+      return;
+    }
 
     if (!mounted) return;
 
     setState(() => _isProcessing = false);
 
-    // Clear cart after order creation
+    // Clear cart only after a confirmed successful order.
     try {
       cartProvider?.clearCart();
     } catch (_) {}
@@ -95,6 +103,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
           estimatedArrival: '10-15 mins (Live Quick Delivery)',
         ),
       ),
+    );
+  }
+
+  void _showFailureToast(Map<String, dynamic> payload) {
+    if (mounted) {
+      setState(() => _isProcessing = false);
+    }
+    final message = (payload['message'] as String?) ?? 'Payment could not be completed. Please try again.';
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 
