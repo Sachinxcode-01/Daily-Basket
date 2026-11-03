@@ -5,7 +5,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/user_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import 'login_screen.dart';
-import 'verify_email_screen.dart';
+
 
 
 /// Create Account Screen — Google Stitch Design System & User Mockup Specification
@@ -108,10 +108,16 @@ class _RegisterScreenState extends State<RegisterScreen>
             phone: '+91 98765 43210',
           );
       setState(() => _isLoading = false);
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => VerifyEmailScreen(email: email),
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Account created successfully! Welcome to Daily Basket.'),
+          backgroundColor: Color(0xFF006B23),
+          behavior: SnackBarBehavior.floating,
         ),
+      );
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/customer/home',
+        (route) => false,
       );
     } else {
       setState(() {

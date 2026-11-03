@@ -60,6 +60,7 @@ graphify-out/
 *.tar.gz
 *.zip
 *.tar
+scratch/
 
 # Added by code-review-graph
 .code-review-graph/
