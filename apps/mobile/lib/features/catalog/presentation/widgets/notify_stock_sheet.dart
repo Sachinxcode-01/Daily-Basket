@@ -105,7 +105,8 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
     } else {
       setState(() {
         _isSubmitting = false;
-        _errorMessage = res['error']?.toString() ?? 'Failed to register alert. Please try again.';
+        _errorMessage = res['error']?.toString() ??
+            'Failed to register alert. Please try again.';
       });
     }
   }
@@ -114,10 +115,12 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final bgColor = isDark ? const Color(0xFF1E2124) : Colors.white;
-    final cardColor = isDark ? const Color(0xFF282B30) : const Color(0xFFF9F9FC);
+    final cardColor =
+        isDark ? const Color(0xFF282B30) : const Color(0xFFF9F9FC);
     final borderColor = isDark ? Colors.white12 : const Color(0xFFE2E2E5);
     final textPrimary = isDark ? Colors.white : const Color(0xFF191C1E);
-    final textSecondary = isDark ? const Color(0xFFB0B3B8) : const Color(0xFF3F4A3D);
+    final textSecondary =
+        isDark ? const Color(0xFFB0B3B8) : const Color(0xFF3F4A3D);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -224,7 +227,8 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
                             width: 56,
                             height: 56,
                             color: isDark ? Colors.white10 : Colors.black12,
-                            child: const Icon(Icons.inventory_2_outlined, size: 28),
+                            child: const Icon(Icons.inventory_2_outlined,
+                                size: 28),
                           ),
                         ),
                       )
@@ -266,7 +270,8 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: const Color(0xFFFFDAD6),
                                   borderRadius: BorderRadius.circular(6),
@@ -280,7 +285,8 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
                                   ),
                                 ),
                               ),
-                              if (widget.unit != null && widget.unit!.isNotEmpty) ...[
+                              if (widget.unit != null &&
+                                  widget.unit!.isNotEmpty) ...[
                                 const SizedBox(width: 8),
                                 Text(
                                   widget.unit!,
@@ -302,11 +308,13 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
 
               // Restock Estimate Banner
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+                  border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
@@ -318,11 +326,14 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        widget.estimatedRestockTime ?? 'Expected restock in 2–4 hours today',
+                        widget.estimatedRestockTime ??
+                            'Expected restock in 2–4 hours today',
                         style: GoogleFonts.inter(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: isDark ? AppColors.primaryFixedDim : const Color(0xFF0F5B24),
+                          color: isDark
+                              ? AppColors.primaryFixedDim
+                              : const Color(0xFF0F5B24),
                         ),
                       ),
                     ),
@@ -360,7 +371,8 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
                 title: 'WhatsApp or SMS Alert',
                 subtitle: 'Quick message to your registered phone number',
                 value: _notifyWhatsapp,
-                onChanged: (val) => setState(() => _notifyWhatsapp = val ?? false),
+                onChanged: (val) =>
+                    setState(() => _notifyWhatsapp = val ?? false),
                 isDark: isDark,
                 textPrimary: textPrimary,
                 textSecondary: textSecondary,
@@ -383,16 +395,23 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
                 TextField(
                   controller: _contactController,
                   decoration: InputDecoration(
-                    labelText: _notifyEmail ? 'Email address or Mobile number' : 'Mobile number',
-                    hintText: _notifyEmail ? 'you@example.com / +91 98765 43210' : '+91 98765 43210',
+                    labelText: _notifyEmail
+                        ? 'Email address or Mobile number'
+                        : 'Mobile number',
+                    hintText: _notifyEmail
+                        ? 'you@example.com / +91 98765 43210'
+                        : '+91 98765 43210',
                     prefixIcon: Icon(
-                      _notifyEmail ? Icons.alternate_email_rounded : Icons.phone_android_rounded,
+                      _notifyEmail
+                          ? Icons.alternate_email_rounded
+                          : Icons.phone_android_rounded,
                       size: 20,
                       color: AppColors.primary,
                     ),
                     filled: true,
                     fillColor: cardColor,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 14, vertical: 12),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(color: borderColor),
@@ -403,7 +422,8 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+                      borderSide: const BorderSide(
+                          color: AppColors.primary, width: 1.5),
                     ),
                   ),
                 ),
@@ -437,9 +457,12 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
                             color: Colors.white,
                           ),
                         )
-                      : const Icon(Icons.notifications_active_rounded, size: 20),
+                      : const Icon(Icons.notifications_active_rounded,
+                          size: 20),
                   label: Text(
-                    _isSubmitting ? 'Registering Alert...' : 'Notify Me When In Stock',
+                    _isSubmitting
+                        ? 'Registering Alert...'
+                        : 'Notify Me When In Stock',
                     style: GoogleFonts.outfit(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -481,7 +504,8 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
           child: Row(
             children: [
-              Icon(icon, size: 20, color: value ? AppColors.primary : textSecondary),
+              Icon(icon,
+                  size: 20, color: value ? AppColors.primary : textSecondary),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -509,7 +533,8 @@ class _NotifyStockSheetState extends State<NotifyStockSheet> {
                 value: value,
                 activeColor: AppColors.primary,
                 onChanged: onChanged,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4)),
               ),
             ],
           ),

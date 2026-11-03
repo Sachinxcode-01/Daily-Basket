@@ -5,12 +5,7 @@ import 'package:daily_basket_mobile/core/services/stock_alerts_service.dart';
 import 'package:daily_basket_mobile/features/catalog/presentation/widgets/notify_stock_sheet.dart';
 import 'package:daily_basket_mobile/features/notifications/presentation/screens/back_to_stock_alerts_screen.dart';
 
-class _MockHttpOverrides extends HttpOverrides {
-  @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context);
-  }
-}
+class _MockHttpOverrides extends HttpOverrides {}
 
 class _FakeStockAlertsService extends StockAlertsService {
   final List<Map<String, dynamic>> mockAlerts;
@@ -251,3 +246,4 @@ void main() {
     });
   });
 }
+

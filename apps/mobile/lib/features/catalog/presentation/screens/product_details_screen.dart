@@ -41,7 +41,8 @@ class ProductDetailsScreen extends StatefulWidget {
     this.discountPercentage = '-20%',
     this.unitDetails = '500g ~3-4 pieces',
     this.deliveryTime = '15-30 mins',
-    this.imageUrl = 'https://lh3.googleusercontent.com/aida-public/AB6AXuAUZTLTSv5m1XvtD0eVooGUshRAE_TEf1VJ6rDo2p2NK8V-OtAgWRr9FnG7_wymxfNYoJbO-z3fuiHP_nel0NrAMmwbjTaJpS2Qn6gtKhCoGN6ltUY0Ye1kqsw-Lgi3oSwN5RBZcGCyK2PH3mZqTsqvfYztVjk3FZnajEMLUCbI6q8oB1hqEySrz4h9bFTXR1c7DcEprHGwUvQVM7TEPLq83eHICr5VanKASkHt7mYjWh7jE8sEGGd1',
+    this.imageUrl =
+        'https://lh3.googleusercontent.com/aida-public/AB6AXuAUZTLTSv5m1XvtD0eVooGUshRAE_TEf1VJ6rDo2p2NK8V-OtAgWRr9FnG7_wymxfNYoJbO-z3fuiHP_nel0NrAMmwbjTaJpS2Qn6gtKhCoGN6ltUY0Ye1kqsw-Lgi3oSwN5RBZcGCyK2PH3mZqTsqvfYztVjk3FZnajEMLUCbI6q8oB1hqEySrz4h9bFTXR1c7DcEprHGwUvQVM7TEPLq83eHICr5VanKASkHt7mYjWh7jE8sEGGd1',
     this.description,
   });
 
@@ -66,40 +67,62 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   List<Map<String, dynamic>> get _comboCompanions {
     final all = kAllCatalogProducts['all'] ?? [];
-    final currentCat = (_catalogProduct?['category'] ?? _catalogProduct?['sub'] ?? widget.categoryTag).toString().toLowerCase();
+    final currentCat = (_catalogProduct?['category'] ??
+            _catalogProduct?['sub'] ??
+            widget.categoryTag)
+        .toString()
+        .toLowerCase();
 
-    final matches = all.where((p) {
-      if (p['id'] == widget.productId) return false;
-      final cat = (p['category'] ?? p['sub'] ?? '').toString().toLowerCase();
-      if (currentCat.contains('milk')) {
-        return cat.contains('bread') || cat.contains('cereal');
-      }
-      if (currentCat.contains('bread')) {
-        return cat.contains('milk') || cat.contains('butter');
-      }
-      return cat != currentCat;
-    }).take(2).toList();
+    final matches = all
+        .where((p) {
+          if (p['id'] == widget.productId) return false;
+          final cat =
+              (p['category'] ?? p['sub'] ?? '').toString().toLowerCase();
+          if (currentCat.contains('milk')) {
+            return cat.contains('bread') || cat.contains('cereal');
+          }
+          if (currentCat.contains('bread')) {
+            return cat.contains('milk') || cat.contains('butter');
+          }
+          return cat != currentCat;
+        })
+        .take(2)
+        .toList();
 
-    return matches.isNotEmpty ? matches : all.where((p) => p['id'] != widget.productId).take(2).toList();
+    return matches.isNotEmpty
+        ? matches
+        : all.where((p) => p['id'] != widget.productId).take(2).toList();
   }
 
   List<Map<String, dynamic>> get _smartSubstitutes {
     final all = kAllCatalogProducts['all'] ?? [];
-    final currentCat = (_catalogProduct?['category'] ?? _catalogProduct?['sub'] ?? widget.categoryTag).toString().toLowerCase();
+    final currentCat = (_catalogProduct?['category'] ??
+            _catalogProduct?['sub'] ??
+            widget.categoryTag)
+        .toString()
+        .toLowerCase();
 
-    final matches = all.where((p) {
-      if (p['id'] == widget.productId) return false;
-      final cat = (p['category'] ?? p['sub'] ?? '').toString().toLowerCase();
-      return cat == currentCat || p['image'].toString().contains('fresh-vegetables');
-    }).take(3).toList();
+    final matches = all
+        .where((p) {
+          if (p['id'] == widget.productId) return false;
+          final cat =
+              (p['category'] ?? p['sub'] ?? '').toString().toLowerCase();
+          return cat == currentCat ||
+              p['image'].toString().contains('fresh-vegetables');
+        })
+        .take(3)
+        .toList();
 
-    return matches.isNotEmpty ? matches : all.where((p) => p['id'] != widget.productId).take(3).toList();
+    return matches.isNotEmpty
+        ? matches
+        : all.where((p) => p['id'] != widget.productId).take(3).toList();
   }
 
   Map<String, dynamic>? get _catalogProduct {
     final all = kAllCatalogProducts['all'] ?? [];
     for (final p in all) {
-      if (p['id'] == widget.productId || (p['name'] == widget.productName && p['image'] == widget.imageUrl)) {
+      if (p['id'] == widget.productId ||
+          (p['name'] == widget.productName && p['image'] == widget.imageUrl)) {
         return p;
       }
     }
@@ -107,7 +130,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   String get _effectiveBrand =>
-      widget.brand ?? (_catalogProduct?['brand'] as String?) ?? 'Daily Basket Select';
+      widget.brand ??
+      (_catalogProduct?['brand'] as String?) ??
+      'Daily Basket Select';
 
   String get _effectiveCategory =>
       (_catalogProduct?['category'] as String?) ??
@@ -115,10 +140,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       widget.categoryTag;
 
   String get _effectiveUnit {
-    if (widget.unitDetails.isNotEmpty && widget.unitDetails != '500g ~3-4 pieces') {
+    if (widget.unitDetails.isNotEmpty &&
+        widget.unitDetails != '500g ~3-4 pieces') {
       return widget.unitDetails;
     }
-    final raw = (_catalogProduct?['unit'] ?? _catalogProduct?['subtitle'] ?? '1 Pack').toString();
+    final raw =
+        (_catalogProduct?['unit'] ?? _catalogProduct?['subtitle'] ?? '1 Pack')
+            .toString();
     return raw;
   }
 
@@ -165,7 +193,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   List<String> get _weightOptions {
     final unit = _effectiveUnit;
-    if (unit.contains('Pack') || unit.contains('g') || unit.contains('ml') || unit.contains('L')) {
+    if (unit.contains('Pack') ||
+        unit.contains('g') ||
+        unit.contains('ml') ||
+        unit.contains('L')) {
       return [unit, 'Value Saver (2x)'];
     }
     return [unit];
@@ -178,28 +209,36 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ? widget.imageUrl.split('products/').last.split('/').first
         : '';
 
-    final matches = all.where((p) {
-      if (p['id'] == widget.productId) return false;
-      if (currentFolder.isNotEmpty && p['image'].toString().contains('products/$currentFolder/')) {
-        return true;
-      }
-      if (currentCat != null && (p['category'] == currentCat || p['sub'] == currentCat)) {
-        return true;
-      }
-      return false;
-    }).take(4).toList();
+    final matches = all
+        .where((p) {
+          if (p['id'] == widget.productId) return false;
+          if (currentFolder.isNotEmpty &&
+              p['image'].toString().contains('products/$currentFolder/')) {
+            return true;
+          }
+          if (currentCat != null &&
+              (p['category'] == currentCat || p['sub'] == currentCat)) {
+            return true;
+          }
+          return false;
+        })
+        .take(4)
+        .toList();
 
     final sourceList = matches.isNotEmpty ? matches : all.take(4).toList();
-    return sourceList.map((p) => {
-      'id': p['id'].toString(),
-      'name': p['name'].toString(),
-      'weight': (p['unit'] ?? p['subtitle'] ?? '1 Pack').toString(),
-      'price': '₹${(p['price'] as num).round()}',
-      'mrp': '₹${((p['mrp'] as num?) ?? (p['price'] as num) * 1.25).round()}',
-      'image': p['image'].toString(),
-      'brand': (p['brand'] ?? 'Daily Basket').toString(),
-      'category': (p['category'] ?? '').toString(),
-    }).toList();
+    return sourceList
+        .map((p) => {
+              'id': p['id'].toString(),
+              'name': p['name'].toString(),
+              'weight': (p['unit'] ?? p['subtitle'] ?? '1 Pack').toString(),
+              'price': '₹${(p['price'] as num).round()}',
+              'mrp':
+                  '₹${((p['mrp'] as num?) ?? (p['price'] as num) * 1.25).round()}',
+              'image': p['image'].toString(),
+              'brand': (p['brand'] ?? 'Daily Basket').toString(),
+              'category': (p['category'] ?? '').toString(),
+            })
+        .toList();
   }
 
   @override
@@ -244,7 +283,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       color: AppColors.primary.withValues(alpha: 0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.auto_awesome_rounded, color: AppColors.primary, size: 24),
+                    child: const Icon(Icons.auto_awesome_rounded,
+                        color: AppColors.primary, size: 24),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -281,13 +321,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               _aiSuggestionTile(
                 icon: Icons.health_and_safety_rounded,
                 title: 'Storage & Freshness',
-                subtitle: '$_effectiveStorage. Shelf life is $_effectiveShelfLife under standard conditions.',
+                subtitle:
+                    '$_effectiveStorage. Shelf life is $_effectiveShelfLife under standard conditions.',
               ),
               const SizedBox(height: 12),
               _aiSuggestionTile(
                 icon: Icons.restaurant_menu_rounded,
                 title: 'Pairing Suggestions',
-                subtitle: 'Pairs exceptionally well with daily breakfast essentials and fresh ingredients.',
+                subtitle:
+                    'Pairs exceptionally well with daily breakfast essentials and fresh ingredients.',
               ),
               const SizedBox(height: 24),
               SizedBox(
@@ -297,9 +339,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   onPressed: () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
-                  child: Text('Close Assistant', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white)),
+                  child: Text('Close Assistant',
+                      style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
             ],
@@ -309,7 +354,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     );
   }
 
-  Widget _aiSuggestionTile({required IconData icon, required String title, required String subtitle}) {
+  Widget _aiSuggestionTile(
+      {required IconData icon,
+      required String title,
+      required String subtitle}) {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -328,12 +376,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               children: [
                 Text(
                   title,
-                  style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                  style: GoogleFonts.outfit(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.onSurface),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant, height: 1.3),
+                  style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: AppColors.onSurfaceVariant,
+                      height: 1.3),
                 ),
               ],
             ),
@@ -368,7 +422,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         backgroundColor: Colors.white,
         elevation: 0.5,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.onSurface),
+          icon:
+              const Icon(Icons.arrow_back_rounded, color: AppColors.onSurface),
           onPressed: () => Navigator.of(context).maybePop(),
         ),
         title: Text(
@@ -398,11 +453,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             onPressed: () {
               HapticFeedback.lightImpact();
               Clipboard.setData(ClipboardData(
-                text: 'Check out ${widget.productName} (${widget.price}) on Daily Basket! Delivered in 10 minutes: https://dailybasket.com/p/${widget.productId}',
+                text:
+                    'Check out ${widget.productName} (${widget.price}) on Daily Basket! Delivered in 10 minutes: https://dailybasket.com/p/${widget.productId}',
               ));
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('Link copied to clipboard! Share ${widget.productName} with friends.'),
+                  content: Text(
+                      'Link copied to clipboard! Share ${widget.productName} with friends.'),
                   backgroundColor: const Color(0xFF006B23),
                   behavior: SnackBarBehavior.floating,
                 ),
@@ -447,7 +504,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     fit: BoxFit.cover,
                     errorBuilder: (_, __, ___) => const CircleAvatar(
                       backgroundColor: Color(0xFF2D9D43),
-                      child: Icon(Icons.person_rounded, color: Colors.white, size: 18),
+                      child: Icon(Icons.person_rounded,
+                          color: Colors.white, size: 18),
                     ),
                   ),
                 ),
@@ -483,7 +541,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(20),
-                        child: _galleryImages[_selectedImageIndex].startsWith('assets/')
+                        child: _galleryImages[_selectedImageIndex]
+                                .startsWith('assets/')
                             ? Image.asset(
                                 _galleryImages[_selectedImageIndex],
                                 width: double.infinity,
@@ -496,7 +555,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 height: double.infinity,
                                 fit: BoxFit.cover,
                                 errorBuilder: (ctx, err, stack) => const Center(
-                                  child: Icon(Icons.shopping_basket_rounded, size: 64, color: AppColors.primary),
+                                  child: Icon(Icons.shopping_basket_rounded,
+                                      size: 64, color: AppColors.primary),
                                 ),
                               ),
                       ),
@@ -507,18 +567,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           child: Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 5),
                                 decoration: BoxDecoration(
                                   color: AppColors.primary,
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Row(
                                   children: [
-                                    const Icon(Icons.eco_rounded, color: Colors.white, size: 14),
+                                    const Icon(Icons.eco_rounded,
+                                        color: Colors.white, size: 14),
                                     const SizedBox(width: 4),
                                     Text(
                                       'Certified Organic',
-                                      style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+                                      style: GoogleFonts.inter(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
                                     ),
                                   ],
                                 ),
@@ -536,14 +601,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             final idx = entry.key;
                             final isSel = idx == _selectedImageIndex;
                             return GestureDetector(
-                              onTap: () => setState(() => _selectedImageIndex = idx),
+                              onTap: () =>
+                                  setState(() => _selectedImageIndex = idx),
                               child: AnimatedContainer(
                                 duration: const Duration(milliseconds: 200),
-                                margin: const EdgeInsets.symmetric(horizontal: 4),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 4),
                                 width: isSel ? 24 : 8,
                                 height: 8,
                                 decoration: BoxDecoration(
-                                  color: isSel ? AppColors.primary : Colors.white.withValues(alpha: 0.7),
+                                  color: isSel
+                                      ? AppColors.primary
+                                      : Colors.white.withValues(alpha: 0.7),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                               ),
@@ -581,15 +650,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 // 3. Rating Row
                 Row(
                   children: [
-                    const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
-                    const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
-                    const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
-                    const Icon(Icons.star_rounded, color: Colors.amber, size: 20),
-                    const Icon(Icons.star_half_rounded, color: Colors.amber, size: 20),
+                    const Icon(Icons.star_rounded,
+                        color: Colors.amber, size: 20),
+                    const Icon(Icons.star_rounded,
+                        color: Colors.amber, size: 20),
+                    const Icon(Icons.star_rounded,
+                        color: Colors.amber, size: 20),
+                    const Icon(Icons.star_rounded,
+                        color: Colors.amber, size: 20),
+                    const Icon(Icons.star_half_rounded,
+                        color: Colors.amber, size: 20),
                     const SizedBox(width: 6),
                     Text(
                       '(128 Reviews)',
-                      style: GoogleFonts.inter(fontSize: 13, color: AppColors.onSurfaceVariant),
+                      style: GoogleFonts.inter(
+                          fontSize: 13, color: AppColors.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -619,14 +694,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                     const SizedBox(width: 10),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: const Color(0xFFFFDAD6),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         widget.discountPercentage,
-                        style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold, color: const Color(0xFF93000A)),
+                        style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF93000A)),
                       ),
                     ),
                   ],
@@ -634,12 +713,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 const SizedBox(height: 6),
                 RichText(
                   text: TextSpan(
-                    style: GoogleFonts.inter(fontSize: 13, color: AppColors.onSurfaceVariant),
+                    style: GoogleFonts.inter(
+                        fontSize: 13, color: AppColors.onSurfaceVariant),
                     children: [
                       const TextSpan(text: 'Delivery in '),
                       TextSpan(
                         text: widget.deliveryTime,
-                        style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: AppColors.primary),
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.primary),
                       ),
                     ],
                   ),
@@ -650,7 +732,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 // 5. Select Weight Pack Size
                 Text(
                   'Select Weight',
-                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                  style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.onSurface),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -665,10 +750,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           child: Container(
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             decoration: BoxDecoration(
-                              color: isSel ? AppColors.primary.withValues(alpha: 0.05) : Colors.white,
+                              color: isSel
+                                  ? AppColors.primary.withValues(alpha: 0.05)
+                                  : Colors.white,
                               borderRadius: BorderRadius.circular(14),
                               border: Border.all(
-                                color: isSel ? AppColors.primary : const Color(0xFFE2E8F0),
+                                color: isSel
+                                    ? AppColors.primary
+                                    : const Color(0xFFE2E8F0),
                                 width: isSel ? 2 : 1,
                               ),
                             ),
@@ -679,12 +768,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   style: GoogleFonts.outfit(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
-                                    color: isSel ? AppColors.primary : AppColors.onSurface,
+                                    color: isSel
+                                        ? AppColors.primary
+                                        : AppColors.onSurface,
                                   ),
                                 ),
                                 Text(
-                                  opt.contains('~') ? opt.substring(opt.indexOf('~')) : '',
-                                  style: GoogleFonts.inter(fontSize: 11, color: AppColors.onSurfaceVariant),
+                                  opt.contains('~')
+                                      ? opt.substring(opt.indexOf('~'))
+                                      : '',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 11,
+                                      color: AppColors.onSurfaceVariant),
                                 ),
                               ],
                             ),
@@ -716,7 +811,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             color: AppColors.primary,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 20),
+                          child: const Icon(Icons.auto_awesome_rounded,
+                              color: Colors.white, size: 20),
                         ),
                         const SizedBox(width: 14),
                         Expanded(
@@ -725,16 +821,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             children: [
                               Text(
                                 'Ask AI Chef',
-                                style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                                style: GoogleFonts.outfit(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.onSurface),
                               ),
                               Text(
                                 'Get instant recipe ideas, pairing suggestions, or preparation tips for ${widget.productName}.',
-                                style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+                                style: GoogleFonts.inter(
+                                    fontSize: 12,
+                                    color: AppColors.onSurfaceVariant),
                               ),
                             ],
                           ),
                         ),
-                        const Icon(Icons.chevron_right_rounded, color: AppColors.primary),
+                        const Icon(Icons.chevron_right_rounded,
+                            color: AppColors.primary),
                       ],
                     ),
                   ),
@@ -757,12 +859,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 // 7. Specifications Section
                 Text(
                   'Product Details',
-                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                  style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.onSurface),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   _effectiveDescription,
-                  style: GoogleFonts.inter(fontSize: 14, color: AppColors.onSurfaceVariant, height: 1.5),
+                  style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: AppColors.onSurfaceVariant,
+                      height: 1.5),
                 ),
                 const SizedBox(height: 12),
                 Container(
@@ -778,8 +886,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       _specRow('Pack Unit', _effectiveUnit),
                       _specRow('Category', _effectiveCategory),
                       _specRow('Country of Origin', 'India 🇮🇳'),
-                      _specRow('Storage Instructions', 'Store in a cool & dry place'),
-                      _specRow('Return Policy', '100% Doorstep Return eligible'),
+                      _specRow('Storage Instructions',
+                          'Store in a cool & dry place'),
+                      _specRow(
+                          'Return Policy', '100% Doorstep Return eligible'),
                     ],
                   ),
                 ),
@@ -789,7 +899,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 // 8. Nutrition Facts Table
                 Text(
                   'Nutritional Info (per 100g)',
-                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                  style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.onSurface),
                 ),
                 const SizedBox(height: 12),
                 Container(
@@ -802,11 +915,26 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _nutritionPill(_catalogNutrition['Calories'] ?? '135 kcal', 'ENERGY'),
-                      _nutritionPill(_catalogNutrition['Protein'] ?? '4.2 g', 'PROTEIN'),
-                      _nutritionPill(_catalogNutrition['Total Fat'] ?? _catalogNutrition['Fat'] ?? '2.1 g', 'FAT'),
-                      _nutritionPill(_catalogNutrition['Carbohydrates'] ?? _catalogNutrition['Carbs'] ?? '22.0 g', 'CARBS'),
-                      _nutritionPill(_catalogNutrition['Dietary Fiber'] ?? _catalogNutrition['Fiber'] ?? '3.5 g', 'FIBER'),
+                      _nutritionPill(
+                          _catalogNutrition['Calories'] ?? '135 kcal',
+                          'ENERGY'),
+                      _nutritionPill(
+                          _catalogNutrition['Protein'] ?? '4.2 g', 'PROTEIN'),
+                      _nutritionPill(
+                          _catalogNutrition['Total Fat'] ??
+                              _catalogNutrition['Fat'] ??
+                              '2.1 g',
+                          'FAT'),
+                      _nutritionPill(
+                          _catalogNutrition['Carbohydrates'] ??
+                              _catalogNutrition['Carbs'] ??
+                              '22.0 g',
+                          'CARBS'),
+                      _nutritionPill(
+                          _catalogNutrition['Dietary Fiber'] ??
+                              _catalogNutrition['Fiber'] ??
+                              '3.5 g',
+                          'FIBER'),
                     ],
                   ),
                 ),
@@ -839,23 +967,30 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.star_rounded, color: Colors.amber, size: 24),
+                        const Icon(Icons.star_rounded,
+                            color: Colors.amber, size: 24),
                         const SizedBox(width: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               '4.8 Star Rating (142 Verified Reviews)',
-                              style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                              style: GoogleFonts.outfit(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.onSurface),
                             ),
                             Text(
                               'Tap to view customer photo gallery & buyer feedback',
-                              style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+                              style: GoogleFonts.inter(
+                                  fontSize: 12,
+                                  color: AppColors.onSurfaceVariant),
                             ),
                           ],
                         ),
                         const Spacer(),
-                        const Icon(Icons.chevron_right_rounded, color: AppColors.onSurfaceVariant),
+                        const Icon(Icons.chevron_right_rounded,
+                            color: AppColors.onSurfaceVariant),
                       ],
                     ),
                   ),
@@ -866,7 +1001,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 // 10. Similar Products
                 Text(
                   'Similar Fresh Recommendations',
-                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                  style: GoogleFonts.outfit(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.onSurface),
                 ),
                 const SizedBox(height: 12),
                 SizedBox(
@@ -920,13 +1058,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               const SizedBox(height: 8),
                               Text(
                                 item['name']!,
-                                style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                                style: GoogleFonts.outfit(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.onSurface),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
                                 item['price']!,
-                                style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.bold, color: AppColors.primary),
+                                style: GoogleFonts.outfit(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary),
                               ),
                             ],
                           ),
@@ -948,7 +1092,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.90),
                     border: Border(
@@ -999,11 +1144,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   decoration: BoxDecoration(
                                     color: Colors.amber.shade100,
                                     borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: Colors.amber.shade300),
+                                    border: Border.all(
+                                        color: Colors.amber.shade300),
                                   ),
                                   child: Text(
                                     'Sold Out in Store',
-                                    style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.amber.shade900),
+                                    style: GoogleFonts.inter(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                        color: Colors.amber.shade900),
                                   ),
                                 ),
                               ),
@@ -1011,7 +1160,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ElevatedButton.icon(
                                 onPressed: () async {
                                   if (!_notifyMeRegistered) {
-                                    final registered = await NotifyStockSheet.show(
+                                    final messenger = ScaffoldMessenger.of(context);
+                                    final navigator = Navigator.of(context);
+                                    final registered =
+                                        await NotifyStockSheet.show(
                                       context,
                                       productId: widget.productId,
                                       productName: widget.productName,
@@ -1019,13 +1171,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       imageUrl: widget.imageUrl,
                                       unit: _effectiveUnit,
                                     );
-                                    if (registered == true && mounted) {
-                                      setState(() => _notifyMeRegistered = true);
-                                      ScaffoldMessenger.of(context).showSnackBar(
+                                    if (!mounted) return;
+                                    if (registered == true) {
+                                      setState(
+                                          () => _notifyMeRegistered = true);
+                                      messenger
+                                          .showSnackBar(
                                         SnackBar(
                                           content: Text(
                                             '✓ Alert registered! We will notify you when ${widget.productName} is restocked.',
-                                            style: GoogleFonts.inter(color: Colors.white),
+                                            style: GoogleFonts.inter(
+                                                color: Colors.white),
                                           ),
                                           backgroundColor: AppColors.primary,
                                           duration: const Duration(seconds: 3),
@@ -1033,7 +1189,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                             label: 'View Alerts',
                                             textColor: Colors.white,
                                             onPressed: () {
-                                              Navigator.of(context).pushNamed('/back-to-stock-alerts');
+                                              navigator.pushNamed(
+                                                  '/back-to-stock-alerts');
                                             },
                                           ),
                                         ),
@@ -1045,7 +1202,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       SnackBar(
                                         content: Text(
                                           'Alert cancelled for ${widget.productName}.',
-                                          style: GoogleFonts.inter(color: Colors.white),
+                                          style: GoogleFonts.inter(
+                                              color: Colors.white),
                                         ),
                                         backgroundColor: AppColors.primary,
                                         duration: const Duration(seconds: 2),
@@ -1053,13 +1211,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     );
                                   }
                                 },
-                                icon: Icon(_notifyMeRegistered ? Icons.notifications_active_rounded : Icons.notifications_none_rounded, size: 18),
-                                label: Text(_notifyMeRegistered ? 'Alert Set' : 'Notify Me'),
+                                icon: Icon(
+                                    _notifyMeRegistered
+                                        ? Icons.notifications_active_rounded
+                                        : Icons.notifications_none_rounded,
+                                    size: 18),
+                                label: Text(_notifyMeRegistered
+                                    ? 'Alert Set'
+                                    : 'Notify Me'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
                                 ),
                               ),
                             ],
@@ -1085,12 +1251,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(horizontal: 28),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 28),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
                                 ),
                                 child: Text(
                                   'Add to Cart - ${widget.price}',
-                                  style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold),
+                                  style: GoogleFonts.outfit(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ),
                             ),
@@ -1116,19 +1286,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     );
                                   },
                                   child: const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                    child: Icon(Icons.remove_rounded, color: Colors.white, size: 20),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 8),
+                                    child: Icon(Icons.remove_rounded,
+                                        color: Colors.white, size: 20),
                                   ),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 8),
                                   child: AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 180),
-                                    transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                                    transitionBuilder: (child, anim) =>
+                                        ScaleTransition(
+                                            scale: anim, child: child),
                                     child: Text(
                                       '$currentQty',
                                       key: ValueKey<int>(currentQty),
-                                      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                                      style: GoogleFonts.outfit(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white),
                                     ),
                                   ),
                                 ),
@@ -1144,8 +1322,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     );
                                   },
                                   child: const Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                    child: Icon(Icons.add_rounded, color: Colors.white, size: 20),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 8),
+                                    child: Icon(Icons.add_rounded,
+                                        color: Colors.white, size: 20),
                                   ),
                                 ),
                               ],
@@ -1179,8 +1359,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: Colors.amber.shade200, shape: BoxShape.circle),
-                child: Icon(Icons.warning_amber_rounded, color: Colors.amber.shade900, size: 20),
+                decoration: BoxDecoration(
+                    color: Colors.amber.shade200, shape: BoxShape.circle),
+                child: Icon(Icons.warning_amber_rounded,
+                    color: Colors.amber.shade900, size: 20),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -1189,11 +1371,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   children: [
                     Text(
                       'Currently Sold Out',
-                      style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.amber.shade900),
+                      style: GoogleFonts.outfit(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.amber.shade900),
                     ),
                     Text(
                       'Restock in progress. Try these direct 10-min delivery alternatives:',
-                      style: GoogleFonts.inter(fontSize: 11, color: Colors.amber.shade800),
+                      style: GoogleFonts.inter(
+                          fontSize: 11, color: Colors.amber.shade800),
                     ),
                   ],
                 ),
@@ -1206,7 +1392,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             final subName = sub['name'].toString();
             final subPrice = (sub['price'] as num?)?.toDouble() ?? 30.0;
             final subImg = sub['image'].toString();
-            final subUnit = (sub['unit'] ?? sub['subtitle'] ?? '1 Pack').toString();
+            final subUnit =
+                (sub['unit'] ?? sub['subtitle'] ?? '1 Pack').toString();
             final isAdded = _substituteAddedId == subId;
 
             return Container(
@@ -1236,15 +1423,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         Row(
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                              decoration: BoxDecoration(color: AppColors.primaryContainer, borderRadius: BorderRadius.circular(4)),
-                              child: Text('95% Match', style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 2),
+                              decoration: BoxDecoration(
+                                  color: AppColors.primaryContainer,
+                                  borderRadius: BorderRadius.circular(4)),
+                              child: Text('95% Match',
+                                  style: GoogleFonts.inter(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors.primary)),
                             ),
                           ],
                         ),
                         const SizedBox(height: 2),
-                        Text(subName, style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
-                        Text(subUnit, style: GoogleFonts.inter(fontSize: 10, color: AppColors.onSurfaceVariant)),
+                        Text(subName,
+                            style: GoogleFonts.inter(
+                                fontSize: 12, fontWeight: FontWeight.bold),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis),
+                        Text(subUnit,
+                            style: GoogleFonts.inter(
+                                fontSize: 10,
+                                color: AppColors.onSurfaceVariant)),
                       ],
                     ),
                   ),
@@ -1252,7 +1453,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('₹${subPrice.round()}', style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onSurface)),
+                      Text('₹${subPrice.round()}',
+                          style: GoogleFonts.outfit(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.onSurface)),
                       const SizedBox(height: 4),
                       SizedBox(
                         height: 28,
@@ -1268,16 +1473,21 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             );
                             setState(() => _substituteAddedId = subId);
                             Future.delayed(const Duration(seconds: 2), () {
-                              if (mounted) setState(() => _substituteAddedId = null);
+                              if (mounted) {
+                                setState(() => _substituteAddedId = null);
+                              }
                             });
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppColors.primary,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(horizontal: 10),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
                           ),
-                          child: Text(isAdded ? '✓ Added' : '+ Add', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold)),
+                          child: Text(isAdded ? '✓ Added' : '+ Add',
+                              style: GoogleFonts.inter(
+                                  fontSize: 10, fontWeight: FontWeight.bold)),
                         ),
                       ),
                     ],
@@ -1292,7 +1502,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   // ─── Feature 2: Frequently Bought Together ─────────────────────────────────
-  Widget _buildFrequentlyBoughtTogether(CartProvider? cartProvider, double unitPrice) {
+  Widget _buildFrequentlyBoughtTogether(
+      CartProvider? cartProvider, double unitPrice) {
     final companions = _comboCompanions;
     if (companions.isEmpty) return const SizedBox.shrink();
 
@@ -1301,7 +1512,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       comboOriginalTotal += (c['price'] as num?)?.toDouble() ?? 30.0;
     }
     const discountPercent = 12;
-    final comboDiscounted = (comboOriginalTotal * (1 - discountPercent / 100)).roundToDouble();
+    final comboDiscounted =
+        (comboOriginalTotal * (1 - discountPercent / 100)).roundToDouble();
     final savings = comboOriginalTotal - comboDiscounted;
 
     return Container(
@@ -1318,8 +1530,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(6),
-                decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-                child: const Icon(Icons.layers_rounded, color: Colors.white, size: 16),
+                decoration: const BoxDecoration(
+                    color: AppColors.primary, shape: BoxShape.circle),
+                child: const Icon(Icons.layers_rounded,
+                    color: Colors.white, size: 16),
               ),
               const SizedBox(width: 8),
               Expanded(
@@ -1328,19 +1542,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   children: [
                     Text(
                       'Frequently Bought Together',
-                      style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+                      style: GoogleFonts.outfit(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.onSurface),
                     ),
                     Text(
                       'Morning essentials bundle with 12% combo discount',
-                      style: GoogleFonts.inter(fontSize: 11, color: AppColors.onSurfaceVariant),
+                      style: GoogleFonts.inter(
+                          fontSize: 11, color: AppColors.onSurfaceVariant),
                     ),
                   ],
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(12)),
-                child: Text('SAVE 12%', style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+                decoration: BoxDecoration(
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(12)),
+                child: Text('SAVE 12%',
+                    style: GoogleFonts.inter(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)),
               ),
             ],
           ),
@@ -1350,20 +1574,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildBundleThumb(widget.imageUrl, widget.productName, widget.price),
+                _buildBundleThumb(
+                    widget.imageUrl, widget.productName, widget.price),
                 ...companions.map((c) => Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 6),
-                      child: Text('+', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
-                    ),
-                    _buildBundleThumb(
-                      c['image'].toString(),
-                      c['name'].toString(),
-                      '₹${(c['price'] as num).round()}',
-                    ),
-                  ],
-                )),
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 6),
+                          child: Text('+',
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: AppColors.primary)),
+                        ),
+                        _buildBundleThumb(
+                          c['image'].toString(),
+                          c['name'].toString(),
+                          '₹${(c['price'] as num).round()}',
+                        ),
+                      ],
+                    )),
               ],
             ),
           ),
@@ -1378,12 +1607,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 children: [
                   Row(
                     children: [
-                      Text('₹${comboDiscounted.round()}', style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface)),
+                      Text('₹${comboDiscounted.round()}',
+                          style: GoogleFonts.outfit(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.onSurface)),
                       const SizedBox(width: 6),
-                      Text('₹${comboOriginalTotal.round()}', style: GoogleFonts.inter(fontSize: 12, decoration: TextDecoration.lineThrough, color: AppColors.outline)),
+                      Text('₹${comboOriginalTotal.round()}',
+                          style: GoogleFonts.inter(
+                              fontSize: 12,
+                              decoration: TextDecoration.lineThrough,
+                              color: AppColors.outline)),
                     ],
                   ),
-                  Text('Save ₹${savings.round()} instantly', style: GoogleFonts.inter(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                  Text('Save ₹${savings.round()} instantly',
+                      style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary)),
                 ],
               ),
               ElevatedButton.icon(
@@ -1402,7 +1643,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     cartProvider?.updateQuantityById(
                       id: c['id'].toString(),
                       name: c['name'].toString(),
-                      subtitle: (c['unit'] ?? c['subtitle'] ?? '1 Pack').toString(),
+                      subtitle:
+                          (c['unit'] ?? c['subtitle'] ?? '1 Pack').toString(),
                       price: (c['price'] as num?)?.toDouble() ?? 30.0,
                       image: c['image'].toString(),
                       delta: 1,
@@ -1413,12 +1655,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     if (mounted) setState(() => _comboAdded = false);
                   });
                 },
-                icon: Icon(_comboAdded ? Icons.check_rounded : Icons.shopping_basket_rounded, size: 16),
-                label: Text(_comboAdded ? 'Combo Added!' : 'Add Combo (${companions.length + 1})'),
+                icon: Icon(
+                    _comboAdded
+                        ? Icons.check_rounded
+                        : Icons.shopping_basket_rounded,
+                    size: 16),
+                label: Text(_comboAdded
+                    ? 'Combo Added!'
+                    : 'Add Combo (${companions.length + 1})'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
               ),
             ],
@@ -1441,11 +1690,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(6),
-            child: AppNetworkImage(imageUrl: img, width: 44, height: 44, fit: BoxFit.contain),
+            child: AppNetworkImage(
+                imageUrl: img, width: 44, height: 44, fit: BoxFit.contain),
           ),
           const SizedBox(height: 4),
-          Text(name, style: GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
-          Text(price, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary)),
+          Text(name,
+              style:
+                  GoogleFonts.inter(fontSize: 9, fontWeight: FontWeight.w600),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis),
+          Text(price,
+              style: GoogleFonts.inter(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary)),
         ],
       ),
     );
@@ -1461,13 +1719,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             width: 140,
             child: Text(
               label,
-              style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
+              style: GoogleFonts.inter(
+                  fontSize: 12, color: AppColors.onSurfaceVariant),
             ),
           ),
           Expanded(
             child: Text(
               val,
-              style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.onSurface),
+              style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.onSurface),
             ),
           ),
         ],
@@ -1478,9 +1740,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Widget _nutritionPill(String val, String label) {
     return Column(
       children: [
-        Text(val, style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold, color: AppColors.primary)),
+        Text(val,
+            style: GoogleFonts.outfit(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary)),
         const SizedBox(height: 2),
-        Text(label, style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.onSurfaceVariant)),
+        Text(label,
+            style: GoogleFonts.inter(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: AppColors.onSurfaceVariant)),
       ],
     );
   }

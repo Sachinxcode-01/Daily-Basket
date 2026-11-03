@@ -3,7 +3,7 @@ import { StockAlertsService } from './stock-alerts.service';
 
 @Controller('stock-alerts')
 export class StockAlertsController {
-  constructor(private readonly stockAlertsService: StockAlertsService) {}
+  constructor(private readonly stockAlertsService: StockAlertsService) { }
 
   @Get()
   async getStockAlerts(@Request() req: any) {

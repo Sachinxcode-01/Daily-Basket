@@ -1,7 +1,5 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 import '../network/api_client.dart';
 
 /// Stock Alerts Service for Daily Basket Flutter Application
@@ -16,11 +14,6 @@ class StockAlertsService {
         _client = client;
 
   ApiClient get _apiClient => _client ?? ApiClient(baseUrl: baseUrl);
-
-  Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      };
 
   /// Register user notification for out-of-stock product
   Future<Map<String, dynamic>> subscribe({

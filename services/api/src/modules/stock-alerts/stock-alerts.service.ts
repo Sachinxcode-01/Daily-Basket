@@ -3,143 +3,143 @@ import { PrismaService } from '../../database/prisma.service';
 
 @Injectable()
 export class StockAlertsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getStockAlerts(userId: string) {
-    try {
-      const alerts = await this.prisma.stockAlert.findMany({
-        where: { userId },
-        include: {
-          variant: {
-            include: {
-              product: true,
-            },
-          },
-        },
-        orderBy: { updatedAt: 'desc' },
-      });
+            try {
+              const alerts = await this.prisma.stockAlert.findMany({
+                where: { userId },
+                include: {
+                  variant: {
+                    include: {
+                      product: true,
+                    },
+                  },
+                },
+    orderBy: { updatedAt: 'desc' },
+  });
 
-      if (alerts && alerts.length > 0) {
-        const items = alerts.map((a) => ({
-          id: a.id,
-          name: a.variant?.product?.name || 'Daily Basket Item',
-          brand: 'Daily Basket',
-          price: `₹${a.variant?.price ?? 0}`,
-          mrp: `₹${a.variant?.mrp ?? 0}`,
-          status: a.status,
-          time: a.status === 'RESTOCKED' ? 'Restocked recently' : 'Out of stock',
-          notifyEnabled: a.isEnabled,
-          image: a.variant?.product?.images?.[0] || 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=400&q=80',
-        }));
+  if (alerts && alerts.length > 0) {
+    const items = alerts.map((a) => ({
+      id: a.id,
+      name: a.variant?.product?.name || 'Daily Basket Item',
+      brand: 'Daily Basket',
+      price: `₹${a.variant?.price ?? 0}`,
+      mrp: `₹${a.variant?.mrp ?? 0}`,
+      status: a.status,
+      time: a.status === 'RESTOCKED' ? 'Restocked recently' : 'Out of stock',
+      notifyEnabled: a.isEnabled,
+      image: a.variant?.product?.images?.[0] || 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=400&q=80',
+    }));
 
-        return { status: 'success', data: items };
-      }
-    } catch (_) {
-      // Fall through to mock catalog defaults
-    }
+    return { status: 'success', data: items };
+  }
+} catch (_) {
+  // Fall through to mock catalog defaults
+}
 
-    return {
-      status: 'success',
-      data: [
-        {
-          id: 'bs1',
-          name: 'A2 Desi Cow Ghee 500ml',
-          brand: 'Daily Basket Farm Fresh',
-          price: '₹599',
-          mrp: '₹650',
-          status: 'RESTOCKED',
-          time: 'Restocked 10 mins ago',
-          notifyEnabled: true,
-          image: 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=400&q=80',
-        },
-        {
-          id: 'bs2',
-          name: 'Alphonso Mangoes Box (1kg)',
-          brand: 'Devgad Premium',
-          price: '₹299',
-          mrp: '₹399',
-          status: 'OUT_OF_STOCK',
-          time: 'Expected restock today, 4 PM',
-          notifyEnabled: true,
-          image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80',
-        },
-        {
-          id: 'bs3',
-          name: 'Organic Strawberries (250g)',
-          brand: 'Mahabaleshwar Organic',
-          price: '₹140',
-          mrp: '₹180',
-          status: 'OUT_OF_STOCK',
-          time: 'Expected restock tomorrow morning',
-          notifyEnabled: false,
-          image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=400&q=80',
-        },
-      ],
-    };
+return {
+  status: 'success',
+  data: [
+    {
+      id: 'bs1',
+      name: 'A2 Desi Cow Ghee 500ml',
+      brand: 'Daily Basket Farm Fresh',
+      price: '₹599',
+      mrp: '₹650',
+      status: 'RESTOCKED',
+      time: 'Restocked 10 mins ago',
+      notifyEnabled: true,
+      image: 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=400&q=80',
+    },
+    {
+      id: 'bs2',
+      name: 'Alphonso Mangoes Box (1kg)',
+      brand: 'Devgad Premium',
+      price: '₹299',
+      mrp: '₹399',
+      status: 'OUT_OF_STOCK',
+      time: 'Expected restock today, 4 PM',
+      notifyEnabled: true,
+      image: 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80',
+    },
+    {
+      id: 'bs3',
+      name: 'Organic Strawberries (250g)',
+      brand: 'Mahabaleshwar Organic',
+      price: '₹140',
+      mrp: '₹180',
+      status: 'OUT_OF_STOCK',
+      time: 'Expected restock tomorrow morning',
+      notifyEnabled: false,
+      image: 'https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=400&q=80',
+    },
+  ],
+};
   }
 
   async createStockAlert(userId: string, variantId: string) {
-    try {
-      const alert = await this.prisma.stockAlert.upsert({
-        where: {
-          userId_variantId: { userId, variantId },
-        },
-        update: {
-          isEnabled: true,
-        },
-        create: {
-          userId,
-          variantId,
-          isEnabled: true,
-          status: 'OUT_OF_STOCK',
-        },
-      });
+  try {
+    const alert = await this.prisma.stockAlert.upsert({
+      where: {
+        userId_variantId: { userId, variantId },
+      },
+      update: {
+        isEnabled: true,
+      },
+      create: {
+        userId,
+        variantId,
+        isEnabled: true,
+        status: 'OUT_OF_STOCK',
+      },
+    });
 
-      return { status: 'success', data: alert };
-    } catch (_) {
-      return {
-        status: 'success',
-        data: {
-          id: `alert_${Date.now()}`,
-          userId,
-          variantId,
-          isEnabled: true,
-          status: 'OUT_OF_STOCK',
-          createdAt: new Date().toISOString(),
-        },
-      };
-    }
+    return { status: 'success', data: alert };
+  } catch (_) {
+    return {
+      status: 'success',
+      data: {
+        id: `alert_${Date.now()}`,
+        userId,
+        variantId,
+        isEnabled: true,
+        status: 'OUT_OF_STOCK',
+        createdAt: new Date().toISOString(),
+      },
+    };
   }
+}
 
   async toggleStockAlert(id: string, isEnabled: boolean) {
-    try {
-      const alert = await this.prisma.stockAlert.update({
-        where: { id },
-        data: { isEnabled },
-      });
+  try {
+    const alert = await this.prisma.stockAlert.update({
+      where: { id },
+      data: { isEnabled },
+    });
 
-      return { status: 'success', data: alert };
-    } catch (_) {
-      return {
-        status: 'success',
-        data: {
-          id,
-          isEnabled,
-          updatedAt: new Date().toISOString(),
-        },
-      };
-    }
+    return { status: 'success', data: alert };
+  } catch (_) {
+    return {
+      status: 'success',
+      data: {
+        id,
+        isEnabled,
+        updatedAt: new Date().toISOString(),
+      },
+    };
   }
+}
 
   async deleteStockAlert(id: string) {
-    try {
-      await this.prisma.stockAlert.delete({
-        where: { id },
-      });
-    } catch (_) {
-      // Ignored for mock/demo entries
-    }
-
-    return { status: 'success', message: 'Alert removed' };
+  try {
+    await this.prisma.stockAlert.delete({
+      where: { id },
+    });
+  } catch (_) {
+    // Ignored for mock/demo entries
   }
+
+  return { status: 'success', message: 'Alert removed' };
+}
 }
