@@ -5,7 +5,7 @@ import { EmailService, EmailOptions, InboundEmailDto } from './email.service';
 @ApiTags('SMTP & AI Email Support')
 @Controller('email')
 export class EmailController {
-  constructor(private readonly emailService: EmailService) {}
+  constructor(private readonly emailService: EmailService) { }
 
   @Post('send')
   @ApiOperation({ summary: 'Send transaction or alert email via SMTP provider' })
