@@ -7,13 +7,13 @@ export interface EmailOptions {
   to: string;
   subject: string;
   template:
-    | 'WELCOME'
-    | 'ORDER_CONFIRMATION'
-    | 'PAYMENT_SUCCESS'
-    | 'OUT_FOR_DELIVERY'
-    | 'DELIVERED'
-    | 'LOW_STOCK'
-    | 'AI_SUPPORT_REPLY';
+  | 'WELCOME'
+  | 'ORDER_CONFIRMATION'
+  | 'PAYMENT_SUCCESS'
+  | 'OUT_FOR_DELIVERY'
+  | 'DELIVERED'
+  | 'LOW_STOCK'
+  | 'AI_SUPPORT_REPLY';
   data: Record<string, any>;
 }
 
@@ -36,7 +36,7 @@ export class EmailService {
     private readonly configService: ConfigService,
     private readonly aiService: AiService,
     private readonly prisma: PrismaService,
-  ) {}
+  ) { }
 
   async sendEmail(options: EmailOptions) {
     const isGmail = this.configService.get<string>('USE_GMAIL') === 'true';
@@ -56,13 +56,14 @@ export class EmailService {
     const htmlContent = this.renderTemplate(options.template, options.data);
 
     this.logger.log(
-      `[SMTP - ${isGmail ? 'Gmail Dev' : 'Production'}] Sending ${options.template} to ${options.to} via ${smtpHost}:${smtpPort}`,
+      `[SMTP - ${isGmail ? 'Gmail Dev' : 'Production'}] Sending ${options.template} to ${options.to} from ${smtpFrom} via ${smtpHost}:${smtpPort}`,
     );
 
     return {
       success: true,
       messageId: `msg_${Date.now()}_${Math.random().toString(36).substring(7)}`,
       to: options.to,
+      from: smtpFrom,
       subject: options.subject,
       provider: isGmail
         ? 'Gmail SMTP (Development)'
@@ -266,14 +267,13 @@ export class EmailService {
           <div class="content-box">
             ${formattedMessage}
           </div>
-          ${
-            data.orderId
-              ? `<div class="info-card">
+          ${data.orderId
+          ? `<div class="info-card">
                    <p style="margin: 0; font-weight: bold; color: #34d399;">Active Reference: ${data.orderId}</p>
                    <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Our delivery and store operations team is alerted for this inquiry.</p>
                  </div>`
-              : ''
-          }
+          : ''
+        }
           <a href="https://dailybasket.com/tracking/${data.orderId || ''}" class="cta">View Live Order & Support Portal</a>
           <div class="footer">
             <p>You received this email because you contacted Daily Basket 24x7 Support.</p>
