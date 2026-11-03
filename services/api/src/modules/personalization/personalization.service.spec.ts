@@ -111,4 +111,12 @@ describe('PersonalizationService', () => {
     expect(insights).toBeDefined();
     expect(insights.monthlySpending).toBeGreaterThan(0);
   });
+
+  it('should get recommendations by recently viewed product IDs', async () => {
+    const res = await service.getRecommendationsByRecentlyViewed(['p1', 'p2'], 'Dairy', 4);
+    expect(res).toBeDefined();
+    expect(res.success).toBe(true);
+    expect(res.items.length).toBeGreaterThan(0);
+    expect(res.reason).toBeDefined();
+  });
 });

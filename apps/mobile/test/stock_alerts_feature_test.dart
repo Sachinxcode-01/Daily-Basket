@@ -5,6 +5,7 @@ import 'package:daily_basket_mobile/core/services/stock_alerts_service.dart';
 import 'package:daily_basket_mobile/features/catalog/presentation/widgets/notify_stock_sheet.dart';
 import 'package:daily_basket_mobile/features/notifications/presentation/screens/back_to_stock_alerts_screen.dart';
 
+
 class _MockHttpOverrides extends HttpOverrides {}
 
 class _FakeStockAlertsService extends StockAlertsService {
@@ -14,30 +15,31 @@ class _FakeStockAlertsService extends StockAlertsService {
   String? lastSubscribedProductId;
 
   _FakeStockAlertsService({List<Map<String, dynamic>>? alerts})
-      : mockAlerts = alerts ?? [
-          {
-            'id': 'bs1',
-            'name': 'A2 Desi Cow Ghee 500ml',
-            'brand': 'Daily Basket Farm Fresh',
-            'price': '₹599',
-            'mrp': '₹650',
-            'status': 'RESTOCKED',
-            'time': 'Restocked 10 mins ago',
-            'notifyEnabled': true,
-            'image': '',
-          },
-          {
-            'id': 'bs2',
-            'name': 'Alphonso Mangoes Box (1kg)',
-            'brand': 'Devgad Premium',
-            'price': '₹299',
-            'mrp': '₹399',
-            'status': 'OUT_OF_STOCK',
-            'time': 'Expected restock today, 4 PM',
-            'notifyEnabled': false,
-            'image': '',
-          },
-        ];
+      : mockAlerts = alerts ??
+            [
+              {
+                'id': 'bs1',
+                'name': 'A2 Desi Cow Ghee 500ml',
+                'brand': 'Daily Basket Farm Fresh',
+                'price': '₹599',
+                'mrp': '₹650',
+                'status': 'RESTOCKED',
+                'time': 'Restocked 10 mins ago',
+                'notifyEnabled': true,
+                'image': '',
+              },
+              {
+                'id': 'bs2',
+                'name': 'Alphonso Mangoes Box (1kg)',
+                'brand': 'Devgad Premium',
+                'price': '₹299',
+                'mrp': '₹399',
+                'status': 'OUT_OF_STOCK',
+                'time': 'Expected restock today, 4 PM',
+                'notifyEnabled': false,
+                'image': '',
+              },
+            ];
 
   @override
   Future<Map<String, dynamic>> subscribe({
@@ -210,7 +212,8 @@ void main() {
       expect(find.text('Push Alert'), findsOneWidget);
     });
 
-    testWidgets('toggling switch triggers toggleAlert on service', (tester) async {
+    testWidgets('toggling switch triggers toggleAlert on service',
+        (tester) async {
       final fakeService = _FakeStockAlertsService();
 
       await tester.pumpWidget(
@@ -230,7 +233,8 @@ void main() {
       expect(fakeService.toggleCalled, isTrue);
     });
 
-    testWidgets('renders empty state when alerts list is empty', (tester) async {
+    testWidgets('renders empty state when alerts list is empty',
+        (tester) async {
       final fakeService = _FakeStockAlertsService(alerts: []);
 
       await tester.pumpWidget(
@@ -242,8 +246,10 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('No Stock Alerts Yet'), findsOneWidget);
-      expect(find.text('Items you set restock notifications for will appear here.'), findsOneWidget);
+      expect(
+          find.text(
+              'Items you set restock notifications for will appear here.'),
+          findsOneWidget);
     });
   });
 }
-

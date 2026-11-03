@@ -34,6 +34,8 @@ import '../widgets/product_spotlight_section.dart';
 import '../widgets/refer_and_earn_banner.dart';
 import '../widgets/store_status_banner_widget.dart';
 import '../widgets/smart_weekly_basket_card.dart';
+import '../widgets/daily_message_banner.dart';
+import '../widgets/ai_copilot_overlay.dart';
 
 class _Product {
   final String id, name, brand, unit, price, mrp, imageUrl, category;
@@ -1180,6 +1182,10 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   ]),
             ),
 
+            // ─── Live Daily Announcement Feed ──────────────────────────────────
+            const DailyMessageBanner(),
+            const SizedBox(height: 6),
+
             // ─── 1. Multi-Banner Hero Carousel ──────────────────────────────────
             HeroBannerCarousel(
               onOffersTap: () => Navigator.pushNamed(context, '/coupons'),
@@ -1315,6 +1321,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             // ─── Recently Viewed ───────────────────────────────────────
             const SizedBox(height: 28),
             const RecentlyViewedSection(),
+            const SizedBox(height: 16),
+            const AICopilotOverlay(),
             const SizedBox(height: 32),
           ],
         ),

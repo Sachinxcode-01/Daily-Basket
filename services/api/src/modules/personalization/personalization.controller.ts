@@ -94,4 +94,28 @@ export class PersonalizationController {
   ) {
     return this.smartBasketService.optimizeBasket(userId || 'user_demo_01', items || []);
   }
+
+  @Post('recommendations')
+  @ApiOperation({ summary: 'Get AI Copilot product recommendations personalized by recently viewed items' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        recentlyViewedIds: { type: 'array', items: { type: 'string' } },
+        category: { type: 'string' },
+        limit: { type: 'number' },
+      },
+    },
+  })
+  async getPersonalizedRecommendations(
+    @Body('recentlyViewedIds') recentlyViewedIds?: string[],
+    @Body('category') category?: string,
+    @Body('limit') limit?: number,
+  ) {
+    return this.personalizationService.getRecommendationsByRecentlyViewed(
+      recentlyViewedIds || [],
+      category,
+      Number(limit) || 6,
+    );
+  }
 }

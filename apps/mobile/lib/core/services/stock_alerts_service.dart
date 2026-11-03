@@ -58,7 +58,8 @@ class StockAlertsService {
 
       return {
         'success': false,
-        'error': response['error'] ?? 'Could not register alert. Please try again.',
+        'error':
+            response['error'] ?? 'Could not register alert. Please try again.',
       };
     } catch (e) {
       debugPrint('StockAlertsService.subscribe error: $e');
@@ -82,7 +83,8 @@ class StockAlertsService {
           'status': 'RESTOCKED',
           'time': 'Restocked 10 mins ago',
           'notifyEnabled': true,
-          'image': 'https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=400&q=80',
+          'image':
+              'https://images.unsplash.com/photo-1589927986089-35812388d1f4?w=400&q=80',
         },
         {
           'id': 'bs2',
@@ -93,7 +95,8 @@ class StockAlertsService {
           'status': 'OUT_OF_STOCK',
           'time': 'Expected restock today, 4 PM',
           'notifyEnabled': true,
-          'image': 'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80',
+          'image':
+              'https://images.unsplash.com/photo-1553279768-865429fa0078?w=400&q=80',
         },
       ];
     }

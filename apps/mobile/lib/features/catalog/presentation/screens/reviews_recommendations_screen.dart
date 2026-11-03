@@ -6,6 +6,7 @@ import '../../../../core/navigation/app_navigation_drawer.dart';
 import '../../../../core/providers/user_provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_network_image.dart';
+import '../widgets/product_review_sheet.dart';
 
 /// Reviews & Recommendations Screen — Google Stitch Specification (ID: c6a5b7dc5a8c45249003dc69571be238)
 /// Features rating breakdown chart, verified buyer reviews, and category recommendations.
@@ -65,126 +66,36 @@ class _ReviewsRecommendationsScreenState extends State<ReviewsRecommendationsScr
     ];
   }
 
-  void _openWriteReviewSheet() {
-    int selectedRating = 5;
-    final nameCtrl = TextEditingController(text: 'Customer');
-    final titleCtrl = TextEditingController();
-    final bodyCtrl = TextEditingController();
+  Future<void> _openWriteReviewSheet() async {
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await ProductReviewSheet.show(
+      context,
+      productId: widget.productId,
+      productName: widget.productName,
+      imageUrl: widget.productImage,
+    );
+    if (!mounted || result == null) return;
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    setState(() {
+      final tags = result['tags'] as List?;
+      final tagStr = tags != null && tags.isNotEmpty ? tags.join(' • ') : 'Verified Customer Review';
+      final comment = result['comment']?.toString();
+      _userReviews.insert(0, {
+        'name': 'You (Verified Buyer)',
+        'verified': true,
+        'time': 'Just now',
+        'rating': result['rating'] ?? 5,
+        'title': tagStr,
+        'body': comment != null && comment.isNotEmpty ? comment : 'Great fresh product from Daily Basket.',
+      });
+    });
+
+    messenger.showSnackBar(
+      const SnackBar(
+        content: Text('✓ Thank you! Your review has been submitted.'),
+        backgroundColor: AppColors.primary,
+        duration: Duration(seconds: 3),
       ),
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                left: 20,
-                right: 20,
-                top: 20,
-                bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    'Write a Review',
-                    style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.onSurface),
-                  ),
-                  Text(
-                    widget.productName,
-                    style: GoogleFonts.inter(fontSize: 12, color: AppColors.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: 14),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(5, (idx) {
-                      final star = idx + 1;
-                      return IconButton(
-                        icon: Icon(
-                          star <= selectedRating ? Icons.star_rounded : Icons.star_outline_rounded,
-                          color: Colors.amber,
-                          size: 32,
-                        ),
-                        onPressed: () {
-                          setModalState(() => selectedRating = star);
-                        },
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: titleCtrl,
-                    decoration: InputDecoration(
-                      labelText: 'Review Title',
-                      hintText: 'e.g. Excellent fresh quality!',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: bodyCtrl,
-                    maxLines: 3,
-                    decoration: InputDecoration(
-                      labelText: 'Detailed Feedback',
-                      hintText: 'Tell other buyers about freshness, taste, and packaging...',
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (titleCtrl.text.trim().isEmpty) return;
-                        setState(() {
-                          _userReviews.insert(0, {
-                            'name': nameCtrl.text.trim().isEmpty ? 'Customer' : nameCtrl.text.trim(),
-                            'verified': true,
-                            'time': 'Just now',
-                            'rating': selectedRating,
-                            'title': titleCtrl.text.trim(),
-                            'body': bodyCtrl.text.trim().isEmpty ? 'Great product, verified purchase.' : bodyCtrl.text.trim(),
-                          });
-                        });
-                        Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('✓ Thank you! Your review has been published.'),
-                            backgroundColor: AppColors.primary,
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      ),
-                      child: Text('Submit Review', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white)),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
     );
   }
 
