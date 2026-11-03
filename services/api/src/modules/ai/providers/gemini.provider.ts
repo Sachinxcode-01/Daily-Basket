@@ -18,7 +18,7 @@ export class GeminiProvider implements AIProvider {
   constructor(private configService: ConfigService) {
     this.apiKey = this.configService.get<string>('GEMINI_API_KEY') || '';
     this.modelName =
-      this.configService.get<string>('GEMINI_MODEL') || 'gemini-1.5-flash';
+      this.configService.get<string>('GEMINI_MODEL') || 'gemini-3.5-flash';
   }
 
   getProviderName(): string {
@@ -84,7 +84,7 @@ export class GeminiProvider implements AIProvider {
       // Select vision-capable model if image/audio context is provided
       const activeModel =
         context?.imageBase64 || context?.audioBase64
-          ? 'gemini-1.5-pro'
+          ? 'gemini-3.5-flash'
           : this.modelName;
 
       const body: any = {

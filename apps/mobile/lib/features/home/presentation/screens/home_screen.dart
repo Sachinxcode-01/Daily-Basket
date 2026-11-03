@@ -1323,14 +1323,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   Widget _buildHeader([UserProvider? userProvider]) => Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(
-            onPressed: () {
-              HapticFeedback.lightImpact();
-              AppNavigationDrawer.show(context);
-            },
-            icon: const Icon(Icons.menu_rounded,
-                color: Color(0xFF1A1C1E), size: 26),
-            tooltip: 'Navigation Hub',
+          Builder(
+            builder: (scaffoldContext) => IconButton(
+              onPressed: () {
+                HapticFeedback.lightImpact();
+                AppNavigationDrawer.openOrShow(scaffoldContext);
+              },
+              icon: const Icon(Icons.menu_rounded,
+                  color: Color(0xFF1A1C1E), size: 26),
+              tooltip: 'Navigation Hub',
+            ),
           ),
           Flexible(
             child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -1393,36 +1395,41 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                       )),
               ]),
               const SizedBox(width: 4),
-              GestureDetector(
-                onTap: () {
-                  HapticFeedback.lightImpact();
-                  setState(() => _navIndex = 5);
-                },
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border:
-                        Border.all(color: const Color(0xFFC0E8C7), width: 1.8),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color(0xFF006B23).withValues(alpha: 0.12),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(9999),
-                    child: Image.network(
-                      userProvider?.profileImageUrl ??
-                          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(
-                        Icons.person,
-                        color: Color(0xFF2D9D43),
-                        size: 20,
+              Material(
+                color: Colors.transparent,
+                shape: const CircleBorder(),
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () {
+                    HapticFeedback.lightImpact();
+                    setState(() => _navIndex = 5);
+                  },
+                  child: Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border:
+                          Border.all(color: const Color(0xFFC0E8C7), width: 1.8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(0xFF006B23).withValues(alpha: 0.12),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(9999),
+                      child: Image.network(
+                        userProvider?.profileImageUrl ??
+                            'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80',
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) => const Icon(
+                          Icons.person,
+                          color: Color(0xFF2D9D43),
+                          size: 20,
+                        ),
                       ),
                     ),
                   ),

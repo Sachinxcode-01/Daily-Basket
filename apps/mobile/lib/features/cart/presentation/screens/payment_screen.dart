@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/checkout_provider.dart';
 import '../../../../core/providers/auth_provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_top_bar.dart';
 import '../../../orders/presentation/screens/order_success_screen.dart';
 
 /// Payment Method Screen — Google Stitch Source of Truth Specification
@@ -116,22 +118,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.onSurface),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        title: Text(
-          'Select Payment Method',
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: AppColors.onSurface,
-          ),
-        ),
-        centerTitle: true,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      appBar: const AppTopBar(
+        title: 'Select Payment Method',
+        showBack: true,
+        showDrawerAction: true,
+        showProfile: true,
       ),
       body: Stack(
         children: [

@@ -95,10 +95,12 @@ class TrackingProvider extends ChangeNotifier {
     return 'Arriving in $mins ${mins == 1 ? "Min" : "Mins"}';
   }
 
-  TrackingProvider({this.orderId}) {
+  TrackingProvider({this.orderId, bool autoSimulate = true}) {
     _initDefaultRoute();
-    fetchOsrmRoute();
-    _startLiveSimulation();
+    if (autoSimulate) {
+      fetchOsrmRoute();
+      _startLiveSimulation();
+    }
     if (orderId != null && orderId!.isNotEmpty) {
       _fetchOrderTracking();
     }

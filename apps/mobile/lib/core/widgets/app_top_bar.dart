@@ -82,13 +82,15 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
             },
       );
     } else if (showDrawer) {
-      leadingWidget = IconButton(
-        icon: Icon(Icons.menu_rounded, color: iconColor, size: 26),
-        tooltip: 'Navigation Hub',
-        onPressed: () {
-          HapticFeedback.lightImpact();
-          AppNavigationDrawer.show(context);
-        },
+      leadingWidget = Builder(
+        builder: (scaffoldContext) => IconButton(
+          icon: Icon(Icons.menu_rounded, color: iconColor, size: 26),
+          tooltip: 'Navigation Hub',
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            AppNavigationDrawer.openOrShow(scaffoldContext);
+          },
+        ),
       );
     }
 
@@ -101,13 +103,15 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     final shouldShowDrawerAction = showDrawerAction || (showBack && showDrawer);
     if (shouldShowDrawerAction) {
       actionsList.add(
-        IconButton(
-          icon: Icon(Icons.menu_rounded, color: iconColor),
-          tooltip: 'Navigation Hub',
-          onPressed: () {
-            HapticFeedback.lightImpact();
-            AppNavigationDrawer.show(context);
-          },
+        Builder(
+          builder: (scaffoldContext) => IconButton(
+            icon: Icon(Icons.menu_rounded, color: iconColor),
+            tooltip: 'Navigation Hub',
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              AppNavigationDrawer.openOrShow(scaffoldContext);
+            },
+          ),
         ),
       );
     }
@@ -160,33 +164,38 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
       actionsList.add(
         Padding(
           padding: const EdgeInsets.only(right: 14, left: 4),
-          child: GestureDetector(
-            onTap: () {
-              HapticFeedback.lightImpact();
-              Navigator.of(context).pushNamed('/profile');
-            },
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: avatarBorderColor, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: brandColor.withValues(alpha: 0.12),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(9999),
-                child: Image.network(
-                  profileImageUrl,
-                  fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Icon(
-                    Icons.person,
-                    color: brandColor,
+          child: Material(
+            color: Colors.transparent,
+            shape: const CircleBorder(),
+            child: InkWell(
+              onTap: () {
+                HapticFeedback.lightImpact();
+                Navigator.of(context).pushNamed('/profile');
+              },
+              customBorder: const CircleBorder(),
+              child: Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: avatarBorderColor, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: brandColor.withValues(alpha: 0.12),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(9999),
+                  child: Image.network(
+                    profileImageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Icon(
+                      Icons.person,
+                      color: brandColor,
+                    ),
                   ),
                 ),
               ),

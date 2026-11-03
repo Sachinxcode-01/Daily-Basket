@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_top_bar.dart';
 import '../../../../core/providers/checkout_provider.dart';
 import '../../../referral/providers/coupon_provider.dart';
 import '../../../profile/providers/address_provider.dart';
@@ -119,27 +121,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: AppColors.onSurface),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        title: Text(
-          'Checkout Summary',
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: AppColors.onSurface,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_basket_outlined, color: AppColors.primary),
-            onPressed: () => Navigator.of(context).pushNamed('/cart'),
-          ),
-        ],
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      appBar: const AppTopBar(
+        title: 'Checkout Summary',
+        showBack: true,
+        showDrawerAction: true,
+        showProfile: true,
+        showCart: true,
       ),
       body: Stack(
         children: [

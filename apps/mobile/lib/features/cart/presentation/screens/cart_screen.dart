@@ -758,7 +758,9 @@ class _CartScreenState extends State<CartScreen> {
                                                           TextOverflow.ellipsis,
                                                     ),
                                                     const SizedBox(height: 4),
-                                                    Row(
+                                                    Wrap(
+                                                      spacing: 8,
+                                                      crossAxisAlignment: WrapCrossAlignment.center,
                                                       children: [
                                                         Text(
                                                           '₹${item['price']}',
@@ -908,20 +910,25 @@ class _CartScreenState extends State<CartScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.bolt_rounded,
-                            color: Color(0xFF006B23), size: 20),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Before You Checkout',
-                          style: GoogleFonts.outfit(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF1A1C1E),
+                    Expanded(
+                      child: Row(
+                        children: [
+                          const Icon(Icons.bolt_rounded,
+                              color: Color(0xFF006B23), size: 20),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            child: Text(
+                              'Before You Checkout',
+                              style: GoogleFonts.outfit(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF1A1C1E),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
@@ -1202,25 +1209,31 @@ class _CartScreenState extends State<CartScreen> {
                           const Icon(Icons.published_with_changes_rounded,
                               color: Color(0xFF006B23), size: 20),
                           const SizedBox(width: 8),
-                          Text(
-                            'If items are out of stock:',
-                            style: GoogleFonts.outfit(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF1A1C1E),
+                          Expanded(
+                            child: Text(
+                              'If items are out of stock:',
+                              style: GoogleFonts.outfit(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: const Color(0xFF1A1C1E),
+                              ),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          _buildSubstitutionChip('Call me for replacement'),
-                          const SizedBox(width: 8),
-                          _buildSubstitutionChip('Replace with organic'),
-                          const SizedBox(width: 8),
-                          _buildSubstitutionChip('Refund missing item'),
-                        ],
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          children: [
+                            _buildSubstitutionChip('Call me for replacement'),
+                            const SizedBox(width: 8),
+                            _buildSubstitutionChip('Replace with organic'),
+                            const SizedBox(width: 8),
+                            _buildSubstitutionChip('Refund missing item'),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -1539,12 +1552,13 @@ class _CartScreenState extends State<CartScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'TOTAL TO PAY',
+                          Flexible(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'TOTAL TO PAY',
                                 style: GoogleFonts.inter(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
@@ -1561,22 +1575,23 @@ class _CartScreenState extends State<CartScreen> {
                                 ),
                               ),
                             ],
-                          ),
+                          ),),
                           Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                'Proceed to Checkout',
+                                'Checkout',
                                 style: GoogleFonts.outfit(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.w700,
                                   color: Colors.white,
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: 6),
                               const Icon(
                                 Icons.arrow_forward_rounded,
                                 color: Colors.white,
-                                size: 20,
+                                size: 18,
                               ),
                             ],
                           ),
@@ -1595,30 +1610,28 @@ class _CartScreenState extends State<CartScreen> {
 
   Widget _buildSubstitutionChip(String label) {
     final isSelected = _selectedSubstitution == label;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _selectedSubstitution = label),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-          decoration: BoxDecoration(
-            color:
-                isSelected ? const Color(0xFFE8F5E9) : const Color(0xFFF3F3F6),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isSelected ? const Color(0xFF006B23) : Colors.transparent,
-              width: 1.2,
-            ),
+    return GestureDetector(
+      onTap: () => setState(() => _selectedSubstitution = label),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+        decoration: BoxDecoration(
+          color:
+              isSelected ? const Color(0xFFE8F5E9) : const Color(0xFFF3F3F6),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF006B23) : Colors.transparent,
+            width: 1.2,
           ),
-          child: Text(
-            label,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected
-                  ? const Color(0xFF006B23)
-                  : const Color(0xFF6E7A6C),
-            ),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: GoogleFonts.inter(
+            fontSize: 11,
+            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+            color: isSelected
+                ? const Color(0xFF006B23)
+                : const Color(0xFF6E7A6C),
           ),
         ),
       ),
@@ -1629,15 +1642,18 @@ class _CartScreenState extends State<CartScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            fontWeight: isDiscount ? FontWeight.w600 : FontWeight.w400,
-            color:
-                isDiscount ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
+        Expanded(
+          child: Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              fontWeight: isDiscount ? FontWeight.w600 : FontWeight.w400,
+              color:
+                  isDiscount ? const Color(0xFF006B23) : const Color(0xFF6E7A6C),
+            ),
           ),
         ),
+        const SizedBox(width: 8),
         Text(
           value,
           style: GoogleFonts.inter(

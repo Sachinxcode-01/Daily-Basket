@@ -13,6 +13,7 @@ import 'package:daily_basket_mobile/features/profile/providers/address_provider.
 import 'package:daily_basket_mobile/features/cart/presentation/screens/cart_screen.dart';
 import 'package:daily_basket_mobile/features/cart/presentation/screens/checkout_screen.dart';
 import 'package:daily_basket_mobile/features/orders/presentation/screens/delivery_tracking_screen.dart';
+import 'package:daily_basket_mobile/features/tracking/providers/tracking_provider.dart';
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -29,6 +30,7 @@ void main() {
         final themeProvider = AppThemeProvider();
         final languageProvider = LanguageProvider();
         final notificationProvider = NotificationProvider();
+        final trackingProvider = TrackingProvider(autoSimulate: false);
 
         Widget createTestApp(Widget homeWidget) {
           return MultiProvider(
@@ -41,6 +43,7 @@ void main() {
               ChangeNotifierProvider<AppThemeProvider>.value(value: themeProvider),
               ChangeNotifierProvider<LanguageProvider>.value(value: languageProvider),
               ChangeNotifierProvider<NotificationProvider>.value(value: notificationProvider),
+              ChangeNotifierProvider<TrackingProvider>.value(value: trackingProvider),
             ],
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
@@ -124,7 +127,7 @@ void main() {
         final selectedAddress = addressProvider.defaultAddress ?? addressProvider.addresses.first;
         expect(selectedAddress, isNotNull);
         expect(selectedAddress['district'], 'Bengaluru');
-        expect(selectedAddress['pincode'], '560034');
+        expect(selectedAddress['pincode'], '560038');
 
         // ═════════════════════════════════════════════════════════════════════
         // STEP 4: PUMP UI & VERIFY CART & TRACKING SCREENS RENDER CLEANLY
@@ -139,7 +142,7 @@ void main() {
         await tester.pumpWidget(createTestApp(const DeliveryTrackingScreen()));
         await tester.pumpAndSettle();
 
-        expect(find.text('Live Delivery Tracking'), findsOneWidget);
+        expect(find.text('Live Order Tracking'), findsOneWidget);
         expect(find.text('Ramesh Kumar'), findsOneWidget);
         expect(find.byIcon(Icons.two_wheeler_rounded), findsWidgets);
       },

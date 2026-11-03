@@ -7,6 +7,9 @@ import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/providers/visual_search_provider.dart';
 import '../../../../shared/widgets/favorite_button.dart';
 import '../widgets/multi_object_selector_card.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_top_bar.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 class VisualSearchResultsScreen extends StatelessWidget {
   const VisualSearchResultsScreen({super.key});
@@ -35,29 +38,21 @@ class VisualSearchResultsScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF1E293B)),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Results from AI Visual Search',
-          style: GoogleFonts.outfit(
-            color: const Color(0xFF1E293B),
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: [
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      appBar: AppTopBar(
+        title: 'AI Visual Search',
+        showBack: true,
+        showDrawerAction: true,
+        showProfile: true,
+        extraActions: [
           IconButton(
             icon: const Icon(Icons.camera_alt_outlined, color: Color(0xFF006B23)),
             onPressed: () => Navigator.pushReplacementNamed(context, '/camera-search'),
           ),
         ],
       ),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 2),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(

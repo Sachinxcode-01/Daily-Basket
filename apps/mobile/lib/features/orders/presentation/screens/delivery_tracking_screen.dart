@@ -454,12 +454,15 @@ class DeliveryTrackingScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Text(
-                                  driver['name'] as String,
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                    color: AppColors.onSurface,
+                                Flexible(
+                                  child: Text(
+                                    driver['name'] as String,
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.onSurface,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                                 const SizedBox(width: 8),

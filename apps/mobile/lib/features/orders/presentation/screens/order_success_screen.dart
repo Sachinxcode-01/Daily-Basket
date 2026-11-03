@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../home/presentation/screens/home_screen.dart' show CustomerHomeScreen;
 import '../../../tracking/presentation/screens/tracking_screen.dart' show OrderTrackingScreen;
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_top_bar.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 /// Order Success Screen — Google Stitch Design System Exact Replica
 class OrderSuccessScreen extends StatefulWidget {
@@ -65,25 +68,20 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        title: Text(
-          'Daily Basket',
-          style: GoogleFonts.outfit(
-            fontSize: 22,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF006B23),
-          ),
-        ),
-        actions: [
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      appBar: AppTopBar(
+        title: 'Order Confirmed',
+        showBack: false,
+        showDrawer: true,
+        showProfile: true,
+        extraActions: [
           IconButton(
             icon: const Icon(Icons.close_rounded, color: Color(0xFF1A1C1E), size: 24),
             onPressed: _goToHome,
           ),
         ],
       ),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 4),
       body: Stack(
         children: [
           // ─── 1. Decorative Confetti Particle Floating Overlay ──────────────

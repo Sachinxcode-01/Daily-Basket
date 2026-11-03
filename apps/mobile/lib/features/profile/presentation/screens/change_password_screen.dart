@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_top_bar.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 /// Change Password Screen — Google Stitch Design System Exact Replica
 class ChangePasswordScreen extends StatefulWidget {
@@ -69,23 +72,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Color(0xFF006B23)),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        title: Text(
-          'Change Password',
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            color: const Color(0xFF006B23),
-          ),
-        ),
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      appBar: const AppTopBar(
+        title: 'Change Password',
+        showBack: true,
+        showDrawerAction: true,
+        showProfile: true,
       ),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 5),
       body: Stack(
         children: [
           SingleChildScrollView(

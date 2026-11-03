@@ -6,6 +6,9 @@ import 'package:provider/provider.dart';
 import '../../../../core/services/pincode_lookup_service.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../providers/address_provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_top_bar.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 /// Add / Edit Delivery Address Screen
 /// Google Stitch Screen ID: 2743ef4c5bb54d7294444b23f082597e
@@ -314,44 +317,15 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.surface,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(64),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: AppColors.primary),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    widget.editAddressData != null ? 'Edit Address' : 'Add Address',
-                    style: GoogleFonts.outfit(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.onSurface,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      appBar: AppTopBar(
+        title: widget.editAddressData != null ? 'Edit Address' : 'Add Address',
+        showBack: true,
+        showDrawerAction: true,
+        showProfile: true,
       ),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 5),
       body: SafeArea(
         child: Column(
           children: [

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/app_motion.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_top_bar.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 /// Empty Basket Screen — Exact Google Stitch Specification
 /// Matches:
@@ -17,29 +20,15 @@ class EmptyBasketScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: Colors.white.withValues(alpha: 0.90),
-        elevation: 0.5,
-        leading: Navigator.of(context).canPop()
-            ? IconButton(
-                icon: const Icon(
-                  Icons.arrow_back_rounded,
-                  color: AppColors.primary,
-                ),
-                onPressed: () => Navigator.of(context).pop(),
-              )
-            : null,
-        title: Text(
-          'Your Shopping Basket',
-          style: GoogleFonts.outfit(
-            fontSize: 20,
-            fontWeight: FontWeight.w800,
-            color: AppColors.onSurface,
-          ),
-        ),
-        centerTitle: true,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      appBar: const AppTopBar(
+        title: 'Your Shopping Basket',
+        showBack: true,
+        showDrawerAction: true,
+        showProfile: true,
       ),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 3),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(

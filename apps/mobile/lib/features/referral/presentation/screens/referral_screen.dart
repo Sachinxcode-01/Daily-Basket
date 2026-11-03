@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/navigation/app_navigation_drawer.dart';
-import '../../../../core/providers/user_provider.dart';
 import '../../../../core/widgets/app_bottom_nav.dart';
+import '../../../../core/widgets/app_top_bar.dart';
 import '../../providers/coupon_provider.dart';
 
 /// Refer & Earn Screen — Google Stitch Design System Exact Replica
@@ -477,16 +477,15 @@ class _ReferralScreenState extends State<ReferralScreen> {
     final couponProvider = context.watch<CouponProvider>();
     final referralCode = couponProvider.referralCode;
 
-    UserProvider? userProvider;
-    try {
-      userProvider = context.watch<UserProvider>();
-    } catch (_) {}
 
-    final profileImageUrl = userProvider?.profileImageUrl ??
-        'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      appBar: const AppTopBar(
+        title: 'Refer & Earn',
+        showDrawer: true,
+        showProfile: true,
+      ),
       drawer: const AppNavigationDrawer(isDrawer: true),
       bottomNavigationBar: const AppBottomNav(currentIndex: -1),
       body: SafeArea(
@@ -508,71 +507,6 @@ class _ReferralScreenState extends State<ReferralScreen> {
                   child: Column(
                     children: [
                       const SizedBox(height: 12),
-
-                      // ─── 1. Header (Menu + Refer & Earn Title + Profile Avatar) ──
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              HapticFeedback.lightImpact();
-                              AppNavigationDrawer.show(context);
-                            },
-                            tooltip: 'Main Navigation Menu',
-                            icon: const Icon(
-                              Icons.menu_rounded,
-                              color: Color(0xFF1A1C1E),
-                              size: 26,
-                            ),
-                          ),
-                          Text(
-                            'Refer & Earn',
-                            style: GoogleFonts.outfit(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w700,
-                              color: const Color(0xFF006B23),
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              HapticFeedback.lightImpact();
-                              Navigator.of(context).pushNamed('/profile');
-                            },
-                            child: Container(
-                              width: 38,
-                              height: 38,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: const Color(0xFFC0E8C7),
-                                  width: 2,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFF006B23)
-                                        .withValues(alpha: 0.12),
-                                    blurRadius: 6,
-                                    offset: const Offset(0, 2),
-                                  ),
-                                ],
-                              ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(9999),
-                                child: Image.network(
-                                  profileImageUrl,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => const Icon(
-                                    Icons.person,
-                                    color: Color(0xFF006B23),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      const SizedBox(height: 16),
 
                       // ─── 2. Hero Incentive Banner Card ───────────────────────
                       Container(

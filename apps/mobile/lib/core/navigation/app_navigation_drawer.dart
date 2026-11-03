@@ -17,6 +17,13 @@ class AppNavigationDrawer extends StatelessWidget {
   });
 
   static void show(BuildContext context) {
+    try {
+      final scaffold = Scaffold.maybeOf(context);
+      if (scaffold != null && scaffold.hasDrawer) {
+        scaffold.openDrawer();
+        return;
+      }
+    } catch (_) {}
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -24,6 +31,9 @@ class AppNavigationDrawer extends StatelessWidget {
       builder: (context) => const AppNavigationDrawer(),
     );
   }
+
+  static void openOrShow(BuildContext context) => show(context);
+  static void open(BuildContext context) => show(context);
 
   @override
   Widget build(BuildContext context) {

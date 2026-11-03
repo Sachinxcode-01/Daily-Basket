@@ -4,6 +4,9 @@ import 'package:provider/provider.dart';
 
 import '../../../../core/theme/app_theme.dart';
 import '../../providers/address_provider.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_top_bar.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 /// Location & Delivery Address Screen
 /// Google Stitch Screen ID: bd155992620f4ad598d33db7ecffa41b
@@ -134,51 +137,15 @@ class _LocationDeliveryAddressScreenState
     final bool canConfirm = _selectedAddressId != null;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(64),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: 0.8),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 4,
-                offset: const Offset(0, 1),
-              ),
-            ],
-          ),
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back, color: AppColors.onSurfaceVariant),
-                    onPressed: () {
-                      if (Navigator.canPop(context)) {
-                        Navigator.pop(context);
-                      }
-                    },
-                  ),
-                  Expanded(
-                    child: Text(
-                      'Select Location',
-                      textAlign: TextAlign.center,
-                      style: GoogleFonts.outfit(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.onSurface,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 48), // Balancing back button
-                ],
-              ),
-            ),
-          ),
-        ),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      appBar: const AppTopBar(
+        title: 'Select Location',
+        showBack: true,
+        showDrawerAction: true,
+        showProfile: true,
       ),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 5),
       body: SafeArea(
         child: Column(
           children: [

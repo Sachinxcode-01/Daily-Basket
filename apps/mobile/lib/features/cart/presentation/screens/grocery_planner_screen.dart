@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../../core/navigation/app_navigation_drawer.dart';
+import '../../../../core/widgets/app_top_bar.dart';
+import '../../../../core/widgets/app_bottom_nav.dart';
 
 class GroceryPlannerScreen extends StatefulWidget {
   const GroceryPlannerScreen({super.key});
@@ -39,16 +42,15 @@ class _GroceryPlannerScreenState extends State<GroceryPlannerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-      appBar: AppBar(
-        title: Text(
-          'Smart Grocery Planner',
-          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18, color: const Color(0xFF0F172A)),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0.5,
-        foregroundColor: const Color(0xFF0F172A),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      drawer: const AppNavigationDrawer(isDrawer: true),
+      appBar: const AppTopBar(
+        title: 'Smart Grocery Planner',
+        showBack: true,
+        showDrawerAction: true,
+        showProfile: true,
       ),
+      bottomNavigationBar: const AppBottomNav(currentIndex: 3),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

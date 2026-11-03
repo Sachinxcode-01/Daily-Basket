@@ -125,13 +125,14 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
   }
 
   Widget _buildVoiceSheet(BuildContext ctx, AiChatProvider provider) {
+    final isDark = Theme.of(ctx).brightness == Brightness.dark;
     return StatefulBuilder(
       builder: (context, setSheetState) {
         return Container(
           height: MediaQuery.of(context).size.height * 0.55,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF191C1E) : Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -140,14 +141,14 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
                   width: 40,
                   height: 4,
                   decoration: BoxDecoration(
-                      color: const Color(0xFFE0E0E0),
+                      color: isDark ? const Color(0xFF40483E) : const Color(0xFFE0E0E0),
                       borderRadius: BorderRadius.circular(2))),
               const SizedBox(height: 20),
               Text('Voice Input',
                   style: GoogleFonts.outfit(
                       fontSize: 20,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.onSurface)),
+                      color: isDark ? const Color(0xFFF0F0F3) : AppColors.onSurface)),
               const SizedBox(height: 8),
 
               // Language selection chips
@@ -529,6 +530,12 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
 
   PreferredSizeWidget _buildAppBar(AiChatProvider provider, String agentName,
       String agentRole, bool isEscalated) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final appBarBg = isDark
+        ? const Color(0xFF191C1E).withValues(alpha: 0.95)
+        : Colors.white.withValues(alpha: 0.95);
+    final onSurfaceColor = isDark ? const Color(0xFFF0F0F3) : AppColors.onSurface;
+
     UserProvider? userProvider;
     try {
       userProvider = context.watch<UserProvider>();
@@ -537,22 +544,22 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
         'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&q=80';
 
     return AppBar(
-      backgroundColor: Colors.white.withValues(alpha: 0.95),
+      backgroundColor: appBarBg,
       elevation: 0.5,
       leading: IconButton(
-        icon: const Icon(Icons.arrow_back_rounded, color: AppColors.onSurface),
+        icon: Icon(Icons.arrow_back_rounded, color: onSurfaceColor),
         onPressed: () => Navigator.of(context).pop(),
       ),
       title: _isSearching
           ? TextField(
               controller: _searchController,
               autofocus: true,
-              style: GoogleFonts.inter(fontSize: 14),
+              style: GoogleFonts.inter(fontSize: 14, color: onSurfaceColor),
               decoration: InputDecoration(
                 hintText: 'Search chat...',
                 border: InputBorder.none,
                 hintStyle: GoogleFonts.inter(
-                    fontSize: 14, color: AppColors.onSurfaceVariant),
+                    fontSize: 14, color: isDark ? const Color(0xFF94A3B8) : AppColors.onSurfaceVariant),
               ),
               onChanged: (v) => provider.setSearchQuery(v),
             )
@@ -564,7 +571,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
                       radius: 19,
                       backgroundColor: isEscalated
                           ? AppColors.primaryContainer
-                          : const Color(0xFFDCE5DD),
+                          : (isDark ? const Color(0xFF292C2F) : const Color(0xFFDCE5DD)),
                       child: Icon(
                         isEscalated
                             ? Icons.verified_user_rounded
@@ -582,7 +589,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
                         decoration: BoxDecoration(
                           color: const Color(0xFF4CAF50),
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 2),
+                          border: Border.all(color: isDark ? const Color(0xFF191C1E) : Colors.white, width: 2),
                         ),
                       ),
                     ),
@@ -592,14 +599,22 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(agentName,
+                          Flexible(
+                            child: Text(
+                              agentName,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
                               style: GoogleFonts.outfit(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.onSurface)),
+                                  color: onSurfaceColor),
+                            ),
+                          ),
                           if (isEscalated) ...[
                             const SizedBox(width: 4),
                             const Icon(Icons.verified_rounded,
@@ -607,11 +622,15 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
                           ],
                         ],
                       ),
-                      Text(agentRole,
-                          style: GoogleFonts.inter(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primary)),
+                      Text(
+                        agentRole,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: GoogleFonts.inter(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary),
+                      ),
                     ],
                   ),
                 ),
@@ -621,7 +640,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
         IconButton(
           icon: Icon(
               _isSearching ? Icons.close_rounded : Icons.search_rounded,
-              color: AppColors.onSurface),
+              color: onSurfaceColor),
           onPressed: () {
             setState(() {
               _isSearching = !_isSearching;
@@ -633,7 +652,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
           },
         ),
         PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert_rounded, color: AppColors.onSurface),
+          icon: Icon(Icons.more_vert_rounded, color: onSurfaceColor),
           onSelected: (value) {
             switch (value) {
               case 'call':
@@ -686,7 +705,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
           ],
         ),
         IconButton(
-          icon: const Icon(Icons.menu_rounded, color: AppColors.onSurface),
+          icon: Icon(Icons.menu_rounded, color: onSurfaceColor),
           tooltip: 'Navigation Hub',
           onPressed: () {
             HapticFeedback.lightImpact();
@@ -730,12 +749,13 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
   // ─── Date Badge ────────────────────────────────────────────────────────────
 
   Widget _buildDateBadge() {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Center(
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFFEEEEF0),
+          color: isDark ? const Color(0xFF292C2F) : const Color(0xFFEEEEF0),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
@@ -743,7 +763,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
           style: GoogleFonts.inter(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: AppColors.onSurfaceVariant),
+              color: isDark ? const Color(0xFFBECAB9) : AppColors.onSurfaceVariant),
         ),
       ),
     );
@@ -779,7 +799,9 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
               maxWidth: MediaQuery.of(context).size.width * 0.82),
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: isAgent ? const Color(0xFFEEEEF0) : AppColors.primary,
+            color: isAgent
+                ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFF292C2F) : const Color(0xFFEEEEF0))
+                : AppColors.primary,
             borderRadius: BorderRadius.only(
               topLeft: const Radius.circular(18),
               topRight: const Radius.circular(18),
@@ -852,7 +874,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
                           fontSize: 14,
                           height: 1.4,
                           color: isAgent
-                              ? AppColors.onSurface
+                              ? (Theme.of(context).brightness == Brightness.dark ? const Color(0xFFF0F0F3) : AppColors.onSurface)
                               : Colors.white,
                         ),
                       ),
@@ -1003,14 +1025,15 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
   }
 
   Widget _buildOrderStatusCard(Map<String, dynamic> data) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(top: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF1F2224) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-            color: AppColors.outlineVariant.withValues(alpha: 0.40)),
+            color: isDark ? const Color(0xFF40483E) : AppColors.outlineVariant.withValues(alpha: 0.40)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1020,7 +1043,9 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
             children: [
               Text(data['orderId'] ?? '#DB-9824',
                   style: GoogleFonts.outfit(
-                      fontWeight: FontWeight.bold, fontSize: 14)),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: isDark ? const Color(0xFFF0F0F3) : AppColors.onSurface)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
@@ -1072,11 +1097,12 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
   }
 
   Widget _buildRefundCard(Map<String, dynamic> data) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(top: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7FFF2),
+        color: isDark ? const Color(0xFF003912) : const Color(0xFFF7FFF2),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
             color: AppColors.primary.withValues(alpha: 0.30)),
@@ -1195,11 +1221,12 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
   // ─── Input Bar ─────────────────────────────────────────────────────────────
 
   Widget _buildInputBar(AiChatProvider provider) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFE2E2E5))),
+      decoration: BoxDecoration(
+        color: isDark ? const Color(0xFF191C1E) : Colors.white,
+        border: Border(top: BorderSide(color: isDark ? const Color(0xFF292C2F) : const Color(0xFFE2E2E5))),
       ),
       child: Row(
         children: [
@@ -1215,7 +1242,7 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
           Expanded(
             child: TextField(
               controller: _messageController,
-              style: GoogleFonts.inter(fontSize: 14),
+              style: GoogleFonts.inter(fontSize: 14, color: isDark ? const Color(0xFFF0F0F3) : AppColors.onSurface),
               maxLines: 3,
               minLines: 1,
               textCapitalization: TextCapitalization.sentences,
@@ -1223,10 +1250,10 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
                 hintText: 'Type your message or issue...',
                 hintStyle: GoogleFonts.inter(
                   fontSize: 14,
-                  color: AppColors.onSurfaceVariant.withValues(alpha: 0.7),
+                  color: isDark ? const Color(0xFF94A3B8) : AppColors.onSurfaceVariant.withValues(alpha: 0.7),
                 ),
                 filled: true,
-                fillColor: const Color(0xFFF3F3F6),
+                fillColor: isDark ? const Color(0xFF292C2F) : const Color(0xFFF3F3F6),
                 contentPadding: const EdgeInsets.symmetric(
                     horizontal: 16, vertical: 10),
                 border: OutlineInputBorder(
@@ -1303,15 +1330,16 @@ class _LiveSupportChatScreenState extends State<LiveSupportChatScreen>
   // ─── Quick Reply Chips ─────────────────────────────────────────────────────
 
   Widget _chip(AiChatProvider provider, String text, IconData icon) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return ActionChip(
       avatar: Icon(icon, size: 16, color: AppColors.primary),
       label: Text(text,
           style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: AppColors.onSurface)),
-      backgroundColor: Colors.white,
-      side: const BorderSide(color: Color(0xFFE2E2E5)),
+              color: isDark ? const Color(0xFFF0F0F3) : AppColors.onSurface)),
+      backgroundColor: isDark ? const Color(0xFF292C2F) : Colors.white,
+      side: BorderSide(color: isDark ? const Color(0xFF40483E) : const Color(0xFFE2E2E5)),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       onPressed: () {
         // Strip emoji prefix before sending
