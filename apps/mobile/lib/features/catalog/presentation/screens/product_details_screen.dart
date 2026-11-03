@@ -13,6 +13,7 @@ import '../../../../shared/widgets/favorite_button.dart';
 import '../../../../core/providers/cart_provider.dart';
 import '../../../../core/providers/recently_viewed_provider.dart';
 import 'reviews_recommendations_screen.dart';
+import '../widgets/notify_stock_sheet.dart';
 
 /// Product Details Screen — Google Stitch Source of Truth Specification
 /// Project: Daily Basket Quick-Commerce Suite
@@ -1008,18 +1009,49 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ),
                               const SizedBox(width: 8),
                               ElevatedButton.icon(
-                                onPressed: () {
-                                  setState(() => _notifyMeRegistered = !_notifyMeRegistered);
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(
-                                        _notifyMeRegistered ? '✓ Alert registered! We will notify you when restocked.' : 'Alert cancelled.',
-                                        style: GoogleFonts.inter(color: Colors.white),
+                                onPressed: () async {
+                                  if (!_notifyMeRegistered) {
+                                    final registered = await NotifyStockSheet.show(
+                                      context,
+                                      productId: widget.productId,
+                                      productName: widget.productName,
+                                      brand: _effectiveBrand,
+                                      imageUrl: widget.imageUrl,
+                                      unit: _effectiveUnit,
+                                    );
+                                    if (registered == true && mounted) {
+                                      setState(() => _notifyMeRegistered = true);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            '✓ Alert registered! We will notify you when ${widget.productName} is restocked.',
+                                            style: GoogleFonts.inter(color: Colors.white),
+                                          ),
+                                          backgroundColor: AppColors.primary,
+                                          duration: const Duration(seconds: 3),
+                                          action: SnackBarAction(
+                                            label: 'View Alerts',
+                                            textColor: Colors.white,
+                                            onPressed: () {
+                                              Navigator.of(context).pushNamed('/back-to-stock-alerts');
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  } else {
+                                    setState(() => _notifyMeRegistered = false);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text(
+                                          'Alert cancelled for ${widget.productName}.',
+                                          style: GoogleFonts.inter(color: Colors.white),
+                                        ),
+                                        backgroundColor: AppColors.primary,
+                                        duration: const Duration(seconds: 2),
                                       ),
-                                      backgroundColor: AppColors.primary,
-                                      duration: const Duration(seconds: 2),
-                                    ),
-                                  );
+                                    );
+                                  }
                                 },
                                 icon: Icon(_notifyMeRegistered ? Icons.notifications_active_rounded : Icons.notifications_none_rounded, size: 18),
                                 label: Text(_notifyMeRegistered ? 'Alert Set' : 'Notify Me'),

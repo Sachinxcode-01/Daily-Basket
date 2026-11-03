@@ -12,12 +12,14 @@ export class StockAlertsController {
   }
 
   @Post()
+  @Post('subscribe')
   async createStockAlert(
     @Request() req: any,
-    @Body() body: { variantId: string },
+    @Body() body: { variantId?: string; productId?: string },
   ) {
     const userId = req.user?.id || 'demo_user_id';
-    return this.stockAlertsService.createStockAlert(userId, body.variantId);
+    const variantId = body.variantId || body.productId || 'default_variant';
+    return this.stockAlertsService.createStockAlert(userId, variantId);
   }
 
   @Post(':id/toggle')
