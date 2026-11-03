@@ -37,10 +37,12 @@ class _DailyMessageBannerState extends State<DailyMessageBanner>
   void initState() {
     super.initState();
     _service = widget.messagesService ?? DailyMessagesService();
-    final isTest = !kIsWeb && (
-      Platform.environment.containsKey('FLUTTER_TEST') ||
-      WidgetsBinding.instance.runtimeType.toString().toLowerCase().contains('test')
-    );
+    final isTest = !kIsWeb &&
+        (Platform.environment.containsKey('FLUTTER_TEST') ||
+            WidgetsBinding.instance.runtimeType
+                .toString()
+                .toLowerCase()
+                .contains('test'));
     _pulseController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 1400),
@@ -81,7 +83,8 @@ class _DailyMessageBannerState extends State<DailyMessageBanner>
     }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final title = _messageData!['title']?.toString() ?? 'Today\'s Daily Harvest 🌿';
+    final title =
+        _messageData!['title']?.toString() ?? 'Today\'s Daily Harvest 🌿';
     final body = _messageData!['body']?.toString() ??
         'Crisp organic greens and fresh essentials delivered in 10 minutes.';
 
@@ -90,7 +93,8 @@ class _DailyMessageBannerState extends State<DailyMessageBanner>
         ? AppColors.primary.withValues(alpha: 0.3)
         : const Color(0xFFB7E4C7);
     final textPrimary = isDark ? Colors.white : const Color(0xFF191C1E);
-    final textSecondary = isDark ? const Color(0xFFD0D3D6) : const Color(0xFF3F4A3D);
+    final textSecondary =
+        isDark ? const Color(0xFFD0D3D6) : const Color(0xFF3F4A3D);
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),

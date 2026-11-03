@@ -27,7 +27,8 @@ void main() {
       expect(res['data']['title'], contains('Harvest'));
     });
 
-    testWidgets('DailyMessageBanner renders announcement, title, and handles dismiss',
+    testWidgets(
+        'DailyMessageBanner renders announcement, title, and handles dismiss',
         (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
@@ -73,7 +74,8 @@ void main() {
       expect(voteRes, isTrue);
     });
 
-    testWidgets('ProductReviewSheet renders stars, tag chips, and submits review',
+    testWidgets(
+        'ProductReviewSheet renders stars, tag chips, and submits review',
         (tester) async {
       Map<String, dynamic>? submittedResult;
 
@@ -130,7 +132,8 @@ void main() {
       expect((res['items'] as List).length, greaterThan(0));
     });
 
-    testWidgets('AICopilotOverlay responds to RecentlyViewedProvider and adds to cart',
+    testWidgets(
+        'AICopilotOverlay responds to RecentlyViewedProvider and adds to cart',
         (tester) async {
       final rvProvider = RecentlyViewedProvider();
       final cartProvider = CartProvider();
@@ -138,7 +141,8 @@ void main() {
       await tester.pumpWidget(
         MultiProvider(
           providers: [
-            ChangeNotifierProvider<RecentlyViewedProvider>.value(value: rvProvider),
+            ChangeNotifierProvider<RecentlyViewedProvider>.value(
+                value: rvProvider),
             ChangeNotifierProvider<CartProvider>.value(value: cartProvider),
           ],
           child: const MaterialApp(
