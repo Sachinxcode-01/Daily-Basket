@@ -47,4 +47,22 @@ class AdminApiClient {
       };
     }
   }
+
+  static Future<Map<String, dynamic>> delete(String path) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl$path'),
+        headers: {
+          'Content-Type': 'application/json',
+          if (authToken != null) 'Authorization': 'Bearer $authToken',
+        },
+      );
+      return jsonDecode(response.body);
+    } catch (_) {
+      return {
+        'success': false,
+        'message': 'Network offline or server unreachable.'
+      };
+    }
+  }
 }

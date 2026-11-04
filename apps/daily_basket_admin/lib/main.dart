@@ -4,6 +4,7 @@ import 'core/theme/admin_theme.dart';
 import 'core/providers/admin_auth_provider.dart';
 import 'core/providers/admin_dashboard_provider.dart';
 import 'core/providers/admin_products_provider.dart';
+import 'core/providers/admin_marketing_provider.dart';
 import 'core/providers/theme_provider.dart';
 
 // Stitch Authentication & Session Screens
@@ -73,6 +74,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AdminAuthProvider()),
         ChangeNotifierProvider(create: (_) => AdminDashboardProvider()),
         ChangeNotifierProvider(create: (_) => AdminProductsProvider()),
+        ChangeNotifierProvider(create: (_) => AdminMarketingProvider()),
         ChangeNotifierProvider(create: (_) => AiHealthProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
