@@ -12,9 +12,11 @@ class CreateCampaignSheet extends StatefulWidget {
 
 class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
   final _formKey = GlobalKey<FormState>();
-  final _titleController = TextEditingController(text: 'Morning Organic Harvest 🌿');
+  final _titleController =
+      TextEditingController(text: 'Morning Organic Harvest 🌿');
   final _bodyController = TextEditingController(
-      text: 'Crisp greens, farm-fresh milk & seasonal berries delivered to your door in 10 minutes.');
+      text:
+          'Crisp greens, farm-fresh milk & seasonal berries delivered to your door in 10 minutes.');
   String _selectedAudience = 'CUSTOMER';
   bool _setActiveImmediately = true;
   bool _isSubmitting = false;
@@ -114,7 +116,8 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                       color: _primaryGreen.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.campaign_rounded, color: _primaryGreen, size: 24),
+                    child: const Icon(Icons.campaign_rounded,
+                        color: _primaryGreen, size: 24),
                   ),
                   const SizedBox(width: 12),
                   const Expanded(
@@ -128,7 +131,8 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close_rounded, color: Colors.white70),
+                    icon:
+                        const Icon(Icons.close_rounded, color: Colors.white70),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -138,7 +142,10 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
               // Title Field
               const Text(
                 'Campaign Title',
-                style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 6),
               TextFormField(
@@ -154,16 +161,22 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
-                validator: (val) => val == null || val.trim().isEmpty ? 'Please enter a title' : null,
+                validator: (val) => val == null || val.trim().isEmpty
+                    ? 'Please enter a title'
+                    : null,
               ),
               const SizedBox(height: 16),
 
               // Body Field
               const Text(
                 'Announcement Message',
-                style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 6),
               TextFormField(
@@ -174,22 +187,29 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: _inputBg,
-                  hintText: 'Enter promo copy, product mentions, or delivery guarantees...',
+                  hintText:
+                      'Enter promo copy, product mentions, or delivery guarantees...',
                   hintStyle: const TextStyle(color: Colors.white38),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 ),
-                validator: (val) => val == null || val.trim().isEmpty ? 'Please enter a message body' : null,
+                validator: (val) => val == null || val.trim().isEmpty
+                    ? 'Please enter a message body'
+                    : null,
               ),
               const SizedBox(height: 16),
 
               // Target Audience Chips
               const Text(
                 'Target Audience',
-                style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               Wrap(
@@ -208,7 +228,10 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                 activeColor: _primaryGreen,
                 title: const Text(
                   'Set as Active Morning Banner',
-                  style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600),
                 ),
                 subtitle: const Text(
                   'Immediately reflects on customer app home screen',
@@ -222,7 +245,10 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
               // Live Customer Preview Banner
               const Text(
                 'Live Customer App Preview',
-                style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               Container(
@@ -248,7 +274,8 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                         color: _primaryGreen.withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.auto_awesome_rounded, color: Color(0xFF70DD7A), size: 18),
+                      child: const Icon(Icons.auto_awesome_rounded,
+                          color: Color(0xFF70DD7A), size: 18),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -258,7 +285,8 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                           Row(
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: _primaryGreen,
                                   borderRadius: BorderRadius.circular(6),
@@ -294,7 +322,9 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                             _bodyController.text.isEmpty
                                 ? 'Your promotional message preview will appear here...'
                                 : _bodyController.text,
-                            style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 11),
+                            style: TextStyle(
+                                color: Colors.white.withOpacity(0.85),
+                                fontSize: 11),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -315,14 +345,16 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _primaryGreen,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
                     elevation: 0,
                   ),
                   child: _isSubmitting
                       ? const SizedBox(
                           width: 24,
                           height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -331,7 +363,8 @@ class _CreateCampaignSheetState extends State<CreateCampaignSheet> {
                             SizedBox(width: 8),
                             Text(
                               'Publish Daily Message',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                  fontSize: 15, fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),

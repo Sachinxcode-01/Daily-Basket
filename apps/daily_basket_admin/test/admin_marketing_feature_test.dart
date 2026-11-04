@@ -89,7 +89,8 @@ void main() {
   });
 
   group('AdminMarketingProvider State & Actions', () {
-    test('Loads campaigns and coupons, computes totals and active campaign', () async {
+    test('Loads campaigns and coupons, computes totals and active campaign',
+        () async {
       final provider = AdminMarketingProvider();
       await provider.loadMarketingData();
 
@@ -148,7 +149,8 @@ void main() {
       expect(added, isTrue);
       expect(provider.coupons.length, initialCount + 1);
 
-      final newCoupon = provider.coupons.firstWhere((c) => c.code == 'TESTCODE');
+      final newCoupon =
+          provider.coupons.firstWhere((c) => c.code == 'TESTCODE');
       final deleted = await provider.deleteCoupon(newCoupon.id);
       expect(deleted, isTrue);
       expect(provider.coupons.any((c) => c.code == 'TESTCODE'), isFalse);
@@ -156,7 +158,8 @@ void main() {
   });
 
   group('AdminMarketingScreen UI Rendering', () {
-    testWidgets('Renders Marketing & Growth Hub with KPI cards and tabs', (WidgetTester tester) async {
+    testWidgets('Renders Marketing & Growth Hub with KPI cards and tabs',
+        (WidgetTester tester) async {
       final provider = AdminMarketingProvider();
       await provider.loadMarketingData();
 

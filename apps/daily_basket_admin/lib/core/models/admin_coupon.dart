@@ -71,3 +71,4 @@ class AdminCoupon {
     return '₹${discountValue.toInt()} OFF';
   }
 }
+

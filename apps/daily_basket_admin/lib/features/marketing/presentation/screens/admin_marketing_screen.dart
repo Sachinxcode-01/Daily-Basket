@@ -59,24 +59,28 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
           children: [
             Icon(Icons.bolt_rounded, color: Colors.amber, size: 28),
             SizedBox(width: 8),
-            Text('Dispatch Push Broadcast?', style: TextStyle(color: Colors.white, fontSize: 17)),
+            Text('Dispatch Push Broadcast?',
+                style: TextStyle(color: Colors.white, fontSize: 17)),
           ],
         ),
         content: Text(
           'This will send instant push notifications and update the in-app daily grocery banner for target customers.\n\nCampaign: "${active?.title ?? 'Active Daily Message'}"',
-          style: const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+          style:
+              const TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+            child:
+                const Text('Cancel', style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(
               backgroundColor: _primaryGreen,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
             child: const Text('Broadcast Now 🚀'),
           ),
@@ -92,10 +96,12 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
     if (!mounted) return;
 
     if (result['success'] == true) {
-      final delivered = result['deliveredCount'] ?? result['totalTargeted'] ?? 0;
+      final delivered =
+          result['deliveredCount'] ?? result['totalTargeted'] ?? 0;
       messenger.showSnackBar(
         SnackBar(
-          content: Text('⚡ Broadcast delivered to $delivered customers successfully!'),
+          content: Text(
+              '⚡ Broadcast delivered to $delivered customers successfully!'),
           backgroundColor: _primaryGreen,
           behavior: SnackBarBehavior.floating,
         ),
@@ -103,7 +109,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
     } else {
       messenger.showSnackBar(
         SnackBar(
-          content: Text('Broadcast failed: ${result['error'] ?? 'Unknown error'}'),
+          content:
+              Text('Broadcast failed: ${result['error'] ?? 'Unknown error'}'),
           backgroundColor: Colors.redAccent,
           behavior: SnackBarBehavior.floating,
         ),
@@ -123,8 +130,10 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: _cardBg,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text('Create Promo Coupon', style: TextStyle(color: Colors.white, fontSize: 17)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Text('Create Promo Coupon',
+              style: TextStyle(color: Colors.white, fontSize: 17)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: minAxisSizeMin,
@@ -156,13 +165,19 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
                         dropdownColor: _cardBg,
                         style: const TextStyle(color: Colors.white),
                         items: const [
-                          DropdownMenuItem(value: 'FLAT', child: Text('Flat (₹)')),
-                          DropdownMenuItem(value: 'PERCENTAGE', child: Text('Percent (%)')),
+                          DropdownMenuItem(
+                              value: 'FLAT', child: Text('Flat (₹)')),
+                          DropdownMenuItem(
+                              value: 'PERCENTAGE', child: Text('Percent (%)')),
                         ],
                         onChanged: (val) {
-                          if (val != null) setDialogState(() => discountType = val);
+                          if (val != null) {
+                            setDialogState(() => discountType = val);
+                          }
                         },
-                        decoration: const InputDecoration(labelText: 'Type', labelStyle: TextStyle(color: Colors.white70)),
+                        decoration: const InputDecoration(
+                            labelText: 'Type',
+                            labelStyle: TextStyle(color: Colors.white70)),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -195,7 +210,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel', style: TextStyle(color: Colors.white54)),
+              child:
+                  const Text('Cancel', style: TextStyle(color: Colors.white54)),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -241,7 +257,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
         ),
         title: const Text(
           'Marketing & Growth Hub',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+          style: TextStyle(
+              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
           IconButton(
@@ -249,7 +266,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
                 ? const SizedBox(
                     width: 18,
                     height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
                   )
                 : const Icon(Icons.refresh_rounded, color: Colors.white70),
             onPressed: () => provider.loadMarketingData(),
@@ -262,10 +280,13 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
           indicatorWeight: 3,
           labelColor: Colors.white,
           unselectedLabelColor: Colors.white54,
-          labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+          labelStyle:
+              const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
           tabs: const [
             Tab(icon: Icon(Icons.campaign_rounded), text: 'Daily Messages'),
-            Tab(icon: Icon(Icons.local_offer_rounded), text: 'Coupons & Vouchers'),
+            Tab(
+                icon: Icon(Icons.local_offer_rounded),
+                text: 'Coupons & Vouchers'),
           ],
         ),
       ),
@@ -294,7 +315,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
 
   Widget _buildDailyMessagesTab(AdminMarketingProvider provider) {
     if (provider.isLoading && provider.campaigns.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: _primaryGreen));
+      return const Center(
+          child: CircularProgressIndicator(color: _primaryGreen));
     }
 
     final active = provider.activeCampaign;
@@ -319,7 +341,10 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
             children: [
               const Text(
                 'Campaign History',
-                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               _buildFilterChip('ALL', 'All', provider),
@@ -341,9 +366,11 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
               ),
               child: const Column(
                 children: [
-                  Icon(Icons.campaign_outlined, color: Colors.white38, size: 48),
+                  Icon(Icons.campaign_outlined,
+                      color: Colors.white38, size: 48),
                   SizedBox(height: 12),
-                  Text('No campaigns found', style: TextStyle(color: Colors.white70)),
+                  Text('No campaigns found',
+                      style: TextStyle(color: Colors.white70)),
                 ],
               ),
             )
@@ -388,7 +415,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
     );
   }
 
-  Widget _buildMetricTile(String label, String value, IconData icon, Color accentColor) {
+  Widget _buildMetricTile(
+      String label, String value, IconData icon, Color accentColor) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
       decoration: BoxDecoration(
@@ -403,7 +431,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 2),
           Text(
@@ -417,7 +446,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
     );
   }
 
-  Widget _buildBroadcastActionCard(DailyMessageCampaign campaign, AdminMarketingProvider provider) {
+  Widget _buildBroadcastActionCard(
+      DailyMessageCampaign campaign, AdminMarketingProvider provider) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -445,25 +475,33 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
                 ),
                 child: const Text(
                   'CURRENT ACTIVE MORNING MESSAGE',
-                  style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
               const Spacer(),
               Text(
                 '${campaign.outboxCount} Dispatched',
-                style: const TextStyle(color: Color(0xFF70DD7A), fontSize: 11, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                    color: Color(0xFF70DD7A),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600),
               ),
             ],
           ),
           const SizedBox(height: 10),
           Text(
             campaign.title,
-            style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(
             campaign.body,
-            style: TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 12),
+            style:
+                TextStyle(color: Colors.white.withOpacity(0.85), fontSize: 12),
           ),
           const SizedBox(height: 14),
           Row(
@@ -475,24 +513,29 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white70,
                   side: const BorderSide(color: Colors.white30),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
               ),
               const Spacer(),
               ElevatedButton.icon(
-                onPressed: provider.isDispatching ? null : () => _triggerBroadcast(campaign.id),
+                onPressed: provider.isDispatching
+                    ? null
+                    : () => _triggerBroadcast(campaign.id),
                 icon: provider.isDispatching
                     ? const SizedBox(
                         width: 14,
                         height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
                       )
                     : const Icon(Icons.bolt_rounded, size: 18),
                 label: const Text('Broadcast Now ⚡'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _primaryGreen,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
               ),
             ],
@@ -502,7 +545,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
     );
   }
 
-  Widget _buildCampaignCard(DailyMessageCampaign campaign, AdminMarketingProvider provider) {
+  Widget _buildCampaignCard(
+      DailyMessageCampaign campaign, AdminMarketingProvider provider) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -510,7 +554,9 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
         color: _cardBg,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: campaign.enabled ? _primaryGreen.withOpacity(0.5) : _borderDark.withOpacity(0.3),
+          color: campaign.enabled
+              ? _primaryGreen.withOpacity(0.5)
+              : _borderDark.withOpacity(0.3),
         ),
       ),
       child: Column(
@@ -521,12 +567,17 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: campaign.enabled ? const Color(0xFF15803D) : const Color(0xFF475569),
+                  color: campaign.enabled
+                      ? const Color(0xFF15803D)
+                      : const Color(0xFF475569),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   campaign.enabled ? 'ACTIVE' : 'INACTIVE',
-                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold),
                 ),
               ),
               const SizedBox(width: 8),
@@ -544,7 +595,9 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
               const Spacer(),
               IconButton(
                 icon: Icon(
-                  campaign.enabled ? Icons.toggle_on_rounded : Icons.toggle_off_rounded,
+                  campaign.enabled
+                      ? Icons.toggle_on_rounded
+                      : Icons.toggle_off_rounded,
                   color: campaign.enabled ? _primaryGreen : Colors.white38,
                   size: 30,
                 ),
@@ -557,7 +610,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
           const SizedBox(height: 10),
           Text(
             campaign.title,
-            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+                color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4),
           Text(
@@ -567,7 +621,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
           const SizedBox(height: 10),
           Row(
             children: [
-              const Icon(Icons.outbox_rounded, color: Color(0xFF94A3B8), size: 14),
+              const Icon(Icons.outbox_rounded,
+                  color: Color(0xFF94A3B8), size: 14),
               const SizedBox(width: 4),
               Text(
                 '${campaign.outboxCount} Dispatched',
@@ -576,8 +631,10 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
               const Spacer(),
               TextButton.icon(
                 onPressed: () => _triggerBroadcast(campaign.id),
-                icon: const Icon(Icons.send_rounded, size: 14, color: _primaryGreen),
-                label: const Text('Dispatch', style: TextStyle(color: _primaryGreen, fontSize: 12)),
+                icon: const Icon(Icons.send_rounded,
+                    size: 14, color: _primaryGreen),
+                label: const Text('Dispatch',
+                    style: TextStyle(color: _primaryGreen, fontSize: 12)),
               ),
             ],
           ),
@@ -586,7 +643,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
     );
   }
 
-  Widget _buildFilterChip(String key, String label, AdminMarketingProvider provider) {
+  Widget _buildFilterChip(
+      String key, String label, AdminMarketingProvider provider) {
     final isSelected = provider.audienceFilter == key;
     return GestureDetector(
       onTap: () => provider.setAudienceFilter(key),
@@ -611,7 +669,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
 
   Widget _buildCouponsTab(AdminMarketingProvider provider) {
     if (provider.isLoading && provider.coupons.isEmpty) {
-      return const Center(child: CircularProgressIndicator(color: _primaryGreen));
+      return const Center(
+          child: CircularProgressIndicator(color: _primaryGreen));
     }
 
     return RefreshIndicator(
@@ -625,7 +684,10 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
             children: [
               Text(
                 '${provider.coupons.length} Active Vouchers',
-                style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 15,
+                    fontWeight: FontWeight.bold),
               ),
               const Spacer(),
               ElevatedButton.icon(
@@ -635,7 +697,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _primaryGreen,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
               ),
             ],
@@ -650,9 +713,11 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
               ),
               child: const Column(
                 children: [
-                  Icon(Icons.local_offer_outlined, color: Colors.white38, size: 48),
+                  Icon(Icons.local_offer_outlined,
+                      color: Colors.white38, size: 48),
                   SizedBox(height: 12),
-                  Text('No coupons registered', style: TextStyle(color: Colors.white70)),
+                  Text('No coupons registered',
+                      style: TextStyle(color: Colors.white70)),
                 ],
               ),
             )
@@ -682,7 +747,8 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
               color: _primaryGreen.withOpacity(0.18),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.confirmation_number_rounded, color: _primaryGreen, size: 24),
+            child: const Icon(Icons.confirmation_number_rounded,
+                color: _primaryGreen, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -702,19 +768,24 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: const Color(0xFF0F766E),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
                         coupon.discountDisplay,
-                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent, size: 20),
+                      icon: const Icon(Icons.delete_outline_rounded,
+                          color: Colors.redAccent, size: 20),
                       onPressed: () => provider.deleteCoupon(coupon.id),
                     ),
                   ],
@@ -729,12 +800,16 @@ class _AdminMarketingScreenState extends State<AdminMarketingScreen>
                   children: [
                     Text(
                       'Min: ₹${coupon.minOrderValue.toInt()}',
-                      style: const TextStyle(color: Colors.white54, fontSize: 11),
+                      style:
+                          const TextStyle(color: Colors.white54, fontSize: 11),
                     ),
                     const SizedBox(width: 12),
                     Text(
                       '${coupon.usageCount} Redemptions',
-                      style: const TextStyle(color: Color(0xFF70DD7A), fontSize: 11, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                          color: Color(0xFF70DD7A),
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),

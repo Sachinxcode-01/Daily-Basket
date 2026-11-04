@@ -9,7 +9,8 @@ import 'package:daily_basket_admin/core/providers/ai_health_provider.dart';
 import 'package:daily_basket_admin/core/providers/theme_provider.dart';
 
 void main() {
-  testWidgets('Daily Basket Admin App initializes and renders Splash Screen', (WidgetTester tester) async {
+  testWidgets('Daily Basket Admin App initializes and renders Splash Screen',
+      (WidgetTester tester) async {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
@@ -25,7 +26,8 @@ void main() {
     );
 
     expect(find.text('DAILY BASKET'), findsOneWidget);
-    expect(find.text('Enterprise Operations & Dark Store Suite'), findsOneWidget);
+    expect(
+        find.text('Enterprise Operations & Dark Store Suite'), findsOneWidget);
 
     // Advance past the 2.2s splash navigation timer
     await tester.pump(const Duration(milliseconds: 2500));
